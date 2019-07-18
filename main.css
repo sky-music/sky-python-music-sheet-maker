@@ -1,0 +1,55 @@
+body {
+  font-family: "Avenir", Arial, sans-serif;
+}
+
+table {
+  margin: 20px;
+  padding: 5px;
+  display: inline-block;
+  /*border-spacing: 5px;*/
+  border-style: solid;
+  border-radius: 5px;
+  border-width: 2px;
+  border-color: black;*/
+
+}
+
+.instrument-button{
+	fill:#ffffff;
+	opacity:0.4;
+}
+
+.instrument-button-icon {
+    fill:none;
+    stroke-width:3;
+    stroke:#000000;
+  }
+
+/*.note-root, .note-diamond, .note-circle {
+  transform: scale(0.5);
+  -ms-transform: scale(0.5);
+  -webkit-transform: scale(0.5);
+}
+*/
+
+.highlighted-0 {
+  fill: pink;
+  opacity: 0.8;
+}
+
+.highlighted-1 {
+  fill: greenyellow;
+  opacity: 0.6;
+}
+
+.highlighted-2 {
+  fill: deeppink;
+}
+
+.highlighted-3 {
+  fill: hotpink;
+}
+
+hr {
+  color: grey;
+}
