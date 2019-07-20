@@ -22,8 +22,8 @@ table {
 .instrument-button-icon {
     fill:none;
     stroke-width:3;
-    stroke:#000000;
-  }
+    stroke:none;
+}
 
 /*.note-root, .note-diamond, .note-circle {
   transform: scale(0.5);
@@ -32,9 +32,22 @@ table {
 }
 */
 
+.highlighted-0.instrument-button-icon {
+  stroke-width: 3;
+  stroke: white;
+  fill: none;
+}
+
+.unhighlighted.instrument-button-icon {
+  stroke-width: 3;
+  stroke: white;
+  fill: grey;
+  opacity: 0.25;
+}
+
 .highlighted-0 {
-  fill: pink;
-  opacity: 0.8;
+  fill: black;
+  opacity: 1.0;
 }
 
 .highlighted-1 {

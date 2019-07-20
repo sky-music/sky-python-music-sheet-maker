@@ -3,8 +3,8 @@
 from instrument import *
 from notes import *
 from parser import *
-
-from enum import Enum
+from modes import *
+from render import *
 
 # Dash separated list of chords
 CHORD_DELIMITER = '-'
@@ -14,12 +14,7 @@ NOTE_WIDTH = 40
 
 BLANK_ICON = '.'
 
-class mode(Enum):
-    VISUAL = 1
-    ALPHANUMERIC  = 2
-
-
-transcribe_mode = input("Mode (type)")
+parser = Parser()
 
 ### Define Errors
 class Error(Exception):
@@ -36,7 +31,23 @@ class BlackIconError(Error):
 print('==NEW SONG==')
 song_title = input('Song title: ')
 print('============')
-print('Use QWERT ASDFG ZXCVB keys as the harp keyboard.')
+
+print("CHOOSE INPUT MODE")
+print("1) Use QWERT ASDFG ZXCVB as keyboard.")
+print("2) Use A1 A2 A3 A4 A5, B1 B2 B3 B4 B5, C1 C2 C3 C4 C5 directly.")
+
+try:
+    song_input_mode = int(input("Mode (Type '1' or '2'): ").strip())
+except ValueError:
+    song_input_mode = 1
+
+if song_input_mode == 1:
+    song_input_mode = InputMode.KEYBOARD
+elif song_input_mode == 2:
+    song_input_mode = InputMode.ALPHANUMERIC
+else:
+    song_input_mode == InputMode.KEYBOARD
+
 print('Separate blocks of notes with \"' + ICON_DELIMITER + '\".')
 print('Use \"' + BLANK_ICON + '\" for a blank block.')
 print('If you want multiple colours within an icon, separate the colours with \"' + CHORD_DELIMITER + '\".')
@@ -47,7 +58,7 @@ instrument_lines = [] # A list of instrument_lines
 
 while song_line:
 
-    instrument_line = parse_line(song_line, ICON_DELIMITER, BLANK_ICON, CHORD_DELIMITER)
+    instrument_line = parser.parse_line(song_line, ICON_DELIMITER, BLANK_ICON, CHORD_DELIMITER, song_input_mode)
 
     instrument_lines.append(instrument_line)
 
