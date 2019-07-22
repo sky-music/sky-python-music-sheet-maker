@@ -6,6 +6,8 @@ from parser import *
 from modes import *
 from render import *
 
+import os as os
+
 # Dash separated list of chords
 CHORD_DELIMITER = '-'
 
@@ -72,10 +74,18 @@ recommended_key = input('Recommended key: ')
 
 # Render the song
 
-with open(song_title + '.html', 'w+') as song_file:
+mycwd = os.getcwd()
+os.chdir("..")
+
+if not os.path.exists('songs'):
+    os.makedirs('songs')
+
+song_file_path = os.path.join('songs', song_title + '.html')
+
+with open(song_file_path, 'w+') as song_file:
     song_file.write('<!DOCTYPE html>\n')
     song_file.write('<html>\n')
-    song_file.write('<head> <title>' + song_title + '</title> <link href="main.css" rel="stylesheet" /> </head>\n')
+    song_file.write('<head> <title>' + song_title + '</title> <link href="../css/main.css" rel="stylesheet" /> </head>\n')
 
     song_file.write('<body>\n')
     song_file.write('<h1> ' + song_title + ' </h1>\n')
@@ -97,3 +107,5 @@ with open(song_title + '.html', 'w+') as song_file:
     song_file.write('</body>\n')
 
     song_file.write('</html>\n')
+
+os.chdir(mycwd)
