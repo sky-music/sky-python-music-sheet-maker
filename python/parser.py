@@ -37,9 +37,15 @@ class Parser:
         #TODO: Implement logic for parsing line vs single icon.
         for icon in icons:
             chords = self.parse_icon(icon, chord_delimiter, input_mode)
-            chord_image = self.parse_chords(chords, blank_icon, input_mode)
+            results = self.parse_chords(chords, blank_icon, input_mode)
+            chord_image = results[0]
+            harp_is_highlighted = results[1]
+
             harp = Harp()
+            harp.set_is_highlighted(harp_is_highlighted)
             harp.set_chord_image(chord_image)
+
+
             instrument_line.append(harp)
 
         return instrument_line
@@ -70,6 +76,7 @@ class Parser:
 
     def parse_chords(self, chords, blank_icon, input_mode):
 
+        is_empty = True
         chord_image = {}
 
         for chord_idx, chord in enumerate(chords):
@@ -86,9 +93,10 @@ class Parser:
                     except KeyError:
                         pass
                     else:
+                        is_empty = False
                         chord_image[highlighted_note_position] = {}
                         chord_image[highlighted_note_position][chord_idx] = True
-                        
+
             elif input_mode == InputMode.ALPHANUMERIC:
                 try:
                     highlighted_note_position = self.map_note_to_position(chord, blank_icon, input_mode)
@@ -97,4 +105,5 @@ class Parser:
                 else:
                     chord_image[highlighted_note_position][chord_idx] = True
 
-        return chord_image
+        results = [chord_image, not(is_empty)]
+        return results

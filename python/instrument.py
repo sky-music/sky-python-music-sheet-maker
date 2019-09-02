@@ -14,6 +14,7 @@ class Harp:
         self.chord_image = {}
         self.highlighted_states_image = []
         self.instrument_type = 'harp'
+        self.is_highlighted = False
 
 
 
@@ -22,6 +23,15 @@ class Harp:
 
     def get_column_count(self):
         return self.column_count
+
+    def get_is_highlighted(self):
+        return self.is_highlighted
+
+    def set_is_highlighted(self, is_highlighted):
+        '''
+        Expecting a boolean, to determine whether the harp is empty in this frame
+        '''
+        self.is_highlighted = is_highlighted
 
     def set_chord_image(self, chord_image):
         '''
@@ -55,8 +65,14 @@ class Harp:
 
     def render_from_chord_image(self, chord_image, note_width, instrument_index):
 
+        harp_is_empty = not(self.get_is_highlighted())
+
         harp_render = ''
-        harp_render += '<table class=\"harp harp-' + str(instrument_index) + '\">'
+
+        if harp_is_empty:
+            harp_render += '<table class=\"harp harp-' + str(instrument_index) + ' empty \">'
+        else:
+            harp_render += '<table class=\"harp harp-' + str(instrument_index) + '\">'
 
         for row_index in range(self.get_row_count()):
 
@@ -81,7 +97,7 @@ class Harp:
                     # Note is in an even column, so it is a diamond
                     note = NoteDiamond()
 
-                note_render = note.render_from_chord_image(note_width, chord_image, note_position, self.get_instrument_type(), note_index)
+                note_render = note.render_from_chord_image(note_width, chord_image, note_position, self.get_instrument_type(), note_index, harp_is_empty)
                 harp_render += note_render
                 harp_render += '</td>'
 

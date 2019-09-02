@@ -34,14 +34,16 @@ print('==NEW SONG==')
 song_title = input('Song title: ')
 print('============')
 
-print("CHOOSE INPUT MODE")
-print("1) Use QWERT ASDFG ZXCVB as keyboard.")
-print("2) Use A1 A2 A3 A4 A5, B1 B2 B3 B4 B5, C1 C2 C3 C4 C5 directly.")
+#print("CHOOSE INPUT MODE")
+#print("1) Use QWERT ASDFG ZXCVB as keyboard.")
+#print("2) Use A1 A2 A3 A4 A5, B1 B2 B3 B4 B5, C1 C2 C3 C4 C5 directly.")
 
-try:
-    song_input_mode = int(input("Mode (Type '1' or '2'): ").strip())
-except ValueError:
-    song_input_mode = 1
+#try:
+#    song_input_mode = int(input("Mode (Type '1' or '2'): ").strip())
+#except ValueError:
+#    song_input_mode = 1
+
+song_input_mode = 1
 
 if song_input_mode == 1:
     song_input_mode = InputMode.KEYBOARD

@@ -14,15 +14,29 @@ table {
 
 }
 
+table.empty {
+  margin: 20px;
+  padding: 5px;
+  display: inline-block;
+  /*border-spacing: 5px;*/
+  border-style: solid;
+  border-radius: 5px;
+  border-width: 2px;
+  border-color: white;*/
+
+}
+
 .instrument-button{
 	fill:#ffffff;
 	opacity:0.4;
 }
 
+
+
 .instrument-button-icon {
-    fill:none;
-    stroke-width:3;
-    stroke:none;
+  stroke-width: 3;
+  stroke: white;
+  fill: none;
 }
 
 /*.note-root, .note-diamond, .note-circle {
@@ -32,11 +46,6 @@ table {
 }
 */
 
-.highlighted-0.instrument-button-icon {
-  stroke-width: 3;
-  stroke: white;
-  fill: none;
-}
 
 .unhighlighted.instrument-button-icon {
   stroke-width: 3;
@@ -46,23 +55,42 @@ table {
 }
 
 .highlighted-0 {
-  fill: black;
+  fill: deeppink;
   opacity: 1.0;
 }
 
 .highlighted-1 {
-  fill: greenyellow;
-  opacity: 0.6;
+  fill: orange;
+  opacity: 1.0;
 }
 
 .highlighted-2 {
-  fill: deeppink;
+  fill: gold;
+  opacity: 1.0;
 }
 
 .highlighted-3 {
-  fill: hotpink;
+  fill: limegreen;
+  opacity: 1.0;
+}
+
+.highlighted-4 {
+  fill: deepskyblue;
+  opacity: 1.0;
 }
 
 hr {
   color: grey;
+  opacity: 0.2;
+  margin: 30px;
+}
+
+.instrument-button-icon.empty {
+  fill: white;
+  stroke: white;
+}
+
+.note-diamond.empty {
+  fill: white;
+  stroke: white;
 }

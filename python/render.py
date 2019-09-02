@@ -22,6 +22,6 @@ def render_instrument_lines(instrument_lines, note_width):
     for line in instrument_lines:
         line_render, index = render_instrument_line(line, index, note_width)
         song_render += line_render
-        song_render += '\n<br />\n'
+        song_render += '\n<br />\n<hr />\n<br />\n'
 
     return song_render
