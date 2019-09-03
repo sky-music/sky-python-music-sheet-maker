@@ -79,6 +79,8 @@ recommended_key = input('Recommended key: ')
 mycwd = os.getcwd()
 os.chdir("..")
 
+root_dir = os.getcwd()
+
 if not os.path.exists('songs'):
     os.makedirs('songs')
 
@@ -111,3 +113,6 @@ with open(song_file_path, 'w+') as song_file:
     song_file.write('</html>\n')
 
 os.chdir(mycwd)
+
+print('============')
+print('Your song is located at ' + str(root_dir) + '/' + str(song_file_path))
