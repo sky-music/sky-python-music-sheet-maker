@@ -1,7 +1,7 @@
 # Import notes
 
-from notes import *
-from modes import *
+from notes import NoteRoot, NoteCircle,  NoteDiamond
+from modes import InputMode, RenderMode
 
 ### Instrument classes
 

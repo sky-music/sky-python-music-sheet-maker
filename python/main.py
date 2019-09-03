@@ -1,10 +1,10 @@
 # Import from other files
 
-from instrument import *
-from notes import *
-from parser import *
-from modes import *
-from render import *
+from instrument import Harp
+from notes import NoteRoot, NoteCircle, NoteDiamond
+from parser import Parser
+from modes import InputMode, RenderMode
+from render import render_instrument_line, render_instrument_lines
 
 import os as os
 

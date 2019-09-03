@@ -1,6 +1,5 @@
-from instrument import *
-from modes import *
-from instrument import *
+from instrument import Harp
+from modes import InputMode, RenderMode
 
 ### Parser
 
