@@ -79,6 +79,21 @@ table.empty {
   opacity: 1.0;
 }
 
+.highlighted-4 {
+  fill: deepskyblue;
+  opacity: 1.0;
+}
+
+.highlighted-5 {
+  fill: darkblue;
+  opacity: 1.0;
+}
+
+.highlighted-6 {
+  fill: blueviolet;
+  opacity: 1.0;
+}
+
 hr {
   color: grey;
   opacity: 0.2;
