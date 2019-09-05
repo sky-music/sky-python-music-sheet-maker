@@ -43,6 +43,11 @@ print('============')
 #except ValueError:
 #    song_input_mode = 1
 
+print('Use these keys as the music keyboard:')
+print('QWERT')
+print('ASDFG')
+print('ZXCVB\n')
+
 song_input_mode = 1
 
 if song_input_mode == 1:
