@@ -200,7 +200,7 @@ song_file_path = os.path.join('songs', song_title + '.html')
 with open(song_file_path, 'w+') as song_file:
     song_file.write('<!DOCTYPE html>\n')
     song_file.write('<html>\n')
-    song_file.write('<head> <title>' + song_title + '</title> <link href="../css/main.css" rel="stylesheet" /> </head>\n')
+    song_file.write('<head> <title>' + song_title + '</title> <link href="../css/main.css" rel="stylesheet" /> <meta charset="utf-8"/> </head>\n')
 
     song_file.write('<body>\n')
     song_file.write('<h1> ' + song_title + ' </h1>\n')
