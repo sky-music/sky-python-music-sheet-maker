@@ -1,5 +1,6 @@
 body {
   font-family: "Avenir", Arial, sans-serif;
+  font-size: 150%;
 }
 
 table {
@@ -54,8 +55,15 @@ table.empty {
   opacity: 0.25;
 }
 
+.highlighted-0.instrument-button-icon {
+  stroke-width: 3;
+  stroke: white;
+  fill: none;
+}
+
+
 .highlighted-0 {
-  fill: deeppink;
+  fill: lightcoral;
   opacity: 1.0;
 }
 
