@@ -1,30 +1,59 @@
 body {
   font-family: "Avenir", Arial, sans-serif;
-  font-size: 150%;
+}
+
+.note-root, .note-diamond, .note-circle {
+  transform: scale(1.0);
+  -ms-transform: scale(1.0);
+  -webkit-transform: scale(1.0);
+}
+
+.note-root svg {
+  display: inline-block;
+  vertical-align: middle;
+} 
+
+.note-diamond svg {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.note-circle svg {
+  display: inline-block;
+  vertical-align: middle;
 }
 
 table {
-  margin: 20px;
-  padding: 5px;
+  margin: 6px;
+  padding: 0px;
+  display: inline-block;
+  border-style: solid;
+  border-radius: 5px;
+  border-width: 1px;
+  border-color: black;
+
+  
+  
+}
+
+
+table.empty {
+  margin: 6px;
+  padding: 0px;
   display: inline-block;
   /*border-spacing: 5px;*/
   border-style: solid;
   border-radius: 5px;
-  border-width: 2px;
-  border-color: black;*/
+  border-width: 1px;
+  border-color: white;
+  
 
 }
 
-table.empty {
-  margin: 20px;
-  padding: 5px;
-  display: inline-block;
-  /*border-spacing: 5px;*/
-  border-style: solid;
-  border-radius: 5px;
-  border-width: 2px;
-  border-color: white;*/
-
+td {
+  padding-top: 0px;
+  padding-bottom: 0px;
+  margin: 0px;
 }
 
 .instrument-button{
@@ -32,20 +61,15 @@ table.empty {
 	opacity:0.4;
 }
 
-
+#transcript {
+  /*margin: 0 auto;*/
+}
 
 .instrument-button-icon {
   stroke-width: 3;
   stroke: white;
   fill: none;
 }
-
-/*.note-root, .note-diamond, .note-circle {
-  transform: scale(0.5);
-  -ms-transform: scale(0.5);
-  -webkit-transform: scale(0.5);
-}
-*/
 
 
 .unhighlighted.instrument-button-icon {
@@ -105,7 +129,6 @@ table.empty {
 hr {
   color: grey;
   opacity: 0.2;
-  margin: 30px;
 }
 
 .instrument-button-icon.empty {
