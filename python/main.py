@@ -118,7 +118,7 @@ class Parser:
 CHORD_DELIMITER = '-'
 
 ICON_DELIMITER = ' '
-NOTE_WIDTH = 40
+NOTE_WIDTH = "1em"
 
 BLANK_ICON = '.'
 

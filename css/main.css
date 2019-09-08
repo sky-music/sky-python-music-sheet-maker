@@ -11,7 +11,7 @@ body {
 .note-root svg {
   display: inline-block;
   vertical-align: middle;
-} 
+}
 
 .note-diamond svg {
   display: inline-block;
@@ -32,8 +32,8 @@ table {
   border-width: 1px;
   border-color: black;
 
-  
-  
+
+
 }
 
 
@@ -46,7 +46,7 @@ table.empty {
   border-radius: 5px;
   border-width: 1px;
   border-color: white;
-  
+
 
 }
 
@@ -139,4 +139,14 @@ hr {
 .note-diamond.empty {
   fill: white;
   stroke: white;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }
