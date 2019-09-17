@@ -125,6 +125,7 @@ table.empty .unhighlighted.instrument-button-icon {
   fill: none;
   opacity: 0.25;
 }
+
 table.empty svg.harp-button-7 .unhighlighted.instrument-button-icon {
   stroke-width: 3;
   stroke: white;
