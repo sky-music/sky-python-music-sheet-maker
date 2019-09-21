@@ -30,8 +30,6 @@ Templates are free to download and use without credit.
 
 # Examples
 
-[details=Click to expand]
-
 ## Chord Chart in C
 
 ![ChordChart|429x500](https://sky.bloomexperiment.com/uploads/default/original/1X/35846c5ed45a2241fe48c855e9ac39dfbaa2d188.png) 
