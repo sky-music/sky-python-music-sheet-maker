@@ -32,7 +32,7 @@ Templates are free to download and use without credit.
 
 ## Chord Chart in C
 
-![ChordChart|429x500](https://sky.bloomexperiment.com/uploads/default/original/1X/35846c5ed45a2241fe48c855e9ac39dfbaa2d188.png) 
+![ChordChart|429x500](https://raw.githubusercontent.com/sky-music/sky-python-music-sheet-maker/master/images/ChordChart.png) 
 
 ## Let it go - intro piano melody
 ![Let_it_go_1|690x352](https://sky.bloomexperiment.com/uploads/default/original/1X/6668aad19292a1160270cfe0ea77c2c438a6bedd.png)
