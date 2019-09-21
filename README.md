@@ -14,23 +14,17 @@ Website with music sheets made using this program:
 
 https://sky-music.github.io
 
-<div data-theme-toc="true"> </div>
-
 # Code
 
 https://github.com/sky-music/sky-python-music-sheet-maker
 
 # Templates
 
-[details=Image templates if you prefer (click to expand)]
-
-## Template 1
-![music_sheet_template|690x324](upload://4VIpUjk1wB04qNRh28XoA4eBq3P.png) 
+![music_sheet_template|690x324](https://sky.bloomexperiment.com/uploads/default/original/1X/228ee908a12320236b4fc07be9fc04005d3c0d8d.png) 
 
 ## Template 2
-![SKY_MUSIC_SHEET_TEMPLATE|689x319](upload://791h4xqAUOQ4L601lpJ3HkXgPfM.png) 
+![SKY_MUSIC_SHEET_TEMPLATE|689x319](https://sky.bloomexperiment.com/uploads/default/original/1X/321441f67b523588a1e031c62d475abaf5003a8e.png) 
 
-[/details]
 
 Templates are free to download and use without credit.
 
@@ -40,16 +34,16 @@ Templates are free to download and use without credit.
 
 ## Chord Chart in C
 
-![ChordChart|429x500](upload://7Dr1l08uK9UMPQz0LFR4jD8MxFS.png) 
+![ChordChart|429x500](https://sky.bloomexperiment.com/uploads/default/original/1X/35846c5ed45a2241fe48c855e9ac39dfbaa2d188.png) 
 
 ## Let it go - intro piano melody
-![Let_it_go_1|690x352](upload://eBWWVWj049BipHYFyOfxEh57bpH.png)
+![Let_it_go_1|690x352](https://sky.bloomexperiment.com/uploads/default/original/1X/6668aad19292a1160270cfe0ea77c2c438a6bedd.png)
 
-![let_it_go_2|690x298](upload://9QvHHITDHdKiS0CDgcuMAXKDMj7.png) 
+![let_it_go_2|690x298](https://sky.bloomexperiment.com/uploads/default/original/1X/450327ab3240743ec166d75322b86eaed2a3efa9.png) 
 
 ## Flower Dance - intro
 
-![flower_dance_intro|690x346](upload://wX7qFxfxBJauwtUsivoLKgFVpAd.png) 
+![flower_dance_intro|690x346](https://sky.bloomexperiment.com/uploads/default/original/1X/e6f464e420070f7121c1f2ad4562ae58a3f607f1.png) 
 
 [/details]
 
@@ -75,13 +69,11 @@ if you don't yet have Python on your computer, you can download it from python.o
 cd Desktop/sky-python-music-sheet-maker/python
 ```
 
-[details=Notes for troubleshooting]
+Notes for troubleshooting:
 
 This `cd` (change directory) command is to change your current folder to the Python folder inside `sky-python-music-sheet-maker`. Replace the filepath with where the Python folder is located on your computer if your folder structure turns out to be different.
 
 This folder will have files called `main.py`,  `instrument.py`, `modes.py`, `notes.py` `parser.py`,  `render.py`. You can type `ls -la` to check the contents of the current folder.
-
-[/details]
 
 3. Type this command to run the program:
 
@@ -123,7 +115,7 @@ When your song is done, it will tell you where your song is located. Double-clic
 Type line: d f g
 ```
 
-![single notes example|690x179, 50%](upload://c7jEfLKSGqtvEFuTqxKbNXz8WGE.png) 
+![single notes example|690x179, 50%](https://sky.bloomexperiment.com/uploads/default/original/1X/54edd3ae95211f506835eed1b66a6a963ba04a8c.png) 
 
 - Type letters next to each other for chords.
 
@@ -132,7 +124,7 @@ Type line: qet
 Type line: adg
 ```
 
-![chord examples|300x500, 50%](upload://z2Pjs8Io7kjFPci1s7pR0q7tBhr.png) 
+![chord examples|300x500, 50%](https://sky.bloomexperiment.com/uploads/default/original/1X/f59dea80479ed0496f799150d01a598de6401b95.png) 
 
 - Use `.` for blank icons.
 
@@ -141,7 +133,7 @@ Type line: g f d f g g g .
 Type line: f f f . g g g .
 ```
 
-![Mary Had A Little Lamb example|690x173](upload://g7xItJbK6dCC0PILHK9s4qIfgZl.png) 
+![Mary Had A Little Lamb example|690x173](https://sky.bloomexperiment.com/uploads/default/original/1X/70fd16c9e78f6727bfeecf7854c80a7110fc6723.png) 
 
 - Use `-` for coloured notes.
 
@@ -149,7 +141,7 @@ Type line: f f f . g g g .
 e-a-d-g-c
 ```
 
-![colored note example |267x202, 50%](upload://4lQ6hQJUKXOJYoopLwURxIaZMVp.png) 
+![colored note example |267x202, 50%](https://sky.bloomexperiment.com/uploads/default/original/1X/1e80b7d6d7be3978bf7ba58a4b7b2439a777a89f.png) 
 
 - Press <kbd>Enter ↲ </kbd> for a new line. Pressing Enter on a blank line will end the program.
 
