@@ -1,9 +1,37 @@
 # Import notes
 
-from notes import NoteRoot, NoteCircle,  NoteDiamond
-from modes import InputMode, RenderMode
+from notes import NoteRoot, NoteCircle, NoteDiamond
 
 ### Instrument classes
+
+class Voice:
+    
+    def __init__(self):
+        self.instrument_type = 'voice'
+        self.chord_image = {}
+        
+    def render_from_chord_image(self, chord_image, note_width, instrument_index):      
+        chord_render = '<table class=\"voice\">'
+        chord_render +='<tr>'
+        chord_render +='<td>'
+        chord_render += chord_image
+        chord_render += '</td>'
+        chord_render +='</tr>'
+        chord_render +='</table>'
+        return chord_render
+
+    def ascii_from_chord_image(self, chord_image):      
+        chord_render = chord_image
+        return chord_render
+    
+    def set_chord_image(self, chord_image):
+        self.chord_image = chord_image
+        
+    def get_instrument_type(self):
+        return self.instrument_type
+    
+    def get_chord_image(self):
+        return self.chord_image
 
 class Harp:
 
@@ -66,16 +94,17 @@ class Harp:
     def get_chord_image(self):
         return self.chord_image
 
-    def ascii_from_chord_image(self, chord_image, instrument_index):
+    def ascii_from_chord_image(self, chord_image):
         
         ascii_chord = ''
-        for k in chord_image:
-            for f in chord_image[k]:
-                if chord_image[k][f]==True: # Button is highlighted
-                    ascii_chord += self.sky_inverse_position_map[k]
-                     #print(str(k) + ' = ' + ascii_chord)
-        return ascii_chord
-        
+        if len(chord_image)==0:
+            ascii_chord = '.' # Empty frame is assumed to be a pause
+        else:
+            for k in chord_image: # Cycle over positions in a frame
+                for f in chord_image[k]: # Cycle over triplets & quavers
+                    if chord_image[k][f]==True: # Button is highlighted
+                        ascii_chord += self.sky_inverse_position_map[k]
+        return ascii_chord        
         
 
     def render_from_chord_image(self, chord_image, note_width, instrument_index):
@@ -118,10 +147,9 @@ class Harp:
 
             harp_render += '</tr>'
 
-
         harp_render += '</table>'
         return harp_render
-
+    
 
     def get_instrument_type(self):
         return self.instrument_type
