@@ -8,7 +8,7 @@ See here for how to download and use.
 
 This program lets you make visual music sheets for Sky: Children of the Light. It is written in Python and does not require previous knowledge of the command line to run. 
 
-SVG icons are thanks to [madwurmz](http://madwurmz.com).
+SVG icons are thanks to [madwurmz](http://madwurmz.com), and thanks to Jmmelko for support for importing TXT files and using ABC1-5 notation, Jianpu notation and Western notation.
 
 Website with music sheets made using this program: 
 
