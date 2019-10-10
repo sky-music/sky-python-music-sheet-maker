@@ -31,11 +31,14 @@ table {
   border-radius: 5px;
   border-width: 1px;
   border-color: black;
-
-
-
 }
 
+hr {
+  height: 2px;
+  background-color: #CCCCCC;
+  border: none;
+  opacity: 1;
+}
 
 table.empty {
   margin: 6px;
@@ -46,9 +49,18 @@ table.empty {
   border-radius: 5px;
   border-width: 1px;
   border-color: white;
-
-
 }
+
+table.voice {
+  margin: 0px;
+  padding: 0px;
+  display: inline-block;
+  border-style: solid;
+  border-radius: 0px;
+  border-width: 0px;
+  border-color: black;
+}
+
 
 td {
   padding-top: 0px;
@@ -64,10 +76,6 @@ td {
 #transcript {
   /*margin: 0 auto;*/
 }
-
-
-
-
 
 
 /*
@@ -236,11 +244,6 @@ svg.harp-button-14 path.highlighted-0 {
   stroke-width: 3;
   stroke: white;
   fill: none;
-}
-
-hr {
-  color: grey;
-  opacity: 0.2;
 }
 
 .instrument-button-icon.empty {
