@@ -156,9 +156,6 @@ class Parser:
 QUAVER_DELIMITER = '-'
 JIANPU_QUAVER_DELIMITER = '^'
 
-if input_mode == InputMode.JIANPU or input_mode == InputMode.JIANPUFILE:
-    QUAVER_DELIMITER = JIANPU_QUAVER_DELIMITER
-
 ICON_DELIMITER = ' '
 NOTE_WIDTH = "1em"
 BLANK_ICON = '.'
@@ -240,6 +237,9 @@ elif song_input_mode == 3 and song_notation == 3:
     song_input_mode = InputMode.JIANPUFILE
 else:
     song_input_mode = InputMode.KEYBOARD
+
+if song_input_mode == InputMode.JIANPU or song_input_mode == InputMode.JIANPUFILE:
+    QUAVER_DELIMITER = JIANPU_QUAVER_DELIMITER
 
 print('\nSeparate blocks of notes with \"' + ICON_DELIMITER + '\".')
 print('Use \"' + BLANK_ICON + '\" for a blank block.')

@@ -67,7 +67,7 @@ class Harp:
         return self.chord_image
 
     def ascii_from_chord_image(self, chord_image, instrument_index):
-        
+
         ascii_chord = ''
         for k in chord_image:
             for f in chord_image[k]:
@@ -75,10 +75,10 @@ class Harp:
                     ascii_chord += self.sky_inverse_position_map[k]
                      #print(str(k) + ' = ' + ascii_chord)
         return ascii_chord
-        
-        
 
-    def render_from_chord_image(self, chord_image, note_width, instrument_index):
+
+
+    def render_in_html(self, chord_image, note_width, instrument_index):
 
         harp_is_empty = not(self.get_is_highlighted())
 
@@ -112,7 +112,7 @@ class Harp:
                     # Note is in an even column, so it is a diamond
                     note = NoteDiamond()
 
-                note_render = note.render_from_chord_image(note_width, chord_image, note_position, self.get_instrument_type(), note_index, harp_is_empty)
+                note_render = note.render_in_html(note_width, chord_image, note_position, self.get_instrument_type(), note_index, harp_is_empty)
                 harp_render += note_render
                 harp_render += '</td>'
 
