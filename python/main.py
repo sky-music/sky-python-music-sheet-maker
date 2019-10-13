@@ -1,6 +1,4 @@
-# Import from other files
-
-from instrument import Harp, Voice
+from instruments import Harp, Voice
 from notes import NoteRoot, NoteCircle, NoteDiamond
 from modes import InputMode, RenderMode
 from render import render_instrument_line, render_instrument_lines
@@ -276,6 +274,8 @@ print('============')
 print('Press ENTER to skip the following.')
 musical_key = input('Recommended musical key: ')
 song_title = input('Song title (used for the file name): ')
+if song_title=='':
+    song_title='untitled'
 original_artists = input('Original artist(s): ')
 transcript_writer = input('Transcribed by: ')
 
@@ -283,46 +283,54 @@ transcript_writer = input('Transcribed by: ')
 # Render the song
 
 
-song_file_path = os.path.join(song_title + '.html')
+html_path = os.path.join(song_title + '.html')
 
-with open(song_file_path, 'w+') as song_file:
-    song_file.write('<!DOCTYPE html>\n')
-    song_file.write('<html>\n')
-    song_file.write('<head> <title>' + song_title + '</title> <link href="../css/main.css" rel="stylesheet" /> <meta charset="utf-8"/> </head>\n')
+with open(html_path, 'w+') as html_file:
+    html_file.write('<!DOCTYPE html>\n')
+    html_file.write('<html>\n')
+    html_file.write('<head> <title>' + song_title + '</title> <link href="../css/main.css" rel="stylesheet" /> <meta charset="utf-8"/> </head>\n')
 
-    song_file.write('<body>\n')
-    song_file.write('<h1> ' + song_title + ' </h1>\n')
+    html_file.write('<body>\n')
+    html_file.write('<h1> ' + song_title + ' </h1>\n')
 
     if original_artists:
-        song_file.write('<p> <b>Original Artist(s):</b> ' + original_artists + ' </p>\n')
+        html_file.write('<p> <b>Original Artist(s):</b> ' + original_artists + ' </p>\n')
     if transcript_writer:
-        song_file.write('<p> <b> Transcript:</b> ' + transcript_writer + ' </p>\n')
+        html_file.write('<p> <b> Transcript:</b> ' + transcript_writer + ' </p>\n')
     if musical_key:
-        song_file.write('<p> <b> Recommended key:</b> ' + musical_key + ' </p>\n')
+        html_file.write('<p> <b> Recommended key:</b> ' + musical_key + ' </p>\n')
 
-    song_file.write('<div id="transcript">\n\n')
-
-
-    song_file.write(render_instrument_lines(instrument_lines, NOTE_WIDTH, RenderMode.VISUAL))
+    html_file.write('<div id="transcript">\n\n')
 
 
-    song_file.write('</div>\n')
-    song_file.write('</body>\n')
+    html_file.write(render_instrument_lines(instrument_lines, NOTE_WIDTH, RenderMode.VISUAL))
 
-    song_file.write('</html>\n')
+
+    html_file.write('</div>\n')
+    html_file.write('</body>\n')
+
+    html_file.write('</html>\n')
 
 print('============')
-song_full_file_path = os.path.join(str(song_dir), song_file_path)
-print('Your song is located at', song_full_file_path)
+print('Your song is located at', os.path.join(str(song_dir), html_path))
 
 if song_input_mode in [InputMode.WESTERN, InputMode.JIANPU, InputMode.WESTERNFILE, InputMode.JIANPUFILE]:
-    ascii_file_path = os.path.join(song_title + '_ascii.txt')
-    with open(ascii_file_path, 'w+') as ascii_file:
-        ascii_file.write('#'+song_title+'\n')
-        ascii_file.write('#by: '+original_artists+'\n')
-        ascii_file.write('#transcription by: '+transcript_writer+'\n')
-        ascii_file.write(render_instrument_lines(instrument_lines, NOTE_WIDTH, RenderMode.ASCII))
-    ascii_full_file_path = os.path.join(str(song_dir), ascii_file_path)
-    print('Your converted song is located at', ascii_full_file_path)    
-        
+    sky_ascii_path = os.path.join(song_title + '_sky.txt')
+    with open(sky_ascii_path, 'w+') as sky_ascii:
+        sky_ascii.write('# '+song_title+'\n')
+        sky_ascii.write('# by: '+original_artists+'\n')
+        sky_ascii.write('# transcription by: '+transcript_writer+'\n')
+        sky_ascii.write(render_instrument_lines(instrument_lines, NOTE_WIDTH, RenderMode.SKYASCII))
+    print('Your song converted to Sky notation is located at:', os.path.join(str(song_dir), sky_ascii_path))    
+ 
+
+if song_input_mode in [InputMode.SKY, InputMode.SKYFILE]:
+    western_ascii_path = os.path.join(song_title + '_western.txt')
+    with open(western_ascii_path, 'w+') as western_ascii:
+        western_ascii.write('# '+song_title+'\n')
+        western_ascii.write('# by: '+original_artists+'\n')
+        western_ascii.write('# transcription by: '+transcript_writer+'\n')
+        western_ascii.write(render_instrument_lines(instrument_lines, NOTE_WIDTH, RenderMode.WESTERNASCII))
+    print('Your song converted to Western notation is located at:', os.path.join(str(song_dir), western_ascii_path))    
+       
 os.chdir(mycwd)
