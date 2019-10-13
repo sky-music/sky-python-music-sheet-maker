@@ -14,7 +14,9 @@ As well as using QWERT ASDFG ZXCVB keys as the keyboard, there are other support
 - Western notation (C4, D4, E4, F4, G4, A4, B4)
 - Jianpu (1 2 3 4 5 6 7, followed by + or - for octaves)
 
-You can type these in the command line, or save in a text file and import it.
+You can type these in the command line, or save in a text file and import it. 
+
+The output will be HTML, with small icons of the Sky keyboard. If you use Western notation or Jianpu notation, it will also convert to Sky notation for you in a txt file.
 
 SVG icons are thanks to [madwurmz](http://madwurmz.com), and thanks to mimizan for support for importing TXT files and using ABC1-5 notation, Jianpu notation and Western notation.
 
