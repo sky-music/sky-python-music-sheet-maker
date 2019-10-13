@@ -1,10 +1,11 @@
-# Import notes
-
 from notes import NoteRoot, NoteCircle, NoteDiamond
+from modes import RenderMode
 
 ### Instrument classes
+# A cleaner implementation should define a generic instrument class
+# and  instrument sub-classes inheriting some methods
 
-class Voice:
+class Voice: # Lyrics or comments
     
     def __init__(self):
         self.instrument_type = 'voice'
@@ -20,8 +21,8 @@ class Voice:
         chord_render +='</table>'
         return chord_render
 
-    def ascii_from_chord_image(self, chord_image):      
-        chord_render = chord_image
+    def ascii_from_chord_image(self, chord_image, render_mode):     
+        chord_render = '# ' + chord_image # Lyrics marked as comments in output text files
         return chord_render
     
     def set_chord_image(self, chord_image):
@@ -49,13 +50,28 @@ class Harp:
                 (1, 0): 'B1', (1, 1): 'B2', (1, 2): 'B3', (1, 3): 'B4', (1, 4): 'B5',
                 (2, 0): 'C1', (2, 1): 'C2', (2, 2): 'C3', (2, 3): 'C4', (2, 4): 'C5'
                 }
+        
+        self.western_inverse_position_map = {
+                (0, 0): 'C4', (0, 1): 'D4', (0, 2): 'E4', (0, 3): 'F4', (0, 4): 'G4',
+                (1, 0): 'A4', (1, 1): 'B4', (1, 2): 'C5', (1, 3): 'D5', (1, 4): 'E5',
+                (2, 0): 'F5', (2, 1): 'G5', (2, 2): 'A6', (2, 3): 'B6', (2, 4): 'C6'
+                }
+        
+        self.jianpu_inverse_position_map = {
+                (0, 0): '1', (0, 1): '2', (0, 2): '3', (0, 3): '4', (0, 4): '5',
+                (1, 0): '6', (1, 1): '7', (1, 2): '1+', (1, 3): '2+', (1, 4): '3+',
+                (2, 0): '4+', (2, 1): '5+', (2, 2): '6+', (2, 3): '7+', (2, 4): '1++'
+                }               
 
     def get_row_count(self):
         return self.row_count
 
     def get_column_count(self):
         return self.column_count
-
+    
+    def get_instrument_type(self):
+        return self.instrument_type
+    
     def get_is_highlighted(self):
         return self.is_highlighted
 
@@ -94,16 +110,25 @@ class Harp:
     def get_chord_image(self):
         return self.chord_image
 
-    def ascii_from_chord_image(self, chord_image):
+    def ascii_from_chord_image(self, chord_image, render_mode):
         
         ascii_chord = ''
+        if render_mode == RenderMode.SKYASCII:
+            inverse_map = self.sky_inverse_position_map
+        elif render_mode == RenderMode.WESTERNASCII:
+            inverse_map = self.western_inverse_position_map
+        elif render_mode == RenderMode.JIANPUASCII:
+            inverse_map = self.jianpu_inverse_position_map  
+        else:
+            inverse_map  = self.sky_inverse_position_map              
+        
         if len(chord_image)==0:
             ascii_chord = '.' # Empty frame is assumed to be a pause
         else:
             for k in chord_image: # Cycle over positions in a frame
                 for f in chord_image[k]: # Cycle over triplets & quavers
                     if chord_image[k][f]==True: # Button is highlighted
-                        ascii_chord += self.sky_inverse_position_map[k]
+                        ascii_chord += inverse_map[k]
         return ascii_chord        
         
 
@@ -150,6 +175,3 @@ class Harp:
         harp_render += '</table>'
         return harp_render
     
-
-    def get_instrument_type(self):
-        return self.instrument_type
