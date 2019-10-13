@@ -14,7 +14,7 @@ class Voice: # Lyrics or comments
     def render_from_chord_image(self, chord_image, note_width, instrument_index):      
         chord_render = '<table class=\"voice\">'
         chord_render +='<tr>'
-        chord_render +='<td>'
+        chord_render +='<td  width=110 align=\"center\">' # TODO: Width calculated automatically
         chord_render += chord_image
         chord_render += '</td>'
         chord_render +='</tr>'
