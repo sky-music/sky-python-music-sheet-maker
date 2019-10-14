@@ -1,6 +1,6 @@
 # sky-python-music-sheet-maker
 
-See here for how to download and use.
+See here for how to download and use. This currently requires a Desktop computer and is a work-in-progress.
 
 **Instructions:** https://sky.bloomexperiment.com/t/sky-python-music-sheet-maker/102#how-to-download
 
