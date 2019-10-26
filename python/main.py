@@ -1,6 +1,4 @@
-# Import from other files
-
-from instrument import Harp
+from instruments import Harp, Voice
 from notes import NoteRoot, NoteCircle, NoteDiamond
 from modes import InputMode, RenderMode
 from render import render_instrument_line, render_instrument_lines
@@ -26,6 +24,7 @@ class Parser:
                 'C1': (2, 0), 'C2': (2, 1), 'C3': (2, 2), 'C4': (2, 3), 'C5': (2, 4)
                 }
         self.western_position_map = {
+                'F0': (-4, 0), 'G0': (-4, 1), 'A0': (-4, 2), 'B0': (-4, 3), 'C1': (-4, 4),
                 'D1': (-4, 0), 'E1': (-4, 1), 'F1': (-4, 2), 'G1': (-4, 3), 'A1': (-4, 4),
                 'B1': (-3, 0), 'C2': (-3, 1), 'D2': (-3, 2), 'E2': (-3, 3), 'F2': (-3, 4),
                 'G2': (-2, 0), 'A2': (-2, 1), 'B2': (-2, 2), 'C3': (-2, 3), 'D3': (-2, 4),
@@ -64,29 +63,38 @@ class Parser:
         tokens = icon.split(delimiter)
         return tokens
     
-    def parse_line(self, line, icon_delimiter, blank_icon, chord_delimiter, input_mode, octave_shift=0):
+    def parse_line(self, line, icon_delimiter=' ', blank_icon='.', chord_delimiter='-', comment_delimiter='#', input_mode=0, octave_shift=0):
         '''
-        Returns instrument_line: a list of chord images
+        Returns instrument_line: a list of chord 'images' (1 chord = 1 dict)
         ''' 
-        icons = line.rstrip().lstrip().replace(icon_delimiter+icon_delimiter,icon_delimiter).split(icon_delimiter)
         instrument_line = []
-
-        #TODO: Implement logic for parsing line vs single icon.
-        for icon in icons:
-            chords = self.parse_icon(icon, chord_delimiter, input_mode)
-            results = self.parse_chords(chords, blank_icon, input_mode, octave_shift)
-            chord_image = results[0]
-            harp_is_highlighted = results[1]
-
-            harp = Harp()
-            harp.set_is_highlighted(harp_is_highlighted)
-            harp.set_chord_image(chord_image)
-
-            instrument_line.append(harp)
+        icons = line.rstrip().lstrip().replace(icon_delimiter+icon_delimiter,icon_delimiter) # clean-up
+        if len(icons)>0:
+            if icons[0] == comment_delimiter:
+                lyrics = icons.split(comment_delimiter)
+                for lyric in lyrics:
+                    if len(lyric)>0:
+                        voice = Voice()
+                        voice.set_chord_image(lyric.rstrip().lstrip())
+                        instrument_line.append(voice)
+            else:
+                icons=icons.split(icon_delimiter)
+                 #TODO: Implement logic for parsing line vs single icon.        
+                for icon in icons:
+                    chords = self.parse_icon(icon, chord_delimiter, input_mode)
+                    results = self.parse_chords(chords, blank_icon, input_mode, octave_shift)
+                    chord_image = results[0]
+                    harp_is_highlighted = results[1]
+        
+                    harp = Harp()
+                    harp.set_is_highlighted(harp_is_highlighted)
+                    harp.set_chord_image(chord_image)
+        
+                    instrument_line.append(harp)
 
         return instrument_line
 
-    def map_note_to_position(self, note, blank_icon, input_mode, octave_shift=0):
+    def map_note_to_position(self, note, blank_icon='.', input_mode=0, octave_shift=0):
         '''
         Returns a tuple containing the row index and the column index of the note's position.
         '''
@@ -121,7 +129,7 @@ class Parser:
         else:
             raise KeyError
 
-    def parse_chords(self, chords, blank_icon, input_mode, octave_shift=0):
+    def parse_chords(self, chords, blank_icon='.', input_mode=0, octave_shift=0):
         
         is_empty = True
         chord_image = {}
@@ -154,6 +162,7 @@ CHORD_DELIMITER = '-'
 ICON_DELIMITER = ' '
 NOTE_WIDTH = "1em"
 BLANK_ICON = '.'
+COMMENT_DELIMITER = '#'
 
 parser = Parser() # Create a parser object
 
@@ -246,7 +255,7 @@ if song_input_mode in [InputMode.SKYFILE, InputMode.WESTERNFILE, InputMode.JIANP
         fic = open(fp,mode='r')
         print(['Opening file: ' + os.path.abspath(fp)])
         for song_line in fic:
-            instrument_line = parser.parse_line(song_line.rstrip(), ICON_DELIMITER, BLANK_ICON, CHORD_DELIMITER, song_input_mode, octave_shift)            
+            instrument_line = parser.parse_line(song_line.rstrip(), ICON_DELIMITER, BLANK_ICON, CHORD_DELIMITER, COMMENT_DELIMITER, song_input_mode, octave_shift)            
             instrument_lines.append(instrument_line)
             
         fic.close()
@@ -256,7 +265,7 @@ if song_input_mode in [InputMode.SKYFILE, InputMode.WESTERNFILE, InputMode.JIANP
 else:
     song_line = input('Type line: ')
     while song_line: 
-        instrument_line = parser.parse_line(song_line, ICON_DELIMITER, BLANK_ICON, CHORD_DELIMITER, song_input_mode, octave_shift)    
+        instrument_line = parser.parse_line(song_line, ICON_DELIMITER, BLANK_ICON, CHORD_DELIMITER, COMMENT_DELIMITER, song_input_mode, octave_shift)    
         instrument_lines.append(instrument_line)   
         song_line = input('Type line: ')
 
@@ -265,6 +274,8 @@ print('============')
 print('Press ENTER to skip the following.')
 musical_key = input('Recommended musical key: ')
 song_title = input('Song title (used for the file name): ')
+if song_title=='':
+    song_title='untitled'
 original_artists = input('Original artist(s): ')
 transcript_writer = input('Transcribed by: ')
 
@@ -272,43 +283,54 @@ transcript_writer = input('Transcribed by: ')
 # Render the song
 
 
-song_file_path = os.path.join(song_title + '.html')
+html_path = os.path.join(song_title + '.html')
 
-with open(song_file_path, 'w+') as song_file:
-    song_file.write('<!DOCTYPE html>\n')
-    song_file.write('<html>\n')
-    song_file.write('<head> <title>' + song_title + '</title> <link href="../css/main.css" rel="stylesheet" /> <meta charset="utf-8"/> </head>\n')
+with open(html_path, 'w+') as html_file:
+    html_file.write('<!DOCTYPE html>\n')
+    html_file.write('<html>\n')
+    html_file.write('<head> <title>' + song_title + '</title> <link href="../css/main.css" rel="stylesheet" /> <meta charset="utf-8"/> </head>\n')
 
-    song_file.write('<body>\n')
-    song_file.write('<h1> ' + song_title + ' </h1>\n')
+    html_file.write('<body>\n')
+    html_file.write('<h1> ' + song_title + ' </h1>\n')
 
     if original_artists:
-        song_file.write('<p> <b>Original Artist(s):</b> ' + original_artists + ' </p>\n')
+        html_file.write('<p> <b>Original Artist(s):</b> ' + original_artists + ' </p>\n')
     if transcript_writer:
-        song_file.write('<p> <b> Transcript:</b> ' + transcript_writer + ' </p>\n')
+        html_file.write('<p> <b> Transcript:</b> ' + transcript_writer + ' </p>\n')
     if musical_key:
-        song_file.write('<p> <b> Recommended key:</b> ' + musical_key + ' </p>\n')
+        html_file.write('<p> <b> Recommended key:</b> ' + musical_key + ' </p>\n')
 
-    song_file.write('<div id="transcript">\n\n')
-
-
-    song_file.write(render_instrument_lines(instrument_lines, NOTE_WIDTH, RenderMode.VISUAL))
+    html_file.write('<div id="transcript">\n\n')
 
 
-    song_file.write('</div>\n')
-    song_file.write('</body>\n')
+    html_file.write(render_instrument_lines(instrument_lines, NOTE_WIDTH, RenderMode.VISUAL))
 
-    song_file.write('</html>\n')
+
+    html_file.write('</div>\n')
+    html_file.write('</body>\n')
+
+    html_file.write('</html>\n')
 
 print('============')
-song_full_file_path = os.path.join(str(song_dir), song_file_path)
-print('Your song is located at', song_full_file_path)
+print('Your song is located at', os.path.join(str(song_dir), html_path))
 
 if song_input_mode in [InputMode.WESTERN, InputMode.JIANPU, InputMode.WESTERNFILE, InputMode.JIANPUFILE]:
-    ascii_file_path = os.path.join(song_title + '_ascii.txt')
-    with open(ascii_file_path, 'w+') as ascii_file:
-        ascii_file.write(render_instrument_lines(instrument_lines, NOTE_WIDTH, RenderMode.ASCII))
-    ascii_full_file_path = os.path.join(str(song_dir), ascii_file_path)
-    print('Your converted song is located at', ascii_full_file_path)    
-        
+    sky_ascii_path = os.path.join(song_title + '_sky.txt')
+    with open(sky_ascii_path, 'w+') as sky_ascii:
+        sky_ascii.write('# '+song_title+'\n')
+        sky_ascii.write('# by: '+original_artists+'\n')
+        sky_ascii.write('# transcription by: '+transcript_writer+'\n')
+        sky_ascii.write(render_instrument_lines(instrument_lines, NOTE_WIDTH, RenderMode.SKYASCII))
+    print('Your song converted to Sky notation is located at:', os.path.join(str(song_dir), sky_ascii_path))    
+ 
+
+if song_input_mode in [InputMode.SKY, InputMode.SKYFILE]:
+    western_ascii_path = os.path.join(song_title + '_western.txt')
+    with open(western_ascii_path, 'w+') as western_ascii:
+        western_ascii.write('# '+song_title+'\n')
+        western_ascii.write('# by: '+original_artists+'\n')
+        western_ascii.write('# transcription by: '+transcript_writer+'\n')
+        western_ascii.write(render_instrument_lines(instrument_lines, NOTE_WIDTH, RenderMode.WESTERNASCII))
+    print('Your song converted to Western notation is located at:', os.path.join(str(song_dir), western_ascii_path))    
+       
 os.chdir(mycwd)

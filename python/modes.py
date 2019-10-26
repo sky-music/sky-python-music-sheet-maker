@@ -11,4 +11,6 @@ class InputMode(Enum):
 
 class RenderMode(Enum): # Currently unused as of october 9th 2019
     VISUAL = 1
-    ASCII = 2
+    SKYASCII = 2
+    WESTERNASCII = 3
+    JIANPUASCII = 4
