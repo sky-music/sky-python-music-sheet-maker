@@ -1,6 +1,5 @@
 from notes import NoteRoot, NoteCircle, NoteDiamond
 from modes import RenderMode
-
 ### Instrument classes
 # A cleaner implementation should define a generic instrument class
 # and  instrument sub-classes inheriting some methods
@@ -9,30 +8,30 @@ class Voice: # Lyrics or comments
     
     def __init__(self):
         self.instrument_type = 'voice'
-        self.chord_image = {}
+        self.chord_skygrid = {}
         
-    def render_from_chord_image(self, chord_image, note_width, instrument_index):      
+    def render_in_html(self, chord_skygrid, note_width, instrument_index):     
         chord_render = '<table class=\"voice\">'
         chord_render +='<tr>'
-        chord_render +='<td  width=110 align=\"center\">' # TODO: Width calculated automatically
-        chord_render += chord_image
+        chord_render +='<td  width=\"90em\" align=\"center\">' #TODO: width calculated automatically
+        chord_render += chord_skygrid
         chord_render += '</td>'
         chord_render +='</tr>'
         chord_render +='</table>'
         return chord_render
 
-    def ascii_from_chord_image(self, chord_image, render_mode):     
-        chord_render = '# ' + chord_image # Lyrics marked as comments in output text files
+    def render_in_ascii(self, chord_skygrid, render_mode):     
+        chord_render = '# ' + chord_skygrid # Lyrics marked as comments in output text files
         return chord_render
     
-    def set_chord_image(self, chord_image):
-        self.chord_image = chord_image
+    def set_chord_skygrid(self, chord_skygrid):
+        self.chord_skygrid = chord_skygrid
         
     def get_instrument_type(self):
         return self.instrument_type
     
-    def get_chord_image(self):
-        return self.chord_image
+    def get_chord_skygrid(self):
+        return self.chord_skygrid
 
 class Harp:
 
@@ -40,8 +39,8 @@ class Harp:
 
         self.column_count = 5
         self.row_count = 3
-        self.chord_image = {}
-        self.highlighted_states_image = []
+        self.chord_skygrid = {}
+        self.highlighted_states_skygrid = []
         self.instrument_type = 'harp'
         self.is_highlighted = False
 
@@ -81,36 +80,36 @@ class Harp:
         '''
         self.is_highlighted = is_highlighted
 
-    def set_chord_image(self, chord_image):
+    def set_chord_skygrid(self, chord_skygrid):
         '''
-        The chord_image is a dictionary. The keys are tuples representing the positions of the buttons. The values are dictionaries, where each key is the frame, and the value is a Boolean indicating whether the button is highlighted in that frame.
+        The chord_skygrid is a dictionary. The keys are tuples representing the positions of the buttons. The values are dictionaries, where each key is the frame, and the value is a Boolean indicating whether the button is highlighted in that frame.
         '''
         # Ok, but in this case the dict should have keys for all the positions, and shut down buttons should be set to False
-        #TODO: Raise TypeError if chord_image is not a dict
-        self.chord_image = chord_image
+        #TODO: Raise TypeError if chord_skygrid is not a dict
+        self.chord_skygrid = chord_skygrid
 
-    # def update_chord_image(self, index, new_state):
-    def append_highlighted_state(self, row_index, column_index, new_state):
+    # def update_chord_skygrid(self, index, new_state):
+#    def append_highlighted_state(self, row_index, column_index, new_state):
+#
+#        '''
+#        INCOMPLETE IMPLEMENTATION. new_state is expected to be a Boolean
+#        '''
+#
+#        chord_skygrid = self.get_chord_skygrid()
+#
+#        row = chord_skygrid[row_index]
+#        highlighted_states = row[column_index]
+#        highlighted_states.append(new_state)
+#
+#        chord_skygrid[index] = highlighted_states #index is undefined
+#
+#        self.set_chord_skygrid(chord_skygrid)
 
-        '''
-        INCOMPLETE IMPLEMENTATION. new_state is expected to be a Boolean
-        '''
 
-        chord_image = self.get_chord_image()
+    def get_chord_skygrid(self):
+        return self.chord_skygrid
 
-        row = chord_image[row_index]
-        highlighted_states = row[column_index]
-        highlighted_states.append(new_state)
-
-        chord_image[index] = highlighted_states #index is undefined
-
-        self.set_chord_image(chord_image)
-
-
-    def get_chord_image(self):
-        return self.chord_image
-
-    def ascii_from_chord_image(self, chord_image, render_mode):
+    def render_in_ascii(self, chord_skygrid, render_mode):
         
         ascii_chord = ''
         if render_mode == RenderMode.SKYASCII:
@@ -122,17 +121,17 @@ class Harp:
         else:
             inverse_map  = self.sky_inverse_position_map              
         
-        if len(chord_image)==0:
+        if len(chord_skygrid)==0:
             ascii_chord = '.' # Empty frame is assumed to be a pause
         else:
-            for k in chord_image: # Cycle over positions in a frame
-                for f in chord_image[k]: # Cycle over triplets & quavers
-                    if chord_image[k][f]==True: # Button is highlighted
+            for k in chord_skygrid: # Cycle over positions in a frame
+                for f in chord_skygrid[k]: # Cycle over triplets & quavers
+                    if chord_skygrid[k][f]==True: # Button is highlighted
                         ascii_chord += inverse_map[k]
         return ascii_chord        
         
 
-    def render_from_chord_image(self, chord_image, note_width, instrument_index):
+    def render_in_html(self, chord_skygrid, note_width, instrument_index):
 
         harp_is_empty = not(self.get_is_highlighted())
 
@@ -166,7 +165,7 @@ class Harp:
                     # Note is in an even column, so it is a diamond
                     note = NoteDiamond()
 
-                note_render = note.render_from_chord_image(note_width, chord_image, note_position, self.get_instrument_type(), note_index, harp_is_empty)
+                note_render = note.render_in_html(note_width, chord_skygrid, note_position, self.get_instrument_type(), note_index, harp_is_empty)
                 harp_render += note_render
                 harp_render += '</td>'
 
