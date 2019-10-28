@@ -78,8 +78,18 @@ table.voice {
   border-style: solid;
   border-radius: 0px;
   border-width: 0px;
-  border-color: black;
   font-size: 10pt;
+}
+
+table.repeat {
+  margin: 0px;
+  padding: 0px;
+  display: inline-block;
+  border-style: solid;
+  border-radius: 0px;
+  border-width: 0px;
+  border-color: black;
+  font-size: 9pt;
 }
 
 
@@ -107,11 +117,11 @@ td {
 }*/
 
 
-svg.harp-button-0 .unhighlighted.instrument-button-icon,
-svg.harp-button-1 .unhighlighted.instrument-button-icon,
-svg.harp-button-2 .unhighlighted.instrument-button-icon,
-svg.harp-button-3 .unhighlighted.instrument-button-icon,
-svg.harp-button-4 .unhighlighted.instrument-button-icon {
+.harp-button-0 .unhighlighted.instrument-button-icon,
+.harp-button-1 .unhighlighted.instrument-button-icon,
+.harp-button-2 .unhighlighted.instrument-button-icon,
+.harp-button-3 .unhighlighted.instrument-button-icon,
+.harp-button-4 .unhighlighted.instrument-button-icon {
   stroke-width: 3;
   stroke: white;
   fill: limegreen;
@@ -119,11 +129,11 @@ svg.harp-button-4 .unhighlighted.instrument-button-icon {
 }
 
 
-svg.harp-button-5 .unhighlighted.instrument-button-icon,
-svg.harp-button-6 .unhighlighted.instrument-button-icon,
-svg.harp-button-7 .unhighlighted.instrument-button-icon,
-svg.harp-button-8 .unhighlighted.instrument-button-icon,
-svg.harp-button-9 .unhighlighted.instrument-button-icon {
+.harp-button-5 .unhighlighted.instrument-button-icon,
+.harp-button-6 .unhighlighted.instrument-button-icon,
+.harp-button-7 .unhighlighted.instrument-button-icon,
+.harp-button-8 .unhighlighted.instrument-button-icon,
+.harp-button-9 .unhighlighted.instrument-button-icon {
   stroke-width: 3;
   stroke: white;
   fill: deepskyblue;
@@ -131,11 +141,11 @@ svg.harp-button-9 .unhighlighted.instrument-button-icon {
 }
 
 
-svg.harp-button-10 .unhighlighted.instrument-button-icon,
-svg.harp-button-11 .unhighlighted.instrument-button-icon,
-svg.harp-button-12 .unhighlighted.instrument-button-icon,
-svg.harp-button-13 .unhighlighted.instrument-button-icon,
-svg.harp-button-14 .unhighlighted.instrument-button-icon {
+.harp-button-10 .unhighlighted.instrument-button-icon,
+.harp-button-11 .unhighlighted.instrument-button-icon,
+.harp-button-12 .unhighlighted.instrument-button-icon,
+.harp-button-13 .unhighlighted.instrument-button-icon,
+.harp-button-14 .unhighlighted.instrument-button-icon {
   stroke-width: 3;
   stroke: white;
   fill: deeppink;
