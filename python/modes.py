@@ -1,7 +1,7 @@
 from enum import Enum
 
 class InputMode(Enum):
-    KEYBOARD = 1
+    SKYKEYBOARD = 1
     SKY = 2
     WESTERN = 3
     JIANPU = 4
@@ -9,8 +9,9 @@ class InputMode(Enum):
     WESTERNFILE = 6
     JIANPUFILE = 7
 
-class RenderMode(Enum): # Currently unused as of october 9th 2019
-    VISUAL = 1
-    SKYASCII = 2
-    WESTERNASCII = 3
-    JIANPUASCII = 4
+class RenderMode(Enum):
+    VISUALHTML = 1
+    VISUALIMG = 2
+    SKYASCII = 3
+    WESTERNASCII = 4
+    JIANPUASCII = 5

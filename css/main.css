@@ -1,5 +1,16 @@
 body {
   font-family: "Avenir", Arial, sans-serif;
+  font-size: 10 pt;
+}
+
+h1 {
+	font-family: "Avenir", Arial, sans-serif;
+	font-size: 12pt;
+}
+
+p {
+	font-size: 10pt;
+	line-height: 50%;
 }
 
 .note-root, .note-diamond, .note-circle {
@@ -24,20 +35,29 @@ body {
 }
 
 table {
-  margin: 6px;
+  margin-top: 0px;
+  margin-bottom: 0px;
+  margin-left: 4px;
+  margin-bottom: 4px;
   padding: 0px;
   display: inline-block;
   border-style: solid;
   border-radius: 5px;
   border-width: 1px;
   border-color: black;
+  border-spacing: 0 auto;
+  
 }
 
 hr {
   height: 2px;
-  background-color: #CCCCCC;
+  background-color: #BBBBBB;
   border: none;
   opacity: 1;
+  padding: 0;
+  margin-top: 2px;
+  margin-bottom: 2px;
+    
 }
 
 table.empty {
@@ -59,6 +79,7 @@ table.voice {
   border-radius: 0px;
   border-width: 0px;
   border-color: black;
+  font-size: 10pt;
 }
 
 
@@ -66,6 +87,7 @@ td {
   padding-top: 0px;
   padding-bottom: 0px;
   margin: 0px;
+  font-size: 10pt;
 }
 
 .instrument-button{
@@ -74,7 +96,7 @@ td {
 }
 
 #transcript {
-  /*margin: 0 auto;*/
+  margin: 0 0;
 }
 
 
