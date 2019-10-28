@@ -119,7 +119,7 @@ class Parser:
     def parse_icon(self, icon, delimiter, input_mode):
         return icon.split(delimiter)
     
-    def parse_line(self, line, icon_delimiter=' ', blank_icon='.', quaver_delimiter='-', comment_delimiter='#', input_mode=0, octave_shift=0):
+    def parse_line(self, line, icon_delimiter=' ', blank_icon='.', quaver_delimiter='-', comment_delimiter='#', input_mode=0, note_shift=0):
         '''
         Returns instrument_line: a list of chord 'skygrid' (1 chord = 1 dict)
         ''' 
@@ -138,11 +138,13 @@ class Parser:
                  #TODO: Implement logic for parsing line vs single icon.        
                 for icon in icons:
                     chords = self.parse_icon(icon, quaver_delimiter, input_mode)
-                    results = self.parse_chords(chords, blank_icon, input_mode, octave_shift)
+                    results = self.parse_chords(chords, blank_icon, input_mode, note_shift)
                     chord_skygrid = results[0]
                     harp_is_highlighted = results[1]
+                    repeat = results[2]
         
                     harp = Harp()
+                    harp.set_repeat(repeat)
                     harp.set_is_highlighted(harp_is_highlighted)
                     harp.set_chord_skygrid(chord_skygrid)
         
@@ -150,7 +152,7 @@ class Parser:
 
         return instrument_line
 
-    def map_note_to_position(self, note, blank_icon='.', input_mode=0, octave_shift=0):
+    def map_note_to_position(self, note, blank_icon='.', input_mode=0, note_shift=0):
         '''
         Returns a tuple containing the row index and the column index of the note's position.
         '''
@@ -169,7 +171,7 @@ class Parser:
         if note in position_map.keys():           
             pos=position_map[note] #tuple
             idx=pos[0]*5+pos[1]
-            idxshift=idx+7*octave_shift
+            idxshift=idx+note_shift
             pos=(int(idxshift/5),idxshift-5*int(idxshift/5))
             if pos>=(0,0) and pos<=(2,4):
                 return pos
@@ -185,23 +187,27 @@ class Parser:
         else:
             raise KeyError
 
-    def parse_chords(self, chords, blank_icon='.', input_mode=0, octave_shift=0):
+    def parse_chords(self, chords, blank_icon='.', input_mode=0, note_shift=0):
         
         is_empty = True
         chord_skygrid = {}
         for chord_idx, chord in enumerate(chords):
             # Create a skygrid of the harp's chords
             # For each chord, set the highlighted state of each note accordingly (whether True or False)
-            if input_mode in [InputMode.SKY, InputMode.SKYFILE, InputMode.WESTERN, InputMode.WESTERNFILE]:
-                chord=wrap(chord, 2) # Notes are always 2 character-long in Sky and Western notations
-
-            if input_mode in [InputMode.JIANPU, InputMode.JIANPUFILE]:
-                chord=re.sub('([1-9])',' \\1',chord).split()  #Adds space before note and then split            
+            try:
+                repeat = int(re.split('x', chord)[1])
+                chord = re.split('x', chord)[0]
+            except:
+                repeat = 0    
             
+            if input_mode in [InputMode.SKY, InputMode.SKYFILE, InputMode.WESTERN, InputMode.WESTERNFILE]:
+                chord = re.sub('([A-G])', ' \\1', chord).split()
+            if input_mode in [InputMode.JIANPU, InputMode.JIANPUFILE]:
+                chord = re.sub('([1-9])', ' \\1', chord).split()  #Adds space before note and then split            
             for note in chord: # Chord is a list of notes
                 #Except InvalidLetterException
                 try:
-                    highlighted_note_position = self.map_note_to_position(note, blank_icon, input_mode, octave_shift)
+                    highlighted_note_position = self.map_note_to_position(note, blank_icon, input_mode, note_shift)
                 except KeyError:
                     pass
                 else:
@@ -209,6 +215,6 @@ class Parser:
                     chord_skygrid[highlighted_note_position] = {}
                     chord_skygrid[highlighted_note_position][chord_idx] = True
 
-        results = [chord_skygrid, not(is_empty)]
+        results = [chord_skygrid, not(is_empty), repeat]
         return results
 

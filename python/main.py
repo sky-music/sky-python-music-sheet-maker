@@ -12,11 +12,12 @@ class Error(Exception):
 class BlackIconError(Error):
     pass
 
-QUAVER_DELIMITER = '-' # Hyphen separated list of chords
-ICON_DELIMITER = ' '
-NOTE_WIDTH = "1em"
+# Parameters that can be changed by advanced users
+QUAVER_DELIMITER = '^' # Dash-separated list of chords
+ICON_DELIMITER = ' ' # Chords separation
+NOTE_WIDTH = "1.0em" #Any CSS-compatible unit can be used
 BLANK_ICON = '.'
-COMMENT_DELIMITER = '#'
+COMMENT_DELIMITER = '#' # Lyrics delimiter, can be used for comments
 
 myparser = Parser() # Create a parser object
 
@@ -73,14 +74,14 @@ else:
 
 if song_input_mode in [InputMode.WESTERN, InputMode.WESTERNFILE, InputMode.JIANPU, InputMode.JIANPUFILE]:
     try:
-        octave_shift = int(input('Octave shift (-3 -2 -1 0 1 2 3): ').strip())
+        note_shift = int(input('Shift by n notes (-21 ; +21): ').strip())
     except ValueError:
-        octave_shift = 0
-    else:
-        octave_shift = 0
+        note_shift = 0
+else:
+    note_shift = 0
 
 if song_input_mode in [InputMode.JIANPU, InputMode.JIANPUFILE] and QUAVER_DELIMITER =='-':
-    print('Warning: quaver delimiter \'-\' is incompatible with Jianpu notation. Swtchin to \'^\' instead.')
+    print('\nWarning: quaver delimiter \'-\' is incompatible with Jianpu notation. Please use \'^\' instead.')
     QUAVER_DELIMITER = '^'
 
 print('\nSeparate blocks of notes with \"' + ICON_DELIMITER + '\".')
@@ -122,7 +123,7 @@ if song_input_mode in [InputMode.SKYFILE, InputMode.WESTERNFILE, InputMode.JIANP
     try:
         song_lines = open(fp,mode='r')            
         for song_line in song_lines:
-            instrument_line = myparser.parse_line(song_line.rstrip(), ICON_DELIMITER, BLANK_ICON, QUAVER_DELIMITER, COMMENT_DELIMITER, song_input_mode, octave_shift)            
+            instrument_line = myparser.parse_line(song_line.rstrip(), ICON_DELIMITER, BLANK_ICON, QUAVER_DELIMITER, COMMENT_DELIMITER, song_input_mode, note_shift)            
             instrument_lines.append(instrument_line)    
         song_lines.close()
     except (OSError, IOError) as err:
@@ -130,7 +131,7 @@ if song_input_mode in [InputMode.SKYFILE, InputMode.WESTERNFILE, InputMode.JIANP
         raise err
 else:
     for song_line in song_lines:
-        instrument_line = myparser.parse_line(song_line, ICON_DELIMITER, BLANK_ICON, QUAVER_DELIMITER, COMMENT_DELIMITER, song_input_mode, octave_shift)    
+        instrument_line = myparser.parse_line(song_line, ICON_DELIMITER, BLANK_ICON, QUAVER_DELIMITER, COMMENT_DELIMITER, song_input_mode, note_shift)    
         instrument_lines.append(instrument_line)   
 
 
@@ -148,7 +149,7 @@ original_artists = input('Original artist(s): ')
 transcript_writer = input('Transcribed by: ')
 
 # Renders the song
-titlehead = [['Song title:', song_title]]
+titlehead = [[''], [song_title]]
 headers = [['Original Artist(s):', 'Transcript:', 'Recommended key:'], [original_artists, transcript_writer, musical_key]]
 
 html_path = os.path.join(song_title + '.html')
