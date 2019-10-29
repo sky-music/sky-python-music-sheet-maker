@@ -110,12 +110,13 @@ else:
 # Attempts to detect key for input written in absolute musical scales (western, Jianpu)
 musickeys  = []
 if song_input_mode in [InputMode.WESTERN, InputMode.JIANPU, InputMode.WESTERNFILE, InputMode.JIANPUFILE]:
-    musickeys = myparser.find_key(song_lines, COMMENT_DELIMITER, song_input_mode)       
+    musickeys = myparser.find_key(song_lines, COMMENT_DELIMITER, song_input_mode) 
     if len(musickeys) == 0:
-        print("\nNo playable musical key detected. Assuming it is C.")
+        print("\nYour song cannot be transposed exactly in Sky.")
     else:
-        print("The song can be played in the following keys:")
+        print("\nYour song can be transposed in Sky with the following keys:")
         print(musickeys)
+        print('\nTransposition is not implemented yet. Assuming you will play in \'C\'.')
 
 # Parses song line by line
 instrument_lines = [] # An array of Instrument class lines
@@ -137,10 +138,10 @@ else:
 
 print('=========================')
 print('Press ENTER to skip the following.')
-if len(musickeys)>0:
-    musical_key = myparser.jianpu2western(musickeys[0])
+if len(musickeys)>0:  
+    musical_key = musickeys[0]
 else:
-    musical_key = input('Musical key to play the visual pattern: ') 
+    musical_key = input('Recommended key to play the visual pattern: ') 
 
 song_title = input('Song title (also used for the file name): ')
 if song_title=='':
@@ -150,7 +151,7 @@ transcript_writer = input('Transcribed by: ')
 
 # Renders the song
 titlehead = [[''], [song_title]]
-headers = [['Original Artist(s):', 'Transcript:', 'Recommended key:'], [original_artists, transcript_writer, musical_key]]
+headers = [['Original Artist(s):', 'Transcript:', 'Musical key:'], [original_artists, transcript_writer, musical_key]]
 
 html_path = os.path.join(song_title + '.html')
 with open(html_path, 'w+') as html_file:

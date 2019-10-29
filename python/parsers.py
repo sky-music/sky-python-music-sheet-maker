@@ -78,11 +78,11 @@ class Parser:
     def get_jianpu_position_map(self):
         return self.jianpu_position_map
 
-    def jianpu2western(self,note):
-        try:
-            return self.jianpu2western_map[note]
-        except KeyError:
-            return ''
+    def jianpu2western(self,notes):
+         try:
+            return [self.jianpu2western_map[note] for note in notes]
+         except KeyError:
+            return notes
     
     def find_key(self, song_lines, comment_delimiter='#', input_mode=InputMode.WESTERNFILE):
         '''
@@ -113,8 +113,8 @@ class Parser:
                         scale[0] = scale[0][1::] + scale[0][:1:] # circ shift
                         scale[1] = scale[1][1::] + scale[1][:1:] # circ shift
 
-    
-        return [key for key in possible_keys if key != ''] # return reduced set of possible keys
+        possible_keys = [key for key in possible_keys if key != ''] # return reduced set of possible keys
+        return self.jianpu2western(possible_keys)
                        
     def parse_icon(self, icon, delimiter, input_mode):
         return icon.split(delimiter)
