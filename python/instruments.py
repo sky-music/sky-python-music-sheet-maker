@@ -9,19 +9,20 @@ class Voice: # Lyrics or comments
     def __init__(self):
         self.instrument_type = 'voice'
         self.chord_skygrid = {}
+        self.repeat = 0
         
-    def render_in_html(self, chord_skygrid, note_width, instrument_index):     
+    def render_in_html(self, lyrics, note_width, instrument_index):     
         chord_render = '<table class=\"voice\">'
         chord_render +='<tr>'
         chord_render +='<td  width=\"90em\" align=\"center\">' #TODO: width calculated automatically
-        chord_render += chord_skygrid
+        chord_render += lyrics
         chord_render += '</td>'
         chord_render +='</tr>'
         chord_render +='</table>'
         return chord_render
 
-    def render_in_ascii(self, chord_skygrid, render_mode):     
-        chord_render = '# ' + chord_skygrid # Lyrics marked as comments in output text files
+    def render_in_ascii(self, lyrics, render_mode):     
+        chord_render = '# ' + lyrics # Lyrics marked as comments in output text files
         return chord_render
     
     def set_chord_skygrid(self, chord_skygrid):
@@ -32,6 +33,12 @@ class Voice: # Lyrics or comments
     
     def get_chord_skygrid(self):
         return self.chord_skygrid
+    
+    def set_repeat(self, repeat):
+        self.repeat = repeat
+
+    def get_repeat(self):
+        return self.repeat
 
 class Harp:
 
@@ -43,6 +50,7 @@ class Harp:
         self.highlighted_states_skygrid = []
         self.instrument_type = 'harp'
         self.is_highlighted = False
+        self.repeat = 0
 
         self.sky_inverse_position_map = {
                 (0, 0): 'A1', (0, 1): 'A2', (0, 2): 'A3', (0, 3): 'A4', (0, 4): 'A5',
@@ -73,6 +81,12 @@ class Harp:
     
     def get_is_highlighted(self):
         return self.is_highlighted
+
+    def set_repeat(self, repeat):
+        self.repeat = repeat
+
+    def get_repeat(self):
+        return self.repeat
 
     def set_is_highlighted(self, is_highlighted):
         '''
@@ -172,5 +186,15 @@ class Harp:
             harp_render += '</tr>'
 
         harp_render += '</table>'
+        
+        if self.get_repeat() > 0:
+            harp_render += '<table class=\"repeat harp-' + str(instrument_index) + ' empty \">'
+            harp_render += '<tr>'
+            harp_render += '<td>'
+            harp_render += 'x' + str(self.get_repeat())       
+            harp_render += '</td>'
+            harp_render += '</tr>'
+            harp_render += '</table>'
+        
         return harp_render
     

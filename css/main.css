@@ -78,8 +78,18 @@ table.voice {
   border-style: solid;
   border-radius: 0px;
   border-width: 0px;
-  border-color: black;
   font-size: 10pt;
+}
+
+table.repeat {
+  margin: 0px;
+  padding: 0px;
+  display: inline-block;
+  border-style: solid;
+  border-radius: 0px;
+  border-width: 0px;
+  border-color: black;
+  font-size: 9pt;
 }
 
 
