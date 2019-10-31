@@ -1,5 +1,4 @@
 from modes import RenderMode
-import svgwrite # external package used to write svg more conviniently - could be bypassed
 
 def render_line_html(instrument_line, instrument_index, note_width, render_mode):
     '''
@@ -103,10 +102,6 @@ def write_ascii(ascii_file, titlehead = ['title: ', 'untitled'], headers = [], i
     ascii_file.write(song_render)
 
     return True
-
-def write_svg(svg_file, titlehead = ['title: ', 'untitled'], headers = [], instrument_lines = [], render_mode = RenderMode.VISUALIMG):    
-
-    return    
     
     
     

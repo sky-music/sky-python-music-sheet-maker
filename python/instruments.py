@@ -49,7 +49,8 @@ class Harp:
         self.chord_skygrid = {}
         self.highlighted_states_skygrid = []
         self.instrument_type = 'harp'
-        self.is_highlighted = False
+        self.is_empty = True
+        self.is_error = False
         self.repeat = 0
 
         self.sky_inverse_position_map = {
@@ -79,8 +80,11 @@ class Harp:
     def get_instrument_type(self):
         return self.instrument_type
     
-    def get_is_highlighted(self):
-        return self.is_highlighted
+    def get_is_empty(self):
+        return self.is_empty
+
+    def get_is_error(self):
+        return self.is_error
 
     def set_repeat(self, repeat):
         self.repeat = repeat
@@ -88,11 +92,17 @@ class Harp:
     def get_repeat(self):
         return self.repeat
 
-    def set_is_highlighted(self, is_highlighted):
+    def set_is_error(self, is_error):
+        '''
+        Expecting a boolean, to determine whether the harp could not be translated
+        '''
+        self.is_error = is_error
+
+    def set_is_empty(self, is_empty):
         '''
         Expecting a boolean, to determine whether the harp is empty in this frame
         '''
-        self.is_highlighted = is_highlighted
+        self.is_empty = is_empty
 
     def set_chord_skygrid(self, chord_skygrid):
         '''
@@ -135,6 +145,7 @@ class Harp:
         else:
             inverse_map  = self.sky_inverse_position_map              
         
+        #TODO: differentiate empty harps and pauses
         if len(chord_skygrid)==0:
             ascii_chord = '.' # Empty frame is assumed to be a pause
         else:
@@ -147,12 +158,15 @@ class Harp:
 
     def render_in_html(self, chord_skygrid, note_width, instrument_index):
 
-        harp_is_empty = not(self.get_is_highlighted())
+        harp_empty = self.get_is_empty()
+        harp_error = self.get_is_error()
 
         harp_render = ''
 
-        if harp_is_empty:
-            harp_render += '<table class=\"harp harp-' + str(instrument_index) + ' empty \">'
+        if harp_empty:
+            harp_render += '<table class=\"harp harp-' + str(instrument_index) + ' empty\">'
+        elif harp_error:
+            harp_render += '<table class=\"harp harp-' + str(instrument_index) + ' error\">'
         else:
             harp_render += '<table class=\"harp harp-' + str(instrument_index) + '\">'
 
@@ -179,7 +193,7 @@ class Harp:
                     # Note is in an even column, so it is a diamond
                     note = NoteDiamond()
 
-                note_render = note.render_in_html(note_width, chord_skygrid, note_position, self.get_instrument_type(), note_index, harp_is_empty)
+                note_render = note.render_in_html(note_width, chord_skygrid, note_position, self.get_instrument_type(), note_index, harp_empty, harp_error)
                 harp_render += note_render
                 harp_render += '</td>'
 

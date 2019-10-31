@@ -13,10 +13,10 @@ class BlackIconError(Error):
     pass
 
 # Parameters that can be changed by advanced users
-QUAVER_DELIMITER = '^' # Dash-separated list of chords
+QUAVER_DELIMITER = '-' # Dash-separated list of chords
 ICON_DELIMITER = ' ' # Chords separation
 NOTE_WIDTH = "1.0em" #Any CSS-compatible unit can be used
-BLANK_ICON = '.'
+PAUSE = '.'
 COMMENT_DELIMITER = '#' # Lyrics delimiter, can be used for comments
 
 myparser = Parser() # Create a parser object
@@ -85,7 +85,7 @@ if song_input_mode in [InputMode.JIANPU, InputMode.JIANPUFILE] and QUAVER_DELIMI
     QUAVER_DELIMITER = '^'
 
 print('\nSeparate blocks of notes with \"' + ICON_DELIMITER + '\".')
-print('Use \"' + BLANK_ICON + '\" for a blank block.')
+print('Use \"' + PAUSE + '\" for a blank block.')
 print('If you want multiple colours within an icon, separate the colours with \"' + QUAVER_DELIMITER + '\".')
 print('=========================')
 
@@ -124,7 +124,7 @@ if song_input_mode in [InputMode.SKYFILE, InputMode.WESTERNFILE, InputMode.JIANP
     try:
         song_lines = open(fp,mode='r')            
         for song_line in song_lines:
-            instrument_line = myparser.parse_line(song_line.rstrip(), ICON_DELIMITER, BLANK_ICON, QUAVER_DELIMITER, COMMENT_DELIMITER, song_input_mode, note_shift)            
+            instrument_line = myparser.parse_line(song_line.rstrip(), ICON_DELIMITER, PAUSE, QUAVER_DELIMITER, COMMENT_DELIMITER, song_input_mode, note_shift)            
             instrument_lines.append(instrument_line)    
         song_lines.close()
     except (OSError, IOError) as err:
@@ -132,7 +132,7 @@ if song_input_mode in [InputMode.SKYFILE, InputMode.WESTERNFILE, InputMode.JIANP
         raise err
 else:
     for song_line in song_lines:
-        instrument_line = myparser.parse_line(song_line, ICON_DELIMITER, BLANK_ICON, QUAVER_DELIMITER, COMMENT_DELIMITER, song_input_mode, note_shift)    
+        instrument_line = myparser.parse_line(song_line, ICON_DELIMITER, PAUSE, QUAVER_DELIMITER, COMMENT_DELIMITER, song_input_mode, note_shift)    
         instrument_lines.append(instrument_line)   
 
 

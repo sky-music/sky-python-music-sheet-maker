@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-from textwrap import wrap
 import re
 import os
 from modes import InputMode
@@ -9,22 +8,27 @@ from instruments import Harp, Voice
 ### Parser
 
 class Parser:
-
+    
     def __init__(self):
         
+        self.columns = 5
+        self.lines = 3
+        
         if (os.getenv('LANG') == 'fr') or (os.getenv('LANG') == 'be'):
-            self.keyboard_position_map = {'A': (0, 0), 'Z': (0, 1), 'E': (0, 2), 'R': (0, 3), 'T': (0, 4), 'Q': (1, 0), 'S': (1, 1), 'D': (1, 2), 'F': (1, 3), 'G': (1, 4), 'W': (2, 0), 'X': (2, 1), 'C': (2, 2), 'V': (2, 3), 'B': (2, 4)}
+            self.keyboard_position_map = {'.': (-1, -1), 'A': (0, 0), 'Z': (0, 1), 'E': (0, 2), 'R': (0, 3), 'T': (0, 4), 'Q': (1, 0), 'S': (1, 1), 'D': (1, 2), 'F': (1, 3), 'G': (1, 4), 'W': (2, 0), 'X': (2, 1), 'C': (2, 2), 'V': (2, 3), 'B': (2, 4)}
             self.keyboard_layout="AZERT QSDFG WXCVB"
         else:
-            self.keyboard_position_map = {'Q': (0, 0), 'W': (0, 1), 'E': (0, 2), 'R': (0, 3), 'T': (0, 4), 'A': (1, 0), 'S': (1, 1), 'D': (1, 2), 'F': (1, 3), 'G': (1, 4), 'Z': (2, 0), 'X': (2, 1), 'C': (2, 2), 'V': (2, 3), 'B': (2, 4)}
+            self.keyboard_position_map = {'.': (-1, -1), 'Q': (0, 0), 'W': (0, 1), 'E': (0, 2), 'R': (0, 3), 'T': (0, 4), 'A': (1, 0), 'S': (1, 1), 'D': (1, 2), 'F': (1, 3), 'G': (1, 4), 'Z': (2, 0), 'X': (2, 1), 'C': (2, 2), 'V': (2, 3), 'B': (2, 4)}
             self.keyboard_layout="QWERT ASDFG ZXCVB"
         self.sky_position_map = {
+                '.': (-1, -1),
                 'A1': (0, 0), 'A2': (0, 1), 'A3': (0, 2), 'A4': (0, 3), 'A5': (0, 4),
                 'B1': (1, 0), 'B2': (1, 1), 'B3': (1, 2), 'B4': (1, 3), 'B5': (1, 4),
                 'C1': (2, 0), 'C2': (2, 1), 'C3': (2, 2), 'C4': (2, 3), 'C5': (2, 4)
                 }
         self.western_position_map = {
-                'F0': (-4, 0), 'G0': (-4, 1), 'A0': (-4, 2), 'B0': (-4, 3), 'C1': (-4, 4),
+                '.': (-1, -1),
+                'F0': (-5, 0), 'G0': (-5, 1), 'A0': (-5, 2), 'B0': (-5, 3), 'C1': (-5, 4),
                 'D1': (-4, 0), 'E1': (-4, 1), 'F1': (-4, 2), 'G1': (-4, 3), 'A1': (-4, 4),
                 'B1': (-3, 0), 'C2': (-3, 1), 'D2': (-3, 2), 'E2': (-3, 3), 'F2': (-3, 4),
                 'G2': (-2, 0), 'A2': (-2, 1), 'B2': (-2, 2), 'C3': (-2, 3), 'D3': (-2, 4),
@@ -36,6 +40,8 @@ class Parser:
                 'B6': (4, 0), 'C7': (4, 1), 'D7': (4, 2), 'E7': (4, 3), 'F7': (4, 4)
                 }
         self.jianpu_position_map = {
+                '.': (-1, -1),
+                '4----': (-5, 0), '5----': (-5, 1), '6----': (-5, 2), '7----': (-5, 3), '1---': (-5, 4),
                 '2---': (-4, 0), '3---': (-4, 1), '4---': (-4, 2), '5---': (-4, 3), '6---': (-4, 4),
                 '7---': (-3, 0), '1--': (-3, 1), '2--': (-3, 2), '3--': (-3, 3), '4--': (-3, 4),
                 '5--': (-2, 0), '6--': (-2, 1), '7--': (-2, 2), '1-': (-2, 3), '2-': (-2, 4),
@@ -119,7 +125,7 @@ class Parser:
     def parse_icon(self, icon, delimiter, input_mode):
         return icon.split(delimiter)
     
-    def parse_line(self, line, icon_delimiter=' ', blank_icon='.', quaver_delimiter='-', comment_delimiter='#', input_mode=0, note_shift=0):
+    def parse_line(self, line, icon_delimiter=' ', pause='.', quaver_delimiter='-', comment_delimiter='#', input_mode=0, note_shift=0):
         '''
         Returns instrument_line: a list of chord 'skygrid' (1 chord = 1 dict)
         ''' 
@@ -138,21 +144,19 @@ class Parser:
                  #TODO: Implement logic for parsing line vs single icon.        
                 for icon in icons:
                     chords = self.parse_icon(icon, quaver_delimiter, input_mode)
-                    results = self.parse_chords(chords, blank_icon, input_mode, note_shift)
-                    chord_skygrid = results[0]
-                    harp_is_highlighted = results[1]
-                    repeat = results[2]
-        
+                    chord_skygrid, harp_error, harp_empty, repeat = self.parse_chords(chords, pause, input_mode, note_shift)
+
                     harp = Harp()
                     harp.set_repeat(repeat)
-                    harp.set_is_highlighted(harp_is_highlighted)
+                    harp.set_is_empty(harp_empty)
+                    harp.set_is_error(harp_error)
                     harp.set_chord_skygrid(chord_skygrid)
         
                     instrument_line.append(harp)
 
         return instrument_line
 
-    def map_note_to_position(self, note, blank_icon='.', input_mode=0, note_shift=0):
+    def map_note_to_position(self, note, input_mode=0, note_shift=0):
         '''
         Returns a tuple containing the row index and the column index of the note's position.
         '''
@@ -166,55 +170,65 @@ class Parser:
             position_map = self.get_jianpu_position_map()
         else:
             position_map = self.get_keyboard_position_map()
-        note = note.upper()
-               
-        if note in position_map.keys():           
+        
+        note = note.upper()                  
+        
+        if note in position_map.keys(): # Note Shift (ie transposition in Sky)           
             pos=position_map[note] #tuple
-            idx=pos[0]*5+pos[1]
-            idxshift=idx+note_shift
-            pos=(int(idxshift/5),idxshift-5*int(idxshift/5))
-            if pos>=(0,0) and pos<=(2,4):
+            if (pos[0] < 0) and (pos[1] < 0): #Special character
                 return pos
             else:
-                raise KeyError
-        #elif letter == BLANK_ICON:
-        #    print(letter)
-        #    raise BlankIconError
-        elif note == blank_icon:
-            #TODO: Implement support for breaks/empty harps
-            #Define a custom InvalidLetterException
-            raise KeyError
+                idx = pos[0]*self.columns+pos[1]
+                idx = idx+note_shift
+                pos = (int(idx/self.columns), idx-self.columns*int(idx/self.columns))
+                if pos>=(0,0) and pos<=(2,4):
+                    return pos
+                else:
+                    raise KeyError
         else:
             raise KeyError
 
-    def parse_chords(self, chords, blank_icon='.', input_mode=0, note_shift=0):
+    def parse_chords(self, chords, pause='.', input_mode=0, note_shift=0):
         
-        is_empty = True
+        harp_error = True
         chord_skygrid = {}
         for chord_idx, chord in enumerate(chords):
             # Create a skygrid of the harp's chords
             # For each chord, set the highlighted state of each note accordingly (whether True or False)
+            
+            chord = re.sub(re.escape(pause), '.', chord)
+            
             try:
                 repeat = int(re.split('x', chord)[1])
                 chord = re.split('x', chord)[0]
             except:
-                repeat = 0    
+                repeat = 0
             
             if input_mode in [InputMode.SKY, InputMode.SKYFILE, InputMode.WESTERN, InputMode.WESTERNFILE]:
                 chord = re.sub('([A-G])', ' \\1', chord).split()
             if input_mode in [InputMode.JIANPU, InputMode.JIANPUFILE]:
-                chord = re.sub('([1-9])', ' \\1', chord).split()  #Adds space before note and then split            
+                chord = re.sub('([1-9])', ' \\1', chord).split()  #Adds space before note and then split
+            
+            harp_error = False
+            harp_empty = False
             for note in chord: # Chord is a list of notes
                 #Except InvalidLetterException
                 try:
-                    highlighted_note_position = self.map_note_to_position(note, blank_icon, input_mode, note_shift)
+                    highlighted_note_position = self.map_note_to_position(note, input_mode, note_shift)
                 except KeyError:
+                    harp_error = True
                     pass
                 else:
-                    is_empty = False
                     chord_skygrid[highlighted_note_position] = {}
                     chord_skygrid[highlighted_note_position][chord_idx] = True
-
-        results = [chord_skygrid, not(is_empty), repeat]
+                    if highlighted_note_position[0] < 0 and highlighted_note_position[1] < 0:
+                        chord_skygrid[highlighted_note_position][chord_idx] = False
+            
+            if all([chord_skygrid[k][chord_idx] == False for k in chord_skygrid.keys()]):
+                harp_empty = True
+            
+            #print(str(chord) + ' is empty:' + str(harp_empty) + ' and is error:' + str(harp_error))
+   
+        results = [chord_skygrid, harp_error, harp_empty, repeat]
         return results
 
