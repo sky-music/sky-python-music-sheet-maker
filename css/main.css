@@ -1,13 +1,29 @@
-body {
-  font-family: "Avenir", Arial, sans-serif;
-  font-size: 10 pt;
+/* <!-- The body font size has no effect since all text is embedded --> */
+
+html {
+  scroll-behavior: smooth;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  font-family: "Avenir", Arial, sans-serif;
+  font-size: 12 pt;
+}
+
+/* <!-- Song title --> */
 h1 {
+    font-family: "Avenir", Arial, sans-serif;
 	font-size: 12pt;
 }
 
+/* <!-- Song headers (HTML only) --> */
 p {
+    font-family: "Avenir", Arial, sans-serif;
 	font-size: 10pt;
 	line-height: 50%;
 }
@@ -18,6 +34,7 @@ p {
   -webkit-transform: scale(1.0);
 }
 
+/* <!-- Alignement of SVG (HTML only) --> */
 .note-root svg {
   display: inline-block;
   vertical-align: middle;
@@ -33,6 +50,7 @@ p {
   vertical-align: middle;
 }
 
+/* <!-- Sky chord chart: a table with rounded edges (HTML only) --> */
 table {
   margin-top: 0px;
   margin-bottom: 0px;
@@ -48,24 +66,26 @@ table {
   
 }
 
-hr {
-  height: 2px;
-  background-color: #BBBBBB;
-  border: none;
-  opacity: 1;
-  padding: 0;
-  margin-top: 2px;
-  margin-bottom: 2px;   
+/* <!-- The font size affects the note size! (HTML only)--> */
+td {
+  padding-top: 0px;
+  padding-bottom: 0px;
+  margin: 0px;
+  font-size: 10pt;
 }
 
+/* <!-- Makes the table disappear in case of broken chord  (HTML only)--> */
 table.error {
   border-color: white;
+  border-width: 0;
 }
 
+/* <!-- Empty table  (HTML only)--> */
 table.empty {
   border-color: grey;
 }
 
+/* <!-- Invisible table for lyrics (HTML only) --> */
 table.voice {
   margin: 0px;
   padding: 0px;
@@ -74,6 +94,7 @@ table.voice {
   font-size: 10pt;
 }
 
+/* <!-- Invisible table to contain the repetition mark --> */
 table.repeat {
   margin: 0px;
   padding: 0px;
@@ -83,76 +104,84 @@ table.repeat {
 }
 
 
-td {
-  padding-top: 0px;
-  padding-bottom: 0px;
-  margin: 0px;
-  font-size: 10pt;
+/* <!-- Horizontal line --> */
+hr {
+  height: 2px;
+  background-color: #BBBBBB;
+  border: none;
+  opacity: 1;
+  padding: 0;
+  margin-top: 0px;
+  margin-bottom: 4px;   
 }
 
-.instrument-button{
-	fill:#ffffff;
+/* <!-- TODO: Check if this has no effect ??? --> */
+/* 
+path.instrument-button{
+	fill:#FF0000;
 	opacity:0.4;
 }
-
+ */
+ 
+/* <!-- TODO: Check if this has no effect ??? --> */
 #transcript {
   margin: 0 0;
 }
 
-
+/* <!-- This has no effect since it is overidden --> */
 /*
 .highlighted-0 {
   fill: lightcoral;
   opacity: 1.0;
 }*/
 
-
+/* <!-- Small buttons showing notes positions --> */
 svg.harp-button-0 .unhighlighted.instrument-button-icon,
 svg.harp-button-1 .unhighlighted.instrument-button-icon,
 svg.harp-button-2 .unhighlighted.instrument-button-icon,
 svg.harp-button-3 .unhighlighted.instrument-button-icon,
 svg.harp-button-4 .unhighlighted.instrument-button-icon {
-  stroke-width: 3;
+  stroke-width: 0;
   stroke: white;
   fill: limegreen;
-  opacity: 0.25;
+  opacity: 0.3;
 }
 
-
+/* <!-- Small buttons showing notes positions --> */
 svg.harp-button-5 .unhighlighted.instrument-button-icon,
 svg.harp-button-6 .unhighlighted.instrument-button-icon,
 svg.harp-button-7 .unhighlighted.instrument-button-icon,
 svg.harp-button-8 .unhighlighted.instrument-button-icon,
 svg.harp-button-9 .unhighlighted.instrument-button-icon {
-  stroke-width: 3;
+  stroke-width: 0;
   stroke: white;
   fill: deepskyblue;
-  opacity: 0.25;
+  opacity: 0.3;
 }
 
-
+/* <!-- Small buttons showing notes positions --> */
 svg.harp-button-10 .unhighlighted.instrument-button-icon,
 svg.harp-button-11 .unhighlighted.instrument-button-icon,
 svg.harp-button-12 .unhighlighted.instrument-button-icon,
 svg.harp-button-13 .unhighlighted.instrument-button-icon,
 svg.harp-button-14 .unhighlighted.instrument-button-icon {
-  stroke-width: 3;
+  stroke-width: 0;
   stroke: white;
   fill: deeppink;
-  opacity: 0.25;
+  opacity: 0.3;
 }
 
 /* <!-- Note background when the chord has en error or is empty --> */
 table.error .highlighted-0.instrument-button,
 table.empty .highlighted-0.instrument-button {
-  stroke-width: 3;
+  stroke-width: 0;
   stroke: white;
   fill: none;
 }
 
 /* <!-- Small note buttons when the chord has an error --> */
 table.error .unhighlighted.instrument-button-icon {
-  stroke-width: 3;
+  stroke-width: 0;
   stroke: white;
   fill: none;
   opacity: 0.25;
@@ -160,7 +189,7 @@ table.error .unhighlighted.instrument-button-icon {
 
 /* <!-- Small note button when the chord is empty --> */
 table.empty .unhighlighted.instrument-button-icon {
-  stroke-width: 3;
+  stroke-width: 0;
   stroke: white;
   fill: grey;
   opacity: 0.15;
@@ -168,16 +197,16 @@ table.empty .unhighlighted.instrument-button-icon {
 
 /* <!-- Middle note button when the chord has en error --> */
 table.error svg.harp-button-7 .unhighlighted.instrument-button-icon {
-  stroke-width: 3;
+  stroke-width: 0;
   stroke: white;
   fill: grey;
   opacity: 0.25;
 }
 
 
-/* <!-- Note decoration --> */
+/* <!-- Note decoration (circle, diamond) --> */
 .highlighted-0.instrument-button-icon {
-  stroke-width: 3;
+  stroke-width: 5;
   stroke: white;
   fill: none;
 }
@@ -286,6 +315,8 @@ svg.harp-button-14 path.highlighted-0 {
 }
 
 /* <!-- Button styles if chord has en error --> */
+/* <!-- TODO: Check if this has no effect ??? --> */
+/* 
 .instrument-button-icon.empty {
   fill: red;
   stroke: red;
@@ -295,13 +326,6 @@ svg.harp-button-14 path.highlighted-0 {
   fill: red;
   stroke: red;
 }
+ */
 
-html {
-  scroll-behavior: smooth;
-}
 
-@media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
-}
