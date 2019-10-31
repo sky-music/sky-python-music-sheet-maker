@@ -145,9 +145,10 @@ class Harp:
         else:
             inverse_map  = self.sky_inverse_position_map              
         
-        #TODO: differentiate empty harps and pauses
-        if len(chord_skygrid)==0:
-            ascii_chord = '.' # Empty frame is assumed to be a pause
+        if self.get_is_error():
+            ascii_chord = 'X' # Empty frame is assumed to be a pause
+        elif self.get_is_empty():
+            ascii_chord = '.'
         else:
             for k in chord_skygrid: # Cycle over positions in a frame
                 for f in chord_skygrid[k]: # Cycle over triplets & quavers
@@ -163,10 +164,10 @@ class Harp:
 
         harp_render = ''
 
-        if harp_empty:
+        if harp_error:
+            harp_render += '<table class=\"harp harp-' + str(instrument_index) + ' error\">'           
+        elif harp_empty:
             harp_render += '<table class=\"harp harp-' + str(instrument_index) + ' empty\">'
-        elif harp_error:
-            harp_render += '<table class=\"harp harp-' + str(instrument_index) + ' error\">'
         else:
             harp_render += '<table class=\"harp harp-' + str(instrument_index) + '\">'
 
