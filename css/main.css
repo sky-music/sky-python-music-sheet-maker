@@ -10,21 +10,23 @@ html {
   }
 }
 
+/* <!-- Define the em unit--> */
 body {
   font-family: "Avenir", Arial, sans-serif;
-  font-size: 12 pt;
+  font-size: 12pt;
 }
 
 /* <!-- Song title --> */
-h1 {
+h1, svg text.title {
     font-family: "Avenir", Arial, sans-serif;
-	font-size: 12pt;
+	font-size: 1.3em;
+	font: bold;
 }
 
 /* <!-- Song headers (HTML only) --> */
-p {
+p, svg text.headers {
     font-family: "Avenir", Arial, sans-serif;
-	font-size: 10pt;
+	font-size: 0.8em;
 	line-height: 50%;
 }
 
@@ -34,7 +36,8 @@ p {
   -webkit-transform: scale(1.0);
 }
 
-/* <!-- Alignement of SVG (HTML only) --> */
+/* <!-- Alignment of SVG (HTML only) --> */
+/* <!-- Seems to have no effect ? --> */
 .note-root svg {
   display: inline-block;
   vertical-align: middle;
@@ -66,23 +69,45 @@ table {
   
 }
 
+/* <!-- Sky chord chart: a table with rounded edges (SVG only) --> */
+svg rect.harp {
+  fill:none;
+  stroke-width:1;
+  stroke:black;
+}
+
+
 /* <!-- The font size affects the note size! (HTML only)--> */
 td {
   padding-top: 0px;
   padding-bottom: 0px;
   margin: 0px;
-  font-size: 10pt;
+  font-size: 1em;
 }
 
 /* <!-- Makes the table disappear in case of broken chord  (HTML only)--> */
-table.error {
+table.broken {
   border-color: white;
   border-width: 0;
 }
 
-/* <!-- Empty table  (HTML only)--> */
-table.empty {
-  border-color: grey;
+/* <!-- Makes the table disappear in case of broken chord  (SVG only)--> */
+svg.broken rect{
+  fill:none;
+  stroke-width:0;
+  stroke:white;
+}
+
+/* <!-- Silent table  (HTML only)--> */
+table.silent {
+  border-color:#BBBBBB;
+  border-width:0;
+}
+
+/* <!-- Silent table  (HTML only)--> */
+svg.silent rect {
+  stroke: grey;
+  stroke-width:0;
 }
 
 /* <!-- Invisible table for lyrics (HTML only) --> */
@@ -91,7 +116,16 @@ table.voice {
   padding: 0px;
   border-radius: 0px;
   border-width: 0px;
-  font-size: 10pt;
+  font-size: 0.8em;
+}
+
+/* <!-- Sky voice (SVG only) --> */
+svg text.voice {
+  font-family: "Avenir", Arial, sans-serif;
+  font-size: 0.8em;
+  stroke: none;
+  fill:black;
+  dominant-baseline: middle;
 }
 
 /* <!-- Invisible table to contain the repetition mark --> */
@@ -100,7 +134,16 @@ table.repeat {
   padding: 0px;
   border-radius: 0px;
   border-width: 0px;
-  font-size: 9pt;
+  font-size: 0.8em;
+}
+
+/* <!-- Bottom-left corner repetition mark --> */
+svg.repeat text.repeat {
+  stroke: none;
+  fill:black;
+  dominant-baseline: baseline;
+  font-size: 0.9em;
+  font-family: "Avenir", Arial, sans-serif;
 }
 
 
@@ -114,6 +157,12 @@ hr {
   margin-top: 0px;
   margin-bottom: 4px;   
 }
+
+svg line.divide {
+	stroke: grey;
+	stroke-width: 1.0px;
+}
+
 
 /* <!-- TODO: Check if this has no effect ??? --> */
 /* 
@@ -134,6 +183,12 @@ path.instrument-button{
   fill: lightcoral;
   opacity: 1.0;
 }*/
+
+/* 
+<svg class="note-root harp-button-0" xmlns="https://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 91 91">
+<circle cx="45.4" cy="45.4" r="12" class="instrument-button-icon unhighlighted"/></svg>
+ */
+
 
 /* <!-- Small buttons showing notes positions --> */
 svg.harp-button-0 .unhighlighted.instrument-button-icon,
@@ -171,36 +226,49 @@ svg.harp-button-14 .unhighlighted.instrument-button-icon {
   opacity: 0.3;
 }
 
-/* <!-- Note background when the chord has en error or is empty --> */
-table.error .highlighted-0.instrument-button,
-table.empty .highlighted-0.instrument-button {
+/* <!-- Note background when the chord is or is silent --> */
+table.broken .highlighted-0.instrument-button,
+table.silent .highlighted-0.instrument-button {
   stroke-width: 0;
   stroke: white;
   fill: none;
 }
 
-/* <!-- Small note buttons when the chord has an error --> */
-table.error .unhighlighted.instrument-button-icon {
+/* <!-- Small note buttons when the chord is broken --> */
+table.broken .unhighlighted.instrument-button-icon,
+svg.broken .unhighlighted.instrument-button-icon {
   stroke-width: 0;
   stroke: white;
   fill: none;
   opacity: 0.25;
 }
 
-/* <!-- Small note button when the chord is empty --> */
-table.empty .unhighlighted.instrument-button-icon {
+/* <!-- Small note buttons when the chord is silent --> */
+table.silent .unhighlighted.instrument-button-icon,
+svg.silent .unhighlighted.instrument-button-icon {
   stroke-width: 0;
   stroke: white;
-  fill: grey;
+  fill: none;
   opacity: 0.15;
 }
 
-/* <!-- Middle note button when the chord has en error --> */
-table.error svg.harp-button-7 .unhighlighted.instrument-button-icon {
+/* <!-- Middle note button when the chord is silent --> */
+table.silent svg.harp-button-7 .unhighlighted.instrument-button-icon,
+svg.silent svg.harp-button-7 .unhighlighted.instrument-button-icon {
   stroke-width: 0;
   stroke: white;
   fill: grey;
   opacity: 0.25;
+}
+
+/* <!-- Red question mark when table is broken --> */
+table.broken text,
+svg.broken text {
+  fill: red;
+  text-anchor:middle;
+  font-size:600%;
+  stroke-width:0.05em;
+  stroke:red;
 }
 
 
@@ -314,15 +382,15 @@ svg.harp-button-14 path.highlighted-0 {
   fill: none;
 }
 
-/* <!-- Button styles if chord has en error --> */
+/* <!-- Button styles if chord has en broken --> */
 /* <!-- TODO: Check if this has no effect ??? --> */
 /* 
-.instrument-button-icon.empty {
+.instrument-button-icon.silent {
   fill: red;
   stroke: red;
 }
 
-.note-diamond.empty {
+.note-diamond.silent {
   fill: red;
   stroke: red;
 }
