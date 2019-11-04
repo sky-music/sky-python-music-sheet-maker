@@ -1,21 +1,19 @@
 #!/usr/bin/env python3
 from modes import InputMode, RenderMode
 from parsers import Parser
-from render import write_html, write_ascii
+from songs import Song
 import os
 
 ### Define Errors
-class Error(Exception):
-    """Base class for exceptions in this module."""
-    pass
+#class Error(Exception):
+#    """Base class for exceptions in this module."""
+#    pass
 
-class BlackIconError(Error):
-    pass
 
 # Parameters that can be changed by advanced users
 QUAVER_DELIMITER = '-' # Dash-separated list of chords
 ICON_DELIMITER = ' ' # Chords separation
-NOTE_WIDTH = "1.0em" #Any CSS-compatible unit can be used
+NOTE_WIDTH = "1em" #Any CSS-compatible unit can be used
 PAUSE = '.'
 COMMENT_DELIMITER = '#' # Lyrics delimiter, can be used for comments
 
@@ -119,13 +117,13 @@ if song_input_mode in [InputMode.WESTERN, InputMode.JIANPU, InputMode.WESTERNFIL
         print('\nTransposition is not implemented yet. Assuming you will play in \'C\'.')
 
 # Parses song line by line
-instrument_lines = [] # An array of Instrument class lines
+mysong = Song()
 if song_input_mode in [InputMode.SKYFILE, InputMode.WESTERNFILE, InputMode.JIANPUFILE]:
     try:
         song_lines = open(fp,mode='r')            
         for song_line in song_lines:
             instrument_line = myparser.parse_line(song_line.rstrip(), ICON_DELIMITER, PAUSE, QUAVER_DELIMITER, COMMENT_DELIMITER, song_input_mode, note_shift)            
-            instrument_lines.append(instrument_line)    
+            mysong.add_line(instrument_line)
         song_lines.close()
     except (OSError, IOError) as err:
         print('Error opening file.')
@@ -133,7 +131,7 @@ if song_input_mode in [InputMode.SKYFILE, InputMode.WESTERNFILE, InputMode.JIANP
 else:
     for song_line in song_lines:
         instrument_line = myparser.parse_line(song_line, ICON_DELIMITER, PAUSE, QUAVER_DELIMITER, COMMENT_DELIMITER, song_input_mode, note_shift)    
-        instrument_lines.append(instrument_line)   
+        mysong.add_line(instrument_line)   
 
 
 print('=========================')
@@ -150,26 +148,38 @@ original_artists = input('Original artist(s): ')
 transcript_writer = input('Transcribed by: ')
 
 # Renders the song
-titlehead = [[''], [song_title]]
-headers = [['Original Artist(s):', 'Transcript:', 'Musical key:'], [original_artists, transcript_writer, musical_key]]
+mysong.set_title(song_title)
+mysong.set_headers(original_artists, transcript_writer, musical_key)
 
 html_path = os.path.join(song_title + '.html')
-with open(html_path, 'w+') as html_file:
-    write_html(html_file, titlehead, headers, instrument_lines, NOTE_WIDTH, RenderMode.VISUALHTML)
+html_path = mysong.write_html(html_path, NOTE_WIDTH, RenderMode.VISUALHTML)
 
-print('=========================')
-print('Your song in HTML is located at:', os.path.join(str(song_dir), html_path))
+if html_path != '':
+    print('=========================')
+    print('Your song in HTML is located at:', os.path.join(str(song_dir), html_path))
+
+svg_path0 = os.path.join(song_title + '.svg')
+filenum, svg_path = mysong.write_svg(svg_path0, RenderMode.VISUALIMG)
+
+if svg_path != '':
+    print('-------------------------')
+    print('Your song in SVG is located at:', os.path.join(str(song_dir)))
+    print('Your song has been splitted in ' + str(filenum+1) + ' files '
+          'between ' + os.path.split(svg_path0)[1] + ' and ' + os.path.split(svg_path)[1])
+
 
 if song_input_mode in [InputMode.WESTERN, InputMode.JIANPU, InputMode.WESTERNFILE, InputMode.JIANPUFILE]:
     sky_ascii_path = os.path.join(song_title + '_sky.txt')
-    with open(sky_ascii_path, 'w+') as sky_ascii:
-        write_ascii(sky_ascii, titlehead, headers, instrument_lines, RenderMode.SKYASCII)
-    print('Your song converted to Sky notation is located at:', os.path.join(str(song_dir), sky_ascii_path))    
+    res = mysong.write_ascii(sky_ascii_path, RenderMode.SKYASCII)
+    if sky_ascii_path != '':
+        print('-------------------------')
+        print('Your song converted to Sky notation is located at:', os.path.join(str(song_dir), sky_ascii_path))    
  
 if song_input_mode in [InputMode.SKY, InputMode.SKYFILE, InputMode.SKYKEYBOARD]:
     western_ascii_path = os.path.join(song_title + '_western.txt')
-    with open(western_ascii_path, 'w+') as western_ascii:
-        write_ascii(western_ascii, titlehead, headers, instrument_lines, RenderMode.WESTERNASCII)
-    print('Your song converted to Western notation is located at:', os.path.join(str(song_dir), western_ascii_path))    
+    western_ascii_path = mysong.write_ascii(western_ascii_path, RenderMode.WESTERNASCII)
+    if western_ascii_path != '':
+        print('-------------------------')
+        print('Your song converted to Western notation is located at:', os.path.join(str(song_dir), western_ascii_path))    
        
 os.chdir(mycwd)

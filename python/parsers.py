@@ -2,14 +2,14 @@
 import re
 import os
 from modes import InputMode
-from instruments import Harp, Voice
+import instruments
 
 
 ### Parser
 
 class Parser:
     
-    def __init__(self):
+    def __init__(self):   
         
         self.columns = 5
         self.lines = 3
@@ -52,6 +52,7 @@ class Parser:
                 '2++': (3, 0), '3++': (3, 1), '4++': (3, 2), '5++': (3, 3), '6++': (3, 4),
                 '7++': (4, 0), '1+++': (4, 1), '2+++': (4, 2), '3+++': (4, 3), '4+++': (4, 4)
                 }
+        
         self.Cmajor = [['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'],
                       ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']]   
         self.onemajor = [['1', '2b', '2', '3b', '3', '4', '5b', '5', '6b', '6', '7b', '7'],
@@ -108,18 +109,18 @@ class Parser:
         possible_keys = scale[0].copy()       
                                                    
         for line in song_lines: 
-            if len(line)>0 and any([key!='' for key in possible_keys]):
+            if len(line)>0 and any([musickey!='' for musickey in possible_keys]):
                 if line[0] != comment_delimiter:     
                     notes = re.sub(isNoteRegExp,' \\1',re.sub(notNoteRegExp,'',line)).split() # Clean-up, adds space and split
-                    for i in range(len(possible_keys)):
-                        if possible_keys[i]!='':
+                    for key_idx, musickey in enumerate(possible_keys):
+                        if musickey!='':
                             key_scale = [[scale[0][j] for j in indices], [scale[1][j] for j in indices]]
                             if not all([(note in key_scale[0]) or (note in key_scale[1]) for note in notes]):
-                                possible_keys[i]=''
+                                possible_keys[key_idx]=''
                         scale[0] = scale[0][1::] + scale[0][:1:] # circ shift
                         scale[1] = scale[1][1::] + scale[1][:1:] # circ shift
 
-        possible_keys = [key for key in possible_keys if key != ''] # return reduced set of possible keys
+        possible_keys = [musickey for musickey in possible_keys if musickey != ''] # return reduced set of possible keys
         return self.jianpu2western(possible_keys)
                        
     def parse_icon(self, icon, delimiter, input_mode):
@@ -130,27 +131,28 @@ class Parser:
         Returns instrument_line: a list of chord 'skygrid' (1 chord = 1 dict)
         ''' 
         instrument_line = []
-        line = line.rstrip().lstrip().replace(icon_delimiter+icon_delimiter,icon_delimiter) # clean-up
+        line = line.strip().replace(icon_delimiter+icon_delimiter,icon_delimiter) # clean-up
         if len(line)>0:
             if line[0] == comment_delimiter:
                 lyrics = line.split(comment_delimiter)
                 for lyric in lyrics:
                     if len(lyric)>0:
-                        voice = Voice()
-                        voice.set_chord_skygrid(lyric.rstrip().lstrip())
+                        voice = instruments.Voice()
+                        voice.set_lyric(lyric.strip())
                         instrument_line.append(voice)
             else:
                 icons=line.split(icon_delimiter)
                  #TODO: Implement logic for parsing line vs single icon.        
                 for icon in icons:
                     chords = self.parse_icon(icon, quaver_delimiter, input_mode)
-                    chord_skygrid, harp_error, harp_empty, repeat = self.parse_chords(chords, pause, input_mode, note_shift)
+                    chord_skygrid, harp_broken, harp_silent, repeat = self.parse_chords(chords, pause, input_mode, note_shift)
 
-                    harp = Harp()
+                    harp = instruments.Harp()
                     harp.set_repeat(repeat)
-                    harp.set_is_empty(harp_empty)
-                    harp.set_is_error(harp_error)
+                    harp.set_is_silent(harp_silent)
+                    harp.set_is_broken(harp_broken)
                     harp.set_chord_skygrid(chord_skygrid)
+                    
         
                     instrument_line.append(harp)
 
@@ -171,8 +173,8 @@ class Parser:
         else:
             position_map = self.get_keyboard_position_map()
         
-        note = note.upper()                  
-        
+        note = note.upper()
+               
         if note in position_map.keys(): # Note Shift (ie transposition in Sky)           
             pos=position_map[note] #tuple
             if (pos[0] < 0) and (pos[1] < 0): #Special character
@@ -190,7 +192,7 @@ class Parser:
 
     def parse_chords(self, chords, pause='.', input_mode=0, note_shift=0):
         
-        harp_error = True
+        harp_broken = True
         chord_skygrid = {}
         for chord_idx, chord in enumerate(chords):
             # Create a skygrid of the harp's chords
@@ -209,26 +211,24 @@ class Parser:
             if input_mode in [InputMode.JIANPU, InputMode.JIANPUFILE]:
                 chord = re.sub('([1-9])', ' \\1', chord).split()  #Adds space before note and then split
             
-            harp_error = False
-            harp_empty = False
+            harp_broken = False
+            harp_silent = False
             for note in chord: # Chord is a list of notes
-                #Except InvalidLetterException
+                #Except InvalidLetterException       
                 try:
                     highlighted_note_position = self.map_note_to_position(note, input_mode, note_shift)
                 except KeyError:
-                    harp_error = True
+                    #harp_silent = False
+                    harp_broken = True
                     pass
                 else:
                     chord_skygrid[highlighted_note_position] = {}
                     chord_skygrid[highlighted_note_position][chord_idx] = True
-                    if highlighted_note_position[0] < 0 and highlighted_note_position[1] < 0:
+                    harp_silent = False
+                    if highlighted_note_position[0] < 0 and highlighted_note_position[1] < 0: #Note is a silence
                         chord_skygrid[highlighted_note_position][chord_idx] = False
-            
-            if all([chord_skygrid[k][chord_idx] == False for k in chord_skygrid.keys()]):
-                harp_empty = True
-            
-            #print(str(chord) + ' is empty:' + str(harp_empty) + ' and is error:' + str(harp_error))
-   
-        results = [chord_skygrid, harp_error, harp_empty, repeat]
+                        harp_silent = True
+
+        results = [chord_skygrid, harp_broken, harp_silent, repeat]
         return results
 
