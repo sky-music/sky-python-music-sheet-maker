@@ -2,6 +2,7 @@ from modes import RenderMode
 #import re
 import instruments
 import os
+from PIL import Image
 
 class Song():
 
@@ -56,7 +57,7 @@ class Song():
     def get_voice_SVG_height(self):
         return self.fontpt*self.pt2px
     
-    def write_html(self, file_path, note_width='1em', render_mode=RenderMode.VISUALHTML, embed_css=True, css_path='css/main.css'):
+    def write_html(self, file_path, note_width='1em', render_mode=RenderMode.VISUAL, embed_css=True, css_path='css/main.css'):
         
         try:
             html_file = open(file_path, 'w+')
@@ -76,10 +77,11 @@ class Song():
             css_file = ''
     
         if embed_css == True:
-            html_file.write('<style type=\"text/css\">')
+            html_file.write('\n<style type=\"text/css\">')
             html_file.write(css_file)
-            html_file.write('</style>')
+            html_file.write('\n</style>')
         else:
+            css_path = os.path.relpath('css/main.css', start= os.path.dirname(file_path))
             html_file.write('\n<link href="' + css_path + '" rel="stylesheet" />')
             
         html_file.write('\n<meta charset="utf-8"/></head>\n<body>')
@@ -146,7 +148,7 @@ class Song():
     
         return file_path
     
-    def write_svg(self, file_path0, render_mode=RenderMode.VISUALIMG, embed_css=True, css_path='css/main.css', start_row=0, filenum=0,):    
+    def write_svg(self, file_path0, render_mode=RenderMode.VISUAL, embed_css=True, css_path='css/main.css', start_row=0, filenum=0):    
         
         if filenum>self.maxFiles:
             print('\nYour song is too long. Stopping at ' + str(self.maxFiles) + ' files.')
@@ -182,8 +184,9 @@ class Song():
             svg_file.write('\n]]></style></defs>'
                            '\n<title>' + self.title + '-' + str(filenum) + '</title>')
         else:
+            css_path = os.path.relpath('css/main.css', start= os.path.dirname(file_path))
             svg_file.write('<?xml version=\"1.0\" encoding=\"utf-8\" ?>'
-                          '\n<?xml-stylesheet href=\"../css/main.css\" type=\"text/css\" alternate=\"no\" media=\"all\"?>'
+                          '\n<?xml-stylesheet href=\"' + css_path + '\" type=\"text/css\" alternate=\"no\" media=\"all\"?>'
                           '\n<svg baseProfile=\"full\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:ev=\"http://www.w3.org/2001/xml-events\" xmlns:xlink=\"http://www.w3.org/1999/xlink\"'
                           ' width=\"100%\" height=\"100%\"'
                           ' viewBox=\"' + ' '.join((str(self.viewPort[0]), str(self.viewPort[1]), str(self.viewPort[2]), str(self.viewPort[3]))) + '\" preserveAspectRatio=\"xMinYMin\">'
@@ -310,4 +313,3 @@ class Song():
             filenum, file_path = self.write_svg(file_path0, render_mode, embed_css, css_path, end_row, filenum+1) 
         
         return filenum, file_path
-    
