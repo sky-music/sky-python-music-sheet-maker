@@ -56,7 +56,7 @@ class Song():
     def get_voice_SVG_height(self):
         return self.fontpt*self.pt2px
     
-    def write_html(self, file_path, note_width = '1em', render_mode = RenderMode.VISUALHTML):
+    def write_html(self, file_path, note_width='1em', render_mode=RenderMode.VISUALHTML, embed_css=True, css_path='css/main.css'):
         
         try:
             html_file = open(file_path, 'w+')
@@ -66,9 +66,23 @@ class Song():
         
         html_file.write('<!DOCTYPE html>'
                         '\n<html xmlns:svg=\"http://www.w3.org/2000/svg\">')
-        html_file.write('\n<head>\n<title>' + self.title + '</title>')        
-        html_file.write('\n<link href="../css/main.css" rel="stylesheet" /> <meta charset="utf-8"/>'
-                        '\n</head>\n<body>')
+        html_file.write('\n<head>\n<title>' + self.title + '</title>')  
+        
+        try:
+            with open(css_path, 'r') as css_file:
+                css_file = css_file.read()
+        except:
+            print('Could not open CSS file.')
+            css_file = ''
+    
+        if embed_css == True:
+            html_file.write('<style type=\"text/css\">')
+            html_file.write(css_file)
+            html_file.write('</style>')
+        else:
+            html_file.write('\n<link href="' + css_path + '" rel="stylesheet" />')
+            
+        html_file.write('\n<meta charset="utf-8"/></head>\n<body>')
         html_file.write('\n<h1> ' + self.title + ' </h1>')
       
         for i in range(len(self.headers[0])):
@@ -132,7 +146,7 @@ class Song():
     
         return file_path
     
-    def write_svg(self, file_path0, render_mode=RenderMode.VISUALIMG, start_row=0, filenum=0):    
+    def write_svg(self, file_path0, render_mode=RenderMode.VISUALIMG, embed_css=True, css_path='css/main.css', start_row=0, filenum=0,):    
         
         if filenum>self.maxFiles:
             print('\nYour song is too long. Stopping at ' + str(self.maxFiles) + ' files.')
@@ -151,15 +165,30 @@ class Song():
             return ''
         
         # SVG/XML headers
-        file_header = ('<?xml version=\"1.0\" encoding=\"utf-8\" ?>'
-                      '\n<?xml-stylesheet href=\"../css/main.css\" type=\"text/css\" title=\"' + self.title + '-' + str(filenum) + '\" alternate=\"no\" media=\"all\"?>'
+        if embed_css == True:
+            try:
+                with open(css_path, 'r') as css_file:
+                    css_file = css_file.read()
+            except:
+                print('Could not open CSS file.')
+                css_file = ''
+
+            svg_file.write('<?xml version=\"1.0\" encoding=\"utf-8\" ?>'
                       '\n<svg baseProfile=\"full\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:ev=\"http://www.w3.org/2001/xml-events\" xmlns:xlink=\"http://www.w3.org/1999/xlink\"'
                       ' width=\"100%\" height=\"100%\"'
                       ' viewBox=\"' + ' '.join((str(self.viewPort[0]), str(self.viewPort[1]), str(self.viewPort[2]), str(self.viewPort[3]))) + '\" preserveAspectRatio=\"xMinYMin\">'
-                      '\n<defs></defs>'
-                      '\n<title>' + self.title + '-' + str(filenum) + '</title>')
-                      
-        svg_file.write(file_header)
+                      '\n<defs><style type=\"text/css\"><![CDATA[\n')             
+            svg_file.write(css_file)             
+            svg_file.write('\n]]></style></defs>'
+                           '\n<title>' + self.title + '-' + str(filenum) + '</title>')
+        else:
+            svg_file.write('<?xml version=\"1.0\" encoding=\"utf-8\" ?>'
+                          '\n<?xml-stylesheet href=\"../css/main.css\" type=\"text/css\" alternate=\"no\" media=\"all\"?>'
+                          '\n<svg baseProfile=\"full\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:ev=\"http://www.w3.org/2001/xml-events\" xmlns:xlink=\"http://www.w3.org/1999/xlink\"'
+                          ' width=\"100%\" height=\"100%\"'
+                          ' viewBox=\"' + ' '.join((str(self.viewPort[0]), str(self.viewPort[1]), str(self.viewPort[2]), str(self.viewPort[3]))) + '\" preserveAspectRatio=\"xMinYMin\">'
+                          '\n<defs></defs>'
+                          '\n<title>' + self.title + '-' + str(filenum) + '</title>')
 
         # Header SVG container
         song_header = ('\n<svg x=\"' + '%.2f'%self.viewPortMargins[0] + '\" y=\"' + '%.2f'%self.viewPortMargins[1] + \
@@ -278,7 +307,7 @@ class Song():
         #TODO: build array of file paths
         if end_row < len(self.lines):
             #print('reached row ' + str(end_row) + 'out of ' + str(len(self.lines)) + ':creating new file #' + str(filenum+1))
-            filenum, file_path = self.write_svg(file_path0, render_mode, end_row, filenum+1) 
+            filenum, file_path = self.write_svg(file_path0, render_mode, embed_css, css_path, end_row, filenum+1) 
         
         return filenum, file_path
     
