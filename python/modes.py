@@ -8,10 +8,11 @@ class InputMode(Enum):
     SKYFILE = 5
     WESTERNFILE = 6
     JIANPUFILE = 7
+    WESTERNCHORDS = 8
+    WESTERNCHORDSFILE = 9
 
 class RenderMode(Enum):
-    VISUALHTML = 1
-    VISUALIMG = 2
-    SKYASCII = 3
-    WESTERNASCII = 4
-    JIANPUASCII = 5
+    VISUAL = 1
+    SKYASCII = 2
+    WESTERNASCII = 3
+    JIANPUASCII = 4
