@@ -1,5 +1,3 @@
-/* <!-- The body font size has no effect since all text is embedded --> */
-
 html {
   scroll-behavior: smooth;
 }
@@ -71,7 +69,7 @@ table {
 
 /* <!-- Sky chord chart: a table with rounded edges (SVG only) --> */
 svg rect.harp {
-  fill:none;
+  fill:white;
   stroke-width:1;
   stroke:black;
 }
@@ -108,6 +106,7 @@ table.silent {
 svg.silent rect {
   stroke: grey;
   stroke-width:0;
+  fill:none;
 }
 
 /* <!-- Invisible table for lyrics (HTML only) --> */
@@ -198,8 +197,8 @@ svg.harp-button-3 .unhighlighted.instrument-button-icon,
 svg.harp-button-4 .unhighlighted.instrument-button-icon {
   stroke-width: 0;
   stroke: white;
-  fill: limegreen;
-  opacity: 0.3;
+  fill: rgb(194,240,194);
+  opacity: 1;
 }
 
 /* <!-- Small buttons showing notes positions --> */
@@ -210,8 +209,8 @@ svg.harp-button-8 .unhighlighted.instrument-button-icon,
 svg.harp-button-9 .unhighlighted.instrument-button-icon {
   stroke-width: 0;
   stroke: white;
-  fill: deepskyblue;
-  opacity: 0.3;
+  fill: rgb(179,236,255);
+  opacity: 1;
 }
 
 /* <!-- Small buttons showing notes positions --> */
@@ -222,8 +221,8 @@ svg.harp-button-13 .unhighlighted.instrument-button-icon,
 svg.harp-button-14 .unhighlighted.instrument-button-icon {
   stroke-width: 0;
   stroke: white;
-  fill: deeppink;
-  opacity: 0.3;
+  fill: rgb(255,185,223);
+  opacity: 1;
 }
 
 /* <!-- Note background when the chord is or is silent --> */
@@ -240,7 +239,6 @@ svg.broken .unhighlighted.instrument-button-icon {
   stroke-width: 0;
   stroke: white;
   fill: none;
-  opacity: 0.25;
 }
 
 /* <!-- Small note buttons when the chord is silent --> */
@@ -249,16 +247,16 @@ svg.silent .unhighlighted.instrument-button-icon {
   stroke-width: 0;
   stroke: white;
   fill: none;
-  opacity: 0.15;
 }
 
 /* <!-- Middle note button when the chord is silent --> */
 table.silent svg.harp-button-7 .unhighlighted.instrument-button-icon,
-svg.silent svg.harp-button-7 .unhighlighted.instrument-button-icon {
+svg.silent svg.harp-button-7 .unhighlighted.instrument-button-icon,
+svg.silent.harp-button-7 .unhighlighted.instrument-button-icon {
   stroke-width: 0;
   stroke: white;
-  fill: grey;
-  opacity: 0.25;
+  fill: #BBBBBB;
+  opacity: 1;
 }
 
 /* <!-- Red question mark when table is broken --> */
