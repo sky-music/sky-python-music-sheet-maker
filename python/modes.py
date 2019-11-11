@@ -1,18 +1,32 @@
 from enum import Enum
 
-class InputMode(Enum):
-    SKYKEYBOARD = 1
-    SKY = 2
-    WESTERN = 3
-    JIANPU = 4
-    SKYFILE = 5
-    WESTERNFILE = 6
-    JIANPUFILE = 7
-    WESTERNCHORDS = 8
-    WESTERNCHORDSFILE = 9
+class InputModes(Enum):
+    SKYKEYBOARD = [1, 'Sky keyboard']
+    SKY = [2, 'Sky ABC1-5']
+    WESTERN = [3, 'Western CDEFGAB2-7']
+    JIANPU = [4, 'Jianpu 1234567+-']
+    WESTERNCHORDS = [5, 'Chords CDEFGAB']
 
-class RenderMode(Enum):
+class RenderModes(Enum):
     VISUAL = 1
     SKYASCII = 2
     WESTERNASCII = 3
     JIANPUASCII = 4
+    
+    
+#from enum import Enum
+
+#InputModes = {
+#    'SKYKEYBOARD' : [1, 'Sky keyboard'],
+#    'SKY' : [2, 'Sky ABC1-5'],
+#    'WESTERN' : [3, 'Western CDEFGAB2-7'],
+#    'JIANPU' : [4, 'Jianpu 1234567+-'],
+#    'WESTERNCHORDS' : [5, 'Chords CDEFGAB']
+#}
+#    
+#RenderModes = {
+#    'VISUAL' : 1,
+#    'SKYASCII' : 2,
+#    'WESTERNASCII' : 3,
+#    'JIANPUASCII' : 4
+#}

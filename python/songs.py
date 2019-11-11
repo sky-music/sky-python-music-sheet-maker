@@ -1,4 +1,4 @@
-from modes import RenderMode
+from modes import RenderModes
 import instruments
 import os
 from PIL import Image, ImageDraw, ImageFont
@@ -53,17 +53,41 @@ class Song():
             return self.lines[row]
         except:
             return [[]]
-        
+    
+    def get_song(self):
+            return self.lines
+          
     def get_instrument(self, row, col):
         try:
             return self.lines[row][col]
         except:
             return []
+        
+    def get_num_lines(self):
+        return len(self.lines)
+
+    def get_num_instruments(self):
+        c = 0
+        for line in self.lines:
+            c += len(line)
+        return c
+    
+    def get_num_broken(self):
+        b=0
+        for line in self.lines:
+            for instr in line:
+                try:
+                    b += int(instr.get_is_broken())
+                except:
+                    pass
+        return b
     
     def get_max_instruments_per_line(self):        
         if len(self.lines) > 0:
             return max(list(map(len, self.lines)))        
-    
+        else:
+            return 0
+        
     def set_title(self, title):
         self.title = title
         
@@ -75,7 +99,7 @@ class Song():
     
     def set_png_harp_size(self):       
         if self.png_harp_size == None or self.png_harp_spacings == None:
-            Nmax = min(self.maxIconsPerLine, self.get_max_instruments_per_line())
+            Nmax = max(1,min(self.maxIconsPerLine, self.get_max_instruments_per_line()))
             new_harp_width = min(self.png_harp_size0[0], (self.png_size[0]-self.png_margins[0])/(Nmax * (1 + self.harp_relspacings[0])))
             self.png_harp_size = (new_harp_width, new_harp_width/self.harp_AspectRatio)
             self.png_harp_spacings = (self.harp_relspacings[0]*self.png_harp_size[0], self.harp_relspacings[1]*self.png_harp_size[1])
@@ -109,9 +133,9 @@ class Song():
             css_file = ''
     
         if embed_css in [True, 'True']:
-            html_file.write('\n<style type=\"text/css\"><![CDATA[\n')
+            html_file.write('\n<style type=\"text/css\">\n')
             html_file.write(css_file)
-            html_file.write('\n]]></style>')
+            html_file.write('\n</style>')
         elif embed_css in ['IMPORT', 'import']:
             css_path = os.path.relpath(css_path, start=os.path.dirname(file_path)).replace('\\','/')
             html_file.write('\n<style type=\"text/css\">')
@@ -156,7 +180,7 @@ class Song():
         return file_path
     
     
-    def write_ascii(self, file_path, render_mode = RenderMode.SKYASCII):    
+    def write_ascii(self, file_path, render_mode = 'SKYASCII'):    
     
         try:
             ascii_file = open(file_path, 'w+')
@@ -291,7 +315,7 @@ class Song():
             
             # Line SVG container            
             if linetype == 'voice':
-                song_render += '\n<svg x=\"0" y=\"' + '%.2f'%y + '\" width=\"' + '%.2f'%self.SVG_line_width + '\" height=\"' + '%.2f'%self.SVG_text_height + '\" class=\"instrument-line line-' + str(row) + '\">' #TODO: modify height              
+                song_render += '\n<svg x=\"0" y=\"' + '%.2f'%y + '\" width=\"' + '%.2f'%self.SVG_line_width + '\" height=\"' + '%.2f'%self.SVG_text_height + '\" class=\"instrument-line line-' + str(row) + '\">'              
                 y += self.SVG_text_height + self.SVG_harp_spacings[1]/2.0
             else:
                 # Dividing line
@@ -319,7 +343,6 @@ class Song():
                     #print('max reached at row=' + str(row) + ' col=' + str(col)) 
                     # New Line SVG placeholder
                     if linetype == 'voice':
-                         #TODO: check text height and position
                         line_render += '\n<svg x=\"0" y=\"' + '%.2f'%y + '\" width=\"' + '%.2f'%self.SVG_line_width + '\" height=\"' + '%.2f'%self.SVG_text_height + '\" class=\"instrument-line line-' + str(row) + '-' + str(sub_line) + '\">'
                         y += self.SVG_text_height + self.SVG_harp_spacings[1]/2.0
                     else:
@@ -388,8 +411,6 @@ class Song():
         hr_line = Image.new('RGBA', (int(self.png_line_width), 3))
         draw = ImageDraw.Draw(hr_line)
         draw = draw.line(((0,1), (self.png_line_width,1)), fill=(150,150,150), width=1)
-
-        #TODO: add headers, and update ysong
 
         x_in_png = int(self.png_margins[0])
         y_in_png = int(self.png_margins[0])
@@ -503,7 +524,7 @@ class Song():
           
         song_render.save(file_path,dpi=self.png_dpi, compress_level=self.png_compress)
         
-        song_render.show()
+        #song_render.show()
         
         #Open new file
         if end_row < len(self.lines):

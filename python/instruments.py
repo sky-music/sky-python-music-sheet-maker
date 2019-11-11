@@ -1,4 +1,4 @@
-from modes import RenderMode
+from modes import RenderModes
 from notes import Note, NoteRoot, NoteCircle, NoteDiamond
 from PIL import Image
 from PIL import ImageDraw, ImageFont
@@ -92,7 +92,6 @@ class Instrument:
         #harp_size = self.get_png_size()
         repeat_im = Image.new('RGBA',(int(max_width), int(self.get_png_chord_size()[1])), color=self.text_bkg)
         draw = ImageDraw.Draw(repeat_im)
-        #TODO: import better font, adjust size
         fnt = ImageFont.truetype(self.font, self.font_size)
         draw.text((0,repeat_im.size[1]), str(self.repeat), font=fnt, fill=self.font_color)
         
@@ -209,14 +208,14 @@ class Harp(Instrument):
             return NoteDiamond(self)
          
 
-    def render_in_ascii(self, render_mode=RenderMode.SKYASCII):
+    def render_in_ascii(self, render_mode='SKYASCII'):
         
         ascii_chord = ''
-        if render_mode == RenderMode.SKYASCII:
+        if render_mode == 'SKYASCII':
             inverse_map = self.sky_inverse_position_map
-        elif render_mode == RenderMode.WESTERNASCII:
+        elif render_mode == 'WESTERNASCII':
             inverse_map = self.western_inverse_position_map
-        elif render_mode == RenderMode.JIANPUASCII:
+        elif render_mode == 'JIANPUASCII':
             inverse_map = self.jianpu_inverse_position_map  
         else:
             inverse_map  = self.sky_inverse_position_map              
