@@ -14,7 +14,7 @@ class Song():
         self.maxLinesPerFile = 10
         self.maxFiles = 10
         self.harp_AspectRatio = 1.455
-        self.harp_relspacings = (0.1, 0.1)  # Fraction of the harp width that will be allocated to the spacing between harps
+        self.harp_relspacings = (0.13, 0.1) #Fraction of the harp width that will be allocated to the spacing between harps
         
         self.SVG_viewPort = (0.0, 0.0, 1334.0, 750.0)
         minDim = self.SVG_viewPort[2]*0.01
@@ -38,41 +38,48 @@ class Song():
         self.png_dpi = (96*2, 96*2)
         self.png_compress = 6
         self.png_color = (255, 255, 255)
-        self.png_font_size = 24
-        self.png_title_font_size = 36
+        self.png_font_size = 32
+        self.png_title_font_size = 48
         self.png_font = 'elements/Roboto-Regular.ttf' 
         self.font_color = (0, 0, 0)
  
     def add_line(self, line):
+        '''Adds a line of Instrument to the Song'''
         if len(line)>0:
             if isinstance(line[0], instruments.Instrument):
                 self.lines.append(line)
         
     def get_line(self, row):
+        '''Returns line #row, if row is in the Song, or else returns an empty list'''
         try:
             return self.lines[row]
         except:
             return [[]]
     
     def get_song(self):
-            return self.lines
+        '''Returns the Song, a list of lists of Instruments'''
+        return self.lines
           
     def get_instrument(self, row, col):
+        '''Returns the Instrument object at row, col in the Song'''
         try:
             return self.lines[row][col]
         except:
             return []
         
     def get_num_lines(self):
+        '''Returns the number of lines n the Song'''
         return len(self.lines)
 
     def get_num_instruments(self):
+        '''Returns the number of instruments in the Song'''
         c = 0
         for line in self.lines:
             c += len(line)
         return c
     
     def get_num_broken(self):
+        '''Returns the number of broken instruments in the Song'''
         b=0
         for line in self.lines:
             for instr in line:
@@ -82,7 +89,8 @@ class Song():
                     pass
         return b
     
-    def get_max_instruments_per_line(self):        
+    def get_max_instruments_per_line(self):
+        '''Returns the number of instruments in the longest line'''
         if len(self.lines) > 0:
             return max(list(map(len, self.lines)))        
         else:
@@ -95,23 +103,27 @@ class Song():
         self.headers[1] = [original_artists, transcript_writer, musical_key]
 
     def get_voice_SVG_height(self):
+        '''Tries to predict the height of the lyrics text when rendered in SVG'''
         return self.fontpt*self.pt2px
     
-    def set_png_harp_size(self):       
+    def set_png_harp_size(self):  
+        '''Shrinks the Harp image, so that the longest line fits up to max_instruments_per_line instruments'''
         if self.png_harp_size == None or self.png_harp_spacings == None:
             Nmax = max(1,min(self.maxIconsPerLine, self.get_max_instruments_per_line()))
-            new_harp_width = min(self.png_harp_size0[0], (self.png_size[0]-self.png_margins[0])/(Nmax * (1 + self.harp_relspacings[0])))
+            new_harp_width = min(self.png_harp_size0[0], (self.png_size[0]-self.png_margins[0])/(Nmax * (1.0 + self.harp_relspacings[0])))
             self.png_harp_size = (new_harp_width, new_harp_width/self.harp_AspectRatio)
             self.png_harp_spacings = (self.harp_relspacings[0]*self.png_harp_size[0], self.harp_relspacings[1]*self.png_harp_size[1])
     
     def get_png_harp_rescale(self):
+        '''Gets the rescale factor to from the original .png Harp image'''
         if self.png_harp_size[0] != None:
             return 1.0*self.png_harp_size[0]/self.png_harp_size0[0]
         else:
             return 1.0
      
     def get_png_text_height(self, fnt):
-            return fnt.getsize('HQfgjyp')[1]
+        '''Calculates the text height in PNG for a standard text depending on the input font size'''
+        return fnt.getsize('HQfgjyp')[1]
     
     def write_html(self, file_path, note_width='1em', embed_css=True, css_path='css/main.css'):
         
@@ -180,7 +192,7 @@ class Song():
         return file_path
     
     
-    def write_ascii(self, file_path, render_mode = 'SKYASCII'):    
+    def write_ascii(self, file_path, render_mode = RenderModes.SKYASCII):    
     
         try:
             ascii_file = open(file_path, 'w+')
@@ -511,7 +523,7 @@ class Song():
                 if instrument.get_repeat()>0:
                     repeat_im = instrument.get_repeat_png(self.png_harp_spacings[0], harp_rescale)
                     line_render = trans_paste(line_render, repeat_im,(int(x),int(y)))
-                    x += repeat_im.size[0]
+                    #x += repeat_im.size[0]
                
                 x += self.png_harp_spacings[0]
                 
@@ -523,7 +535,6 @@ class Song():
                 yline_in_song += self.png_harp_spacings[1]/2.0 
           
         song_render.save(file_path,dpi=self.png_dpi, compress_level=self.png_compress)
-        
         #song_render.show()
         
         #Open new file

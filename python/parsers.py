@@ -138,7 +138,8 @@ class Parser:
         position_maps = [self.keyboard_position_map, self.sky_position_map, self.western_position_map, self.jianpu_position_map]
         good_notes = [0]*len(position_maps)
         num_notes = [0]*len(position_maps)
-        DEFG_notes = 0       
+        DEFG_notes = 0
+        octave_span = 0
         
         for line in song_lines:
             line = line.strip().replace(icon_delimiter+icon_delimiter,icon_delimiter) # clean-up
@@ -152,14 +153,19 @@ class Parser:
                                 repeat, notes = self.split_chord(chord, position_map)
                                 #TODO: use self.map_note_to_position
                                 good_notes[idx] += sum([int(note in position_map.keys()) for note in notes])
-                                DEFG_notes += sum([int(re.sub('[0-9]','',note) in ['D', 'E', 'F', 'G']) for note in notes])
                                 num_notes[idx] += len(notes)
-       
+                                if position_map == self.western_position_map:
+                                    DEFG_notes += sum([int(re.search('[D-G]',note) != None) for note in notes])
+                                    octaves = [re.search('\d',note) for note in notes]
+                                    octaves = sorted([int(octave.group(0)) for octave in octaves if octave != None])
+                                    if len(octaves)>0:
+                                        octave_span = max(octave_span, octaves[-1] - octaves[0] + 1)
+                                     
         num_notes = [1 if x == 0 else x for x in num_notes] #Removes zeros to avoid division by zero
-        
+
         ratios = list(map(truediv, good_notes, num_notes))
         DEFG_notes /= num_notes[possible_modes.index(InputModes.WESTERN)]
-        if (DEFG_notes < 0.1) and (num_notes[possible_modes.index(InputModes.WESTERN)] > 10):
+        if ((DEFG_notes == 0) or (DEFG_notes < 0.01 and octave_span > 2)) and (num_notes[possible_modes.index(InputModes.WESTERN)] > 10):
             ratios[possible_modes.index(InputModes.WESTERN)] *= 0.5
         sorted_inds, sorted_ratios = zip(*sorted([(i,e) for i,e in enumerate(ratios)], key=itemgetter(1), reverse=True))
         if sorted_ratios[0] == 1 and sorted_ratios[1] < 1:
@@ -207,7 +213,7 @@ class Parser:
         return self.jianpu2western(possible_keys)
                        
     
-    def parse_line(self, line, icon_delimiter=' ', pause='.', quaver_delimiter='-', comment_delimiter='#', input_mode=0, note_shift=0):
+    def parse_line(self, line, icon_delimiter=' ', pause='.', quaver_delimiter='-', comment_delimiter='#', input_mode=InputModes.SKY, note_shift=0):
         '''
         Returns instrument_line: a list of chord 'skygrid' (1 chord = 1 dict)
         '''         

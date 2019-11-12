@@ -31,16 +31,21 @@ class Note:
         self.png_size = None
 
     def get_position(self):
+        '''Return the note position as a tuple row/column'''
         return self.position
     
-    def get_middle_index(self):
-        return int(self.row_count*self.column_count/2.0)
-    
     def set_position(self, row_index, col_index):
+        '''Sets the position tuple from row and column values'''
         self.position = (row_index, col_index)
 
     def get_index(self):
+        '''Returns the note index in Sky grid'''
         return (self.position[0] * self.column_count) + self.position[1]
+    
+    def get_middle_index(self):
+        '''Returns the index at the center of Sky grid'''
+        return int(self.row_count*self.column_count/2.0)
+
     
     def get_highlighted_states(self):
         return self.highlighted_states
@@ -59,10 +64,12 @@ class Note:
         return
     
     def set_png_size(self):
+        '''Retrieves the original size of the .png image of a highlighted note'''
         if self.png_size == None:
             self.png_size =  Image.open(self.A_root_png).size
 
     def get_png_size(self):
+        '''Returns the original size of the .png image of a note'''
         if self.png_size == None:
             self.set_png_size()
         return self.png_size
@@ -74,17 +81,17 @@ class Note:
         return '<circle cx=\"45.4\" cy=\"45.4\" r=\"12\" class=\"instrument-button-icon unhighlighted' + ' '.join(highlighted_classes).rstrip() + '\"/>'       
      
     def get_harpBroken_svg(self, highlighted_classes): 
-        #return '<circle cx="45.4" cy="45.4" r="20" class="instrument-button-icon unhighlighted' + ' '.join(highlighted_classes).rstrip() + '"/>'
         return '<text x=\"45.4\" y=\"81\" class=\"broken\">?</text>'
 
     def get_unhighlighted_svg(self, highlighted_classes):       
         return '<circle cx=\"45.4\" cy=\"45.4\" r=\"12\" class=\"instrument-button-icon unhighlighted' + ' '.join(highlighted_classes).rstrip() + '\"/>'
     
-    def get_dead_png(self): 
+    def get_dead_png(self):
+        '''Renders a PNG of a grey note placeholder, in case we want to display an empty harp when it is broken'''
         return Image.open(self.dead_png)      
         
     def get_unhighlighted_png(self): 
-        
+        '''Renders a PNG of a colored note placholder, when the note is note is unplayed'''
         if self.get_position()[0] == 0:
             return Image.open(self.A_unhighlighted_png)
         elif self.get_position()[0] == 1:

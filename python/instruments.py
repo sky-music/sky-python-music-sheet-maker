@@ -1,7 +1,7 @@
-from modes import RenderModes
 from notes import Note, NoteRoot, NoteCircle, NoteDiamond
 from PIL import Image
 from PIL import ImageDraw, ImageFont
+from modes import RenderModes
 import os
 ### Instrument classes
 
@@ -20,8 +20,8 @@ class Instrument:
         self.png_chord_size = None
         self.text_bkg = (255, 255, 255, 0) # Transparent white
         self.font_color = (0,0,0)
-        self.font = 'elements/Roboto-Regular.ttf'  
-        self.font_size = 36
+        self.font = 'elements/RobotoCondensed-Regular.ttf'  
+        self.font_size = 40
         self.repeat_height = None
    
                 
@@ -44,6 +44,13 @@ class Instrument:
 #
 #        self.set_chord_skygrid(chord_skygrid)
     def get_chord_skygrid(self):
+        '''Returns the dictionary for the chord:
+            where each key is the note position (tuple of row/index),
+            the value is a dictionary with key=frame, value=True/False,
+            where True/False means whether the note is played or not.
+            Inactive notes are actually not in the dictionary at all.
+            Example: {(0,0):{0:True}, (1,1):{0:True}}
+        '''
         return self.chord_skygrid
 
     def get_type(self):
@@ -53,47 +60,49 @@ class Instrument:
         self.repeat = repeat
 
     def get_repeat(self):
+        '''Returns the number of times the chord must be repeated'''
         return self.repeat
 
     def set_index(self, index):
         self.index = index
 
     def get_index(self):
+        '''Instrument index in the song'''
         return self.index
      
     def get_is_silent(self):
+        '''Returns whether the Harp is empty of notes (silent)'''
         return self.is_silent
 
     def get_is_broken(self):
+        '''Returns whether the Harp is broken (notes were not recongized by the Parser)'''
         return self.is_broken
 
     def set_is_broken(self, is_broken=True):
-        '''
-        Expecting a boolean, to determine whether the harp could not be translated
-        '''
+        '''Returns a boolean whether the harp could be translated'''
         self.is_broken = is_broken
 
     def set_is_silent(self, is_silent=True):
-        '''
-        Expecting a boolean, to determine whether the harp is empty in this frame
-        '''
+        '''Returns a boolean whether the harp is empty in this frame'''
         self.is_silent = is_silent        
    
     def set_png_chord_size(self):
+        ''' Sets the size of the chord image from the .png file '''
         if self.png_chord_size == None:
             self.png_chord_size =  Image.open(self.chord_png).size
 
     def get_png_chord_size(self):
+        ''' Returns the size of the chord image, or sets it if None '''
         if self.png_chord_size == None:
             self.set_png_chord_size()
         return self.png_chord_size
         
-    def get_repeat_png(self, max_width, rescale=1):            
-        #harp_size = self.get_png_size()
+    def get_repeat_png(self, max_width, rescale=1):
+        '''Returns an image of the repeat number xN'''
         repeat_im = Image.new('RGBA',(int(max_width), int(self.get_png_chord_size()[1])), color=self.text_bkg)
         draw = ImageDraw.Draw(repeat_im)
         fnt = ImageFont.truetype(self.font, self.font_size)
-        draw.text((0,repeat_im.size[1]), str(self.repeat), font=fnt, fill=self.font_color)
+        draw.text((0,repeat_im.size[1]-1.05*fnt.getsize(str(self.repeat))[1]), 'x'+str(self.repeat), font=fnt, fill=self.font_color)
         
         if rescale != 1:
             repeat_im = repeat_im.resize((int(repeat_im.size[0]*rescale),int(repeat_im.size[1]*rescale)),resample=Image.LANCZOS)
@@ -110,11 +119,12 @@ class Voice(Instrument): # Lyrics or comments
         self.text_bkg = (255, 255, 255, 0)
         self.font_color = (0,0,0)
         self.font = 'elements/Roboto-Regular.ttf'  
-        self.font_size = 36
+        self.font_size = 28
         self.lyric_height = None
         self.lyric_width = None
         
-    def render_in_html(self, note_width):     
+    def render_in_html(self, note_width):
+        '''Renders the lyrics text in HTML inside an invisible table'''
         chord_render = '<table class=\"voice\">'
         chord_render +='<tr>'
         chord_render +='<td  width=\"90em\" align=\"center\">' #TODO: width calculated automatically
@@ -135,17 +145,20 @@ class Voice(Instrument): # Lyrics or comments
         return chord_render
             
     def get_lyric_height(self):
+        '''Calculates the height of the lyrics based on a standard text and the font size'''
         if self.lyric_height == None:
            fnt = ImageFont.truetype(self.font, self.font_size)
         return fnt.getsize('HQfgjyp')[1]
     
     def render_in_svg(self, x, width, height, aspect_ratio):
+        '''Renders the lyrics text in SVG'''
         voice_render = '\n<svg x=\"' + '%.2f'%x + '\" y=\"0\" width=\"100%\" height=\"' + height + '\" class=\"voice voice-' + str(self.get_index()) + '\">'
         voice_render += '\n<text x=\"0%\" y=\"50%\" class=\"voice voice-' + str(self.get_index()) + '\">' + self.lyric + '</text>'
         voice_render += '\n</svg>'
         return voice_render
 
-    def render_in_png(self, rescale=1.0):        
+    def render_in_png(self, rescale=1.0):    
+        '''Renders the lyrics text in PNG'''
         chord_size = self.get_png_chord_size()
         lyric_im = Image.new('RGBA',(int(chord_size[0]),int(self.get_lyric_height())), color=self.text_bkg)
         draw = ImageDraw.Draw(lyric_im)
@@ -166,7 +179,6 @@ class Harp(Instrument):
         self.column_count = 5
         self.row_count = 3
         self.highlighted_states_skygrid = []      
-
 
         self.sky_inverse_position_map = {
                 (0, 0): 'A1', (0, 1): 'A2', (0, 2): 'A3', (0, 3): 'A4', (0, 4): 'A5',
@@ -193,7 +205,7 @@ class Harp(Instrument):
         return self.column_count
      
     def get_note_from_position(self, row_index, column_index):
-         
+        '''Returns the note type Root, Diamond, Circle from the position in Sky grid'''
         # Calculate the note's overall index in the harp (0 to 14)              
         note_index = (row_index * self.get_column_count()) + column_index
     
@@ -208,14 +220,14 @@ class Harp(Instrument):
             return NoteDiamond(self)
          
 
-    def render_in_ascii(self, render_mode='SKYASCII'):
+    def render_in_ascii(self, render_mode=RenderModes.SKYASCII):
         
         ascii_chord = ''
-        if render_mode == 'SKYASCII':
+        if render_mode == RenderModes.SKYASCII:
             inverse_map = self.sky_inverse_position_map
-        elif render_mode == 'WESTERNASCII':
+        elif render_mode == RenderModes.WESTERNASCII:
             inverse_map = self.western_inverse_position_map
-        elif render_mode == 'JIANPUASCII':
+        elif render_mode == RenderModes.JIANPUASCII:
             inverse_map = self.jianpu_inverse_position_map  
         else:
             inverse_map  = self.sky_inverse_position_map              

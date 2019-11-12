@@ -131,7 +131,7 @@ if song_notation == 'JIANPU' and QUAVER_DELIMITER =='-':
 
 # Attempts to detect key for input written in absolute musical scales (western, Jianpu)
 musickeys  = []
-if song_notation in ['WESTERN', 'JIANPU']:
+if song_notation in [InputModes.WESTERN, InputModes.JIANPU]:
     musickeys = myparser.find_key(song_lines, COMMENT_DELIMITER, song_notation) 
     if len(musickeys) == 0:
         print("\nYour song cannot be transposed exactly in Sky.")
@@ -139,7 +139,7 @@ if song_notation in ['WESTERN', 'JIANPU']:
         print("\nYour song can be transposed in Sky with the following keys: " + str(musickeys))
         print('Transposition is not implemented yet. Assuming you will play in \'C\'.')
 
-if song_notation in ['WESTERN', 'JIANPU', 'WESTERNCHORDS']:
+if song_notation in [InputModes.WESTERN, InputModes.JIANPU, InputModes.WESTERNCHORDS]:
     try:
         note_shift = int(input('Shift notes by n positions ? (-21 ; +21): ').strip())
     except ValueError:
@@ -200,16 +200,16 @@ if png_path != '':
     print('Your song has been splitted in ' + str(filenum+1) + ' files '
           'between ' + os.path.split(png_path0)[1] + ' and ' + os.path.split(png_path)[1])
 
-if song_notation in ['WESTERN', 'JIANPU', 'WESTERNCHORDS']:
+if song_notation in [InputModes.WESTERN, InputModes.JIANPU, InputModes.WESTERNCHORDS]:
     sky_ascii_path = os.path.join(SONG_DIR, song_title + '_sky.txt')
-    res = mysong.write_ascii(sky_ascii_path, 'SKYASCII')
+    res = mysong.write_ascii(sky_ascii_path, RenderModes.SKYASCII)
     if sky_ascii_path != '':
         print('--------------------------------------------------')
         print('Your song converted to Sky notation is located at:', os.path.join(str(SONG_DIR), sky_ascii_path))    
  
-if song_notation in ['SKY', 'SKYKEYBOARD']:
+if song_notation in [InputModes.SKY, InputModes.SKYKEYBOARD]:
     western_ascii_path = os.path.join(SONG_DIR, song_title + '_western.txt')
-    western_ascii_path = mysong.write_ascii(western_ascii_path, 'WESTERNASCII')
+    western_ascii_path = mysong.write_ascii(western_ascii_path, RenderModes.WESTERNASCII)
     if western_ascii_path != '':
         print('-------------------------')
         print('Your song converted to Western notation is located at:', os.path.join(str(SONG_DIR), western_ascii_path))    
