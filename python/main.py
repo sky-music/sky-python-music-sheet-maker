@@ -9,7 +9,7 @@ import os
 #    """Base class for exceptions in this module."""
 #    pass
 def ask_for_mode(modes):
-    
+
     mydict = {}
     i = 0
     print('Please choose your note format:\n')
@@ -23,15 +23,15 @@ def ask_for_mode(modes):
         mydict[i] = InputModes.SKY
     if InputModes.WESTERN in modes:
         i += 1
-        print(str(i) + ") Western (note name + octave, e.g. C4 D4 E4 ..., or do4 re4 mi4 ...)")    
+        print(str(i) + ") Western (note name + octave, e.g. C4 D4 E4 ..., or do4 re4 mi4 ...)")
         mydict[i] = InputModes.WESTERN
     if InputModes.JIANPU in modes:
         i += 1
-        print(str(i) + ") Jianpu (note names as 1 2 3 4 5 6 7, followed by + or - for octaves)") 
+        print(str(i) + ") Jianpu (note names as 1 2 3 4 5 6 7, followed by + or - for octaves)")
         mydict[i] = InputModes.JIANPU
     if InputModes.WESTERNCHORDS in modes:
         i += 1
-        print(str(i) + ") Guitar chord name (AC D E F G A B):") 
+        print(str(i) + ") Guitar chord name (AC D E F G A B):")
         mydict[i] = InputModes.WESTERNCHORDS
     try:
         song_notation = int(input("Mode (1-" + str(i) + "): ").strip())
@@ -44,11 +44,11 @@ def is_file(string):
     isfile = False
     fp = os.path.join(SONG_DIR, os.path.normpath(string))
     isfile = os.path.isfile(fp)
-    
+
     if not(isfile):
         fp = os.path.join(SONG_DIR, os.path.normpath(string+'.txt'))
         isfile = os.path.isfile(fp)
-    
+
     if not(isfile):
         fp = os.path.join(os.path.normpath(string))
         isfile = os.path.isfile(fp)
@@ -58,8 +58,8 @@ def is_file(string):
         if len(splitted[0])>0 and len(splitted[1])>0 and len(splitted[1])<=5: #then probably a file name
             while not(isfile) and len(fp)>2:
                 print('\nFile not found.')
-                isfile, fp = is_file(input('File name (in ' + os.path.normpath(SONG_DIR) + '/): ').strip())  
-    
+                isfile, fp = is_file(input('File name (in ' + os.path.normpath(SONG_DIR) + '/): ').strip())
+
     return isfile, fp
 
 # Parameters that can be changed by advanced users
@@ -79,14 +79,14 @@ mycwd = os.getcwd()
 os.chdir("..")
 
 ### MAIN SCRIPT
- 
+
 print('===== VISUAL MUSIC SHEETS FOR SKY:CHILDREN OF THE LIGHT =====')
 print('\nAccepted music notes formats:')
 print("\n* Typing on keyboard as you would in Sky:\n   " + myparser.keyboard_layout.replace(' ','\n   '))
 print("\n* Sky colum/row notation:\n   A1 A2 A3 A4 A5\n   B1 B2 B3 B4 B5\n   C1 C2 C3 C4 C5")
-print("\n* Western (note name + octave, e.g. C4 D4 E4 ..., or do4 re4 mi4 ...)")    
-print("\n* Jianpu (note names as 1 2 3 4 5 6 7, followed by + or - for octaves)") 
-#print("  * Guitar chord name (AC D E F G A B):") 
+print("\n* Western (note name + octave, e.g. C4 D4 E4 ..., or do4 re4 mi4 ...)")
+print("\n* Jianpu (note names as 1 2 3 4 5 6 7, followed by + or - for octaves)")
+#print("  * Guitar chord name (AC D E F G A B):")
 print('\nNotes composing a chord must be glued together (e.g. A1B1C1).')
 print('Separate chords with \"' + ICON_DELIMITER + '\".')
 print('Use \"' + PAUSE + '\" for a silence (rest).')
@@ -104,10 +104,10 @@ song_lines = []
 if isfile:
     try:
         for song_line in open(fp,mode='r'):
-            song_lines.append(song_line)           
+            song_lines.append(song_line)
     except (OSError, IOError) as err:
          print('Error opening file.')
-         raise err  
+         raise err
     print('(Song imported from ' + os.path.abspath(fp)+')')
 else:
     song_line = first_line
@@ -129,7 +129,7 @@ elif len(possible_modes) == 0:
 else:
     print('\nWe detected that you use the following notation: ' + possible_modes[0].value[1] + '.')
     song_notation = possible_modes[0]
-     
+
 if song_notation == 'JIANPU' and QUAVER_DELIMITER =='-':
     print('\nWarning: quaver delimiter \'-\' is incompatible with Jianpu notation. Please use \'^\' instead.')
     QUAVER_DELIMITER = '^'
@@ -137,7 +137,7 @@ if song_notation == 'JIANPU' and QUAVER_DELIMITER =='-':
 # Attempts to detect key for input written in absolute musical scales (western, Jianpu)
 musickeys  = []
 if song_notation in [InputModes.WESTERN, InputModes.JIANPU]:
-    musickeys = myparser.find_key(song_lines, COMMENT_DELIMITER, song_notation) 
+    musickeys = myparser.find_key(song_lines, COMMENT_DELIMITER, song_notation)
     if len(musickeys) == 0:
         print("\nYour song cannot be transposed exactly in Sky.")
     else:
@@ -155,7 +155,7 @@ else:
 # Parses song line by line
 mysong = Song()
 for song_line in song_lines:
-    instrument_line = myparser.parse_line(song_line.strip(), ICON_DELIMITER, PAUSE, QUAVER_DELIMITER, COMMENT_DELIMITER, song_notation, note_shift)            
+    instrument_line = myparser.parse_line(song_line.strip(), ICON_DELIMITER, PAUSE, QUAVER_DELIMITER, COMMENT_DELIMITER, song_notation, note_shift)
     mysong.add_line(instrument_line)
 
 
@@ -165,10 +165,10 @@ if mysong.get_num_broken()/max(1,mysong.get_num_instruments())<0.05:
 else:
     print('Your song contains many errors.')
 print('\nPlease fill song info or press ENTER to skip:')
-if len(musickeys)>0:  
+if len(musickeys)>0:
     musical_key = musickeys[0]
 else:
-    musical_key = input('Recommended key to play the visual pattern: ') 
+    musical_key = input('Recommended key to play the visual pattern: ')
 
 song_title = input('Song title (also used for the file name): ')
 if song_title=='':
@@ -210,13 +210,13 @@ if song_notation in [InputModes.WESTERN, InputModes.JIANPU, InputModes.WESTERNCH
     res = mysong.write_ascii(sky_ascii_path, RenderModes.SKYASCII)
     if sky_ascii_path != '':
         print('--------------------------------------------------')
-        print('Your song converted to Sky notation is located at:', os.path.join(str(SONG_DIR), sky_ascii_path))    
- 
+        print('Your song converted to Sky notation is located at:', os.path.join(str(SONG_DIR), sky_ascii_path))
+
 if song_notation in [InputModes.SKY, InputModes.SKYKEYBOARD]:
     western_ascii_path = os.path.join(SONG_DIR, song_title + '_western.txt')
     western_ascii_path = mysong.write_ascii(western_ascii_path, RenderModes.WESTERNASCII)
     if western_ascii_path != '':
         print('--------------------------------------------------')
-        print('Your song in TXT converted to Western notation is located at:', os.path.join(str(SONG_DIR), western_ascii_path))    
+        print('Your song in TXT converted to Western notation is located at:', os.path.join(str(SONG_DIR), western_ascii_path))
 
 os.chdir(mycwd)
