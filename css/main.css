@@ -308,58 +308,30 @@ svg.harp-button-14 path.highlighted-0 {
 }
 
 /* <!-- Below the styles for buttons in a quaver --> */
-.highlighted-1 {
-  fill: orange;
+.highlighted-7 {
+  fill: rgb(68,1,84);
   opacity: 1.0;
 }
 
-.highlighted-1.instrument-button-icon {
+.highlighted-7.instrument-button-icon {
   stroke-width: 3;
   stroke: white;
   fill: none;
 }
 
-.highlighted-2 {
-  fill: gold;
+.highlighted-6 {
+  fill: rgb(68,57,130);
   opacity: 1.0;
 }
 
-.highlighted-2.instrument-button-icon {
-  stroke-width: 3;
-  stroke: white;
-  fill: none;
-}
-
-.highlighted-3 {
-  fill: aquamarine;
-  opacity: 1.0;
-}
-
-.highlighted-3.instrument-button-icon {
-  stroke-width: 3;
-  stroke: white;
-  fill: none;
-}
-
-.highlighted-3.instrument-button-icon {
-  stroke-width: 3;
-  stroke: white;
-  fill: none;
-}
-
-.highlighted-4 {
-  fill: darkcyan;
-  opacity: 1.0;
-}
-
-.highlighted-4.instrument-button-icon {
+.highlighted-6.instrument-button-icon {
   stroke-width: 3;
   stroke: white;
   fill: none;
 }
 
 .highlighted-5 {
-  fill: darkblue;
+  fill: rgb(48,103,141);
   opacity: 1.0;
 }
 
@@ -369,12 +341,46 @@ svg.harp-button-14 path.highlighted-0 {
   fill: none;
 }
 
-.highlighted-6 {
-  fill: blueviolet;
+
+.highlighted-4 {
+  fill: rgb(32,144,140);
   opacity: 1.0;
 }
 
-.highlighted-6.instrument-button-icon {
+.highlighted-4.instrument-button-icon {
+  stroke-width: 3;
+  stroke: white;
+  fill: none;
+}
+
+.highlighted-3 {
+  fill: rgb(53,183,120);
+  opacity: 1.0;
+}
+
+.highlighted-3.instrument-button-icon {
+  stroke-width: 3;
+  stroke: white;
+  fill: none;
+}
+
+.highlighted-2 {
+  fill: rgb(144,214,67);
+  opacity: 1.0;
+}
+
+.highlighted-2.instrument-button-icon {
+  stroke-width: 3;
+  stroke: white;
+  fill: none;
+}
+
+.highlighted-1 {
+  fill: rgb(253,231,36);
+  opacity: 1.0;
+}
+
+.highlighted-1.instrument-button-icon {
   stroke-width: 3;
   stroke: white;
   fill: none;
