@@ -1,4 +1,4 @@
-from modes import RenderModes
+from modes import RenderModes, CSSModes
 import instruments
 import os
 from PIL import Image, ImageDraw, ImageFont
@@ -27,14 +27,16 @@ class Song():
         self.SVG_harp_size = (SVG_harp_width, max(minDim, SVG_harp_width / self.harp_AspectRatio) )
         self.SVG_harp_spacings = (self.harp_relspacings[0]*SVG_harp_width, self.harp_relspacings[1]*SVG_harp_width/self.harp_AspectRatio)
         
-        self.png_size = (750*2, 1334*2) # must be an integer tuple
+        self.png_size = (1334*2, 750*2) # must be an integer tuple
         self.png_margins = (13, 7)
         self.png_harp_size0 = instruments.Harp().render_in_png().size #A tuple
         self.png_harp_spacings0 = (int(self.harp_relspacings[0]*self.png_harp_size0[0]), int(self.harp_relspacings[1]*self.png_harp_size0[1]))
         self.png_harp_size = None
         self.png_harp_spacings = None
         self.png_line_width = int(self.png_size[0] - self.png_margins[0])
-        self.png_lyric_height = instruments.Voice().get_lyric_height()
+        #self.png_lyric_relheight = instruments.Voice().lyric_relheight
+        self.png_lyric_size0 = (self.png_harp_size0[0], instruments.Voice().get_lyric_height())
+        self.png_lyric_size = None
         self.png_dpi = (96*2, 96*2)
         self.png_compress = 6
         self.png_color = (255, 255, 255)
@@ -113,7 +115,11 @@ class Song():
             new_harp_width = min(self.png_harp_size0[0], (self.png_size[0]-self.png_margins[0])/(Nmax * (1.0 + self.harp_relspacings[0])))
             self.png_harp_size = (new_harp_width, new_harp_width/self.harp_AspectRatio)
             self.png_harp_spacings = (self.harp_relspacings[0]*self.png_harp_size[0], self.harp_relspacings[1]*self.png_harp_size[1])
-    
+            self.png_lyric_size = (self.png_harp_size[0], (self.png_harp_size[1]/self.png_harp_size0[1]))
+                
+    def set_png_voice_size(self):     
+            self.png_lyric_size = (self.png_lyric_size0[0]*self.get_png_harp_rescale(),self.png_lyric_size0[1]*self.get_png_harp_rescale())
+        
     def get_png_harp_rescale(self):
         '''Gets the rescale factor to from the original .png Harp image'''
         if self.png_harp_size[0] != None:
@@ -125,7 +131,7 @@ class Song():
         '''Calculates the text height in PNG for a standard text depending on the input font size'''
         return fnt.getsize('HQfgjyp')[1]
     
-    def write_html(self, file_path, note_width='1em', embed_css=True, css_path='css/main.css'):
+    def write_html(self, file_path, note_width='1em', css_mode=CSSModes.EMBED, css_path='css/main.css'):
         
         try:
             html_file = open(file_path, 'w+')
@@ -136,25 +142,22 @@ class Song():
         html_file.write('<!DOCTYPE html>'
                         '\n<html xmlns:svg=\"http://www.w3.org/2000/svg\">')
         html_file.write('\n<head>\n<title>' + self.title + '</title>')  
-        
-        try:
-            with open(css_path, 'r') as css_file:
-                css_file = css_file.read()
-        except:
-            print('Could not open CSS file.')
-            css_file = ''
-    
-        if embed_css in [True, 'True']:
+           
+        if css_mode == CSSModes.EMBED:         
+            try:
+                with open(css_path, 'r') as css_file:
+                    css_file = css_file.read()
+            except:
+                print('Could not open CSS file to embed it in HTML.')
+                css_file = ''          
             html_file.write('\n<style type=\"text/css\">\n')
             html_file.write(css_file)
             html_file.write('\n</style>')
-        elif embed_css in ['IMPORT', 'import']:
-            css_path = os.path.relpath(css_path, start=os.path.dirname(file_path)).replace('\\','/')
+        elif css_mode == CSSModes.IMPORT:
             html_file.write('\n<style type=\"text/css\">')
-            html_file.write("@import url(\'" + css_path + "\');</style>") 
-        elif embed_css in ['XML', 'xml', 'href', 'HREF', False, 'False']:
-            css_path = os.path.relpath(css_path, start=os.path.dirname(file_path))
-            html_file.write('\n<link href=\"' + css_path + '\" rel=\"stylesheet\" />')
+            html_file.write("@import url(\'" + os.path.relpath(css_path, start=os.path.dirname(file_path)).replace('\\','/') + "\');</style>") 
+        elif css_mode == CSSModes.XML:
+            html_file.write('\n<link href=\"' + os.path.relpath(css_path, start=os.path.dirname(file_path)) + '\" rel=\"stylesheet\" />')
             
         html_file.write('\n<meta charset="utf-8"/></head>\n<body>')
         html_file.write('\n<h1> ' + self.title + ' </h1>')
@@ -220,7 +223,7 @@ class Song():
     
         return file_path
     
-    def write_svg(self, file_path0, embed_css=True, css_path='css/main.css', start_row=0, filenum=0):    
+    def write_svg(self, file_path0, css_mode=CSSModes.EMBED, css_path='css/main.css', start_row=0, filenum=0):    
         
         if filenum>self.maxFiles:
             print('\nYour song is too long. Stopping at ' + str(self.maxFiles) + ' files.')
@@ -239,32 +242,29 @@ class Song():
             return filenum, ''
                 
         # SVG/XML headers
-        svg_file.write('<?xml version=\"1.0\" encoding=\"utf-8\" ?>')
+        svg_file.write('<?xml version=\"1.0\" encoding=\"utf-8\" ?>')      
         
-        try:
-            with open(css_path, 'r') as css_file:
-                css_file = css_file.read()
-        except:
-            print('Could not open CSS file.')
-            css_file = ''
-            pass
-        
-        if embed_css in ['XML', 'xml', 'href', 'HREF', False, 'False']:            
-            css_path = os.path.relpath(css_path, start=os.path.dirname(file_path))
-            svg_file.write('\n<?xml-stylesheet href=\"' + css_path + '\" type=\"text/css\" alternate=\"no\" media=\"all\"?>')
+        if css_mode == CSSModes.HREF:            
+            svg_file.write('\n<?xml-stylesheet href=\"' + os.path.relpath(css_path, start=os.path.dirname(file_path)) + '\" type=\"text/css\" alternate=\"no\" media=\"all\"?>')
 
         svg_file.write('\n<svg baseProfile=\"full\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:ev=\"http://www.w3.org/2001/xml-events\" xmlns:xlink=\"http://www.w3.org/1999/xlink\"'
                        ' width=\"100%\" height=\"100%\"'
                        ' viewBox=\"' + ' '.join((str(self.SVG_viewPort[0]), str(self.SVG_viewPort[1]), str(self.SVG_viewPort[2]), str(self.SVG_viewPort[3]))) + '\" preserveAspectRatio=\"xMinYMin\">')
         
-        if embed_css in [True, 'True']:            
+        if css_mode == CSSModes.EMBED: 
+            try:
+                with open(css_path, 'r') as css_file:
+                    css_file = css_file.read()
+            except:
+                print('Could not open CSS file to embed it in SVG.')
+                css_file = ''
+                pass
             svg_file.write('\n<defs><style type=\"text/css\"><![CDATA[\n')             
             svg_file.write(css_file)             
             svg_file.write('\n]]></style></defs>')   
-        elif embed_css in ['IMPORT', 'import']:
-            css_path = os.path.relpath(css_path, start=os.path.dirname(file_path)).replace('\\','/')
+        elif css_mode == CSSModes.IMPORT:
             svg_file.write('\n<defs><style type=\"text/css\">')
-            svg_file.write("@import url(\'" + css_path + "\');</style></defs>") 
+            svg_file.write("@import url(\'" + os.path.relpath(css_path, start=os.path.dirname(file_path)).replace('\\','/') + "\');</style></defs>") 
         else:
             svg_file.write('\n<defs></defs>')
              
@@ -385,7 +385,7 @@ class Song():
         
         #Open new file
         if end_row < len(self.lines):
-            filenum, file_path = self.write_svg(file_path0, embed_css, css_path, end_row, filenum+1) 
+            filenum, file_path = self.write_svg(file_path0, css_mode, css_path, end_row, filenum+1) 
         
         return filenum, file_path
     
@@ -415,6 +415,7 @@ class Song():
                        
         # Determines png size as a function of the numer of chords per line        
         self.set_png_harp_size()
+        self.set_png_voice_size()
         harp_rescale = self.get_png_harp_rescale()
         song_render = Image.new('RGBA', self.png_size, self.png_color)
         
@@ -434,8 +435,10 @@ class Song():
             title_header = Image.new('RGBA', (int(self.png_line_width), int(h)))
             draw = ImageDraw.Draw(title_header)
             draw.text((0,0), self.title, font=fnt, fill=self.font_color)
-            song_render = trans_paste(song_render, title_header, (x_in_png, y_in_png))
-            y_in_png += h*2
+            if harp_rescale != 1:
+                title_header = title_header.resize((int(title_header.size[0]*harp_rescale), int(title_header.size[1]*harp_rescale)), resample=Image.LANCZOS)
+            song_render = trans_paste(song_render, title_header, (int(x_in_png), int(y_in_png)))
+            y_in_png += h*2*harp_rescale
             
             for i in range(len(self.headers[0])):
                 fnt = ImageFont.truetype(self.png_font, self.png_font_size)
@@ -443,15 +446,19 @@ class Song():
                 header = Image.new('RGBA', (int(self.png_line_width), int(h)))
                 draw = ImageDraw.Draw(header)
                 draw.text((0,0), self.headers[0][i] + ' ' + self.headers[1][i], font=fnt, fill=self.font_color)
-                song_render = trans_paste(song_render, header, (x_in_png, y_in_png))
-                y_in_png += h*2
+                if harp_rescale != 1:
+                    header = header.resize((int(header.size[0]*harp_rescale), int(header.size[1]*harp_rescale)), resample=Image.LANCZOS)
+                song_render = trans_paste(song_render, header, (int(x_in_png), int(y_in_png)))
+                y_in_png += h*2*harp_rescale
         else:
             fnt = ImageFont.truetype(self.png_font, self.png_font_size)
             h = self.get_png_text_height(fnt)
             title_header = Image.new('RGBA', (int(self.png_line_width), int(h)))
             draw = ImageDraw.Draw(title_header)
             draw.text((0,0), self.title + '(page ' + str(filenum+1) + ')', font=fnt, fill=self.font_color)
-            song_render = trans_paste(song_render, title_header, (x_in_png, y_in_png))
+            if harp_rescale != 1:
+                title_header = title_header.resize((int(title_header.size[0]*harp_rescale), int(title_header.size[1]*harp_rescale)), resample=Image.LANCZOS)
+            song_render = trans_paste(song_render, title_header, (int(x_in_png), int(y_in_png)))
             y_in_png += 2*h + self.png_harp_spacings[1]
             
 
@@ -470,7 +477,7 @@ class Song():
             nsublines = int(1.0*ncols/self.maxIconsPerLine) # to be changed
             
             if linetype == 'voice':
-                ypredict = yline_in_song  + (self.png_lyric_height+self.png_harp_spacings[1]/2.0)*(nsublines+1) + self.png_harp_spacings[1]/2.0
+                ypredict = yline_in_song  + (self.png_lyric_size[1]+self.png_harp_spacings[1]/2.0)*(nsublines+1) + self.png_harp_spacings[1]/2.0
             else:
                 ypredict = yline_in_song  + (self.png_harp_size[1]+self.png_harp_spacings[1])*(nsublines+1) + self.png_harp_spacings[1]/2.0
                        
@@ -481,7 +488,7 @@ class Song():
             sub_line = 0
             # Line            
             if linetype.lower() == 'voice':
-                line_render = Image.new('RGBA', (int(self.png_line_width),int(self.png_lyric_height)), self.png_color)
+                line_render = Image.new('RGBA', (int(self.png_line_width),int(self.png_lyric_size[1])), self.png_color)
             else:
                 # Dividing line
                 yline_in_song += self.png_harp_spacings[1]/4.0
@@ -510,7 +517,7 @@ class Song():
                     #print('max reached at row=' + str(row) + ' col=' + str(col)) 
                     # New Line
                     if linetype.lower() == 'voice':
-                        line_render = Image.new('RGBA', (int(self.png_line_width),int(self.png_lyric_height)), self.png_color)
+                        line_render = Image.new('RGBA', (int(self.png_line_width),int(self.png_lyric_size[1])), self.png_color)
                     else:
                         line_render = Image.new('RGBA', (int(self.png_line_width),int(self.png_harp_size[1])), self.png_color)
  
@@ -522,10 +529,10 @@ class Song():
                 # REPEAT                
                 if instrument.get_repeat()>0:
                     repeat_im = instrument.get_repeat_png(self.png_harp_spacings[0], harp_rescale)
-                    line_render = trans_paste(line_render, repeat_im,(int(x),int(y)))
-                    #x += repeat_im.size[0]
-               
-                x += self.png_harp_spacings[0]
+                    line_render = trans_paste(line_render, repeat_im, (int(x),int(y+self.png_harp_size[1]-repeat_im.size[1])))
+                    x += max(repeat_im.size[0], self.png_harp_spacings[0])
+                else:
+                    x += self.png_harp_spacings[0]
                 
                 instrument_index += 1              
              
@@ -535,7 +542,6 @@ class Song():
                 yline_in_song += self.png_harp_spacings[1]/2.0 
           
         song_render.save(file_path,dpi=self.png_dpi, compress_level=self.png_compress)
-        #song_render.show()
         
         #Open new file
         if end_row < len(self.lines):

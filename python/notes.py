@@ -28,6 +28,9 @@ class Note:
         self.A_unhighlighted_png = 'elements/A-unhighlighted.png'
         self.B_unhighlighted_png = 'elements/B-unhighlighted.png'
         self.C_unhighlighted_png = 'elements/C-unhighlighted.png'
+        self.root_highlighted_pngs = ['elements/root-highlighted-' + str(i) +'.png' for i in range(1,8)]
+        self.diamond_highlighted_pngs = ['elements/diamond-highlighted-' + str(i) +'.png' for i in range(1,8)]
+        self.circle_highlighted_pngs = ['elements/circle-highlighted-' + str(i) +'.png' for i in range(1,8)]
         self.png_size = None
 
     def get_position(self):
@@ -46,16 +49,15 @@ class Note:
         '''Returns the index at the center of Sky grid'''
         return int(self.row_count*self.column_count/2.0)
 
-    
-    def get_highlighted_states(self):
-        return self.highlighted_states
-
-    def set_highlighted_states(self, highlighted_states):
-        '''
-        highlighted_states is a list of True/False depending on whether the note is highlighted in n-th frame, where n is the index of the item in the list
-        '''
-        #TODO: raise TypeError if type of highlighted_states is not a list
-        self.highlighted_states = highlighted_states
+#    def get_highlighted_states(self):
+#        return self.highlighted_states
+#
+#    def set_highlighted_states(self, highlighted_states):
+#        '''
+#        highlighted_states is a list of True/False depending on whether the note is highlighted in n-th frame, where n is the index of the item in the list
+#        '''
+#        #TODO: raise TypeError if type of highlighted_states is not a list
+#        self.highlighted_states = highlighted_states
         
     def get_svg(self):
         return ''
@@ -149,18 +151,19 @@ class Note:
     def render_in_png(self, rescale=1.0):
         try:
             note_states = self.chord_skygrid[self.get_position()] #Is note at 'position' highlighted or not
-            #highlighted_classes = ['highlighted-' + str(frame_index) for frame_index in note_states.keys()]
+            highlighted_frames = [frame_index for frame_index in note_states.keys()]
         except KeyError: #Note is not in the chord_skygrid dictionary: so it is not highlighted
             note_states = {}
+            highlighted_frames = []
             pass
 
         if not(self.harp_is_broken) and not(self.harp_is_silent):
-            if len(note_states)==0:
+            if len(highlighted_frames)==0:
                 #Draws a small button (will be colored thanks to CSS)
                 note_render = self.get_unhighlighted_png()
             else:
-                #Draws an highlighted note          
-                note_render = self.get_png()
+                #Draws an highlighted note
+                note_render = self.get_png(highlighted_frames)
         else:
             note_render = self.get_dead_png()
         
@@ -181,18 +184,20 @@ class NoteCircle(Note):
          note_render += '<circle cx="45.4" cy="45.4" r="25.5" class="instrument-button-icon ' + ' '.join(highlighted_classes).rstrip() + '"/>'
          return note_render
      
-    def get_png(self):
+    def get_png(self, highlighted_frames):        
         try:
-            if self.get_position()[0] == 0:
-                return Image.open(self.A_circle_png)
-            elif self.get_position()[0] == 1:
-                return Image.open(self.B_circle_png)
-            elif self.get_position()[0] == 2:
-                return Image.open(self.C_circle_png)
-            else:
-                return None
+            if highlighted_frames[0] == 0:             
+                if self.get_position()[0] == 0:
+                    return Image.open(self.A_circle_png)
+                elif self.get_position()[0] == 1:
+                    return Image.open(self.B_circle_png)
+                elif self.get_position()[0] == 2:
+                    return Image.open(self.C_circle_png)
+                else:
+                    return None
+            else:               
+                return Image.open(self.circle_highlighted_pngs[min(highlighted_frames[0]-1,len(self.circle_highlighted_pngs))])
         except:
-            print('Could not open note image.')
             return None  
             
 class NoteDiamond(Note):   
@@ -207,19 +212,22 @@ class NoteDiamond(Note):
          note_render +=  '<rect x="22.6" y="22.7" transform="matrix(-0.7071 -0.7071 0.7071 -0.7071 45.3002 109.5842)" width="45.4" height="45.4" class="instrument-button-icon ' + ' '.join(highlighted_classes).rstrip() + '"/>'
          return note_render
      
-    def get_png(self):
+    def get_png(self, highlighted_frames):
         try:
-            if self.get_position()[0] == 0:
-                return Image.open(self.A_diamond_png)
-            elif self.get_position()[0] == 1:
-                return Image.open(self.B_diamond_png)
-            elif self.get_position()[0] == 2:
-                return Image.open(self.C_diamond_png)
+            if highlighted_frames[0] == 0:
+                if self.get_position()[0] == 0:
+                    return Image.open(self.A_diamond_png)
+                elif self.get_position()[0] == 1:
+                    return Image.open(self.B_diamond_png)
+                elif self.get_position()[0] == 2:
+                    return Image.open(self.C_diamond_png)
+                else:
+                    return None       
             else:
-                return None
+                return Image.open(self.diamond_highlighted_pngs[min(highlighted_frames[0]-1,len(self.diamond_highlighted_pngs))])        
         except:
-            print('Could not open note image.')
-            return None       
+            print('Could not open diamond note image.')
+            return None      
 
 class NoteRoot(Note):   
      
@@ -234,17 +242,20 @@ class NoteRoot(Note):
         note_render += '<rect x="19.5" y="19.3" transform="matrix(-0.7071 0.7071 -0.7071 -0.7071 109.7415 45.2438)" width="52" height="52" class="instrument-button-icon ' + ' '.join(highlighted_classes).rstrip() + '"/>\n'
         return note_render
     
-    def get_png(self):
+    def get_png(self, highlighted_frames):
         try:
-            if self.get_position()[0] == 0:
-                return Image.open(self.A_root_png)
-            elif self.get_position()[0] == 1:
-                return Image.open(self.B_root_png)
-            elif self.get_position()[0] == 2:
-                return Image.open(self.C_root_png)
+            if highlighted_frames[0] == 0:           
+                if self.get_position()[0] == 0:
+                    return Image.open(self.A_root_png)
+                elif self.get_position()[0] == 1:
+                    return Image.open(self.B_root_png)
+                elif self.get_position()[0] == 2:
+                    return Image.open(self.C_root_png)
+                else:
+                    return None
             else:
-                return None
+                return Image.open(self.root_highlighted_pngs[min(highlighted_frames[0]-1,len(self.root_highlighted_pngs))])        
         except:
-            print('Could not open note image.')
+            print('Could not open root note image.')
             return None
        

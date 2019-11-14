@@ -21,7 +21,7 @@ class Instrument:
         self.text_bkg = (255, 255, 255, 0) # Transparent white
         self.font_color = (0,0,0)
         self.font = 'elements/RobotoCondensed-Regular.ttf'  
-        self.font_size = 40
+        self.font_size = 36
         self.repeat_height = None
    
                 
@@ -97,9 +97,9 @@ class Instrument:
             self.set_png_chord_size()
         return self.png_chord_size
         
-    def get_repeat_png(self, max_width, rescale=1):
+    def get_repeat_png(self, max_rescaled_width, rescale=1):
         '''Returns an image of the repeat number xN'''
-        repeat_im = Image.new('RGBA',(int(max_width), int(self.get_png_chord_size()[1])), color=self.text_bkg)
+        repeat_im = Image.new('RGBA',(int(max_rescaled_width/rescale), int(self.get_png_chord_size()[1])), color=self.text_bkg)
         draw = ImageDraw.Draw(repeat_im)
         fnt = ImageFont.truetype(self.font, self.font_size)
         draw.text((0,repeat_im.size[1]-1.05*fnt.getsize(str(self.repeat))[1]), 'x'+str(self.repeat), font=fnt, fill=self.font_color)
@@ -119,9 +119,10 @@ class Voice(Instrument): # Lyrics or comments
         self.text_bkg = (255, 255, 255, 0)
         self.font_color = (0,0,0)
         self.font = 'elements/Roboto-Regular.ttf'  
-        self.font_size = 28
+        self.font_size = 36
         self.lyric_height = None
         self.lyric_width = None
+        #self.lyric_relheight = 0.1 #Fraction of the chord height the lyric height should be
         
     def render_in_html(self, note_width):
         '''Renders the lyrics text in HTML inside an invisible table'''
@@ -161,8 +162,8 @@ class Voice(Instrument): # Lyrics or comments
         '''Renders the lyrics text in PNG'''
         chord_size = self.get_png_chord_size()
         lyric_im = Image.new('RGBA',(int(chord_size[0]),int(self.get_lyric_height())), color=self.text_bkg)
-        draw = ImageDraw.Draw(lyric_im)
-        fnt = ImageFont.truetype(self.font, self.font_size)
+        draw = ImageDraw.Draw(lyric_im)     
+        fnt = ImageFont.truetype(self.font, int(self.font_size))
         lyric_width = fnt.getsize(self.lyric)[0]
         draw.text((int((chord_size[0]-lyric_width)/2.0),0), self.lyric, font=fnt, fill=self.font_color)
 
@@ -178,7 +179,7 @@ class Harp(Instrument):
         self.type = 'harp'
         self.column_count = 5
         self.row_count = 3
-        self.highlighted_states_skygrid = []      
+        #self.highlighted_states_skygrid = []      
 
         self.sky_inverse_position_map = {
                 (0, 0): 'A1', (0, 1): 'A2', (0, 2): 'A3', (0, 3): 'A4', (0, 4): 'A5',

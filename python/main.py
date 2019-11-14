@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from modes import InputModes, RenderModes
+from modes import InputModes, RenderModes, CSSModes
 from parsers import Parser
 from songs import Song
 import os
@@ -44,7 +44,11 @@ def is_file(string):
     isfile = False
     fp = os.path.join(SONG_DIR, os.path.normpath(string))
     isfile = os.path.isfile(fp)
-     
+    
+    if not(isfile):
+        fp = os.path.join(SONG_DIR, os.path.normpath(string+'.txt'))
+        isfile = os.path.isfile(fp)
+    
     if not(isfile):
         fp = os.path.join(os.path.normpath(string))
         isfile = os.path.isfile(fp)
@@ -66,7 +70,7 @@ PAUSE = '.'
 COMMENT_DELIMITER = '#' # Lyrics delimiter, can be used for comments
 SONG_DIR = 'songs'
 CSS_PATH = 'css/main.css'
-EMBED_CSS = True #'XML', 'HREF', 'IMPORT', True, False
+CSS_MODE = CSSModes.HREF
 
 myparser = Parser() # Create a parser object
 
@@ -87,11 +91,12 @@ print('\nNotes composing a chord must be glued together (e.g. A1B1C1).')
 print('Separate chords with \"' + ICON_DELIMITER + '\".')
 print('Use \"' + PAUSE + '\" for a silence (rest).')
 print('Use \"' + QUAVER_DELIMITER + '\" to link notes within an icon, for triplets, quavers... (e.g. A1-B1-C1).')
+print('Add x2 after a chord to indicate repetition.')
 print('Sharps # and flats b (semitones) are not supported in Sky.')
 print('============================================================')
 
 
-first_line = input('Type 1st song line, or file name (in ' + os.path.normpath(SONG_DIR) + '/): ').strip()
+first_line = input('Type or copy-paste notes, or enter file name (in ' + os.path.normpath(SONG_DIR) + '/): ').strip()
 
 isfile, fp = is_file(first_line)
 
@@ -176,14 +181,14 @@ mysong.set_title(song_title)
 mysong.set_headers(original_artists, transcript_writer, musical_key)
 
 html_path = os.path.join(SONG_DIR, song_title + '.html')
-html_path = mysong.write_html(html_path, NOTE_WIDTH, EMBED_CSS, CSS_PATH)
+html_path = mysong.write_html(html_path, NOTE_WIDTH, CSS_MODE, CSS_PATH)
 
 if html_path != '':
     print('============================================================')
     print('Your song in HTML is located at:', os.path.join(str(SONG_DIR), html_path))
 
 svg_path0 = os.path.join(SONG_DIR, song_title + '.svg')
-filenum, svg_path = mysong.write_svg(svg_path0, EMBED_CSS, CSS_PATH)
+filenum, svg_path = mysong.write_svg(svg_path0, CSS_MODE, CSS_PATH)
 
 if svg_path != '':
     print('--------------------------------------------------')
@@ -211,7 +216,7 @@ if song_notation in [InputModes.SKY, InputModes.SKYKEYBOARD]:
     western_ascii_path = os.path.join(SONG_DIR, song_title + '_western.txt')
     western_ascii_path = mysong.write_ascii(western_ascii_path, RenderModes.WESTERNASCII)
     if western_ascii_path != '':
-        print('-------------------------')
-        print('Your song converted to Western notation is located at:', os.path.join(str(SONG_DIR), western_ascii_path))    
+        print('--------------------------------------------------')
+        print('Your song in TXT converted to Western notation is located at:', os.path.join(str(SONG_DIR), western_ascii_path))    
 
 os.chdir(mycwd)

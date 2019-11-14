@@ -243,7 +243,7 @@ class Parser:
                  #TODO: Implement logic for parsing line vs single icon.        
                 for icon in icons:
                     chords = self.parse_icon(icon, quaver_delimiter)
-                    
+                    #From here, real chords are still glued, quavers have been split in different list slots                    
                     chord_skygrid, harp_broken, harp_silent, repeat = self.parse_chords(chords, pause, position_map, note_shift)
                     harp = instruments.Harp()
                     harp.set_repeat(repeat)
@@ -277,16 +277,24 @@ class Parser:
             raise KeyError
 
     def parse_chords(self, chords, pause='.', position_map=None, note_shift=0):
-               
+        #Individual note is a single-element list: chords=['A5']
+        #Real chord is a single element list: chords=['B1A1A3']
+        #Triplets and quavers are a list of notes or chords: chords=['B2', 'B3B1', 'B4', 'B5', 'C1', 'C2']    
         harp_broken = True
         chord_skygrid = {}
+        
+        #print(chord)
+        if len(chords)>1:
+            idx0 = 1 #Notes in quavers and triplets have a frame index >1
+        else:
+            idx0 = 0 #Single note or note in chord jas a frame index ==0
+        
         for chord_idx, chord in enumerate(chords):
             # Create a skygrid of the harp's chords
-            # For each chord, set the highlighted state of each note accordingly (whether True or False)
-            
+            # For each chord, set the highlighted state of each note accordingly (whether True or False)         
             chord = re.sub(re.escape(pause), '.', chord) #Replaces the pause character by the default
-                     
             repeat, chord = self.split_chord(chord, position_map)
+            #Now the real chord has been split in notes (1 note = 1 list slot)
             
             harp_broken = False
             harp_silent = False
@@ -299,10 +307,10 @@ class Parser:
                     pass
                 else:
                     chord_skygrid[highlighted_note_position] = {}
-                    chord_skygrid[highlighted_note_position][chord_idx] = True
+                    chord_skygrid[highlighted_note_position][idx0+chord_idx] = True
                     harp_silent = False
                     if highlighted_note_position[0] < 0 and highlighted_note_position[1] < 0: #Note is a silence
-                        chord_skygrid[highlighted_note_position][chord_idx] = False
+                        chord_skygrid[highlighted_note_position][idx0+chord_idx] = False
                         harp_silent = True
 
         results = [chord_skygrid, harp_broken, harp_silent, repeat]
