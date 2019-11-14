@@ -145,7 +145,7 @@ class Note:
 
         return note_render
 
-    def render_in_svg(self, width, x, y):
+    def render_in_svg(self, width, x, y):        
         return self.render_in_html(width, x, y)
 
     def render_in_png(self, rescale=1.0):
@@ -258,4 +258,3 @@ class NoteRoot(Note):
         except:
             print('Could not open root note image.')
             return None
-       

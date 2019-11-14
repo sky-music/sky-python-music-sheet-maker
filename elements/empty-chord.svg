@@ -1,3 +1,8 @@
+<?xml version="1.0" encoding="utf-8" ?>
+                 
+<svg baseProfile="full" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xlink="http://www.w3.org/1999/xlink" width="358px" height="246px">
+<defs>
+<style type="text/css"><![CDATA[
 html {
   scroll-behavior: smooth;
 }
@@ -70,8 +75,9 @@ table {
 /* <!-- Sky chord chart: a table with rounded edges (SVG only) --> */
 svg rect.harp {
   fill:white;
-  stroke-width:1;
+  stroke-width:6;
   stroke:black;
+  opacity:1;
 }
 
 
@@ -106,7 +112,7 @@ table.silent {
 svg.silent rect {
   stroke: grey;
   stroke-width:0;
-  fill:none;
+  fill: white;
 }
 
 /* <!-- Invisible table for lyrics (HTML only) --> */
@@ -183,10 +189,6 @@ path.instrument-button{
   opacity: 1.0;
 }*/
 
-/* 
-<svg class="note-root harp-button-0" xmlns="https://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 91 91">
-<circle cx="45.4" cy="45.4" r="12" class="instrument-button-icon unhighlighted"/></svg>
- */
 
 
 /* <!-- Small buttons showing notes positions --> */
@@ -197,8 +199,8 @@ svg.harp-button-3 .unhighlighted.instrument-button-icon,
 svg.harp-button-4 .unhighlighted.instrument-button-icon {
   stroke-width: 0;
   stroke: white;
-  fill: rgb(194,240,194);
-  opacity: 1;
+  fill: limegreen;
+  opacity: 0.3;
 }
 
 /* <!-- Small buttons showing notes positions --> */
@@ -209,8 +211,8 @@ svg.harp-button-8 .unhighlighted.instrument-button-icon,
 svg.harp-button-9 .unhighlighted.instrument-button-icon {
   stroke-width: 0;
   stroke: white;
-  fill: rgb(179,236,255);
-  opacity: 1;
+  fill: deepskyblue;
+  opacity: 0.3;
 }
 
 /* <!-- Small buttons showing notes positions --> */
@@ -221,8 +223,8 @@ svg.harp-button-13 .unhighlighted.instrument-button-icon,
 svg.harp-button-14 .unhighlighted.instrument-button-icon {
   stroke-width: 0;
   stroke: white;
-  fill: rgb(255,185,223);
-  opacity: 1;
+  fill: deeppink;
+  opacity: 0.3;
 }
 
 /* <!-- Note background when the chord is or is silent --> */
@@ -239,6 +241,7 @@ svg.broken .unhighlighted.instrument-button-icon {
   stroke-width: 0;
   stroke: white;
   fill: none;
+  opacity: 0.25;
 }
 
 /* <!-- Small note buttons when the chord is silent --> */
@@ -247,6 +250,7 @@ svg.silent .unhighlighted.instrument-button-icon {
   stroke-width: 0;
   stroke: white;
   fill: none;
+  opacity: 0.15;
 }
 
 /* <!-- Middle note button when the chord is silent --> */
@@ -255,8 +259,8 @@ svg.silent svg.harp-button-7 .unhighlighted.instrument-button-icon,
 svg.silent.harp-button-7 .unhighlighted.instrument-button-icon {
   stroke-width: 0;
   stroke: white;
-  fill: #BBBBBB;
-  opacity: 1;
+  fill: grey;
+  opacity: 0.25;
 }
 
 /* <!-- Red question mark when table is broken --> */
@@ -308,64 +312,19 @@ svg.harp-button-14 path.highlighted-0 {
 }
 
 /* <!-- Below the styles for buttons in a quaver --> */
-.highlighted-7 {
-  fill: rgb(68,1,84);
+.highlighted-1 {
+  fill: orange;
   opacity: 1.0;
 }
 
-.highlighted-7.instrument-button-icon {
-  stroke-width: 3;
-  stroke: white;
-  fill: none;
-}
-
-.highlighted-6 {
-  fill: rgb(68,57,130);
-  opacity: 1.0;
-}
-
-.highlighted-6.instrument-button-icon {
-  stroke-width: 3;
-  stroke: white;
-  fill: none;
-}
-
-.highlighted-5 {
-  fill: rgb(48,103,141);
-  opacity: 1.0;
-}
-
-.highlighted-5.instrument-button-icon {
-  stroke-width: 3;
-  stroke: white;
-  fill: none;
-}
-
-
-.highlighted-4 {
-  fill: rgb(32,144,140);
-  opacity: 1.0;
-}
-
-.highlighted-4.instrument-button-icon {
-  stroke-width: 3;
-  stroke: white;
-  fill: none;
-}
-
-.highlighted-3 {
-  fill: rgb(53,183,120);
-  opacity: 1.0;
-}
-
-.highlighted-3.instrument-button-icon {
+.highlighted-1.instrument-button-icon {
   stroke-width: 3;
   stroke: white;
   fill: none;
 }
 
 .highlighted-2 {
-  fill: rgb(144,214,67);
+  fill: gold;
   opacity: 1.0;
 }
 
@@ -375,12 +334,51 @@ svg.harp-button-14 path.highlighted-0 {
   fill: none;
 }
 
-.highlighted-1 {
-  fill: rgb(253,231,36);
+.highlighted-3 {
+  fill: aquamarine;
   opacity: 1.0;
 }
 
-.highlighted-1.instrument-button-icon {
+.highlighted-3.instrument-button-icon {
+  stroke-width: 3;
+  stroke: white;
+  fill: none;
+}
+
+.highlighted-3.instrument-button-icon {
+  stroke-width: 3;
+  stroke: white;
+  fill: none;
+}
+
+.highlighted-4 {
+  fill: darkcyan;
+  opacity: 1.0;
+}
+
+.highlighted-4.instrument-button-icon {
+  stroke-width: 3;
+  stroke: white;
+  fill: none;
+}
+
+.highlighted-5 {
+  fill: darkblue;
+  opacity: 1.0;
+}
+
+.highlighted-5.instrument-button-icon {
+  stroke-width: 3;
+  stroke: white;
+  fill: none;
+}
+
+.highlighted-6 {
+  fill: blueviolet;
+  opacity: 1.0;
+}
+
+.highlighted-6.instrument-button-icon {
   stroke-width: 3;
   stroke: white;
   fill: none;
@@ -401,3 +399,10 @@ svg.harp-button-14 path.highlighted-0 {
  */
 
 
+
+]]></style> 
+</defs>
+<svg x="0" y="0" width="100%" height="100%" class="instrument-harp harp-0">
+<rect x="1.0%" y="1.5%" width="98%" height="97%" rx="6%" ry="9%" class="harp harp-0"/>
+</svg>
+</svg>
