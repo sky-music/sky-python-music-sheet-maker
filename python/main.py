@@ -70,7 +70,7 @@ PAUSE = '.'
 COMMENT_DELIMITER = '#' # Lyrics delimiter, can be used for comments
 SONG_DIR = 'songs'
 CSS_PATH = 'css/main.css'
-CSS_MODE = CSSModes.HREF
+CSS_MODE = CSSModes.EMBED
 
 myparser = Parser() # Create a parser object
 
