@@ -195,8 +195,9 @@ class NoteCircle(Note):
                 else:
                     return None
             else:
-                return Image.open(self.circle_highlighted_pngs[min(highlighted_frames[0]-1,len(self.circle_highlighted_pngs))])
+                return Image.open(self.circle_highlighted_pngs[min(highlighted_frames[0],len(self.circle_highlighted_pngs))-1])
         except:
+            print('\nERROR: Could not open circle note image.')
             return None
 
 class NoteDiamond(Note):
@@ -223,9 +224,9 @@ class NoteDiamond(Note):
                 else:
                     return None
             else:
-                return Image.open(self.diamond_highlighted_pngs[min(highlighted_frames[0]-1,len(self.diamond_highlighted_pngs))])
+                return Image.open(self.diamond_highlighted_pngs[min(highlighted_frames[0],len(self.diamond_highlighted_pngs))-1])
         except:
-            print('Could not open diamond note image.')
+            print('\nERROR: Could not open diamond note image.')
             return None
 
 class NoteRoot(Note):
@@ -253,7 +254,7 @@ class NoteRoot(Note):
                 else:
                     return None
             else:
-                return Image.open(self.root_highlighted_pngs[min(highlighted_frames[0]-1,len(self.root_highlighted_pngs))])
+                return Image.open(self.root_highlighted_pngs[min(highlighted_frames[0],len(self.root_highlighted_pngs))-1])
         except:
-            print('Could not open root note image.')
+            print('\nERROR: Could not open root note image.')
             return None
