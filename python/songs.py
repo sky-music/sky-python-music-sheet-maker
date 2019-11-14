@@ -391,6 +391,7 @@ class Song():
     
     #TODO: support for triplets and quavers with different colors
     def write_png(self, file_path0, start_row=0, filenum=0):        
+ 
         def trans_paste(bg, fg, box=(0,0)):
             if fg.mode == 'RGBA':
                 if bg.mode != 'RGBA':
@@ -399,9 +400,10 @@ class Song():
                 fg_trans.paste(fg,box,mask=fg)#transparent foreground
                 return Image.alpha_composite(bg,fg_trans)
             else:
-                new_img = bg.copy()
-                new_img.paste(fg, box)
-                return new_img    
+                 if bg.mode == 'RGBA':
+                    bg = bg.convert('RGB')
+                 bg.paste(fg, box)
+                 return bg    
                 
         if filenum>self.maxFiles:
             print('\nYour song is too long. Stopping at ' + str(self.maxFiles) + ' files.')

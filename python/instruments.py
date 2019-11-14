@@ -1,8 +1,7 @@
-from notes import Note, NoteRoot, NoteCircle, NoteDiamond
-from PIL import Image
-from PIL import ImageDraw, ImageFont
-from modes import RenderModes
 import os
+from PIL import Image, ImageDraw, ImageFont
+from notes import Note, NoteRoot, NoteCircle, NoteDiamond
+from modes import RenderModes
 ### Instrument classes
 
 class Instrument:
@@ -19,6 +18,7 @@ class Instrument:
         self.silent_png = os.path.normpath('elements/silent-symbol.png')
         self.png_chord_size = None
         self.text_bkg = (255, 255, 255, 0) # Transparent white
+        self.song_bkg = (255, 255, 255)
         self.font_color = (0,0,0)
         self.font = 'elements/RobotoCondensed-Regular.ttf'  
         self.font_size = 36
@@ -330,7 +330,6 @@ class Harp(Instrument):
     
       
     def render_in_png(self, rescale=1.0):    
-        
         def trans_paste(bg, fg, box=(0,0)):
             if fg.mode == 'RGBA':
                 if bg.mode != 'RGBA':
@@ -339,9 +338,10 @@ class Harp(Instrument):
                 fg_trans.paste(fg,box,mask=fg)#transparent foreground
                 return Image.alpha_composite(bg,fg_trans)
             else:
-                new_img = bg.copy()
-                new_img.paste(fg, box)
-                return new_img    
+                 if bg.mode == 'RGBA':
+                    bg = bg.convert('RGB')
+                 bg.paste(fg, box)
+                 return bg    
         
         harp_silent = self.get_is_silent()
         harp_broken = self.get_is_broken()
@@ -349,7 +349,7 @@ class Harp(Instrument):
         harp_file =  Image.open(self.chord_png) #loads image into memory
         harp_size = harp_file.size
         
-        harp_render = Image.new('RGBA', harp_file.size)
+        harp_render = Image.new('RGB', harp_file.size, self.song_bkg)
         
         # Get a typical note to check that the size of the note png is consistent with the harp png                  
         note_size = Note(self).get_png_size()

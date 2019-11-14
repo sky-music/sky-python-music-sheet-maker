@@ -5,7 +5,7 @@ class Note:
     def __init__(self, instrument):
         self.position = ()
         self.index = 0
-        self.highlighted_states = []
+#        self.highlighted_states = []
         self.type = 'any_note'
         self.svgclass = 'any-note'
         self.chord_skygrid = instrument.get_chord_skygrid()
@@ -102,7 +102,6 @@ class Note:
             return Image.open(self.C_unhighlighted_png)
 
     def render_in_html(self, width='1em', x=0, y=0):
-
         try:
             note_states = self.chord_skygrid[self.get_position()] #Is note at 'position' highlighted or not
             #skygrid is a dictionary with keys=position tuple, value = dictionary with key=frame, value=True/false
