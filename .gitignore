@@ -1,4 +1,5 @@
-
-songs/Flower Dance.html
 *.html
 *.pyc
+*.png
+*.svg
+*.txt
