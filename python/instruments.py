@@ -18,10 +18,10 @@ class Instrument:
         self.silent_png = os.path.normpath('elements/silent-symbol.png')
         self.png_chord_size = None
         self.text_bkg = (255, 255, 255, 0) # Transparent white
-        self.song_bkg = (255, 255, 255)
-        self.font_color = (0,0,0)
+        self.song_bkg = (255, 255, 255) #White paper sheet
+        self.font_color = (0, 0, 0)
         self.font = 'elements/RobotoCondensed-Regular.ttf'  
-        self.font_size = 36
+        self.font_size = 40
         self.repeat_height = None
    
                 
@@ -52,6 +52,7 @@ class Instrument:
             Example: {(0,0):{0:True}, (1,1):{0:True}}
         '''
         return self.chord_skygrid
+
 
     def get_type(self):
         return self.type
@@ -116,19 +117,18 @@ class Voice(Instrument): # Lyrics or comments
         super().__init__()
         self.type = 'voice'
         self.lyric = ''
-        self.text_bkg = (255, 255, 255, 0)
-        self.font_color = (0,0,0)
+        #self.text_bkg = (255, 255, 255, 0)#Uncomment to make it different from the inherited class
+        #self.font_color = (255,255,255)#Uncomment to make it different from the inherited class
         self.font = 'elements/Roboto-Regular.ttf'  
         self.font_size = 36
         self.lyric_height = None
         self.lyric_width = None
-        #self.lyric_relheight = 0.1 #Fraction of the chord height the lyric height should be
         
     def render_in_html(self, note_width):
         '''Renders the lyrics text in HTML inside an invisible table'''
         chord_render = '<table class=\"voice\">'
         chord_render +='<tr>'
-        chord_render +='<td  width=\"90em\" align=\"center\">' #TODO: width calculated automatically
+        chord_render +='<td  width=\"102em\" align=\"center\">' #TODO: width calculated automatically
         chord_render += self.lyric
         chord_render += '</td>'
         chord_render +='</tr>'
@@ -140,6 +140,13 @@ class Voice(Instrument): # Lyrics or comments
     
     def set_lyric(self, lyric):
         self.lyric = lyric
+
+    def __len__(self):
+        return len(self.lyric)
+    
+    def __str__(self):
+        return '<' + self.type + '-' + str(self.index) + ', ' + str(len(self)) + ' chars, repeat=' + str(self.repeat) + '>'
+
 
     def render_in_ascii(self, render_mode):     
         chord_render = '# ' + self.lyric # Lyrics marked as comments in output text files
@@ -204,7 +211,23 @@ class Harp(Instrument):
 
     def get_column_count(self):
         return self.column_count
-     
+    
+    def get_num_highlighted(self):
+        num = 0
+        for k in self.chord_skygrid.keys():
+            for kk in self.chord_skygrid[k].keys():
+                if self.chord_skygrid[k][kk] == True:
+                    num +=1
+        return num
+
+    def __len__(self):
+        return self.column_count*self.row_count
+    
+    def __str__(self):
+        return '<' + self.type + '-' + str(self.index) + ', ' + str(len(self)) + ' notes, ' + \
+               str(self.get_num_highlighted()) + ' highlighted, repeat=' + str(self.repeat) + '>'
+    
+    
     def get_note_from_position(self, row_index, column_index):
         '''Returns the note type Root, Diamond, Circle from the position in Sky grid'''
         # Calculate the note's overall index in the harp (0 to 14)              

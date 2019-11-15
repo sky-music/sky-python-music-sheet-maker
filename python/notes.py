@@ -4,7 +4,7 @@ class Note:
 
     def __init__(self, instrument):
         self.position = ()
-        self.index = 0
+        self.index = None
 #        self.highlighted_states = []
         self.type = 'any_note'
         self.svgclass = 'any-note'
@@ -40,6 +40,7 @@ class Note:
     def set_position(self, row_index, col_index):
         '''Sets the position tuple from row and column values'''
         self.position = (row_index, col_index)
+        self.index = (row_index * self.column_count) + col_index
 
     def get_index(self):
         '''Returns the note index in Sky grid'''
@@ -100,6 +101,10 @@ class Note:
             return Image.open(self.B_unhighlighted_png)
         elif self.get_position()[0] == 2:
             return Image.open(self.C_unhighlighted_png)
+
+    def __str__(self):
+        return '<' + self.type + '>'
+
 
     def render_in_html(self, width='1em', x=0, y=0):
         try:
