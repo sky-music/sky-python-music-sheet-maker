@@ -118,7 +118,9 @@ class Parser:
             chord = re.split('x', chord)[0]
         except:
             repeat = 0
-               
+        
+        chord = chord.upper()
+
         if position_map in [self.sky_position_map, self.western_position_map]:
             chord = re.sub('([A-G])', ' \\1', chord).split()
         elif position_map  == self.jianpu_position_map:
