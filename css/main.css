@@ -133,7 +133,7 @@ table.repeat {
   padding: 0px;
   border-radius: 0px;
   border-width: 0px;
-  font-size: 0.8em;
+  font-size: 0.9em;
 }
 
 /* <!-- Bottom-left corner repetition mark --> */
@@ -311,7 +311,11 @@ svg.harp-button-14 path.highlighted-0 {
 Set to none to have a transparent SVG, and a transparent PNG with alpha layer (RGBA) later
 Set to white to make the background white in RGB mode, and the PNG background white when converted to RGB
 --> */
-svg rect.white-background {
+svg rect.harp-background {
+	fill:white;	
+}
+
+svg rect.note-background {
 	fill:white;	
 }
 
