@@ -15,29 +15,30 @@ def ask_for_mode(modes):
     print('Please choose your note format:\n')
     if InputModes.SKYKEYBOARD in modes:
         i += 1
-        print(str(i) + ") Type on keyboard as you would in Sky:\n   " + myparser.keyboard_layout.replace(' ','\n   '))
+        print(str(i) + ') ' + InputModes.SKYKEYBOARD.value[2] + '\n   ' + myparser.keyboard_layout.replace(' ','\n   ') + ':')
         mydict[i] = InputModes.SKYKEYBOARD
     if InputModes.SKY in modes:
         i += 1
-        print(str(i) + ") Sky colum/row notation:\n   A1 A2 A3 A4 A5\n   B1 B2 B3 B4 B5\n   C1 C2 C3 C4 C5")
+        print(str(i) + ') ' + InputModes.SKY.value[2])
         mydict[i] = InputModes.SKY
     if InputModes.WESTERN in modes:
         i += 1
-        print(str(i) + ") Western (note name + octave, e.g. C4 D4 E4 ..., or do4 re4 mi4 ...)")
+        print(str(i) + ') ' + InputModes.WESTERN.value[2])
         mydict[i] = InputModes.WESTERN
     if InputModes.JIANPU in modes:
         i += 1
-        print(str(i) + ") Jianpu (note names as 1 2 3 4 5 6 7, followed by + or - for octaves)")
+        print(str(i) + ') ' + InputModes.JIANPU.value[2])
         mydict[i] = InputModes.JIANPU
     if InputModes.WESTERNCHORDS in modes:
         i += 1
-        print(str(i) + ") Guitar chord name (AC D E F G A B):")
+        print(str(i) + ') ' + InputModes.WESTERNCHORDS.value[2])
         mydict[i] = InputModes.WESTERNCHORDS
     try:
         song_notation = int(input("Mode (1-" + str(i) + "): ").strip())
-    except ValueError:
-        return InputModes.SKY
-    return mydict[song_notation]
+        mode = mydict[song_notation]
+    except (ValueError, KeyError):
+        mode = InputModes.SKY
+    return mode
 
 
 def is_file(string):
@@ -82,11 +83,11 @@ os.chdir("..")
 
 print('===== VISUAL MUSIC SHEETS FOR SKY:CHILDREN OF THE LIGHT =====')
 print('\nAccepted music notes formats:')
-print("\n* Typing on keyboard as you would in Sky:\n   " + myparser.keyboard_layout.replace(' ','\n   '))
-print("\n* Sky colum/row notation:\n   A1 A2 A3 A4 A5\n   B1 B2 B3 B4 B5\n   C1 C2 C3 C4 C5")
-print("\n* Western (note name + octave, e.g. C4 D4 E4 ..., or do4 re4 mi4 ...)")
-print("\n* Jianpu (note names as 1 2 3 4 5 6 7, followed by + or - for octaves)")
-#print("  * Guitar chord name (AC D E F G A B):")
+print('\n* ' + InputModes.SKYKEYBOARD.value[2] + '\n   ' + myparser.keyboard_layout.replace(' ','\n   '))
+print('\n* ' + InputModes.SKY.value[2])
+print('\n* ' + InputModes.WESTERN.value[2])
+print('\n* ' + InputModes.JIANPU.value[2])
+print('\n* ' + InputModes.WESTERNCHORDS.value[2])
 print('\nNotes composing a chord must be glued together (e.g. A1B1C1).')
 print('Separate chords with \"' + ICON_DELIMITER + '\".')
 print('Use \"' + PAUSE + '\" for a silence (rest).')
@@ -121,7 +122,7 @@ else:
 possible_modes = myparser.detect_input_type(song_lines, ICON_DELIMITER, PAUSE, QUAVER_DELIMITER, COMMENT_DELIMITER)
 
 if len(possible_modes) > 1:
-    print('Several possible notations detected.')
+    print('\nSeveral possible notations detected.')
     song_notation = ask_for_mode(possible_modes)
 elif len(possible_modes) == 0:
     print('\nCould not detect your note format. Maybe your song contains typo errors?')
@@ -196,7 +197,7 @@ if svg_path != '':
     print('Your song has been splitted in ' + str(filenum+1) + ' files '
           'between ' + os.path.split(svg_path0)[1] + ' and ' + os.path.split(svg_path)[1])
 
-    png_path0 = os.path.join(SONG_DIR, song_title + '.png')
+png_path0 = os.path.join(SONG_DIR, song_title + '.png')
 filenum, png_path = mysong.write_png(png_path0)
 
 if png_path != '':
