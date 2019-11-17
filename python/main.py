@@ -161,7 +161,10 @@ for song_line in song_lines:
 
 
 print('============================================================')
-if mysong.get_num_broken()/max(1,mysong.get_num_instruments())<0.05:
+error_ratio = mysong.get_num_broken()/max(1,mysong.get_num_instruments())
+if error_ratio==0:
+    print('Song successfully read with no errors!')
+elif error_ratio<0.05:
     print('Song successfully read with few errors!')
 else:
     print('Your song contains many errors.')
