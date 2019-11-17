@@ -3,7 +3,6 @@ from modes import InputModes, RenderModes, CSSModes
 from parsers import Parser
 from songs import Song
 import os
-import time
 
 ### Define Errors
 #class Error(Exception):
@@ -196,11 +195,9 @@ if svg_path != '':
     print('Your song in SVG is located in', os.path.join(str(SONG_DIR)))
     print('Your song has been splitted in ' + str(filenum+1) + ' files '
           'between ' + os.path.split(svg_path0)[1] + ' and ' + os.path.split(svg_path)[1])
-start = time.time()
-png_path0 = os.path.join(SONG_DIR, song_title + '.png')
+
+    png_path0 = os.path.join(SONG_DIR, song_title + '.png')
 filenum, png_path = mysong.write_png(png_path0)
-end = time.time()
-print(end-start)
 
 if png_path != '':
     print('--------------------------------------------------')
