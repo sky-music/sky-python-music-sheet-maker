@@ -59,7 +59,7 @@ class Note:
         except KeyError: #Note is not in the chord_skygrid dictionary: so it is not highlighted
             highlighted_frames = []
         return highlighted_frames
-     
+
     def is_highlighted(self):
         highlighted_frames = self.get_highlighted_frames()
         if len(highlighted_frames) >0:
@@ -111,13 +111,13 @@ class Note:
             return Image.open(self.B_unhighlighted_png)
         elif self.get_position()[0] == 2:
             return Image.open(self.C_unhighlighted_png)
-   
+
 
 ####### Rendering methods
     def render_in_html(self, width='1em', x=0, y=0):
         try:
             highlighted_frames = self.get_highlighted_frames()
-            highlighted_classes = ['highlighted-' + str(frame) for frame in highlighted_frames]            
+            highlighted_classes = ['highlighted-' + str(frame) for frame in highlighted_frames]
         except KeyError: #Note is not in the chord_skygrid dictionary: so it is not highlighted
             highlighted_classes = []
 
@@ -154,13 +154,13 @@ class Note:
 
         return note_render
 
-    def render_in_svg(self, width, x, y):        
+    def render_in_svg(self, width, x, y):
         return self.render_in_html(width, x, y)
 
     def render_in_png(self, rescale=1.0):
-        
+
         highlighted_frames = self.get_highlighted_frames()
-        
+
         if not(self.harp_is_broken) and not(self.harp_is_silent):
             if len(highlighted_frames)==0:
                 #Draws a small button (will be colored thanks to CSS)
@@ -200,7 +200,7 @@ class NoteCircle(Note):
                 else:
                     return None
             else:
-                return Image.open(self.circle_highlighted_pngs[min(highlighted_frames[0],len(self.circle_highlighted_pngs))-1])
+                return Image.open(self.circle_highlighted_pngs[min(highlighted_frames[0]-1,len(self.circle_highlighted_pngs)-1)])
         except:
             print('\nERROR: Could not open circle note image.')
             return None
@@ -229,7 +229,7 @@ class NoteDiamond(Note):
                 else:
                     return None
             else:
-                return Image.open(self.diamond_highlighted_pngs[min(highlighted_frames[0],len(self.diamond_highlighted_pngs))-1])
+                return Image.open(self.diamond_highlighted_pngs[min(highlighted_frames[0]-1,len(self.diamond_highlighted_pngs)-1)])
         except:
             print('\nERROR: Could not open diamond note image.')
             return None
@@ -259,7 +259,7 @@ class NoteRoot(Note):
                 else:
                     return None
             else:
-                return Image.open(self.root_highlighted_pngs[min(highlighted_frames[0],len(self.root_highlighted_pngs))-1])
+                return Image.open(self.root_highlighted_pngs[min(highlighted_frames[0]-1,len(self.root_highlighted_pngs)-1)])
         except:
             print('\nERROR: Could not open root note image.')
             return None
