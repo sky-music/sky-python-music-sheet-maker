@@ -33,17 +33,19 @@ class Song():
         self.png_harp_spacings0 = (int(self.harp_relspacings[0]*self.png_harp_size0[0]), int(self.harp_relspacings[1]*self.png_harp_size0[1]))
         self.png_harp_size = None
         self.png_harp_spacings = None
-        self.png_line_width = int(self.png_size[0] - self.png_margins[0])
-        #self.png_lyric_relheight = instruments.Voice().lyric_relheight
+        self.png_line_width = int(self.png_size[0] - self.png_margins[0])        #self.png_lyric_relheight = instruments.Voice().lyric_relheight
         self.png_lyric_size0 = (self.png_harp_size0[0], instruments.Voice().get_lyric_height())
         self.png_lyric_size = None
         self.png_dpi = (96*2, 96*2)
         self.png_compress = 6
+        self.font_color = (0, 0, 0)
         self.png_color = (255, 255, 255)
+        #self.font_color = (0, 0, 0)   #Discord colors     
+		#self.png_color = (54, 57, 63)    #Discord colors
         self.png_font_size = 32
         self.png_title_font_size = 48
         self.png_font = 'elements/Roboto-Regular.ttf' 
-        self.font_color = (0, 0, 0)
+
  
     def add_line(self, line):
         '''Adds a line of Instrument to the Song'''
@@ -72,6 +74,13 @@ class Song():
     def get_num_lines(self):
         '''Returns the number of lines n the Song'''
         return len(self.lines)
+
+    def __len__(self):
+        return self.get_num_instruments()
+    
+    def __str__(self):
+        return '<Song \'' + self.title + '\', ' + str(self.get_num_lines()) + ' lines, ' \
+               + str(self.get_num_instruments()) + ' instruments, ' + str(self.get_num_broken()) + ' errors>'
 
     def get_num_instruments(self):
         '''Returns the number of instruments in the Song'''
@@ -389,8 +398,8 @@ class Song():
         
         return filenum, file_path
     
-    #TODO: support for triplets and quavers with different colors
     def write_png(self, file_path0, start_row=0, filenum=0):        
+ 
         def trans_paste(bg, fg, box=(0,0)):
             if fg.mode == 'RGBA':
                 if bg.mode != 'RGBA':
@@ -399,9 +408,10 @@ class Song():
                 fg_trans.paste(fg,box,mask=fg)#transparent foreground
                 return Image.alpha_composite(bg,fg_trans)
             else:
-                new_img = bg.copy()
-                new_img.paste(fg, box)
-                return new_img    
+                 if bg.mode == 'RGBA':
+                    bg = bg.convert('RGB')
+                 bg.paste(fg, box)
+                 return bg    
                 
         if filenum>self.maxFiles:
             print('\nYour song is too long. Stopping at ' + str(self.maxFiles) + ' files.')

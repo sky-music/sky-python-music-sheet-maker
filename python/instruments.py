@@ -1,8 +1,7 @@
-from notes import Note, NoteRoot, NoteCircle, NoteDiamond
-from PIL import Image
-from PIL import ImageDraw, ImageFont
-from modes import RenderModes
 import os
+from PIL import Image, ImageDraw, ImageFont
+from notes import Note, NoteRoot, NoteCircle, NoteDiamond
+from modes import RenderModes
 ### Instrument classes
 
 class Instrument:
@@ -14,35 +13,21 @@ class Instrument:
         self.index = 0
         self.is_silent = True
         self.is_broken = False
-        self.chord_png = os.path.normpath('elements/empty-chord.png')
+        self.empty_chord_png = os.path.normpath('elements/empty-chord.png') #blank harp
+        self.unhighlighted_chord_png = os.path.normpath('elements/unhighlighted-chord.png') # harp with unhighlighted notes
         self.broken_png = os.path.normpath('elements/broken-symbol.png')
         self.silent_png = os.path.normpath('elements/silent-symbol.png')
         self.png_chord_size = None
         self.text_bkg = (255, 255, 255, 0) # Transparent white
-        self.font_color = (0,0,0)
+        self.song_bkg = (255, 255, 255) #White paper sheet
+        self.font_color = (0, 0, 0)
         self.font = 'elements/RobotoCondensed-Regular.ttf'  
-        self.font_size = 36
+        self.font_size = 40
         self.repeat_height = None
-   
-                
+                   
     def set_chord_skygrid(self, chord_skygrid):
         self.chord_skygrid = chord_skygrid
-    # def update_chord_skygrid(self, index, new_state):
-#    def append_highlighted_state(self, row_index, column_index, new_state):
-#
-#        '''
-#        INCOMPLETE IMPLEMENTATION. new_state is expected to be a Boolean
-#        '''
-#
-#        chord_skygrid = self.get_chord_skygrid()
-#
-#        row = chord_skygrid[row_index]
-#        highlighted_states = row[column_index]
-#        highlighted_states.append(new_state)
-#
-#        chord_skygrid[index] = highlighted_states #index is undefined
-#
-#        self.set_chord_skygrid(chord_skygrid)
+
     def get_chord_skygrid(self):
         '''Returns the dictionary for the chord:
             where each key is the note position (tuple of row/index),
@@ -89,7 +74,7 @@ class Instrument:
     def set_png_chord_size(self):
         ''' Sets the size of the chord image from the .png file '''
         if self.png_chord_size == None:
-            self.png_chord_size =  Image.open(self.chord_png).size
+            self.png_chord_size =  Image.open(self.unhighlighted_chord_png).size
 
     def get_png_chord_size(self):
         ''' Returns the size of the chord image, or sets it if None '''
@@ -116,19 +101,18 @@ class Voice(Instrument): # Lyrics or comments
         super().__init__()
         self.type = 'voice'
         self.lyric = ''
-        self.text_bkg = (255, 255, 255, 0)
-        self.font_color = (0,0,0)
+        #self.text_bkg = (255, 255, 255, 0)#Uncomment to make it different from the inherited class
+        #self.font_color = (255,255,255)#Uncomment to make it different from the inherited class
         self.font = 'elements/Roboto-Regular.ttf'  
         self.font_size = 36
         self.lyric_height = None
         self.lyric_width = None
-        #self.lyric_relheight = 0.1 #Fraction of the chord height the lyric height should be
         
     def render_in_html(self, note_width):
         '''Renders the lyrics text in HTML inside an invisible table'''
         chord_render = '<table class=\"voice\">'
         chord_render +='<tr>'
-        chord_render +='<td  width=\"90em\" align=\"center\">' #TODO: width calculated automatically
+        chord_render +='<td  width=\"102em\" align=\"center\">' #TODO: width calculated automatically
         chord_render += self.lyric
         chord_render += '</td>'
         chord_render +='</tr>'
@@ -140,6 +124,13 @@ class Voice(Instrument): # Lyrics or comments
     
     def set_lyric(self, lyric):
         self.lyric = lyric
+
+    def __len__(self):
+        return len(self.lyric)
+    
+    def __str__(self):
+        return '<' + self.type + '-' + str(self.index) + ', ' + str(len(self)) + ' chars, repeat=' + str(self.repeat) + '>'
+
 
     def render_in_ascii(self, render_mode):     
         chord_render = '# ' + self.lyric # Lyrics marked as comments in output text files
@@ -204,21 +195,37 @@ class Harp(Instrument):
 
     def get_column_count(self):
         return self.column_count
-     
-    def get_note_from_position(self, row_index, column_index):
+    
+    def get_num_highlighted(self):
+        num = 0
+        for k in self.chord_skygrid.keys():
+            for kk in self.chord_skygrid[k].keys():
+                if self.chord_skygrid[k][kk] == True:
+                    num +=1
+        return num
+
+    def __len__(self):
+        return self.column_count*self.row_count
+    
+    def __str__(self):
+        return '<' + self.type + '-' + str(self.index) + ', ' + str(len(self)) + ' notes, ' + \
+               str(self.get_num_highlighted()) + ' highlighted, repeat=' + str(self.repeat) + '>'
+    
+    
+    def get_note_from_position(self, pos):
         '''Returns the note type Root, Diamond, Circle from the position in Sky grid'''
         # Calculate the note's overall index in the harp (0 to 14)              
-        note_index = (row_index * self.get_column_count()) + column_index
-    
+        note_index = (pos[0] * self.get_column_count()) + pos[1]
+        
         if note_index % 7 == 0: #the 7 comes from the heptatonic scale of Sky's music (no semitones)
             # Note is a root note
-            return NoteRoot(self) #very important: the chord creating the note is passed as a parameter
+            return NoteRoot(self, pos) #very important: the chord creating the note is passed as a parameter
         elif (note_index % self.get_column_count() == 0 or note_index % self.get_column_count() == 2) or note_index % self.get_column_count() == 4:
             # Note is in an odd column, so it is a circle
-            return NoteCircle(self)
+            return NoteCircle(self, pos)
         else:
             # Note is in an even column, so it is a diamond
-            return NoteDiamond(self)
+            return NoteDiamond(self, pos)
          
 
     def render_in_ascii(self, render_mode=RenderModes.SKYASCII):
@@ -268,8 +275,8 @@ class Harp(Instrument):
 
                 harp_render += '<td>'
 
-                note = self.get_note_from_position(row, col)
-                note.set_position(row, col)
+                note = self.get_note_from_position((row, col))
+                #note.set_position(row, col)
 
                 note_render = note.render_in_html(note_width)
                 harp_render += note_render
@@ -312,8 +319,8 @@ class Harp(Instrument):
         for row in range(self.get_row_count()):
              for col in range(self.get_column_count()):
                 
-                note = self.get_note_from_position(row, col)                
-                note.set_position(row, col)
+                note = self.get_note_from_position((row, col))                
+                #note.set_position(row, col)
                  
                 note_width = 0.21
                 xn = 0.12 + col*(1-2*0.12)/(self.get_column_count()-1)-note_width/2.0
@@ -330,7 +337,6 @@ class Harp(Instrument):
     
       
     def render_in_png(self, rescale=1.0):    
-        
         def trans_paste(bg, fg, box=(0,0)):
             if fg.mode == 'RGBA':
                 if bg.mode != 'RGBA':
@@ -339,17 +345,18 @@ class Harp(Instrument):
                 fg_trans.paste(fg,box,mask=fg)#transparent foreground
                 return Image.alpha_composite(bg,fg_trans)
             else:
-                new_img = bg.copy()
-                new_img.paste(fg, box)
-                return new_img    
+                 if bg.mode == 'RGBA':
+                    bg = bg.convert('RGB')
+                 bg.paste(fg, box)
+                 return bg    
         
         harp_silent = self.get_is_silent()
         harp_broken = self.get_is_broken()
                
-        harp_file =  Image.open(self.chord_png) #loads image into memory
+        harp_file =  Image.open(self.unhighlighted_chord_png) #loads default harp image into memory
         harp_size = harp_file.size
         
-        harp_render = Image.new('RGBA', harp_file.size)
+        harp_render = Image.new('RGB', harp_file.size, self.song_bkg) #Empty image
         
         # Get a typical note to check that the size of the note png is consistent with the harp png                  
         note_size = Note(self).get_png_size()
@@ -359,26 +366,26 @@ class Harp(Instrument):
         else:
             note_rescale = 1
         
-        if harp_broken:
+        if harp_broken: #'?' in the middle of the image (no harp around)
              symbol = Image.open(self.broken_png)
              harp_render = trans_paste(harp_render, symbol,(int((harp_size[0]-symbol.size[0])/2.0),int((harp_size[1]-symbol.size[1])/2.0)))
-        elif harp_silent:
+        elif harp_silent: #'.' in the middle of the image (no harp around)
              symbol = Image.open(self.silent_png)      
              harp_render = trans_paste(harp_render, symbol,(int((harp_size[0]-symbol.size[0])/2.0),int((harp_size[1]-symbol.size[1])/2.0)))
         else:
-            harp_render = trans_paste(harp_render, harp_file)
+            harp_render = trans_paste(harp_render, harp_file) #default harp image
             for row in range(self.get_row_count()):
                  for col in range(self.get_column_count()):
                     
-                    note = self.get_note_from_position(row, col)                
-                    note.set_position(row, col)
-                     
-                    xn = (0.13 + col*(1-2*0.13)/(self.get_column_count()-1))*harp_size[0] - note_size[0]/2.0
-                    yn = (0.18 + row*(1-2*0.18)/(self.get_row_count()-1))*harp_size[1] - note_size[1]/2.0
-                    
+                    note = self.get_note_from_position((row, col))                
+                    #note.set_position(row, col)
+                                         
                     #NOTE RENDER
-                    note_render = note.render_in_png(note_rescale)
-                    harp_render = trans_paste(harp_render, note_render, (int(round(xn)),int(round(yn))))
+                    if len(note.get_highlighted_frames()) > 0: #Only paste highlighted notes
+                        xn = (0.13 + col*(1-2*0.13)/(self.get_column_count()-1))*harp_size[0] - note_size[0]/2.0
+                        yn = (0.17 + row*(1-2*0.17)/(self.get_row_count()-1))*harp_size[1] - note_size[1]/2.0
+                        note_render = note.render_in_png(note_rescale)
+                        harp_render = trans_paste(harp_render, note_render, (int(round(xn)),int(round(yn))))
         
         if rescale != 1:
             harp_render = harp_render.resize((int(harp_render.size[0]*rescale),int(harp_render.size[1]*rescale)), resample=Image.LANCZOS)

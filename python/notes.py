@@ -2,10 +2,12 @@ from PIL import Image
 
 class Note:
 
-    def __init__(self, instrument):
-        self.position = ()
-        self.index = 0
-        self.highlighted_states = []
+    def __init__(self, instrument, pos=None):
+        self.position = pos
+        if pos != None:
+            self.index = (pos[0] * instrument.get_column_count()) + pos[1]
+        else:
+            self.index = None
         self.type = 'any_note'
         self.svgclass = 'any-note'
         self.chord_skygrid = instrument.get_chord_skygrid()
@@ -37,27 +39,36 @@ class Note:
         '''Return the note position as a tuple row/column'''
         return self.position
 
-    def set_position(self, row_index, col_index):
+    def set_position(self, pos):
         '''Sets the position tuple from row and column values'''
-        self.position = (row_index, col_index)
+        self.position = pos
+        self.index = (pos[0] * self.column_count) + pos[1]
 
     def get_index(self):
         '''Returns the note index in Sky grid'''
-        return (self.position[0] * self.column_count) + self.position[1]
+        return self.index
 
     def get_middle_index(self):
         '''Returns the index at the center of Sky grid'''
         return int(self.row_count*self.column_count/2.0)
 
-#    def get_highlighted_states(self):
-#        return self.highlighted_states
-#
-#    def set_highlighted_states(self, highlighted_states):
-#        '''
-#        highlighted_states is a list of True/False depending on whether the note is highlighted in n-th frame, where n is the index of the item in the list
-#        '''
-#        #TODO: raise TypeError if type of highlighted_states is not a list
-#        self.highlighted_states = highlighted_states
+    def get_highlighted_frames(self):
+        try:
+            note_states = self.chord_skygrid[self.get_position()] #Is note at 'position' highlighted or not
+            highlighted_frames = [frame_index for frame_index in note_states.keys()]
+        except KeyError: #Note is not in the chord_skygrid dictionary: so it is not highlighted
+            highlighted_frames = []
+        return highlighted_frames
+
+    def is_highlighted(self):
+        highlighted_frames = self.get_highlighted_frames()
+        if len(highlighted_frames) >0:
+            return True
+        else:
+            return False
+
+    def __str__(self):
+        return '<' + self.type + ' ' + str(self.index) + ', pos=' + str(self.position) +', highlighted frames=' + str(self.get_highlighted_frames()) + '>'
 
     def get_svg(self):
         return ''
@@ -101,16 +112,14 @@ class Note:
         elif self.get_position()[0] == 2:
             return Image.open(self.C_unhighlighted_png)
 
-    def render_in_html(self, width='1em', x=0, y=0):
 
+####### Rendering methods
+    def render_in_html(self, width='1em', x=0, y=0):
         try:
-            note_states = self.chord_skygrid[self.get_position()] #Is note at 'position' highlighted or not
-            #skygrid is a dictionary with keys=position tuple, value = dictionary with key=frame, value=True/false
-            # {(0,0):{0:True}, (1,1):{0:True}}
-            highlighted_classes = ['highlighted-' + str(frame_index) for frame_index in note_states.keys()]
+            highlighted_frames = self.get_highlighted_frames()
+            highlighted_classes = ['highlighted-' + str(frame) for frame in highlighted_frames]
         except KeyError: #Note is not in the chord_skygrid dictionary: so it is not highlighted
             highlighted_classes = []
-            pass
 
         if self.harp_is_broken and (self.get_index() == self.get_middle_index()):
                 highlighted_classes = []
@@ -145,17 +154,12 @@ class Note:
 
         return note_render
 
-    def render_in_svg(self, width, x, y):        
+    def render_in_svg(self, width, x, y):
         return self.render_in_html(width, x, y)
 
     def render_in_png(self, rescale=1.0):
-        try:
-            note_states = self.chord_skygrid[self.get_position()] #Is note at 'position' highlighted or not
-            highlighted_frames = [frame_index for frame_index in note_states.keys()]
-        except KeyError: #Note is not in the chord_skygrid dictionary: so it is not highlighted
-            note_states = {}
-            highlighted_frames = []
-            pass
+
+        highlighted_frames = self.get_highlighted_frames()
 
         if not(self.harp_is_broken) and not(self.harp_is_silent):
             if len(highlighted_frames)==0:
@@ -174,8 +178,8 @@ class Note:
 
 class NoteCircle(Note):
 
-    def __init__(self, chord):
-        super().__init__(chord)
+    def __init__(self, chord, pos):
+        super().__init__(chord, pos)
         self.type = 'note_circle'
         self.svgclass = 'note-circle'
 
@@ -196,14 +200,15 @@ class NoteCircle(Note):
                 else:
                     return None
             else:
-                return Image.open(self.circle_highlighted_pngs[min(highlighted_frames[0]-1,len(self.circle_highlighted_pngs)-1)])
+                return Image.open(self.root_highlighted_pngs[min(highlighted_frames[0],len(self.root_highlighted_pngs))-1])
         except:
+            print('\nERROR: Could not open circle note image.')
             return None
 
 class NoteDiamond(Note):
 
-    def __init__(self, chord):
-        super().__init__(chord)
+    def __init__(self, chord, pos):
+        super().__init__(chord, pos)
         self.type = 'note_diamond'
         self.svgclass = 'note-diamond'
 
@@ -224,15 +229,15 @@ class NoteDiamond(Note):
                 else:
                     return None
             else:
-                return Image.open(self.diamond_highlighted_pngs[min(highlighted_frames[0]-1,len(self.diamond_highlighted_pngs)-1)])
+                return Image.open(self.root_highlighted_pngs[min(highlighted_frames[0],len(self.root_highlighted_pngs))-1])
         except:
-            print('Could not open diamond note image.')
+            print('\nERROR: Could not open diamond note image.')
             return None
 
 class NoteRoot(Note):
 
-    def __init__(self, chord):
-        super().__init__(chord)
+    def __init__(self, chord, pos):
+        super().__init__(chord, pos)
         self.type = 'note_root'
         self.svgclass = 'note-root'
 
@@ -254,7 +259,7 @@ class NoteRoot(Note):
                 else:
                     return None
             else:
-                return Image.open(self.root_highlighted_pngs[min(highlighted_frames[0]-1,len(self.root_highlighted_pngs)-1)])
+                return Image.open(self.root_highlighted_pngs[min(highlighted_frames[0],len(self.root_highlighted_pngs))-1])
         except:
-            print('Could not open root note image.')
+            print('\nERROR: Could not open root note image.')
             return None
