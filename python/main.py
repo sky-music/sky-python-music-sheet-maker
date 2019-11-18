@@ -91,7 +91,7 @@ print('\n* ' + InputModes.WESTERNCHORDS.value[2])
 print('\nNotes composing a chord must be glued together (e.g. A1B1C1).')
 print('Separate chords with \"' + ICON_DELIMITER + '\".')
 print('Use \"' + PAUSE + '\" for a silence (rest).')
-print('Use \"' + QUAVER_DELIMITER + '\" to link notes within an icon, for triplets, quavers... (e.g. A1-B1-C1).')
+print('Use \"' + QUAVER_DELIMITER + '\" to link notes within an icon, for triplets, quavers... (e.g. A1' + QUAVER_DELIMITER + 'B1' + QUAVER_DELIMITER + 'C1).')
 print('Add x2 after a chord to indicate repetition.')
 print('Sharps # and flats b (semitones) are not supported in Sky.')
 print('============================================================')
@@ -197,7 +197,7 @@ filenum, svg_path = mysong.write_svg(svg_path0, CSS_MODE, CSS_PATH)
 if svg_path != '':
     print('--------------------------------------------------')
     print('Your song in SVG is located in', os.path.join(str(SONG_DIR)))
-    print('Your song has been splitted in ' + str(filenum+1) + ' files '
+    print('Your song has been split into ' + str(filenum+1) + ' files '
           'between ' + os.path.split(svg_path0)[1] + ' and ' + os.path.split(svg_path)[1])
 
 png_path0 = os.path.join(SONG_DIR, song_title + '.png')
@@ -206,7 +206,7 @@ filenum, png_path = mysong.write_png(png_path0)
 if png_path != '':
     print('--------------------------------------------------')
     print('Your song in PNG is located in:', os.path.join(str(SONG_DIR)))
-    print('Your song has been splitted in ' + str(filenum+1) + ' files '
+    print('Your song has been split into ' + str(filenum+1) + ' files '
           'between ' + os.path.split(png_path0)[1] + ' and ' + os.path.split(png_path)[1])
 
 if song_notation in [InputModes.WESTERN, InputModes.JIANPU, InputModes.WESTERNCHORDS]:
