@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+                 
+<svg baseProfile="full" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xlink="http://www.w3.org/1999/xlink" width="358px" height="246px">
+<defs>
+<style type="text/css">
+@import url('../css/main.css')
+</style> 
+</defs>
+<svg x="0" y="0" width="100%" height="100%" class="instrument-harp harp-0">
+<rect x="0" y="0" width="100%" height="100%" class="harp-background"/>
+<rect x="1.0%" y="1.5%" width="98%" height="97%" rx="6%" ry="9%" class="harp harp-0"/>
+
+<svg x="2.32%" y="6.36%" class="note-root harp-button-0" width="21.00%" height="21.00%" viewBox="0 0 91 91">
+<circle cx="45.4" cy="45.4" r="12" class="instrument-button-icon unhighlighted"/></svg>
+<svg x="20.76%" y="6.36%" class="note-diamond harp-button-1" width="21.00%" height="21.00%" viewBox="0 0 91 91">
+<circle cx="45.4" cy="45.4" r="12" class="instrument-button-icon unhighlighted"/></svg>
+<svg x="39.50%" y="6.36%" class="note-circle harp-button-2" width="21.00%" height="21.00%" viewBox="0 0 91 91">
+<circle cx="45.4" cy="45.4" r="12" class="instrument-button-icon unhighlighted"/></svg>
+<svg x="57.94%" y="6.36%" class="note-diamond harp-button-3" width="21.00%" height="21.00%" viewBox="0 0 91 91">
+<circle cx="45.4" cy="45.4" r="12" class="instrument-button-icon unhighlighted"/></svg>
+<svg x="76.35%" y="6.36%" class="note-circle harp-button-4" width="21.00%" height="21.00%" viewBox="0 0 91 91">
+<circle cx="45.4" cy="45.4" r="12" class="instrument-button-icon unhighlighted"/></svg>
+
+<svg x="2.32%" y="39.50%" class="note-circle harp-button-5" width="21.00%" height="21.00%" viewBox="0 0 91 91">
+<circle cx="45.4" cy="45.4" r="12" class="instrument-button-icon unhighlighted"/></svg>
+<svg x="20.76%" y="39.50%" class="note-diamond harp-button-6" width="21.00%" height="21.00%" viewBox="0 0 91 91">
+<circle cx="45.4" cy="45.4" r="12" class="instrument-button-icon unhighlighted"/></svg>
+<svg x="39.50%" y="39.50%" class="note-root harp-button-7" width="21.00%" height="21.00%" viewBox="0 0 91 91">
+<circle cx="45.4" cy="45.4" r="12" class="instrument-button-icon unhighlighted"/></svg>
+<svg x="57.94%" y="39.50%" class="note-diamond harp-button-8" width="21.00%" height="21.00%" viewBox="0 0 91 91">
+<circle cx="45.4" cy="45.4" r="12" class="instrument-button-icon unhighlighted"/></svg>
+<svg x="76.35%" y="39.50%" class="note-circle harp-button-9" width="21.00%" height="21.00%" viewBox="0 0 91 91">
+<circle cx="45.4" cy="45.4" r="12" class="instrument-button-icon unhighlighted"/></svg>
+
+<svg x="2.32%" y="72.50%" class="note-circle harp-button-10" width="21.00%" height="21.00%" viewBox="0 0 91 91">
+<circle cx="45.4" cy="45.4" r="12" class="instrument-button-icon unhighlighted"/></svg>
+<svg x="20.76%" y="72.50%" class="note-diamond harp-button-11" width="21.00%" height="21.00%" viewBox="0 0 91 91">
+<circle cx="45.4" cy="45.4" r="12" class="instrument-button-icon unhighlighted"/></svg>
+<svg x="39.50%" y="72.50%" class="note-circle harp-button-12" width="21.00%" height="21.00%" viewBox="0 0 91 91">
+<circle cx="45.4" cy="45.4" r="12" class="instrument-button-icon unhighlighted"/></svg>
+<svg x="57.94%" y="72.50%" class="note-diamond harp-button-13" width="21.00%" height="21.00%" viewBox="0 0 91 91">
+<circle cx="45.4" cy="45.4" r="12" class="instrument-button-icon unhighlighted"/></svg>
+<svg x="76.35%" y="72.50%" class="note-root harp-button-14" width="21.00%" height="21.00%" viewBox="0 0 91 91">
+<circle cx="45.4" cy="45.4" r="12" class="instrument-button-icon unhighlighted"/></svg>
+
+
+</svg>
+</svg>
