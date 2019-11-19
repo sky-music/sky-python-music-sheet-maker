@@ -143,10 +143,11 @@ if song_notation in [InputModes.WESTERN, InputModes.JIANPU]:
         print("\nYour song cannot be transposed exactly in Sky.")
     else:
         print("\nYour song can be transposed in Sky with the following keys: " + str(musickeys))
-        print('Transposition is not implemented yet. Assuming you will play in \'C\'.')
 
 if song_notation in [InputModes.WESTERN, InputModes.JIANPU, InputModes.WESTERNCHORDS]:
     try:
+        #TODO: print default range for each mode
+
         note_shift = int(input('Shift notes by n positions ? (-21 ; +21): ').strip())
     except ValueError:
         note_shift = 0
