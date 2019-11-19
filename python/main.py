@@ -72,6 +72,7 @@ COMMENT_DELIMITER = '#' # Lyrics delimiter, can be used for comments
 SONG_DIR = 'songs'
 CSS_PATH = 'css/main.css'
 CSS_MODE = CSSModes.EMBED
+ENABLED_MODES = [RenderModes.HTML, RenderModes.SVG, RenderModes.PNG, RenderModes.SKYASCII, RenderModes.JIANPUASCII, RenderModes.WESTERNASCII]
 
 myparser = Parser() # Create a parser object
 
@@ -184,43 +185,48 @@ transcript_writer = input('Transcribed by: ')
 mysong.set_title(song_title)
 mysong.set_headers(original_artists, transcript_writer, musical_key)
 
-html_path = os.path.join(SONG_DIR, song_title + '.html')
-html_path = mysong.write_html(html_path, NOTE_WIDTH, CSS_MODE, CSS_PATH)
+if RenderModes.HTML in ENABLED_MODES:
+    html_path = os.path.join(SONG_DIR, song_title + '.html')
+    html_path = mysong.write_html(html_path, NOTE_WIDTH, CSS_MODE, CSS_PATH)
+    
+    if html_path != '':
+        print('============================================================')
+        print('Your song in HTML is located at:', os.path.join(str(SONG_DIR), html_path))
 
-if html_path != '':
-    print('============================================================')
-    print('Your song in HTML is located at:', os.path.join(str(SONG_DIR), html_path))
-
-svg_path0 = os.path.join(SONG_DIR, song_title + '.svg')
-filenum, svg_path = mysong.write_svg(svg_path0, CSS_MODE, CSS_PATH)
-
-if svg_path != '':
-    print('--------------------------------------------------')
-    print('Your song in SVG is located in', os.path.join(str(SONG_DIR)))
-    print('Your song has been split into ' + str(filenum+1) + ' files '
-          'between ' + os.path.split(svg_path0)[1] + ' and ' + os.path.split(svg_path)[1])
-
-png_path0 = os.path.join(SONG_DIR, song_title + '.png')
-filenum, png_path = mysong.write_png(png_path0)
-
-if png_path != '':
-    print('--------------------------------------------------')
-    print('Your song in PNG is located in:', os.path.join(str(SONG_DIR)))
-    print('Your song has been split into ' + str(filenum+1) + ' files '
-          'between ' + os.path.split(png_path0)[1] + ' and ' + os.path.split(png_path)[1])
-
-if song_notation in [InputModes.WESTERN, InputModes.JIANPU, InputModes.WESTERNCHORDS]:
-    sky_ascii_path = os.path.join(SONG_DIR, song_title + '_sky.txt')
-    res = mysong.write_ascii(sky_ascii_path, RenderModes.SKYASCII)
-    if sky_ascii_path != '':
+if RenderModes.SVG in ENABLED_MODES:
+    svg_path0 = os.path.join(SONG_DIR, song_title + '.svg')
+    filenum, svg_path = mysong.write_svg(svg_path0, CSS_MODE, CSS_PATH)
+    
+    if svg_path != '':
         print('--------------------------------------------------')
-        print('Your song converted to Sky notation is located at:', os.path.join(str(SONG_DIR), sky_ascii_path))
-
-if song_notation in [InputModes.SKY, InputModes.SKYKEYBOARD]:
-    western_ascii_path = os.path.join(SONG_DIR, song_title + '_western.txt')
-    western_ascii_path = mysong.write_ascii(western_ascii_path, RenderModes.WESTERNASCII)
-    if western_ascii_path != '':
+        print('Your song in SVG is located in', os.path.join(str(SONG_DIR)))
+        print('Your song has been splitted in ' + str(filenum+1) + ' files '
+              'between ' + os.path.split(svg_path0)[1] + ' and ' + os.path.split(svg_path)[1])
+        
+if RenderModes.PNG in ENABLED_MODES:
+    png_path0 = os.path.join(SONG_DIR, song_title + '.png')
+    filenum, png_path = mysong.write_png(png_path0)
+    
+    if png_path != '':
         print('--------------------------------------------------')
-        print('Your song in TXT converted to Western notation is located at:', os.path.join(str(SONG_DIR), western_ascii_path))
+        print('Your song in PNG is located in:', os.path.join(str(SONG_DIR)))
+        print('Your song has been splitted in ' + str(filenum+1) + ' files '
+              'between ' + os.path.split(png_path0)[1] + ' and ' + os.path.split(png_path)[1])
+
+if RenderModes.SKYASCII in ENABLED_MODES:
+    if song_notation in [InputModes.WESTERN, InputModes.JIANPU, InputModes.WESTERNCHORDS]:
+        sky_ascii_path = os.path.join(SONG_DIR, song_title + '_sky.txt')
+        res = mysong.write_ascii(sky_ascii_path, RenderModes.SKYASCII)
+        if sky_ascii_path != '':
+            print('--------------------------------------------------')
+            print('Your song converted to Sky notation is located at:', os.path.join(str(SONG_DIR), sky_ascii_path))
+
+if RenderModes.WESTERNASCII in ENABLED_MODES:
+    if song_notation in [InputModes.SKY, InputModes.SKYKEYBOARD]:
+        western_ascii_path = os.path.join(SONG_DIR, song_title + '_western.txt')
+        western_ascii_path = mysong.write_ascii(western_ascii_path, RenderModes.WESTERNASCII)
+        if western_ascii_path != '':
+            print('--------------------------------------------------')
+            print('Your song in TXT converted to Western notation is located at:', os.path.join(str(SONG_DIR), western_ascii_path))
 
 os.chdir(mycwd)
