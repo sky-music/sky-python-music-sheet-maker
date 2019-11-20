@@ -109,13 +109,23 @@ svg.silent rect {
   fill:none;
 }
 
-/* <!-- Invisible table for lyrics (HTML only) --> */
 table.voice {
-  margin: 0px;
+  margin-top: 0px;
+  margin-bottom: 0px;
+  margin-left: 4px;
+  margin-bottom: 0px;
   padding: 0px;
   border-radius: 0px;
   border-width: 0px;
+}
+
+table.voice td {
+  padding-top: 0px;
+  padding-bottom: 0px;
+  margin: 0px;
   font-size: 0.8em;
+  width: 7.5em;
+  text-align: center;
 }
 
 /* <!-- Sky voice (SVG only) --> */
