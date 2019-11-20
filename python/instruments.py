@@ -112,7 +112,7 @@ class Voice(Instrument): # Lyrics or comments
         '''Renders the lyrics text in HTML inside an invisible table'''
         chord_render = '<table class=\"voice\">'
         chord_render +='<tr>'
-        chord_render +='<td  width=\"102em\" align=\"center\">' #TODO: width calculated automatically
+        chord_render +='<td>'
         chord_render += self.lyric
         chord_render += '</td>'
         chord_render +='</tr>'
