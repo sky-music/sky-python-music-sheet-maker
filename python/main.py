@@ -138,6 +138,7 @@ if song_notation == 'JIANPU' and QUAVER_DELIMITER =='-':
 # Attempts to detect key for input written in absolute musical scales (western, Jianpu)
 musickeys  = []
 if song_notation in [InputModes.WESTERN, InputModes.JIANPU]:
+    #TODO: update find_keys
     musickeys = myparser.find_key(song_lines, COMMENT_DELIMITER, song_notation)
     if len(musickeys) == 0:
         print("\nYour song cannot be transposed exactly in Sky.")
