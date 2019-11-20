@@ -276,7 +276,6 @@ class Harp(Instrument):
                 harp_render += '<td>'
 
                 note = self.get_note_from_position((row, col))
-                #note.set_position(row, col)
 
                 note_render = note.render_in_html(note_width)
                 harp_render += note_render
@@ -287,7 +286,7 @@ class Harp(Instrument):
         harp_render += '</table>'
         
         if self.get_repeat() > 0:
-            harp_render += '\n<table class=\"harp-' + str(self.get_index()) + ' repeat\">'
+            harp_render += '<table class=\"harp-' + str(self.get_index()) + ' repeat\">'
             harp_render += '<tr>'
             harp_render += '<td>'
             harp_render += 'x' + str(self.get_repeat())       
