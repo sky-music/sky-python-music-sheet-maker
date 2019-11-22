@@ -155,7 +155,6 @@ class Parser:
         '''
         Attempts to detect input type and notation
         '''        
-        #TODO : implement WESTERNCHORDS
         possible_modes = [InputModes.SKYKEYBOARD, InputModes.SKY, InputModes.WESTERN, InputModes.JIANPU, InputModes.WESTERNCHORDS]
         position_maps = [self.keyboard_position_map, self.sky_position_map, self.western_position_map, self.jianpu_position_map, self.western_chords]
         good_notes = [0]*len(position_maps)
@@ -164,7 +163,8 @@ class Parser:
         octave_span = 0
         
         for line in song_lines:
-            line = line.strip().replace(icon_delimiter+icon_delimiter,icon_delimiter) # clean-up
+            line = line.strip()
+            re.sub(icon_delimiter+'{2,'+str(max(2,len(line)))+'}',icon_delimiter,line)#removes surnumerous spaces
             if len(line) > 0:  
                 if line[0] != comment_delimiter:
                     icons=line.split(icon_delimiter)
@@ -243,7 +243,8 @@ class Parser:
         Returns instrument_line: a list of chord 'skygrid' (1 chord = 1 dict)
         '''                 
         instrument_line = []
-        line = line.strip().replace(icon_delimiter+icon_delimiter,icon_delimiter) # clean-up
+        line = line.strip()
+        re.sub(icon_delimiter+'{2,'+str(max(2,len(line)))+'}',icon_delimiter,line)#removes surnumerous spaces
         if len(line)>0:
             if line[0] == comment_delimiter:
                 lyrics = line.split(comment_delimiter)
