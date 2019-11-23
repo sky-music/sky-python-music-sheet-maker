@@ -133,11 +133,6 @@ class Parser:
 
     def split_chord(self, chord, position_map, repeat_indicator):
 
-        print('split chord func called')
-        print(chord)
-        print(repeat_indicator)
-        print(re.split(repeat_indicator, chord))
-
         try:
             repeat = int(re.split(repeat_indicator, chord)[1])
             chord = re.split(repeat_indicator, chord)[0]
