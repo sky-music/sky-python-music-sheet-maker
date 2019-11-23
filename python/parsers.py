@@ -134,8 +134,8 @@ class Parser:
     def split_chord(self, chord, position_map, repeat_indicator):
 
         try:
-            repeat = int(re.split(repeat_indicator, chord)[1])
-            chord = re.split(repeat_indicator, chord)[0]
+            repeat = int(re.split(re.escape(repeat_indicator), chord)[1])
+            chord = re.split(re.escape(repeat_indicator), chord)[0]
         except:
             repeat = 0
 
