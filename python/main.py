@@ -69,6 +69,7 @@ ICON_DELIMITER = ' ' # Chords separation
 NOTE_WIDTH = "1em" #Any CSS-compatible unit can be used
 PAUSE = '.'
 COMMENT_DELIMITER = '#' # Lyrics delimiter, can be used for comments
+REPEAT_INDICATOR = '\*'
 SONG_DIR_IN = 'songs'
 SONG_DIR_OUT = 'songs'
 CSS_PATH = 'css/main.css'
@@ -94,7 +95,7 @@ print('\nNotes composing a chord must be glued together (e.g. A1B1C1).')
 print('Separate chords with \"' + ICON_DELIMITER + '\".')
 print('Use \"' + PAUSE + '\" for a silence (rest).')
 print('Use \"' + QUAVER_DELIMITER + '\" to link notes within an icon, for triplets, quavers... (e.g. A1' + QUAVER_DELIMITER + 'B1' + QUAVER_DELIMITER + 'C1).')
-print('Add x2 after a chord to indicate repetition.')
+print('Add ' + REPEAT_INDICATOR + '2 after a chord to indicate repetition.')
 print('Sharps # and flats b (semitones) are not supported in Sky.')
 print('============================================================')
 
@@ -121,7 +122,7 @@ else:
         song_line = input('Type next line: ')
 
 
-possible_modes = myparser.detect_input_type(song_lines, ICON_DELIMITER, PAUSE, QUAVER_DELIMITER, COMMENT_DELIMITER)
+possible_modes = myparser.detect_input_type(song_lines, ICON_DELIMITER, PAUSE, QUAVER_DELIMITER, COMMENT_DELIMITER, REPEAT_INDICATOR)
 
 if len(possible_modes) > 1:
     print('\nSeveral possible notations detected.')
@@ -158,7 +159,7 @@ else:
 # Parses song line by line
 mysong = Song()
 for song_line in song_lines:
-    instrument_line = myparser.parse_line(song_line, ICON_DELIMITER, PAUSE, QUAVER_DELIMITER, COMMENT_DELIMITER, song_notation, note_shift)
+    instrument_line = myparser.parse_line(song_line, ICON_DELIMITER, PAUSE, QUAVER_DELIMITER, COMMENT_DELIMITER, song_notation, note_shift, REPEAT_INDICATOR)
     mysong.add_line(instrument_line)
 
 
