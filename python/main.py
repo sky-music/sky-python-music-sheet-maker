@@ -189,7 +189,7 @@ mysong.set_headers(original_artists, transcript_writer, musical_key)
 if RenderModes.HTML in ENABLED_MODES:
     html_path = os.path.join(SONG_DIR_OUT, song_title + '.html')
     html_path = mysong.write_html(html_path, NOTE_WIDTH, CSS_MODE, CSS_PATH)
-    
+
     if html_path != '':
         print('============================================================')
         print('Your song in HTML is located at:', html_path)
@@ -197,21 +197,21 @@ if RenderModes.HTML in ENABLED_MODES:
 if RenderModes.SVG in ENABLED_MODES:
     svg_path0 = os.path.join(SONG_DIR_OUT, song_title + '.svg')
     filenum, svg_path = mysong.write_svg(svg_path0, CSS_MODE, CSS_PATH)
-    
+
     if svg_path != '':
         print('--------------------------------------------------')
         print('Your song in SVG is located in:', SONG_DIR_OUT)
-        print('Your song has been splitted in ' + str(filenum+1) + ' files '
+        print('Your song has been split into ' + str(filenum+1) + ' files '
               'between ' + os.path.split(svg_path0)[1] + ' and ' + os.path.split(svg_path)[1])
-        
+
 if RenderModes.PNG in ENABLED_MODES:
     png_path0 = os.path.join(SONG_DIR_OUT, song_title + '.png')
     filenum, png_path = mysong.write_png(png_path0)
-    
+
     if png_path != '':
         print('--------------------------------------------------')
         print('Your song in PNG is located in:', SONG_DIR_OUT)
-        print('Your song has been splitted in ' + str(filenum+1) + ' files '
+        print('Your song has been split into ' + str(filenum+1) + ' files '
               'between ' + os.path.split(png_path0)[1] + ' and ' + os.path.split(png_path)[1])
 
 if RenderModes.SKYASCII in ENABLED_MODES:
