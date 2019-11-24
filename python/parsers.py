@@ -430,4 +430,35 @@ class WesternParser:
         Returns the corresponding dict when given a key
         '''
 
-        pass
+        if self.check_if_valid_western_note(western_note) == True:
+
+            if song_key == 'C':
+                return self.C_major_to_int_dict
+            elif song_key == 'Db' or song_key == 'C#':
+                return self.Db_major_to_int_dict
+            elif song_key == 'D':
+                return self.D_major_to_int_dict
+            elif song_key == 'Eb' or song_key == 'D#':
+                return self.Eb_major_to_int_dict
+            elif song_key == 'E':
+                return self.E_major_to_int_dict
+            elif song_key == 'F':
+                return self.F_major_to_int_dict
+            elif song_key == 'Gb' or song_key == 'F#':
+                return self.Gb_major_to_int_dict
+            elif song_key == 'G':
+                return self.G_major_to_int_dict
+            elif song_key == 'Ab' or song_key == 'G#':
+                return self.Ab_major_to_int_dict
+            elif song_key == 'A':
+                return self.A_major_to_int_dict
+            elif song_key == 'Bb' or 'A#':
+                return self.Bb_major_to_int_dict
+            elif song_key == 'B':
+                return self.B_major_to_int_dict
+
+        else:
+
+            #raise error
+
+            pass
