@@ -354,10 +354,18 @@ class WesternParser:
         self.columns = 5
         self.lines = 3
 
-        #TODO: incomplete, need a method to return the right dict when given a key
-        self.Cmajor_to_int_dict: {'C': 0, 'D': 1, 'E': 2, 'F': 3, 'G': 4, 'A': 5, 'B': 6}
+        self.C_major_to_int_dict: {'C': 0, 'D': 1, 'E': 2, 'F': 3, 'G': 4, 'A': 5, 'B': 6}
         self.Db_major_to_int_dict: {'Db': 0, 'C#':0, 'Eb': 1, 'D#': 1, 'F': 2, 'Gb': 3, 'F#':3, 'Ab': 4, 'G#':4, 'Bb': 5, 'A#': 5, 'C': 6}
         self.D_major_to_int_dict: {'D': 0, 'E': 1, 'F#': 2, 'Gb': 2, 'G': 3, 'A': 4, 'B': 5, 'C#': 6, 'Db': 6}
+        self.Eb_major_to_int_dict: {'Eb': 0, 'F': 1, 'G': 2, 'Ab': 3, 'Bb': 4, 'C': 5, 'D': 6}
+        self.E_major_to_int_dict: {'E': 0, 'F#': 1, 'G#': 2, 'A': 3, 'B': 4, 'C#': 5, 'D#': 6}
+        self.F_major_to_int_dict: {'F': 0, 'G': 1, 'A': 2, 'Bb': 3, 'C': 4, 'D': 5, 'E': 6}
+        self.Gb_major_to_int_dict: {'Gb': 0, 'Ab': 1, 'Bb': 2, 'Cb': 3, 'Db': 4, 'Eb': 5, 'F': 6}
+        self.G_major_to_int_dict: {'G': 0, 'A': 1, 'B': 2, 'C': 3, 'D': 4, 'E': 5, 'F#': 6}
+        self.Ab_major_to_int_dict: {'Ab': 0, 'Bb': 1, 'C': 2, 'Db': 3, 'Eb': 4, 'F': 5, 'G': 6}
+        self.A_major_to_int_dict: {'A': 0, 'B': 1, 'C#': 2, 'D': 3, 'E': 4, 'F#': 5, 'G#': 6}
+        self.Bb_major_to_int_dict: {'Bb': 0, 'C': 1, 'D': 2, 'Eb': 3, 'F': 4, 'G': 5, 'A': 6}
+        self.B_major_to_int_dict: {'B': 0, 'C#': 1, 'D#': 2, 'E': 3, 'F#': 4, 'G#': 5, 'A#': 6}
 
     def check_if_valid_western_note(self, western_note):
 
@@ -380,8 +388,6 @@ class WesternParser:
         '''
 
         if self.check_if_valid_western_note(western_note) == True:
-
-
 
             note_name = re.search(r'[ABCDEFGabcdefg][b#]?', western_note)
 
@@ -414,5 +420,13 @@ class WesternParser:
         pass
 
     def convert_base_7_to_base_10(self, sevens_count, units_count):
+
+        pass
+
+    def get_correct_dict_for_song_key(self, song_key):
+
+        '''
+        Returns the corresponding dict when given a key
+        '''
 
         pass
