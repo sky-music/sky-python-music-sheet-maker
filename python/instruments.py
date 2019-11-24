@@ -133,7 +133,7 @@ class Voice(Instrument): # Lyrics or comments
 
 
     def render_in_ascii(self, render_mode):     
-        chord_render = '# ' + self.lyric # Lyrics marked as comments in output text files
+        chord_render = '#' + self.lyric + ' ' # Lyrics marked as comments in output text files
         return chord_render
             
     def get_lyric_height(self):
