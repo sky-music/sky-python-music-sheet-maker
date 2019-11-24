@@ -354,6 +354,7 @@ class WesternParser:
         self.columns = 5
         self.lines = 3
 
+        #TODO: incomplete, need a method to return the right dict when given a key
         self.Cmajor_to_int_dict: {'C': 0, 'D': 1, 'E': 2, 'F': 3, 'G': 4, 'A': 5, 'B': 6}
         self.Db_major_to_int_dict: {'Db': 0, 'C#':0, 'Eb': 1, 'D#': 1, 'F': 2, 'Gb': 3, 'F#':3, 'Ab': 4, 'G#':4, 'Bb': 5, 'A#': 5, 'C': 6}
         self.D_major_to_int_dict: {'D': 0, 'E': 1, 'F#': 2, 'Gb': 2, 'G': 3, 'A': 4, 'B': 5, 'C#': 6, 'Db': 6}
