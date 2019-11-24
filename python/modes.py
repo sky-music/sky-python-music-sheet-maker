@@ -8,10 +8,12 @@ class InputModes(Enum):
     WESTERNCHORDS = [5, 'Chords CDEFGAB', 'Abbrev. chord name (C, F, Dm, Bdim, A+, Csus2, Dsus4, C6, Cmaj7, Dm11)']
 
 class RenderModes(Enum):
-    VISUAL = 1
-    SKYASCII = 2
-    WESTERNASCII = 3
-    JIANPUASCII = 4
+    HTML = 1
+    SVG = 2
+    PNG = 3
+    SKYASCII = 4
+    WESTERNASCII = 5
+    JIANPUASCII = 6
 
 class CSSModes(Enum):
     XML = 1
