@@ -390,9 +390,9 @@ class WesternParser:
 
         if self.check_if_valid_western_note(western_note) == True:
 
-            note_name = re.search(r'[ABCDEFGabcdefg][b#]?', western_note)
+            note_name = re.search(r'[ABCDEFGabcdefg][b#]?', western_note).group(0)
 
-            octave_number = re.search(r'\d')
+            octave_number = int(re.search(r'\d', western_note).group(0))
 
             return (note_name, octave_number)
 
@@ -412,6 +412,10 @@ class WesternParser:
 
         note_name, octave_number = self.parse_western_note(western_note)
 
+        song_key_dict = self.get_corresponding_dict_for_song_key(song_key)
+
+        note_name_base_7 = song_key_dict[note_name]
+
 
 
         # shift down, account for any additional note shift by the player
@@ -424,7 +428,7 @@ class WesternParser:
 
         pass
 
-    def get_correct_dict_for_song_key(self, song_key):
+    def get_corresponding_dict_for_song_key(self, song_key):
 
         '''
         Returns the corresponding dict when given a key
