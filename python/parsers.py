@@ -345,3 +345,73 @@ class Parser:
 
         results = [chord_skygrid, harp_broken, harp_silent, repeat]
         return results
+
+
+class WesternParser:
+
+    def __init__(self):
+
+        self.columns = 5
+        self.lines = 3
+
+        self.Cmajor_to_int_dict: {'C': 0, 'D': 1, 'E': 2, 'F': 3, 'G': 4, 'A': 5, 'B': 6}
+        self.Db_major_to_int_dict: {'Db': 0, 'C#':0, 'Eb': 1, 'D#': 1, 'F': 2, 'Gb': 3, 'F#':3, 'Ab': 4, 'G#':4, 'Bb': 5, 'A#': 5, 'C': 6}
+        self.D_major_to_int_dict: {'D': 0, 'E': 1, 'F#': 2, 'Gb': 2, 'G': 3, 'A': 4, 'B': 5, 'C#': 6, 'Db': 6}
+
+    def check_if_valid_western_note(self, western_note):
+
+        '''
+        Return True if note is in the format /[ABCDEFG][b#]?\d/, else return False
+        '''
+
+        #TODO: i don't remember how to use re.compile
+        western_note_regexobj = re.match(r'[ABCDEFGabcdefg][b#]?\d', western_note)
+
+        if western_note_regexobj:
+            return True
+        else:
+            return False
+
+    def parse_western_note(self, western_note):
+
+        '''
+        Returns a tuple containing note_name, octave_number for a note in the format /[ABCDEFG][b#]?\d/
+        '''
+
+        if self.check_if_valid_western_note(western_note) == True:
+
+
+
+            note_name = re.search(r'[ABCDEFGabcdefg][b#]?', western_note)
+
+            octave_number = re.search(r'\d')
+
+            return (note_name, octave_number)
+
+        else:
+
+            #TODO: raise error
+
+            pass
+
+    def calcuate_coordinate_for_western_note(self, western_note, song_key, note_shift=0):
+
+        '''
+        INCOMPLETE: Returns coordinate for a note in the format /[ABCDEFGabcdefg][b#]?\d/
+        '''
+
+        # Convert Western note to base 7
+
+        note_name, octave_number = self.parse_western_note(western_note)
+
+
+
+        # shift down, account for any additional note shift by the player
+
+        # Convert number to base self.columns (using mod and floor), and return as a tuple
+
+        pass
+
+    def convert_base_7_to_base_10(self, sevens_count, units_count):
+
+        pass
