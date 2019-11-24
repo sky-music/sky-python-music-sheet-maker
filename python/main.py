@@ -81,7 +81,9 @@ myparser = Parser() # Create a parser object
 ### Change directory
 mycwd = os.getcwd()
 os.chdir("..")
-
+if not os.path.isdir(SONG_DIR_OUT):
+    os.mkdir(SONG_DIR_OUT)
+    
 ### MAIN SCRIPT
 
 print('===== VISUAL MUSIC SHEETS FOR SKY:CHILDREN OF THE LIGHT =====')
