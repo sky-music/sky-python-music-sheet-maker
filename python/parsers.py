@@ -406,7 +406,7 @@ class WesternParser:
     def calcuate_coordinate_for_western_note(self, western_note, song_key, note_shift=0):
 
         '''
-        INCOMPLETE: Returns coordinate for a note in the format /[ABCDEFGabcdefg][b#]?\d/
+        Returns coordinate for a note in the format /[ABCDEFGabcdefg][b#]?\d/
         '''
 
         # Convert Western note to base 7
@@ -494,6 +494,3 @@ class WesternParser:
         second_last_digit = math.floor(num / base)
 
         return(second_last_digit, last_digit)
-
-#mytestparser = WesternParser()
-#print(mytestparser.simple_convert_base_10_to_another_base(-30, 5))
