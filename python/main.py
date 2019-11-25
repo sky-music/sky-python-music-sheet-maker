@@ -81,7 +81,9 @@ myparser = Parser() # Create a parser object
 ### Change directory
 mycwd = os.getcwd()
 os.chdir("..")
-
+if not os.path.isdir(SONG_DIR_OUT):
+    os.mkdir(SONG_DIR_OUT)
+    
 ### MAIN SCRIPT
 
 print('===== VISUAL MUSIC SHEETS FOR SKY:CHILDREN OF THE LIGHT =====')
@@ -107,7 +109,7 @@ isfile, fp = is_file(first_line)
 song_lines = []
 if isfile:
     try:
-        for song_line in open(fp,mode='r'):
+        for song_line in open(fp,mode='r', encoding='utf-8', errors='ignore'):
             song_lines.append(song_line)
     except (OSError, IOError) as err:
          print('Error opening file.')
