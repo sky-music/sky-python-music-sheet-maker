@@ -355,19 +355,19 @@ class WesternParser:
         self.columns = 5
         self.lines = 3
 
-        self.C_major_to_int_dict: {'C': 0, 'D': 1, 'E': 2, 'F': 3, 'G': 4, 'A': 5, 'B': 6}
-        self.Db_major_to_int_dict: {'Db': 0, 'C#':0, 'Eb': 1, 'D#': 1, 'F': 2, 'Gb': 3, 'F#':3, 'Ab': 4, 'G#':4, 'Bb': 5, 'A#': 5, 'C': 6}
-        self.D_major_to_int_dict: {'D': 0, 'E': 1, 'F#': 2, 'Gb': 2, 'G': 3, 'A': 4, 'B': 5, 'C#': 6, 'Db': 6}
-        self.Eb_major_to_int_dict: {'Eb': 0, 'D#': 0, 'F': 1, 'G': 2, 'Ab': 3, 'G#': 3, 'Bb': 4, 'A#': 4, 'C': 5, 'D': 6}
-        self.E_major_to_int_dict: {'E': 0, 'F#': 1, 'Gb': 1, 'G#': 2, 'Ab': 2, 'A': 3, 'B': 4, 'C#': 5, 'Db': 5, 'D#': 6}
+        self.C_major_to_int_dict = {'C': 0, 'D': 1, 'E': 2, 'F': 3, 'G': 4, 'A': 5, 'B': 6}
+        self.Db_major_to_int_dict = {'Db': 0, 'C#':0, 'Eb': 1, 'D#': 1, 'F': 2, 'Gb': 3, 'F#':3, 'Ab': 4, 'G#':4, 'Bb': 5, 'A#': 5, 'C': 6}
+        self.D_major_to_int_dict = {'D': 0, 'E': 1, 'F#': 2, 'Gb': 2, 'G': 3, 'A': 4, 'B': 5, 'C#': 6, 'Db': 6}
+        self.Eb_major_to_int_dict = {'Eb': 0, 'D#': 0, 'F': 1, 'G': 2, 'Ab': 3, 'G#': 3, 'Bb': 4, 'A#': 4, 'C': 5, 'D': 6}
+        self.E_major_to_int_dict = {'E': 0, 'F#': 1, 'Gb': 1, 'G#': 2, 'Ab': 2, 'A': 3, 'B': 4, 'C#': 5, 'Db': 5, 'D#': 6}
 
-        self.F_major_to_int_dict: {'F': 0, 'G': 1, 'A': 2, 'Bb': 3, 'A#': 3, 'C': 4, 'D': 5, 'E': 6}
-        self.Gb_major_to_int_dict: {'Gb': 0, 'F#': 0, 'Ab': 1, 'G#': 1, 'Bb': 2, 'A#': 2, 'Cb': 3, 'B': 3, 'Db': 4, 'C#': 4, 'Eb': 5, 'D#': 5, 'F': 6, 'E#': 6}
-        self.G_major_to_int_dict: {'G': 0, 'A': 1, 'B': 2, 'C': 3, 'D': 4, 'E': 5, 'F#': 6, 'Gb': 6}
-        self.Ab_major_to_int_dict: {'Ab': 0, 'G#4': 0, 'Bb': 1, 'A#': 1, 'C': 2, 'Db': 3, 'C#': 3, 'Eb': 4, 'D#': 4, 'F': 5, 'G': 6}
-        self.A_major_to_int_dict: {'A': 0, 'B': 1, 'C#': 2, 'Db': 2, 'D': 3, 'E': 4, 'F#': 5, 'Gb': 5, 'G#': 6, 'Ab': 6}
-        self.Bb_major_to_int_dict: {'Bb': 0, 'A#': 0, 'C': 1, 'D': 2, 'Eb': 3, 'D#': 3, 'F': 4, 'G': 5, 'A': 6}
-        self.B_major_to_int_dict: {'B': 0, 'C#': 1, 'Db': 1, 'D#': 2, 'Eb': 2, 'E': 3, 'Fb': 3, 'F#': 4, 'Gb': 4, 'G#': 5, 'Ab': 5, 'A#': 6, 'Bb': 6}
+        self.F_major_to_int_dict = {'F': 0, 'G': 1, 'A': 2, 'Bb': 3, 'A#': 3, 'C': 4, 'D': 5, 'E': 6}
+        self.Gb_major_to_int_dict = {'Gb': 0, 'F#': 0, 'Ab': 1, 'G#': 1, 'Bb': 2, 'A#': 2, 'Cb': 3, 'B': 3, 'Db': 4, 'C#': 4, 'Eb': 5, 'D#': 5, 'F': 6, 'E#': 6}
+        self.G_major_to_int_dict = {'G': 0, 'A': 1, 'B': 2, 'C': 3, 'D': 4, 'E': 5, 'F#': 6, 'Gb': 6}
+        self.Ab_major_to_int_dict = {'Ab': 0, 'G#4': 0, 'Bb': 1, 'A#': 1, 'C': 2, 'Db': 3, 'C#': 3, 'Eb': 4, 'D#': 4, 'F': 5, 'G': 6}
+        self.A_major_to_int_dict = {'A': 0, 'B': 1, 'C#': 2, 'Db': 2, 'D': 3, 'E': 4, 'F#': 5, 'Gb': 5, 'G#': 6, 'Ab': 6}
+        self.Bb_major_to_int_dict = {'Bb': 0, 'A#': 0, 'C': 1, 'D': 2, 'Eb': 3, 'D#': 3, 'F': 4, 'G': 5, 'A': 6}
+        self.B_major_to_int_dict = {'B': 0, 'C#': 1, 'Db': 1, 'D#': 2, 'Eb': 2, 'E': 3, 'Fb': 3, 'F#': 4, 'Gb': 4, 'G#': 5, 'Ab': 5, 'A#': 6, 'Bb': 6}
 
     def check_if_valid_western_note(self, western_note):
 
@@ -429,7 +429,7 @@ class WesternParser:
 
         # Convert number to base self.columns (using mod and floor), and return as a tuple
 
-        note_coordinate = self.convert_base_10_to_another_base(note_in_base_10, self.columns)
+        note_coordinate = self.simple_convert_base_10_to_another_base(note_in_base_10, self.columns)
 
         return note_coordinate
 
@@ -451,38 +451,33 @@ class WesternParser:
         Returns the corresponding dict when given a key
         '''
 
-        if self.check_if_valid_western_note(western_note) == True:
+        #TODO: check if song key matches re.search(r'[ABCDEFGabcdefg][b#]?', western_note).group(0)
 
-            if song_key == 'C':
-                return self.C_major_to_int_dict
-            elif song_key == 'Db' or song_key == 'C#':
-                return self.Db_major_to_int_dict
-            elif song_key == 'D':
-                return self.D_major_to_int_dict
-            elif song_key == 'Eb' or song_key == 'D#':
-                return self.Eb_major_to_int_dict
-            elif song_key == 'E':
-                return self.E_major_to_int_dict
-            elif song_key == 'F':
-                return self.F_major_to_int_dict
-            elif song_key == 'Gb' or song_key == 'F#':
-                return self.Gb_major_to_int_dict
-            elif song_key == 'G':
-                return self.G_major_to_int_dict
-            elif song_key == 'Ab' or song_key == 'G#':
-                return self.Ab_major_to_int_dict
-            elif song_key == 'A':
-                return self.A_major_to_int_dict
-            elif song_key == 'Bb' or 'A#':
-                return self.Bb_major_to_int_dict
-            elif song_key == 'B':
+        if song_key == 'C':
+            return self.C_major_to_int_dict
+        elif song_key == 'Db' or song_key == 'C#':
+            return self.Db_major_to_int_dict
+        elif song_key == 'D':
+            return self.D_major_to_int_dict
+        elif song_key == 'Eb' or song_key == 'D#':
+            return self.Eb_major_to_int_dict
+        elif song_key == 'E':
+            return self.E_major_to_int_dict
+        elif song_key == 'F':
+            return self.F_major_to_int_dict
+        elif song_key == 'Gb' or song_key == 'F#':
+            return self.Gb_major_to_int_dict
+        elif song_key == 'G':
+            return self.G_major_to_int_dict
+        elif song_key == 'Ab' or song_key == 'G#':
+            return self.Ab_major_to_int_dict
+        elif song_key == 'A':
+            return self.A_major_to_int_dict
+        elif song_key == 'Bb' or 'A#':
+            return self.Bb_major_to_int_dict
+        elif song_key == 'B':
                 return self.B_major_to_int_dict
 
-        else:
-
-            #raise error
-
-            pass
 
     def simple_convert_base_10_to_another_base(self, num, base):
 
