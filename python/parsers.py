@@ -4,6 +4,7 @@ import os
 from modes import InputModes
 import instruments
 from operator import truediv, itemgetter
+import math
 
 
 ### Parser
@@ -416,17 +417,33 @@ class WesternParser:
 
         note_name_base_7 = song_key_dict[note_name]
 
+        # Convert Western note to base 10 for arithmetic
 
+        note_in_base_10 = self.convert_base_7_to_base_10(str(octave_number) + str(note_name_base_7))
 
-        # shift down, account for any additional note shift by the player
+        # shift down, and account for any additional note shift by the player
+
+        note_in_base_10 -= 21 #TODO: change 21 to a constant variable. it is 3 octaves down because we are assuming the piano starts at C4 D4 E4 etc.
+
+        note_in_base_10 += note_shift
 
         # Convert number to base self.columns (using mod and floor), and return as a tuple
 
-        pass
+        note_coordinate = self.convert_base_10_to_another_base(note_in_base_10, self.columns)
 
-    def convert_base_7_to_base_10(self, sevens_count, units_count):
+        return note_coordinate
 
-        pass
+    def convert_base_7_to_base_10(self, num_in_base_7):
+
+        '''
+        Given a number in base 7 as a string, returns the number in base 10 as an integer.
+        '''
+
+        # Use Python int method
+
+        num_in_base_10 = int(num_in_base_7, 7)
+
+        return num_in_base_10
 
     def get_corresponding_dict_for_song_key(self, song_key):
 
@@ -466,3 +483,17 @@ class WesternParser:
             #raise error
 
             pass
+
+    def simple_convert_base_10_to_another_base(self, num, base):
+
+        '''
+        Convert a number in base 10 to base `self.columns` (using mod and floor), and return as a tuple
+        '''
+
+        last_digit = num % base
+        second_last_digit = math.floor(num / base)
+
+        return(second_last_digit, last_digit)
+
+#mytestparser = WesternParser()
+#print(mytestparser.simple_convert_base_10_to_another_base(-30, 5))
