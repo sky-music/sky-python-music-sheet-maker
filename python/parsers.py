@@ -429,7 +429,7 @@ class WesternParser:
 
         # Convert number to base self.columns (using mod and floor), and return as a tuple
 
-        note_coordinate = self.simple_convert_base_10_to_another_base(note_in_base_10, self.columns)
+        note_coordinate = self.convert_base_10_to_coordinate_of_another_base(note_in_base_10, self.columns)
 
         return note_coordinate
 
@@ -479,7 +479,7 @@ class WesternParser:
                 return self.B_major_to_int_dict
 
 
-    def simple_convert_base_10_to_another_base(self, num, base):
+    def convert_base_10_to_coordinate_of_another_base(self, num, base):
 
         '''
         Convert a number in base 10 to base `self.columns` (using mod and floor), and return as a tuple
