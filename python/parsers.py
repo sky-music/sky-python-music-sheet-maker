@@ -367,6 +367,26 @@ class WesternParser:
             }
         self.WESTERN_CHROMATIC_SCALE_COUNT = 12
 
+    def get_western_chromatic_scale_dict(self):
+
+        return self.WESTERN_CHROMATIC_SCALE_DICT
+
+    def get_semitone_interval_to_major_scale_interval_dict(self):
+
+        return self.SEMITONE_INTERVAL_TO_MAJOR_SCALE_INTERVAL_DICT
+
+    def get_western_chromatic_scale_count(self):
+
+        return self.WESTERN_CHROMATIC_SCALE_COUNT
+
+    def get_column_count(self):
+
+        return self.columns
+
+    def get_lines_count(self):
+
+        return self.lines
+
     def check_if_valid_western_note(self, western_note):
 
         '''
@@ -400,26 +420,6 @@ class WesternParser:
             #TODO: raise error
 
             pass
-
-    def get_western_chromatic_scale_dict(self):
-
-        return self.WESTERN_CHROMATIC_SCALE_DICT
-
-    def get_semitone_interval_to_major_scale_interval_dict(self):
-
-        return self.SEMITONE_INTERVAL_TO_MAJOR_SCALE_INTERVAL_DICT
-
-    def get_western_chromatic_scale_count(self):
-
-        return self.WESTERN_CHROMATIC_SCALE_COUNT
-
-    def get_column_count(self):
-
-        return self.columns
-
-    def get_lines_count(self):
-
-        return self.lines
 
     def convert_note_name_into_chromatic_position(self, note_name):
 
@@ -479,25 +479,21 @@ class WesternParser:
             interval_in_semitones += self.get_western_chromatic_scale_count()
 
         try:
+            # Convert semitone interval to major scale interval
             major_scale_interval = self.convert_semitone_interval_to_major_scale_interval(interval_in_semitones)
         except KeyError:
-            #TODO: turn into broken harp, since note is not in the song_key
-            pass
+            #Turn note into a broken harp, since note is not in the song_key
+            return None
 
         # Convert Western note to base 10 for arithmetic
-
         note_in_base_10 = self.convert_base_7_to_base_10(str(octave_number) + str(major_scale_interval))
 
         # shift down, and account for any additional note shift by the player
-
         note_in_base_10 -= 28 #TODO: change 28 to a constant variable. it is 4 octaves down to convert to a coordinate, if we start at C4 D4 E4 etc.
-
         note_in_base_10 += note_shift
 
         # Convert number to base self.columns (using mod and floor), and return as a tuple
-
         note_coordinate = self.convert_base_10_to_coordinate_of_another_base(note_in_base_10, self.get_column_count())
-
         return note_coordinate
 
     def convert_base_7_to_base_10(self, num_in_base_7):
@@ -507,11 +503,8 @@ class WesternParser:
         '''
 
         # Use Python int method
-
         num_in_base_10 = int(num_in_base_7, 7)
-
         return num_in_base_10
-
 
     def convert_base_10_to_coordinate_of_another_base(self, num, base):
 
