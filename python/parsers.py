@@ -355,19 +355,17 @@ class WesternParser:
         self.columns = 5
         self.lines = 3
 
-        self.C_major_to_int_dict = {'C': 0, 'D': 1, 'E': 2, 'F': 3, 'G': 4, 'A': 5, 'B': 6}
-        self.Db_major_to_int_dict = {'Db': 0, 'C#':0, 'Eb': 1, 'D#': 1, 'F': 2, 'Gb': 3, 'F#':3, 'Ab': 4, 'G#':4, 'Bb': 5, 'A#': 5, 'C': 6}
-        self.D_major_to_int_dict = {'D': 0, 'E': 1, 'F#': 2, 'Gb': 2, 'G': 3, 'A': 4, 'B': 5, 'C#': 6, 'Db': 6}
-        self.Eb_major_to_int_dict = {'Eb': 0, 'D#': 0, 'F': 1, 'G': 2, 'Ab': 3, 'G#': 3, 'Bb': 4, 'A#': 4, 'C': 5, 'D': 6}
-        self.E_major_to_int_dict = {'E': 0, 'F#': 1, 'Gb': 1, 'G#': 2, 'Ab': 2, 'A': 3, 'B': 4, 'C#': 5, 'Db': 5, 'D#': 6}
-
-        self.F_major_to_int_dict = {'F': 0, 'G': 1, 'A': 2, 'Bb': 3, 'A#': 3, 'C': 4, 'D': 5, 'E': 6}
-        self.Gb_major_to_int_dict = {'Gb': 0, 'F#': 0, 'Ab': 1, 'G#': 1, 'Bb': 2, 'A#': 2, 'Cb': 3, 'B': 3, 'Db': 4, 'C#': 4, 'Eb': 5, 'D#': 5, 'F': 6, 'E#': 6}
-        self.G_major_to_int_dict = {'G': 0, 'A': 1, 'B': 2, 'C': 3, 'D': 4, 'E': 5, 'F#': 6, 'Gb': 6}
-        self.Ab_major_to_int_dict = {'Ab': 0, 'G#4': 0, 'Bb': 1, 'A#': 1, 'C': 2, 'Db': 3, 'C#': 3, 'Eb': 4, 'D#': 4, 'F': 5, 'G': 6}
-        self.A_major_to_int_dict = {'A': 0, 'B': 1, 'C#': 2, 'Db': 2, 'D': 3, 'E': 4, 'F#': 5, 'Gb': 5, 'G#': 6, 'Ab': 6}
-        self.Bb_major_to_int_dict = {'Bb': 0, 'A#': 0, 'C': 1, 'D': 2, 'Eb': 3, 'D#': 3, 'F': 4, 'G': 5, 'A': 6}
-        self.B_major_to_int_dict = {'B': 0, 'C#': 1, 'Db': 1, 'D#': 2, 'Eb': 2, 'E': 3, 'Fb': 3, 'F#': 4, 'Gb': 4, 'G#': 5, 'Ab': 5, 'A#': 6, 'Bb': 6}
+        self.WESTERN_CHROMATIC_SCALE_DICT = {'C': 0, 'C#': 1, 'Db': 1, 'D': 2, 'D#': 3, 'Eb': 3, 'E': 4, 'F': 5, 'F#': 6, 'Gb': 6, 'G': 7, 'G#': 8, 'Ab': 8, 'A': 9, 'A#': 10, 'Bb': 10, 'B': 11}
+        self.SEMITONE_INTERVAL_TO_MAJOR_SCALE_INTERVAL_DICT = {
+            0: 0, # 0 semitones means it’s the root note
+            2: 1, # 2 semitones means it’s a 2nd interval
+            4: 2, # 4 semitones means it’s a 3rd interval
+            5: 3, # 5 semitones means it’s a 4th interval
+            7: 4, # 7 semitones means it’s a 5th interval
+            9: 5, # 9 semitones means it’s a 6th interval
+            11: 6 # 11 semitones means it’s a 7th interval
+            }
+        self.WESTERN_CHROMATIC_SCALE_COUNT = 12
 
     def check_if_valid_western_note(self, western_note):
 
@@ -403,6 +401,53 @@ class WesternParser:
 
             pass
 
+    def get_western_chromatic_scale_dict(self):
+
+        return self.WESTERN_CHROMATIC_SCALE_DICT
+
+    def get_semitone_interval_to_major_scale_interval_dict(self):
+
+        return self.SEMITONE_INTERVAL_TO_MAJOR_SCALE_INTERVAL_DICT
+
+    def get_western_chromatic_scale_count(self):
+
+        return self.WESTERN_CHROMATIC_SCALE_COUNT
+
+    def get_column_count(self):
+
+        return self.columns
+
+    def get_lines_count(self):
+
+        return self.lines
+
+    def convert_note_name_into_chromatic_position(self, note_name):
+
+        '''
+        Returns the numeric equivalent of the note in the chromatic scale
+        '''
+
+        #TODO: make sure the first letter of the note is uppercase, and any flats are lower case
+
+
+        western_chromatic_scale_dict = self.get_western_chromatic_scale_dict()
+
+        if note_name in western_chromatic_scale_dict.keys():
+            return western_chromatic_scale_dict[note_name]
+        else:
+            # note doesn't exist in the chromatic scale
+            raise KeyError
+
+    def convert_semitone_interval_to_major_scale_interval(self, semitone_interval):
+
+        conversion_dict = self.get_semitone_interval_to_major_scale_interval_dict()
+
+        if semitone_interval in conversion_dict.keys():
+            return conversion_dict[semitone_interval]
+        else:
+            # Error: interval is not in the major scale
+            raise KeyError
+
     def calculate_coordinate_for_western_note(self, western_note, song_key, note_shift=0):
 
         '''
@@ -413,13 +458,35 @@ class WesternParser:
 
         note_name, octave_number = self.parse_western_note(western_note)
 
-        song_key_dict = self.get_corresponding_dict_for_song_key(song_key)
+        # Find the major scale interval from the song_key to the note_name
 
-        note_name_base_7 = song_key_dict[note_name]
+        # Find the semitone interval from the song_key to the note_name first
+        try:
+            song_key_chromatic_equivalent = self.convert_note_name_into_chromatic_position(song_key)
+        except KeyError:
+            # default to C major
+            song_key_chromatic_equivalent = 0
+
+        try:
+            note_name_chromatic_equivalent = self.convert_note_name_into_chromatic_position(note_name)
+        except KeyError:
+            # TODO: Note was not found in the chromatic scale, decide how to handle
+            pass
+
+        interval_in_semitones = note_name_chromatic_equivalent - song_key_chromatic_equivalent
+
+        if interval_in_semitones < 0:
+            interval_in_semitones += self.get_western_chromatic_scale_count()
+
+        try:
+            major_scale_interval = self.convert_semitone_interval_to_major_scale_interval(interval_in_semitones)
+        except KeyError:
+            #TODO: turn into broken harp, since note is not in the song_key
+            pass
 
         # Convert Western note to base 10 for arithmetic
 
-        note_in_base_10 = self.convert_base_7_to_base_10(str(octave_number) + str(note_name_base_7))
+        note_in_base_10 = self.convert_base_7_to_base_10(str(octave_number) + str(major_scale_interval))
 
         # shift down, and account for any additional note shift by the player
 
@@ -429,7 +496,7 @@ class WesternParser:
 
         # Convert number to base self.columns (using mod and floor), and return as a tuple
 
-        note_coordinate = self.convert_base_10_to_coordinate_of_another_base(note_in_base_10, self.columns)
+        note_coordinate = self.convert_base_10_to_coordinate_of_another_base(note_in_base_10, self.get_column_count())
 
         return note_coordinate
 
@@ -445,39 +512,6 @@ class WesternParser:
 
         return num_in_base_10
 
-    def get_corresponding_dict_for_song_key(self, song_key):
-
-        '''
-        Returns the corresponding dict when given a key
-        '''
-
-        #TODO: check if song key matches re.search(r'[ABCDEFGabcdefg][b#]?', western_note).group(0)
-
-        if song_key == 'C':
-            return self.C_major_to_int_dict
-        elif song_key == 'Db' or song_key == 'C#':
-            return self.Db_major_to_int_dict
-        elif song_key == 'D':
-            return self.D_major_to_int_dict
-        elif song_key == 'Eb' or song_key == 'D#':
-            return self.Eb_major_to_int_dict
-        elif song_key == 'E':
-            return self.E_major_to_int_dict
-        elif song_key == 'F':
-            return self.F_major_to_int_dict
-        elif song_key == 'Gb' or song_key == 'F#':
-            return self.Gb_major_to_int_dict
-        elif song_key == 'G':
-            return self.G_major_to_int_dict
-        elif song_key == 'Ab' or song_key == 'G#':
-            return self.Ab_major_to_int_dict
-        elif song_key == 'A':
-            return self.A_major_to_int_dict
-        elif song_key == 'Bb' or 'A#':
-            return self.Bb_major_to_int_dict
-        elif song_key == 'B':
-                return self.B_major_to_int_dict
-
 
     def convert_base_10_to_coordinate_of_another_base(self, num, base):
 
@@ -489,3 +523,8 @@ class WesternParser:
         second_last_digit = math.floor(num / base)
 
         return(second_last_digit, last_digit)
+
+
+#mytestparser = WesternParser()
+#print(mytestparser.calculate_coordinate_for_western_note(western_note='Ab5', song_key='Ab'))
+#print(mytestparser.calculate_coordinate_for_western_note('Ab6', 'Ab'))
