@@ -403,7 +403,7 @@ class WesternParser:
 
             pass
 
-    def calcuate_coordinate_for_western_note(self, western_note, song_key, note_shift=0):
+    def calculate_coordinate_for_western_note(self, western_note, song_key, note_shift=0):
 
         '''
         Returns coordinate for a note in the format /[ABCDEFGabcdefg][b#]?\d/
