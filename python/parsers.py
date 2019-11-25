@@ -423,7 +423,7 @@ class WesternParser:
 
         # shift down, and account for any additional note shift by the player
 
-        note_in_base_10 -= 21 #TODO: change 21 to a constant variable. it is 3 octaves down because we are assuming the piano starts at C4 D4 E4 etc.
+        note_in_base_10 -= 28 #TODO: change 28 to a constant variable. it is 4 octaves down to convert to a coordinate, if we start at C4 D4 E4 etc.
 
         note_in_base_10 += note_shift
 
