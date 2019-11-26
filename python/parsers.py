@@ -445,6 +445,7 @@ class WesternParser:
                 # Player has given note name without specifying an octave
                 note_name = western_note
                 octave_number = self.get_default_starting_octave()
+                return (note_name, octave_number)
             else:
                 # Raise error, not a valid western note
                 raise SyntaxError
@@ -563,6 +564,34 @@ class WesternParser:
 
         return(second_last_digit, remainder)
 
+def find_western_key(song_lines, comment_delimiter='#', input_mode=InputModes.WESTERN):
+
+   if input_mode == InputModes.WESTERN:
+      isNoteRegExp = '([A-G])'
+      notNoteRegExp = '[^A-Gb#]'
+   elif input_mode == InputModes.JIANPU:
+      isNoteRegExp = '([1-7])'
+      notNoteRegExp = '[^1-7b#]'
+   else:
+      return ['']
+
+   myparser = WesternParser()
+   possible_keys = [k for k in myparser.WESTERN_CHROMATIC_SCALE_DICT.keys()]
+   score=[0]*len(possible_keys)
+   for line in song_lines:
+      if len(line)>0:
+         if line[0] != comment_delimiter:
+            notes = re.sub(isNoteRegExp,' \\1',re.sub(notNoteRegExp,'',line)).split() # Clean-up, adds space and split
+
+            for i,k in enumerate(possible_keys):
+               for note in notes:
+                  try:
+                  	  myparser.calculate_coordinate_for_western_note(note, k, note_shift=0)
+                  except KeyError:
+                     score[i]+=1
+
+   sorted_idx, score = zip(*sorted([(i,e) for i,e in enumerate(score)], key=itemgetter(1)))
+   return possible_keys[sorted_idx[0]]
 
 #mytestparser = WesternParser()
 #print(mytestparser.calculate_coordinate_for_western_note(western_note='Ab5', song_key='Ab'))
