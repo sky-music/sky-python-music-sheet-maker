@@ -533,7 +533,7 @@ class WesternParser:
 
         # shift down, and account for any additional note shift by the player
 
-        if not(self.check_if_valid_western_note_with_octave(western_note)):
+        if self.check_if_valid_western_note_with_octave(western_note):
             # Skip the note shift if no octave is specified
 
             note_in_base_10 -= self.get_base_of_western_scale()*self.get_default_starting_octave()
