@@ -333,9 +333,8 @@ class Parser:
                 #Except InvalidLetterException
                 try:
                     highlighted_note_position = self.map_note_to_position(note, position_map, note_shift)
-                except KeyError, SyntaxError:
+                except (KeyError, SyntaxError):
                     harp_broken = True
-                    pass
                 else:
                     chord_skygrid[highlighted_note_position] = {}
                     chord_skygrid[highlighted_note_position][idx0+chord_idx] = True
@@ -459,7 +458,7 @@ class WesternParser:
         if self.check_if_valid_western_note_name(note_name):
 
             # make sure the first letter of the note is uppercase, for the dictionary keys
-            note_name[0] = note_name[0].upper()
+            note_name = note_name.capitalize()
         else:
             #Error: note is not formatted right, output broken harp
             raise SyntaxError
@@ -486,7 +485,7 @@ class WesternParser:
 
         '''
         Returns coordinate (in the form of a tuple) for a western_note in the format /[ABCDEFGabcdefg][b#]?\d/.
-        
+
         song_key will be determined by the find_keys method, and is expected to match WESTERN_CHROMATIC_SCALE_DICT, otherwise the default key will be C.
         note_shift is the variable set by the user.
 
@@ -506,7 +505,7 @@ class WesternParser:
         # Find the semitone interval from the song_key to the note_name first
         try:
             song_key_chromatic_equivalent = self.convert_note_name_into_chromatic_position(song_key)
-        except KeyError, SyntaxError:
+        except (KeyError, SyntaxError):
             # default to C major
             song_key_chromatic_equivalent = 0
         try:
