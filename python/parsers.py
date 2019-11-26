@@ -559,9 +559,9 @@ class WesternParser:
         '''
 
         remainder = num % base
-        second_last_digit = math.floor(num / base)
+        quotient = math.floor(num / base)
 
-        return(second_last_digit, remainder)
+        return(quotient, remainder)
 
     def find_western_key(song_lines, comment_delimiter='#', input_mode=InputModes.WESTERN):
 
