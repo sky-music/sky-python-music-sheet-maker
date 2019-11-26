@@ -532,8 +532,12 @@ class WesternParser:
         note_in_base_10 = self.convert_base_7_to_base_10(str(octave_number) + str(major_scale_interval))
 
         # shift down, and account for any additional note shift by the player
-        note_in_base_10 -= self.get_base_of_western_scale()*self.get_default_starting_octave()
-        note_in_base_10 += note_shift
+
+        if not(self.check_if_valid_western_note_with_octave(western_note)):
+            # Skip the note shift if no octave is specified
+
+            note_in_base_10 -= self.get_base_of_western_scale()*self.get_default_starting_octave()
+            note_in_base_10 += note_shift
 
         # Convert number to base self.columns (using mod and floor), and return as a tuple
         note_coordinate = self.convert_base_10_to_coordinate_of_another_base(note_in_base_10, self.get_column_count())
