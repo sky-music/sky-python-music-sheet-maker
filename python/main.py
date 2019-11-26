@@ -109,7 +109,7 @@ isfile, fp = is_file(first_line)
 song_lines = []
 if isfile:
     try:
-        for song_line in open(fp,mode='r'):
+        for song_line in open(fp,mode='r', encoding='utf-8', errors='ignore'):
             song_lines.append(song_line)
     except (OSError, IOError) as err:
          print('Error opening file.')

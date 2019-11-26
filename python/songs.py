@@ -143,7 +143,7 @@ class Song():
     def write_html(self, file_path, note_width='1em', css_mode=CSSModes.EMBED, css_path='css/main.css'):
         
         try:
-            html_file = open(file_path, 'w+')
+            html_file = open(file_path, 'w+', encoding='utf-8', errors='ignore')
         except:
             print('Could not create text file.')
             return '' 
@@ -154,7 +154,7 @@ class Song():
            
         if css_mode == CSSModes.EMBED:         
             try:
-                with open(css_path, 'r') as css_file:
+                with open(css_path, 'r', encoding='utf-8', errors='ignore') as css_file:
                     css_file = css_file.read()
             except:
                 print('Could not open CSS file to embed it in HTML.')
@@ -207,7 +207,7 @@ class Song():
     def write_ascii(self, file_path, render_mode = RenderModes.SKYASCII):    
     
         try:
-            ascii_file = open(file_path, 'w+')
+            ascii_file = open(file_path, 'w+', encoding='utf-8', errors='ignore')
         except:
             print('Could not create text file.')
             return ''
@@ -245,7 +245,7 @@ class Song():
             file_path = file_path0
             
         try:
-            svg_file = open(file_path, 'w+')
+            svg_file = open(file_path, 'w+', encoding='utf-8', errors='ignore')
         except:
             print('Could not create SVG file.')
             return filenum, ''
@@ -262,7 +262,7 @@ class Song():
         
         if css_mode == CSSModes.EMBED: 
             try:
-                with open(css_path, 'r') as css_file:
+                with open(css_path, 'r', encoding='utf-8', errors='ignore') as css_file:
                     css_file = css_file.read()
             except:
                 print('Could not open CSS file to embed it in SVG.')

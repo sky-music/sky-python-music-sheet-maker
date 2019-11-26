@@ -27,8 +27,8 @@ if iscairo:
             if name in ['circle-highlighted-n', 'diamond-highlighted-n', 'root-highlighted-n']:
                 for i in range(1,max_num_notes+1):
                     new_name = re.sub('-n','-' + str(i),name)
-                    new_file=open(new_name + ext, 'w+')
-                    for line in open(file_path, 'r'):
+                    new_file=open(new_name + ext, 'w+', encoding='utf-8', errors='ignore')
+                    for line in open(file_path, 'r', encoding='utf-8', errors='ignore'):
                         new_file.write(re.sub('highlighted-n','highlighted-' + str(i), line))
                     new_file.close()
                     svg2png(url=(new_name + ext),write_to=(new_name+'.png'))
