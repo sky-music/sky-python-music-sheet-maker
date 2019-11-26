@@ -333,7 +333,7 @@ class Parser:
                 #Except InvalidLetterException
                 try:
                     highlighted_note_position = self.map_note_to_position(note, position_map, note_shift)
-                except KeyError:
+                except KeyError, SyntaxError:
                     harp_broken = True
                     pass
                 else:
