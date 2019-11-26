@@ -461,16 +461,15 @@ class WesternParser:
             # make sure the first letter of the note is uppercase, for the dictionary keys
             note_name[0] = note_name[0].upper()
         else:
-            #TODO: Error: note could not be found in the chromatic scale
-
-            pass
+            #Error: note is not formatted right, output broken harp
+            raise SyntaxError
 
         western_chromatic_scale_dict = self.get_western_chromatic_scale_dict()
 
         if note_name in western_chromatic_scale_dict.keys():
             return western_chromatic_scale_dict[note_name]
         else:
-            # note doesn't exist in the chromatic scale
+            # note doesn't exist in the chromatic scale dict
             raise KeyError
 
     def convert_semitone_interval_to_major_scale_interval(self, semitone_interval):
@@ -486,7 +485,9 @@ class WesternParser:
     def calculate_coordinate_for_western_note(self, western_note, song_key, note_shift=0):
 
         '''
-        Returns coordinate for a note in the format /[ABCDEFGabcdefg][b#]?\d/
+        Returns coordinate for a western_note in the format /[ABCDEFGabcdefg][b#]?\d/.
+        song_key will be determined by the find_keys method, and is expected to match WESTERN_CHROMATIC_SCALE_DICT, otherwise the default key will be C.
+        note_shift is the variable set by the user.
         '''
 
         # Convert Western note to base 7
@@ -496,14 +497,14 @@ class WesternParser:
         # Find the semitone interval from the song_key to the note_name first
         try:
             song_key_chromatic_equivalent = self.convert_note_name_into_chromatic_position(song_key)
-        except KeyError:
+        except KeyError, SyntaxError:
             # default to C major
             song_key_chromatic_equivalent = 0
         try:
             note_name_chromatic_equivalent = self.convert_note_name_into_chromatic_position(note_name)
-        except KeyError:
-            # TODO: Note was not found in the chromatic scale, decide how to handle
-            pass
+        except KeyError, SyntaxError:
+            # Note was not found in the chromatic scale, output broken harp
+            raise SyntaxError
 
         interval_in_semitones = note_name_chromatic_equivalent - song_key_chromatic_equivalent
         if interval_in_semitones < 0:
@@ -513,8 +514,8 @@ class WesternParser:
         try:
             major_scale_interval = self.convert_semitone_interval_to_major_scale_interval(interval_in_semitones)
         except KeyError:
-            #Turn note into a broken harp, since note is not in the song_key
-            return None
+            # Turn note into a broken harp, since note is not in the song_key
+            raise KeyError
 
         # Convert Western note to base 10 for arithmetic
         note_in_base_10 = self.convert_base_7_to_base_10(str(octave_number) + str(major_scale_interval))
