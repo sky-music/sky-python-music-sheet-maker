@@ -441,7 +441,6 @@ class WesternParser:
         else:
 
             if self.is_valid_western_note_name(western_note) == True:
-
                 # Player has given note name without specifying an octave
                 note_name = western_note
                 octave_number = self.get_default_starting_octave()
