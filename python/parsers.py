@@ -367,6 +367,11 @@ class WesternParser:
             }
         self.WESTERN_CHROMATIC_SCALE_COUNT = 12
 
+        # Specify the default starting octave of the harp, in this case, it's 4 (C4 D4 E4 etc.)
+        self.default_starting_octave = 4
+
+        self.base_of_western_scale = 7
+
     def get_western_chromatic_scale_dict(self):
 
         return self.WESTERN_CHROMATIC_SCALE_DICT
@@ -387,14 +392,36 @@ class WesternParser:
 
         return self.lines
 
-    def check_if_valid_western_note(self, western_note):
+    def get_default_starting_octave(self):
+
+        return self.default_starting_octave
+
+    def get_base_of_western_scale(self):
+
+        return self.base_of_western_scale
+
+    def check_if_valid_western_note_with_octave(self, western_note):
 
         '''
-        Return True if note is in the format /[ABCDEFG][b#]?\d/, else return False
+        Return True if note is in the format /[ABCDEFGabcdefg][b#]?\d/, e.g. Ab4, else return False
         '''
 
         #TODO: i don't remember how to use re.compile
         western_note_regexobj = re.match(r'[ABCDEFGabcdefg][b#]?\d', western_note)
+
+        if western_note_regexobj:
+            return True
+        else:
+            return False
+
+    def check_if_valid_western_note_name(self, western_note_name):
+
+        '''
+        Return True if note is in the format /[ABCDEFGABCDEFGabcdefg][b#]?/, e.g. F#, else return False
+        '''
+
+        #TODO: i don't remember how to use re.compile
+        western_note_regexobj = re.match(r'[ABCDEFGabcdefg][b#]?', western_note_name)
 
         if western_note_regexobj:
             return True
@@ -407,19 +434,21 @@ class WesternParser:
         Returns a tuple containing note_name, octave_number for a note in the format /[ABCDEFG][b#]?\d/
         '''
 
-        if self.check_if_valid_western_note(western_note) == True:
+        if self.check_if_valid_western_note_with_octave(western_note) == True:
 
             note_name = re.search(r'[ABCDEFGabcdefg][b#]?', western_note).group(0)
-
             octave_number = int(re.search(r'\d', western_note).group(0))
-
             return (note_name, octave_number)
-
         else:
 
-            #TODO: raise error
+            if self.check_if_valid_western_note_name(western_note) == True:
 
-            pass
+                # Player has given note name without specifying an octave
+                note_name = western_note
+                octave_number = self.get_default_starting_octave()
+            else:
+                #TODO: raise error, not a valid western note
+                pass
 
     def convert_note_name_into_chromatic_position(self, note_name):
 
@@ -427,8 +456,14 @@ class WesternParser:
         Returns the numeric equivalent of the note in the chromatic scale
         '''
 
-        #TODO: make sure the first letter of the note is uppercase, and any flats are lower case
+        if self.check_if_valid_western_note_name(note_name):
 
+            # make sure the first letter of the note is uppercase, for the dictionary keys
+            note_name[0] = note_name[0].upper()
+        else:
+            #TODO: Error: note could not be found in the chromatic scale
+
+            pass
 
         western_chromatic_scale_dict = self.get_western_chromatic_scale_dict()
 
@@ -455,18 +490,15 @@ class WesternParser:
         '''
 
         # Convert Western note to base 7
-
         note_name, octave_number = self.parse_western_note(western_note)
 
         # Find the major scale interval from the song_key to the note_name
-
         # Find the semitone interval from the song_key to the note_name first
         try:
             song_key_chromatic_equivalent = self.convert_note_name_into_chromatic_position(song_key)
         except KeyError:
             # default to C major
             song_key_chromatic_equivalent = 0
-
         try:
             note_name_chromatic_equivalent = self.convert_note_name_into_chromatic_position(note_name)
         except KeyError:
@@ -474,12 +506,11 @@ class WesternParser:
             pass
 
         interval_in_semitones = note_name_chromatic_equivalent - song_key_chromatic_equivalent
-
         if interval_in_semitones < 0:
+            # Circular shift the interval back to a positive number
             interval_in_semitones += self.get_western_chromatic_scale_count()
 
         try:
-            # Convert semitone interval to major scale interval
             major_scale_interval = self.convert_semitone_interval_to_major_scale_interval(interval_in_semitones)
         except KeyError:
             #Turn note into a broken harp, since note is not in the song_key
@@ -489,7 +520,7 @@ class WesternParser:
         note_in_base_10 = self.convert_base_7_to_base_10(str(octave_number) + str(major_scale_interval))
 
         # shift down, and account for any additional note shift by the player
-        note_in_base_10 -= 28 #TODO: change 28 to a constant variable. it is 4 octaves down to convert to a coordinate, if we start at C4 D4 E4 etc.
+        note_in_base_10 -= self.get_base_of_western_scale()*self.get_default_starting_octave()
         note_in_base_10 += note_shift
 
         # Convert number to base self.columns (using mod and floor), and return as a tuple
@@ -502,8 +533,7 @@ class WesternParser:
         Given a number in base 7 as a string, returns the number in base 10 as an integer.
         '''
 
-        # Use Python int method
-        num_in_base_10 = int(num_in_base_7, 7)
+        num_in_base_10 = int(num_in_base_7, self.get_base_of_western_scale())
         return num_in_base_10
 
     def convert_base_10_to_coordinate_of_another_base(self, num, base):
@@ -512,10 +542,10 @@ class WesternParser:
         Convert a number in base 10 to base `self.columns` (using mod and floor), and return as a tuple
         '''
 
-        last_digit = num % base
+        remainder = num % base
         second_last_digit = math.floor(num / base)
 
-        return(second_last_digit, last_digit)
+        return(second_last_digit, remainder)
 
 
 #mytestparser = WesternParser()
