@@ -485,9 +485,17 @@ class WesternParser:
     def calculate_coordinate_for_western_note(self, western_note, song_key, note_shift=0):
 
         '''
-        Returns coordinate for a western_note in the format /[ABCDEFGabcdefg][b#]?\d/.
+        Returns coordinate (in the form of a tuple) for a western_note in the format /[ABCDEFGabcdefg][b#]?\d/.
         song_key will be determined by the find_keys method, and is expected to match WESTERN_CHROMATIC_SCALE_DICT, otherwise the default key will be C.
         note_shift is the variable set by the user.
+
+        KeyError will be raised if:
+        - western_note is not in the major scale of song key (using the dict)
+        - western_note is not in the chromatic scale (using the dict)
+        SyntaxError will be raised if:
+        - western_note is not formatted correctly
+
+        KeyError and SyntaxError can be caught to output a broken harp
         '''
 
         # Convert Western note to base 7
@@ -502,8 +510,11 @@ class WesternParser:
             song_key_chromatic_equivalent = 0
         try:
             note_name_chromatic_equivalent = self.convert_note_name_into_chromatic_position(note_name)
-        except KeyError, SyntaxError:
+        except KeyError:
             # Note was not found in the chromatic scale, output broken harp
+            raise KeyError
+        except SyntaxError:
+            # Note was not formatted correctly
             raise SyntaxError
 
         interval_in_semitones = note_name_chromatic_equivalent - song_key_chromatic_equivalent
