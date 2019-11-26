@@ -447,8 +447,8 @@ class WesternParser:
                 note_name = western_note
                 octave_number = self.get_default_starting_octave()
             else:
-                #TODO: raise error, not a valid western note
-                pass
+                # Raise error, not a valid western note
+                raise SyntaxError
 
     def convert_note_name_into_chromatic_position(self, note_name):
 
@@ -486,6 +486,7 @@ class WesternParser:
 
         '''
         Returns coordinate (in the form of a tuple) for a western_note in the format /[ABCDEFGabcdefg][b#]?\d/.
+        
         song_key will be determined by the find_keys method, and is expected to match WESTERN_CHROMATIC_SCALE_DICT, otherwise the default key will be C.
         note_shift is the variable set by the user.
 
@@ -495,7 +496,7 @@ class WesternParser:
         SyntaxError will be raised if:
         - western_note is not formatted correctly
 
-        KeyError and SyntaxError can be caught to output a broken harp
+        KeyError and SyntaxError can be caught, by any method that calls this one, to output a broken harp
         '''
 
         # Convert Western note to base 7
