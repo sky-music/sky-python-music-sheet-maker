@@ -399,7 +399,7 @@ class WesternParser:
 
         return self.base_of_western_scale
 
-    def check_if_valid_western_note_with_octave(self, western_note):
+    def is_valid_western_note_with_octave(self, western_note):
 
         '''
         Return True if note is in the format /[ABCDEFGabcdefg][b#]?\d/, e.g. Ab4, else return False
@@ -413,7 +413,7 @@ class WesternParser:
         else:
             return False
 
-    def check_if_valid_western_note_name(self, western_note_name):
+    def is_valid_western_note_name(self, western_note_name):
 
         '''
         Return True if note is in the format /[ABCDEFGABCDEFGabcdefg][b#]?/, e.g. F#, else return False
@@ -433,14 +433,14 @@ class WesternParser:
         Returns a tuple containing note_name, octave_number for a note in the format /[ABCDEFG][b#]?\d/
         '''
 
-        if self.check_if_valid_western_note_with_octave(western_note) == True:
+        if self.is_valid_western_note_with_octave(western_note) == True:
 
             note_name = re.search(r'[ABCDEFGabcdefg][b#]?', western_note).group(0)
             octave_number = int(re.search(r'\d', western_note).group(0))
             return (note_name, octave_number)
         else:
 
-            if self.check_if_valid_western_note_name(western_note) == True:
+            if self.is_valid_western_note_name(western_note) == True:
 
                 # Player has given note name without specifying an octave
                 note_name = western_note
@@ -455,7 +455,7 @@ class WesternParser:
         Returns the numeric equivalent of the note in the chromatic scale
         '''
 
-        if self.check_if_valid_western_note_name(note_name):
+        if self.is_valid_western_note_name(note_name):
 
             # make sure the first letter of the note is uppercase, for the dictionary keys
             note_name = note_name.capitalize()
@@ -533,7 +533,7 @@ class WesternParser:
 
         # shift down, and account for any additional note shift by the player
 
-        if self.check_if_valid_western_note_with_octave(western_note):
+        if self.is_valid_western_note_with_octave(western_note):
             # Skip the note shift if no octave is specified
 
             note_in_base_10 -= self.get_base_of_western_scale()*self.get_default_starting_octave()
