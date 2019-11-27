@@ -377,12 +377,7 @@ class NoteParser:
 
 class WesternNoteParser:
 
-
-
     def __init__(self):
-
-        self.columns = 5
-        self.lines = 3
 
         self.CHROMATIC_SCALE_DICT = {'C': 0, 'C#': 1, 'Db': 1, 'D': 2, 'D#': 3, 'Eb': 3, 'E': 4, 'F': 5, 'F#': 6, 'Gb': 6, 'G': 7, 'G#': 8, 'Ab': 8, 'A': 9, 'A#': 10, 'Bb': 10, 'B': 11}
         self.SEMITONE_INTERVAL_TO_MAJOR_SCALE_INTERVAL_DICT = {
@@ -509,10 +504,10 @@ class WesternNoteParser:
             #Error: note is not formatted right, output broken harp
             raise SyntaxError
 
-        western_chromatic_scale_dict = self.get_chromatic_scale_dict()
+        chromatic_scale_dict = self.get_chromatic_scale_dict()
 
-        if note_name in western_chromatic_scale_dict.keys():
-            return western_chromatic_scale_dict[note_name]
+        if note_name in chromatic_scale_dict.keys():
+            return hromatic_scale_dict[note_name]
         else:
             # note doesn't exist in the chromatic scale dict
             raise KeyError
