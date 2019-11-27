@@ -378,6 +378,8 @@ class Parser:
 
 class WesternNoteParser:
 
+
+
     def __init__(self):
 
         self.columns = 5
@@ -399,6 +401,11 @@ class WesternNoteParser:
         self.default_starting_octave = 4
 
         self.base_of_western_scale = 7
+
+        # Compile regexes for notes to save before using
+        self.note_name_with_octave_regex = re.compile(r'[ABCDEFGabcdefg][b#]?\d')
+        self.note_name_regex = re.compile(r'[ABCDEFGabcdefg][b#]?')
+        self.octave_number_regex = re.compile(r'\d')
 
     def get_western_chromatic_scale_dict(self):
 
@@ -428,14 +435,25 @@ class WesternNoteParser:
 
         return self.base_of_western_scale
 
+    def get_note_name_with_octave_regex(self):
+
+        return self.note_name_with_octave_regex
+
+    def get_note_name_regex(self):
+
+        return self.note_name_regex
+
+    def get_octave_number_regex(self):
+
+        return self.octave_number_regex
+
     def is_valid_western_note_with_octave(self, western_note):
 
         '''
         Return True if note is in the format /[ABCDEFGabcdefg][b#]?\d/, e.g. Ab4, else return False
         '''
 
-        #TODO: i don't remember how to use re.compile
-        western_note_regexobj = re.match(r'[ABCDEFGabcdefg][b#]?\d', western_note)
+        western_note_regexobj = self.get_note_name_with_octave_regex().match(western_note)
 
         if western_note_regexobj:
             return True
@@ -448,8 +466,7 @@ class WesternNoteParser:
         Return True if note is in the format /[ABCDEFGABCDEFGabcdefg][b#]?/, e.g. F#, else return False
         '''
 
-        #TODO: i don't remember how to use re.compile
-        western_note_regexobj = re.match(r'[ABCDEFGabcdefg][b#]?', western_note_name)
+        western_note_regexobj = self.get_note_name_regex().match(western_note_name)
 
         if western_note_regexobj:
             return True
@@ -464,8 +481,8 @@ class WesternNoteParser:
 
         if self.is_valid_western_note_with_octave(western_note) == True:
 
-            note_name = re.search(r'[ABCDEFGabcdefg][b#]?', western_note).group(0)
-            octave_number = int(re.search(r'\d', western_note).group(0))
+            note_name = self.get_note_name_regex().search(western_note).group(0)
+            octave_number = int(self.get_octave_number_regex().search(western_note).group(0))
             return (note_name, octave_number)
         else:
 
