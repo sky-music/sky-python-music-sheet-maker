@@ -396,11 +396,10 @@ class WesternNoteParser:
             11: 6 # 11 semitones means it’s a 7th interval
             }
         self.WESTERN_CHROMATIC_SCALE_COUNT = 12
+        self.BASE_OF_WESTERN_MAJOR_SCALE = 7
 
         # Specify the default starting octave of the harp, in this case, it's 4 (C4 D4 E4 etc.)
         self.default_starting_octave = 4
-
-        self.base_of_western_scale = 7
 
         # Compile regexes for notes to save before using
         self.note_name_with_octave_regex = re.compile(r'[ABCDEFGabcdefg][b#]?\d')
@@ -431,9 +430,9 @@ class WesternNoteParser:
 
         return self.default_starting_octave
 
-    def get_base_of_western_scale(self):
+    def get_base_of_western_major_scale(self):
 
-        return self.base_of_western_scale
+        return self.BASE_OF_WESTERN_MAJOR_SCALE
 
     def get_note_name_with_octave_regex(self):
 
@@ -582,7 +581,7 @@ class WesternNoteParser:
         if self.is_valid_western_note_with_octave(western_note):
             # Skip the note shift if no octave is specified
 
-            note_in_base_10 -= self.get_base_of_western_scale()*self.get_default_starting_octave()
+            note_in_base_10 -= self.get_base_of_western_major_scale()*self.get_default_starting_octave()
             note_in_base_10 += note_shift
 
         # Convert number to base self.columns (using mod and floor), and return as a tuple
@@ -595,7 +594,7 @@ class WesternNoteParser:
         Given a number in base 7 as a string, returns the number in base 10 as an integer.
         '''
 
-        num_in_base_10 = int(num_in_base_7, self.get_base_of_western_scale())
+        num_in_base_10 = int(num_in_base_7, self.get_base_of_western_major_scale())
         return num_in_base_10
 
     def convert_base_10_to_coordinate_of_another_base(self, num, base):
