@@ -608,6 +608,8 @@ class WesternNoteParser(NoteParser):
         note_name = note_name.capitalize()
         return note_name
 
+        
+
 def find_western_key(song_lines, comment_delimiter='#', input_mode=InputModes.WESTERN):
 
    if input_mode == InputModes.WESTERN:
