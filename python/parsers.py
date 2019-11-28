@@ -609,37 +609,66 @@ class WesternNoteParser(NoteParser):
         note_name = note_name.capitalize()
         return note_name
 
+    def find_western_key(self, song_lines, comment_delimiter='#', input_mode=InputModes.WESTERN):
 
+       if input_mode == InputModes.WESTERN:
+          isNoteRegExp =  '([ABCDEFGabcdefg][b#]?\d?)'
+          notNoteRegExp = '[^A-Gb#]'
+       elif input_mode == InputModes.JIANPU:
+          isNoteRegExp = '([1-7])'
+          notNoteRegExp = '[^1-7b#]'
+       else:
+          return []#Or None???
+ 
+       possible_keys = [k for k in self.WESTERN_CHROMATIC_SCALE_DICT.keys()]
+       scores = [0]*len(possible_keys)
+       num_notes = [0]*len(possible_keys)
+       for line in song_lines:
+          if len(line)>0:
+             if line[0] != comment_delimiter:
+             	#TODO: use WesternParser Class regexp
+                notes = re.sub(isNoteRegExp,' \\1',re.sub(notNoteRegExp,'',line)).split() # Clean-up, adds space and split
+                print(notes)
+                for i,k in enumerate(possible_keys):
+                   for note in notes:
+                      num_notes[i] += 1
+                      try:
+                      	  self.calculate_coordinate_for_western_note(note, k, note_shift=0)
+                      except KeyError:
+                         scores[i]+=1
+                      except SyntaxError:#Wrongly formatted notes are ignored
+                         num_notes -= 1
+   
+   
+       num_notes = [1 if x == 0 else x for x in num_notes]
+       #Removes zeros to avoid division by zero
+       scores = list(map(truediv, scores, num_notes))
+       scores = [(1 - score) for score in scores]
+       
 
-def find_western_key(song_lines, comment_delimiter='#', input_mode=InputModes.WESTERN):
+       sorted_idx, sorted_scores = zip(*sorted([(i,e) for i,e in enumerate(scores)], key=itemgetter(1), reverse=True))
+       sorted_keys = [possible_keys[i] for i in sorted_idx]
+       #print(sorted_scores)
+       #print(sorted_keys)
+       
+       if sorted_scores[0] == 1:
+          if (sorted_scores[1] < 1) or (sorted_score[2] < 1 and self.WESTERN_CHROMATIC_SCALE_DICT[sorted_keys[0]]==self.WESTERN_CHROMATIC_SCALE_DICT[sorted_keys[1]]):
+       	      print('A unique key was found.')
+       	      return [sorted_keys[0]]
+          else:
+          	print('Several matching keys were found.')
+          	return [k for i,k in enumerate(sorted_keys) if sorted_scores[i]==1 ]
+       elif (sorted_scores[0] > 0.95):
+           sorted_scores = list(map(truediv, sorted_scores, [max(sorted_scores)]*len(sorted_scores)))
+       possible_keys = [k for i,k in enumerate(sorted_keys) if sorted_scores[i]>0.9]
+       if len(possible_keys)==0:
+           print('No matching key found.')
+           return []#Or None??
+       else:
+           print('One or several best matching keys were found.')
+           return possible_keys
 
-   if input_mode == InputModes.WESTERN:
-      isNoteRegExp = '([A-G])'
-      notNoteRegExp = '[^A-Gb#]'
-   elif input_mode == InputModes.JIANPU:
-      isNoteRegExp = '([1-7])'
-      notNoteRegExp = '[^1-7b#]'
-   else:
-      return ['']
-
-   myparser = WesternNoteParser()
-   possible_keys = [k for k in myparser.get_chromatic_scale_dict().keys()]
-   score=[0]*len(possible_keys)
-   for line in song_lines:
-      if len(line)>0:
-         if line[0] != comment_delimiter:
-            notes = re.sub(isNoteRegExp,' \\1',re.sub(notNoteRegExp,'',line)).split() # Clean-up, adds space and split
-
-            for i,k in enumerate(possible_keys):
-               for note in notes:
-                  try:
-                      myparser.calculate_coordinate_for_note(note, k, note_shift=0)
-                  except KeyError:
-                     score[i]+=1
-
-   sorted_idx, score = zip(*sorted([(i,e) for i,e in enumerate(score)], key=itemgetter(1)))
-   return possible_keys[sorted_idx[0]]
-
+   
 #mytestparser = WesternNoteParser()
 #print(mytestparser.calculate_coordinate_for_note(note='Ab5', song_key='Ab')) # expect (1,2)
 #print(mytestparser.calculate_coordinate_for_note('Ab6', 'Ab')) # expect (2,4)
