@@ -195,7 +195,7 @@ class Parser:
         sorted_inds, sorted_ratios = zip(*sorted([(i,e) for i,e in enumerate(ratios)], key=itemgetter(1), reverse=True))
         if sorted_ratios[0] == 1 and sorted_ratios[1] < 1:
             return [possible_modes[sorted_inds[0]]]
-        elif (sorted_ratios[0] > 0.95):
+        elif (sorted_ratios[0] > 0.90):
             sorted_ratios = list(map(truediv, sorted_ratios, [max(sorted_ratios)]*len(sorted_ratios)))
             if sorted_ratios[1] < 0.9:
                 return [possible_modes[sorted_inds[0]]]
