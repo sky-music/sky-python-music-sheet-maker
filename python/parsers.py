@@ -546,7 +546,7 @@ class NoteParser:
             interval_in_semitones += self.get_chromatic_scale_count()
 
             # The interval_in_semitones is later converted to a major_scale_interval to be used as the 7^0 digit in base 7
-            # Adding another octave to the 7^0 digit makes it one octave too high. Subtract 1 from the 7^1 digit, which is represented by octave_number
+            # need to subtract 1 from the octave number after adding an octave to the interval_in_semitones. this is mathematically saying subtracting 3 is the same as adding 4 then taking away 7
             octave_number -= 1
 
         try:
