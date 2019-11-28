@@ -348,59 +348,36 @@ class Parser:
 
 class NoteParser:
 
-    def __init__(self):
+    columns = 5
+    lines = 3
 
-        self.columns = 5
-        self.lines = 3
+    CHROMATIC_SCALE_DICT = {}
+    SEMITONE_INTERVAL_TO_MAJOR_SCALE_INTERVAL_DICT = {
+        0: 0, # 0 semitones means it’s the root note
+        2: 1, # 2 semitones means it’s a 2nd interval
+        4: 2, # 4 semitones means it’s a 3rd interval
+        5: 3, # 5 semitones means it’s a 4th interval
+        7: 4, # 7 semitones means it’s a 5th interval
+        9: 5, # 9 semitones means it’s a 6th interval
+        11: 6 # 11 semitones means it’s a 7th interval
+        }
 
-        self.CHROMATIC_SCALE_DICT = {}
-        self.SEMITONE_INTERVAL_TO_MAJOR_SCALE_INTERVAL_DICT = {
-            0: 0, # 0 semitones means it’s the root note
-            2: 1, # 2 semitones means it’s a 2nd interval
-            4: 2, # 4 semitones means it’s a 3rd interval
-            5: 3, # 5 semitones means it’s a 4th interval
-            7: 4, # 7 semitones means it’s a 5th interval
-            9: 5, # 9 semitones means it’s a 6th interval
-            11: 6 # 11 semitones means it’s a 7th interval
-            }
+    # Number of notes in the chromatic scale, and number of notes in a major scale
+    CHROMATIC_SCALE_COUNT = 12
+    BASE_OF_MAJOR_SCALE = 7
 
-        self.CHROMATIC_SCALE_COUNT = 12
-        self.BASE_OF_MAJOR_SCALE = 7
+    # Specify the default starting octave of the harp, in this case, it's 4 (C4 D4 E4 etc.)
+    default_starting_octave = 4
 
-        # Specify the default starting octave of the harp, in this case, it's 4 (C4 D4 E4 etc.)
-        self.default_starting_octave = 4
-
-        # Compile regexes for notes to save before using
-        #self.note_name_with_octave_regex = re.compile(r'[ABCDEFGabcdefg][b#]?\d')
-        #self.note_name_regex = re.compile(r'[ABCDEFGabcdefg][b#]?')
-        #self.octave_number_regex = re.compile(r'\d')
-
-class WesternNoteParser:
+    # Compile regexes for notes to save before using
+    #TODO: not sure what regex to put for the generic note parser
+    note_name_with_octave_regex = re.compile(r'')
+    note_name_regex = re.compile(r'')
+    octave_number_regex = re.compile(r'')
 
     def __init__(self):
 
-        self.CHROMATIC_SCALE_DICT = {'C': 0, 'C#': 1, 'Db': 1, 'D': 2, 'D#': 3, 'Eb': 3, 'E': 4, 'F': 5, 'F#': 6, 'Gb': 6, 'G': 7, 'G#': 8, 'Ab': 8, 'A': 9, 'A#': 10, 'Bb': 10, 'B': 11}
-        self.SEMITONE_INTERVAL_TO_MAJOR_SCALE_INTERVAL_DICT = {
-            0: 0, # 0 semitones means it’s the root note
-            2: 1, # 2 semitones means it’s a 2nd interval
-            4: 2, # 4 semitones means it’s a 3rd interval
-            5: 3, # 5 semitones means it’s a 4th interval
-            7: 4, # 7 semitones means it’s a 5th interval
-            9: 5, # 9 semitones means it’s a 6th interval
-            11: 6 # 11 semitones means it’s a 7th interval
-            }
-
-        # Number of notes in the chromatic scale, and number of notes in a major scale
-        self.CHROMATIC_SCALE_COUNT = 12
-        self.BASE_OF_MAJOR_SCALE = 7
-
-        # Specify the default starting octave of the harp, in this case, it's 4 (C4 D4 E4 etc.)
-        self.default_starting_octave = 4
-
-        # Compile regexes for notes to save before using
-        self.note_name_with_octave_regex = re.compile(r'[ABCDEFGabcdefg][b#]?\d')
-        self.note_name_regex = re.compile(r'[ABCDEFGabcdefg][b#]?')
-        self.octave_number_regex = re.compile(r'\d')
+        pass
 
     def get_chromatic_scale_dict(self):
 
@@ -487,7 +464,7 @@ class WesternNoteParser:
                 octave_number = self.get_default_starting_octave()
                 return (note_name, octave_number)
             else:
-                # Raise error, not a valid western note
+                # Raise error, not a valid note
                 raise SyntaxError
 
     def convert_note_name_into_chromatic_position(self, note_name):
@@ -498,8 +475,9 @@ class WesternNoteParser:
 
         if self.is_valid_note_name(note_name):
 
-            # make sure the first letter of the note is uppercase, for the dictionary keys
-            note_name = note_name.capitalize()
+            # Do any work to sanitize the note so that it matches the keys of self.CHROMATIC_SCALE_DICT
+            # This `pass` statement can then be removed
+            pass
         else:
             #Error: note is not formatted right, output broken harp
             raise SyntaxError
@@ -507,7 +485,7 @@ class WesternNoteParser:
         chromatic_scale_dict = self.get_chromatic_scale_dict()
 
         if note_name in chromatic_scale_dict.keys():
-            return hromatic_scale_dict[note_name]
+            return chromatic_scale_dict[note_name]
         else:
             # note doesn't exist in the chromatic scale dict
             raise KeyError
@@ -603,6 +581,45 @@ class WesternNoteParser:
         quotient = math.floor(num / base)
 
         return(quotient, remainder)
+
+class WesternNoteParser(NoteParser):
+
+    def __init__(self):
+
+        self.CHROMATIC_SCALE_DICT = {'C': 0, 'C#': 1, 'Db': 1, 'D': 2, 'D#': 3, 'Eb': 3, 'E': 4, 'F': 5, 'F#': 6, 'Gb': 6, 'G': 7, 'G#': 8, 'Ab': 8, 'A': 9, 'A#': 10, 'Bb': 10, 'B': 11}
+
+        self.CHROMATIC_SCALE_COUNT = 12
+        self.BASE_OF_MAJOR_SCALE = 7
+
+        # Specify the default starting octave of the harp, in this case, it's 4 (C4 D4 E4 etc.)
+        self.default_starting_octave = 4
+
+        # Compile regexes for notes to save before using
+        self.note_name_with_octave_regex = re.compile(r'[ABCDEFGabcdefg][b#]?\d')
+        self.note_name_regex = re.compile(r'[ABCDEFGabcdefg][b#]?')
+        self.octave_number_regex = re.compile(r'\d')
+
+    def convert_note_name_into_chromatic_position(self, note_name):
+
+        '''
+        Returns the numeric equivalent of the note in the chromatic scale
+        '''
+
+        if self.is_valid_note_name(note_name):
+
+            # make sure the first letter of the note is uppercase, for western note's dictionary keys
+            note_name = note_name.capitalize()
+        else:
+            #Error: note is not formatted right, output broken harp
+            raise SyntaxError
+
+        chromatic_scale_dict = self.get_chromatic_scale_dict()
+
+        if note_name in chromatic_scale_dict.keys():
+            return chromatic_scale_dict[note_name]
+        else:
+            # note doesn't exist in the chromatic scale dict
+            raise KeyError
 
 def find_western_key(song_lines, comment_delimiter='#', input_mode=InputModes.WESTERN):
 
