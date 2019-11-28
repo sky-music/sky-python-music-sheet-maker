@@ -459,7 +459,7 @@ class NoteParser:
         if self.is_valid_note_name_with_octave(note) == True:
 
             note_name = self.get_note_name_regex().search(note).group(0)
-            #TODO: will probably want to isolate the int() and make this more generic, in the case of Jianpu, octave is denoted by ++ or --
+            #TODO: will probably want to isolate the int() and make this more generic, in the case of Jianpu, octave is denoted by ++ or -- etc.
             octave_number = int(self.get_octave_number_regex().search(note).group(0))
             return (note_name, octave_number)
         else:
