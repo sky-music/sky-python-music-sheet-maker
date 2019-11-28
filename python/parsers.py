@@ -542,8 +542,12 @@ class NoteParser:
 
         interval_in_semitones = note_name_chromatic_equivalent - song_key_chromatic_equivalent
         if interval_in_semitones < 0:
-            # Circular shift the interval back to a positive number
+            # Circular shift the interval back to a positive number, to be used for the SEMITONE_INTERVAL_TO_MAJOR_SCALE_INTERVAL_DICT
             interval_in_semitones += self.get_chromatic_scale_count()
+
+            # The interval_in_semitones is later converted to a major_scale_interval to be used as the 7^0 digit in base 7
+            # Adding another octave to the 7^0 digit makes it one octave too high. Subtract 1 from the 7^1 digit, which is represented by octave_number
+            octave_number -= 1
 
         try:
             major_scale_interval = self.convert_semitone_interval_to_major_scale_interval(interval_in_semitones)
@@ -672,4 +676,4 @@ class WesternNoteParser(NoteParser):
 #mytestparser = WesternNoteParser()
 #print(mytestparser.calculate_coordinate_for_note(note='Ab5', song_key='Ab')) # expect (1,2)
 #print(mytestparser.calculate_coordinate_for_note('Ab6', 'Ab')) # expect (2,4)
-#print(mytestparser.calculate_coordinate_for_note('C#3', 'E')) # expect (2,2), currently bugged
+#print(mytestparser.calculate_coordinate_for_note('C#6', 'E')) # expect (2,2)
