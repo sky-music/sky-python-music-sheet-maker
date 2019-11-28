@@ -348,6 +348,11 @@ class Parser:
 
 class NoteParser:
 
+
+    '''
+    Generic NoteParser for parsing notes of a major scale
+    '''
+
     columns = 5
     lines = 3
 
