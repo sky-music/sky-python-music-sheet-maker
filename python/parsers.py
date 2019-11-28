@@ -350,7 +350,7 @@ class NoteParser:
 
 
     '''
-    Generic NoteParser for parsing notes of a major scale
+    A generic NoteParser for parsing notes of a major scale, and turning them into the corresponding coordinate on Sky's 3*5 piano.
     '''
 
     columns = 5
@@ -480,9 +480,7 @@ class NoteParser:
 
         if self.is_valid_note_name(note_name):
 
-            # Do any work to sanitize the note so that it matches the keys of self.CHROMATIC_SCALE_DICT
-            # This `pass` statement can then be removed
-            pass
+            note_name = self.sanitize_note_name(note_name)
         else:
             #Error: note is not formatted right, output broken harp
             raise SyntaxError
@@ -587,6 +585,12 @@ class NoteParser:
 
         return(quotient, remainder)
 
+    def sanitize_note_name(self, note_name):
+
+        # Do any work to sanitize the note_name so that it matches the keys of self.CHROMATIC_SCALE_DICT
+
+        return note_name
+
 class WesternNoteParser(NoteParser):
 
     def __init__(self):
@@ -604,27 +608,11 @@ class WesternNoteParser(NoteParser):
         self.note_name_regex = re.compile(r'[ABCDEFGabcdefg][b#]?')
         self.octave_number_regex = re.compile(r'\d')
 
-    def convert_note_name_into_chromatic_position(self, note_name):
+    def sanitize_note_name(self, note_name):
 
-        '''
-        Returns the numeric equivalent of the note in the chromatic scale
-        '''
-
-        if self.is_valid_note_name(note_name):
-
-            # make sure the first letter of the note is uppercase, for western note's dictionary keys
-            note_name = note_name.capitalize()
-        else:
-            #Error: note is not formatted right, output broken harp
-            raise SyntaxError
-
-        chromatic_scale_dict = self.get_chromatic_scale_dict()
-
-        if note_name in chromatic_scale_dict.keys():
-            return chromatic_scale_dict[note_name]
-        else:
-            # note doesn't exist in the chromatic scale dict
-            raise KeyError
+        # make sure the first letter of the note is uppercase, for western note's dictionary keys
+        note_name = note_name.capitalize()
+        return note_name
 
 def find_western_key(song_lines, comment_delimiter='#', input_mode=InputModes.WESTERN):
 
@@ -656,5 +644,5 @@ def find_western_key(song_lines, comment_delimiter='#', input_mode=InputModes.WE
    return possible_keys[sorted_idx[0]]
 
 #mytestparser = WesternNoteParser()
-#print(mytestparser.calculate_coordinate_for_note(note='Ab5', song_key='Ab'))
-#print(mytestparser.calculate_coordinate_for_note('Ab6', 'Ab'))
+#print(mytestparser.calculate_coordinate_for_note(note='Ab5', song_key='Ab')) # expect (1,2)
+#print(mytestparser.calculate_coordinate_for_note('Ab6', 'Ab')) # expect (2,4)
