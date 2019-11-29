@@ -245,7 +245,7 @@ class Parser:
         return self.jianpu2western(possible_keys)
 
 
-    def parse_line(self, line, icon_delimiter=' ', pause='.', quaver_delimiter='-', comment_delimiter='#', input_mode=InputModes.SKY, note_shift=0, repeat_indicator='*'):
+    def parse_line(self, line, icon_delimiter=' ', pause='.', quaver_delimiter='-', comment_delimiter='#', input_mode=InputModes.SKY, note_shift=0, repeat_indicator='*', song_key='C'):
         '''
         Returns instrument_line: a list of chord 'skygrid' (1 chord = 1 dict)
         '''
@@ -266,7 +266,7 @@ class Parser:
                 for icon in icons:
                     chords = self.parse_icon(icon, quaver_delimiter)
                     #From here, real chords are still glued, quavers have been split in different list slots
-                    chord_skygrid, harp_broken, harp_silent, repeat = self.parse_chords(chords, pause, input_mode, note_shift, repeat_indicator)
+                    chord_skygrid, harp_broken, harp_silent, repeat = self.parse_chords(chords, pause, input_mode, note_shift, repeat_indicator, song_key)
                     harp = instruments.Harp()
                     harp.set_repeat(repeat)
                     harp.set_is_silent(harp_silent)
