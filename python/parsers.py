@@ -142,17 +142,17 @@ class Parser:
         except:
             repeat = 0
 
-        chord = chord.upper()
-        #chord = chord.capitalize()
-        #TODO: This sanitize is causing errors with chords in Western notation, where 'b' is used to denote flats. For now, comment out the chord.upper() if you are transcribing songs with flats 'b'
-
         if position_map == self.sky_position_map:
+            chord = chord.upper()
             chord = re.sub('([A-G])', ' \\1', chord).split()
         elif position_map == self.western_position_map:
-            chord = re.sub('([A-G][#b]?)', ' \\1', chord).split()
+            chord = re.sub('([ABCDEFGabcdefg][#b]?)', ' \\1', chord).split()
+            for note in chord:
+                note = note.capitalize()
         elif position_map  == self.jianpu_position_map:
             chord = re.sub('([1-9])', ' \\1', chord).split()  #Adds space before note and then split
         elif self.sky_position_map == self.keyboard_position_map:
+            chord = chord.upper()
             chord = re.sub('([' + self.keyboard_layout.replace(' ','') + '])', ' \\1', chord).split()
 
         return repeat, chord
