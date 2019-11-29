@@ -44,7 +44,7 @@ class Song():
 		#self.png_color = (54, 57, 63)    #Discord colors
         self.png_font_size = 36
         self.png_title_font_size = 48
-        self.png_font = 'fonts/NotoSansJP-Regular.otf' 
+        self.png_font = 'fonts/NotoSansCJKjp-Regular.otf' 
 
  
     def add_line(self, line):

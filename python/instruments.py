@@ -21,7 +21,7 @@ class Instrument:
         self.text_bkg = (255, 255, 255, 0) # Transparent white
         self.song_bkg = (255, 255, 255) #White paper sheet
         self.font_color = (0, 0, 0)
-        self.font = 'fonts/NotoSansJP-Regular.otf'  
+        self.font = 'fonts/NotoSansCJKjp-Regular.otf'  
         self.font_size = 38
         self.repeat_height = None
                    
@@ -103,7 +103,7 @@ class Voice(Instrument): # Lyrics or comments
         self.lyric = ''
         #self.text_bkg = (255, 255, 255, 0)#Uncomment to make it different from the inherited class
         #self.font_color = (255,255,255)#Uncomment to make it different from the inherited class
-        self.font = 'fonts/NotoSansJP-Regular.otf'  
+        self.font = 'fonts/NotoSansCJKjp-Regular.otf'  
         self.font_size = 32
         self.lyric_height = None
         self.lyric_width = None
