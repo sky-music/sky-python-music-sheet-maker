@@ -147,6 +147,7 @@ if song_notation in [InputModes.WESTERN, InputModes.JIANPU]:
     musickeys = myparser.find_key(song_lines, COMMENT_DELIMITER, song_notation)
     if len(musickeys) == 0:
         print("\nYour song cannot be transposed exactly in Sky.")
+        print("\nDefault key will be set to C.")
         song_key = 'C'
     else:
         print("\nYour song can be transposed in Sky with the following keys: " + str(musickeys))
