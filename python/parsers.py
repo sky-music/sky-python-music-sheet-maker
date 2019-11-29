@@ -520,7 +520,7 @@ class NoteParser:
     def calculate_coordinate_for_note(self, note, song_key='C', note_shift=0):
 
         '''
-        Returns coordinate (in the form of a tuple) for a note in the format self.note_name_with_octave_regex.
+        For a note in the format self.note_name_with_octave_regex, this method returns the corresponding coordinate on the Sky piano (in the form of a tuple)
 
         song_key will be determined by the find_keys method, and is expected to match CHROMATIC_SCALE_DICT, otherwise the default key will be C.
         note_shift is the variable set by the user.
