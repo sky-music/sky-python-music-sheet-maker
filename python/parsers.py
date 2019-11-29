@@ -338,12 +338,13 @@ class Parser:
             for note in chord: # Chord is a list of notes
                 #Except InvalidLetterException
                 try:
-                    #highlighted_note_position = self.map_note_to_position(note, position_map, note_shift)
-
-                    if note == pause:
-                        highlighted_note_position = (-1, -1)
+                    if input_mode == InputModes.WESTERN:
+                        if note == pause:
+                            highlighted_note_position = (-1, -1)
+                        else:
+                            highlighted_note_position = self.western_note_parser.calculate_coordinate_for_note(note, song_key, note_shift)
                     else:
-                        highlighted_note_position = self.western_note_parser.calculate_coordinate_for_note(note, song_key, note_shift)
+                        highlighted_note_position = self.map_note_to_position(note, position_map, note_shift)
                 except (KeyError, SyntaxError):
                     print('There was an error with: ', note)
                     harp_broken = True
