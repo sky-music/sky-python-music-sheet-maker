@@ -144,7 +144,7 @@ class Parser:
 
         chord = chord.upper()
         #chord = chord.capitalize()
-        #TODO: This sanitize is causing errors with chords in Western notation, where 'b' is used to denote flats
+        #TODO: This sanitize is causing errors with chords in Western notation, where 'b' is used to denote flats. Comment out the chord.upper() if you are transcribing songs with flats 'b'
 
         if position_map == self.sky_position_map:
             chord = re.sub('([A-G])', ' \\1', chord).split()
