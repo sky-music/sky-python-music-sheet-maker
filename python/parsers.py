@@ -95,6 +95,8 @@ class Parser:
                 'C':'C', 'D':'D', 'E':'E', 'F':'F', 'G':'G', 'A':'A', 'B':'B'
                 }
 
+        self.western_note_parser = WesternNoteParser()
+
     def get_westernkeys(self):
         return self.Cmajor
 
@@ -141,9 +143,13 @@ class Parser:
             repeat = 0
 
         chord = chord.upper()
+        #chord = chord.capitalize()
+        #TODO: This sanitize is causing errors with chords in Western notation, where 'b' is used to denote flats
 
-        if position_map in [self.sky_position_map, self.western_position_map]:
+        if position_map == self.sky_position_map:
             chord = re.sub('([A-G])', ' \\1', chord).split()
+        elif position_map == self.western_position_map:
+            chord = re.sub('([A-G][#b]?)', ' \\1', chord).split()
         elif position_map  == self.jianpu_position_map:
             chord = re.sub('([1-9])', ' \\1', chord).split()  #Adds space before note and then split
         elif self.sky_position_map == self.keyboard_position_map:
@@ -332,8 +338,10 @@ class Parser:
             for note in chord: # Chord is a list of notes
                 #Except InvalidLetterException
                 try:
-                    highlighted_note_position = self.map_note_to_position(note, position_map, note_shift)
+                    #highlighted_note_position = self.map_note_to_position(note, position_map, note_shift)
+                    highlighted_note_position = self.western_note_parser.calculate_coordinate_for_note(note, 'C', note_shift)
                 except (KeyError, SyntaxError):
+                    print('There was an error with: ', note)
                     harp_broken = True
                 else:
                     chord_skygrid[highlighted_note_position] = {}
@@ -504,7 +512,7 @@ class NoteParser:
             # Error: interval is not in the major scale
             raise KeyError
 
-    def calculate_coordinate_for_note(self, note, song_key, note_shift=0):
+    def calculate_coordinate_for_note(self, note, song_key='C', note_shift=0):
 
         '''
         Returns coordinate (in the form of a tuple) for a note in the format self.note_name_with_octave_regex.
@@ -677,3 +685,4 @@ class WesternNoteParser(NoteParser):
 #print(mytestparser.calculate_coordinate_for_note(note='Ab5', song_key='Ab')) # expect (1,2)
 #print(mytestparser.calculate_coordinate_for_note('Ab6', 'Ab')) # expect (2,4)
 #print(mytestparser.calculate_coordinate_for_note('C#6', 'E')) # expect (2,2)
+#print(mytestparser.calculate_coordinate_for_note('Bb4', 'Eb')) # expect (0,4)
