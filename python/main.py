@@ -98,7 +98,7 @@ print('Separate chords with \"' + ICON_DELIMITER + '\".')
 print('Use \"' + PAUSE + '\" for a silence (rest).')
 print('Use \"' + QUAVER_DELIMITER + '\" to link notes within an icon, for triplets, quavers... (e.g. A1' + QUAVER_DELIMITER + 'B1' + QUAVER_DELIMITER + 'C1).')
 print('Add ' + REPEAT_INDICATOR + '2 after a chord to indicate repetition.')
-print('Sharps # and flats b (semitones) are not supported in Sky.')
+print('Sharps # and flats b (semitones) are supported for Western notation.')
 print('============================================================')
 
 
