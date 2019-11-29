@@ -294,9 +294,9 @@ class Parser:
                 if pos>=(0,0) and pos<=(2,4):
                     return pos
                 else:
-                    raise KeyError
+                    raise KeyError('Note was not in range of the Sky keyboard.')
         else:
-            raise KeyError
+            raise KeyError('Note was not found in the position_map dictionary.')
 
     def parse_chords(self, chords, pause='.', input_mode=InputModes.SKY, note_shift=0, repeat_indicator='*', song_key='C'):
         #Individual note is a single-element list: chords=['A5']
@@ -484,7 +484,7 @@ class NoteParser:
                 return (note_name, octave_number)
             else:
                 # Raise error, not a valid note
-                raise SyntaxError
+                raise SyntaxError('Note was not formatted correctly. ' + str(note))
 
     def convert_note_name_into_chromatic_position(self, note_name):
 
@@ -497,7 +497,7 @@ class NoteParser:
             note_name = self.sanitize_note_name(note_name)
         else:
             #Error: note is not formatted right, output broken harp
-            raise SyntaxError
+            raise SyntaxError('Note was not formatted correctly. ' + str(note_name))
 
         chromatic_scale_dict = self.get_chromatic_scale_dict()
 
@@ -505,7 +505,7 @@ class NoteParser:
             return chromatic_scale_dict[note_name]
         else:
             # note doesn't exist in the chromatic scale dict
-            raise KeyError
+            raise KeyError('Note was not found in the chromatic scale. ' + str(note_name))
 
     def convert_semitone_interval_to_major_scale_interval(self, semitone_interval):
 
@@ -515,7 +515,7 @@ class NoteParser:
             return conversion_dict[semitone_interval]
         else:
             # Error: interval is not in the major scale
-            raise KeyError
+            raise KeyError('Interval is not in the major scale. ' + str(semitone_interval))
 
     def calculate_coordinate_for_note(self, note, song_key='C', note_shift=0):
 
@@ -548,10 +548,10 @@ class NoteParser:
             note_name_chromatic_equivalent = self.convert_note_name_into_chromatic_position(note_name)
         except KeyError:
             # Note was not found in the chromatic scale, output broken harp
-            raise KeyError
+            raise KeyError('Note was not found in the chromatic scale. ' + note_name)
         except SyntaxError:
             # Note was not formatted correctly
-            raise SyntaxError
+            raise SyntaxError('Note was not formatted correctly' + note_name)
 
         interval_in_semitones = note_name_chromatic_equivalent - song_key_chromatic_equivalent
         if interval_in_semitones < 0:
@@ -566,7 +566,7 @@ class NoteParser:
             major_scale_interval = self.convert_semitone_interval_to_major_scale_interval(interval_in_semitones)
         except KeyError:
             # Turn note into a broken harp, since note is not in the song_key
-            raise KeyError
+            raise KeyError('Note is not in the song key. ' + note)
 
         # Convert note to base 10 for arithmetic
         note_in_base_10 = self.convert_base_7_to_base_10(str(octave_number) + str(major_scale_interval))
@@ -686,8 +686,9 @@ class WesternNoteParser(NoteParser):
            return possible_keys
 
 
-#mytestparser = WesternNoteParser()
+mytestparser = WesternNoteParser()
 #print(mytestparser.calculate_coordinate_for_note(note='Ab5', song_key='Ab')) # expect (1,2)
 #print(mytestparser.calculate_coordinate_for_note('Ab6', 'Ab')) # expect (2,4)
 #print(mytestparser.calculate_coordinate_for_note('C#6', 'E')) # expect (2,2)
 #print(mytestparser.calculate_coordinate_for_note('Bb4', 'Eb')) # expect (0,4)
+#print(mytestparser.calculate_coordinate_for_note('B4', 'Eb')) # expect error not in major scale
