@@ -298,7 +298,7 @@ class Parser:
         else:
             raise KeyError
 
-    def parse_chords(self, chords, pause='.', input_mode=InputModes.SKY, note_shift=0, repeat_indicator='*'):
+    def parse_chords(self, chords, pause='.', input_mode=InputModes.SKY, note_shift=0, repeat_indicator='*', song_key='C'):
         #Individual note is a single-element list: chords=['A5']
         #Real chord is a single element list: chords=['B1A1A3']
         #Triplets and quavers are a list of notes or chords: chords=['B2', 'B3B1', 'B4', 'B5', 'C1', 'C2']
@@ -339,7 +339,7 @@ class Parser:
                 #Except InvalidLetterException
                 try:
                     #highlighted_note_position = self.map_note_to_position(note, position_map, note_shift)
-                    highlighted_note_position = self.western_note_parser.calculate_coordinate_for_note(note, 'C', note_shift)
+                    highlighted_note_position = self.western_note_parser.calculate_coordinate_for_note(note, song_key, note_shift)
                 except (KeyError, SyntaxError):
                     print('There was an error with: ', note)
                     harp_broken = True
