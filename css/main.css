@@ -7,23 +7,23 @@ html {
     scroll-behavior: auto;
   }
 }
-
+ 
 /* <!-- Define the em unit--> */
 body {
-  font-family: "Avenir", Arial, sans-serif;
+  font-family: "Noto Sans", "Noto Sans CJK JP", "Noto Sans CJK KR", "Noto Sans CJK SC", "Noto Sans CJK TC", "Avenir", Arial, sans-serif;
   font-size: 12pt;
 }
 
 /* <!-- Song title --> */
 h1, svg text.title {
-    font-family: "Avenir", Arial, sans-serif;
+    font-family: "Noto Sans", "Noto Sans CJK JP", "Noto Sans CJK KR", "Noto Sans CJK SC", "Noto Sans CJK TC", "Avenir", Arial, sans-serif;
 	font-size: 1.3em;
 	font: bold;
 }
 
 /* <!-- Song headers (HTML only) --> */
 p, svg text.headers {
-    font-family: "Avenir", Arial, sans-serif;
+    font-family: "Noto Sans", "Noto Sans CJK JP", "Noto Sans CJK KR", "Noto Sans CJK SC", "Noto Sans CJK TC", "Avenir", Arial, sans-serif;
 	font-size: 0.8em;
 	line-height: 50%;
 }
@@ -130,7 +130,7 @@ table.voice td {
 
 /* <!-- Sky voice (SVG only) --> */
 svg text.voice {
-  font-family: "Avenir", Arial, sans-serif;
+  font-family: "Noto Sans", "Noto Sans CJK JP", "Noto Sans CJK KR", "Noto Sans CJK SC", "Noto Sans CJK TC", "Avenir", Arial, sans-serif;
   font-size: 0.8em;
   stroke: none;
   fill:black;
@@ -152,7 +152,7 @@ svg.repeat text.repeat {
   fill:black;
   dominant-baseline: baseline;
   font-size: 0.9em;
-  font-family: "Avenir", Arial, sans-serif;
+  font-family: "Noto Sans", "Noto Sans CJK JP", "Noto Sans CJK KR", "Noto Sans CJK SC", "Noto Sans CJK TC", "Avenir", Arial, sans-serif;
 }
 
 
