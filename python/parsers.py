@@ -573,10 +573,10 @@ class NoteParser:
 
         # shift down, and account for any additional note shift by the player
 
+        note_in_base_10 -= self.get_base_of_western_major_scale()*self.get_default_starting_octave()
+
         if self.is_valid_note_name_with_octave(note):
             # Skip the note shift if no octave is specified
-
-            note_in_base_10 -= self.get_base_of_western_major_scale()*self.get_default_starting_octave()
             note_in_base_10 += note_shift
 
         # Convert number to base self.columns (using mod and floor), and return as a tuple
