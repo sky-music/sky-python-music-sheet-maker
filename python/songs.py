@@ -215,7 +215,7 @@ class Song():
         ascii_file.write('#' + self.title + '\n')
 
         for i in range(len(self.headers[0])):
-            ascii_file.write('#' + self.headers[0][i] + ' ' + self.headers[1][i])
+            ascii_file.write('#' + self.headers[0][i] + ' ' + self.headers[1][i] + '\n')
 
         song_render = '\n'
         instrument_index = 0
