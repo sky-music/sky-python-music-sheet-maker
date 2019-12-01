@@ -581,7 +581,13 @@ class NoteParser:
 
         # Convert number to base self.columns (using mod and floor), and return as a tuple
         note_coordinate = self.convert_base_10_to_coordinate_of_another_base(note_in_base_10, self.get_column_count())
-        return note_coordinate
+
+        if self.is_coordinate_in_range(note_coordinate):
+            return note_coordinate
+        else:
+            # Coordinate is not in range of the two octaves of the Sky piano
+            raise KeyError('Note ' + note + ' is not in range of the two octaves of the Sky piano: ' + str(note_coordinate))
+            #TODO: define custom errors
 
     def convert_base_7_to_base_10(self, num_in_base_7):
 
@@ -605,9 +611,22 @@ class NoteParser:
 
     def sanitize_note_name(self, note_name):
 
-        # Do any work to sanitize the note_name so that it matches the keys of self.CHROMATIC_SCALE_DICT
+        # Do any work here to sanitize the note_name so that it matches the keys of self.CHROMATIC_SCALE_DICT
 
         return note_name
+
+    def is_coordinate_in_range(self, coordinate):
+
+        '''
+        Returns True if the coordinate is in range of the Sky piano (as defined by self.columns and self.lines), return False if not.
+        coordinate is expected to be a tuple.
+        '''
+
+        if coordinate[0] >= 0 and coordinate[1] <= self.get_row_count() - 1 and coordinate[1] >= 0 and coordinate[1] <= self.get_column_count() - 1:
+            # Check if the row number and column number of the coordinates are within the instrument's range
+            return True
+        else:
+            return False
 
 class WesternNoteParser(NoteParser):
 
@@ -686,9 +705,11 @@ class WesternNoteParser(NoteParser):
            return possible_keys
 
 
-mytestparser = WesternNoteParser()
+#mytestparser = WesternNoteParser()
 #print(mytestparser.calculate_coordinate_for_note(note='Ab5', song_key='Ab')) # expect (1,2)
 #print(mytestparser.calculate_coordinate_for_note('Ab6', 'Ab')) # expect (2,4)
 #print(mytestparser.calculate_coordinate_for_note('C#6', 'E')) # expect (2,2)
 #print(mytestparser.calculate_coordinate_for_note('Bb4', 'Eb')) # expect (0,4)
 #print(mytestparser.calculate_coordinate_for_note('B4', 'Eb')) # expect error not in major scale
+#print(mytestparser.calculate_coordinate_for_note('C1', 'C')) # expect error not in range of two octaves
+#TODO: set up unit tests
