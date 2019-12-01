@@ -622,7 +622,7 @@ class NoteParser:
         coordinate is expected to be a tuple.
         '''
 
-        if coordinate[0] >= 0 and coordinate[1] <= self.get_row_count() - 1 and coordinate[1] >= 0 and coordinate[1] <= self.get_column_count() - 1:
+        if coordinate[0] >= 0 and coordinate[0] <= self.get_row_count() - 1 and coordinate[1] >= 0 and coordinate[1] <= self.get_column_count() - 1:
             # Check if the row number and column number of the coordinates are within the instrument's range
             return True
         else:
