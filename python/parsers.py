@@ -904,7 +904,7 @@ class JianpuNoteParser(NoteParser):
             '1': 'C', '2' : 'D', '3': 'E', '4': 'F', '5': 'G', '6': 'A', '7': 'B',
             'C':'C', 'D':'D', 'E':'E', 'F':'F', 'G':'G', 'A':'A', 'B':'B'
             }
-            
+
     def parse_note(self, note):
 
         '''
@@ -953,5 +953,7 @@ class JianpuNoteParser(NoteParser):
 #print(mytestparser.calculate_coordinate_for_note('C1', 'C')) # expect error not in range of two octaves
 
 #mytestparser = JianpuNoteParser()
-#print(mytestparser.calculate_coordinate_for_note('1++++', 'C'))
+#print(mytestparser.calculate_coordinate_for_note('1++++', 'C')) # expect (0,0)
+#print(mytestparser.calculate_coordinate_for_note('1++++', 'E'))
+
 #TODO: set up unit tests
