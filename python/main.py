@@ -70,7 +70,6 @@ def is_file(string):
 # Parameters that can be changed by advanced users
 QUAVER_DELIMITER = '-' # Dash-separated list of chords
 ICON_DELIMITER = ' ' # Chords separation
-NOTE_WIDTH = "1em" #Any CSS-compatible unit can be used
 PAUSE = '.'
 COMMENT_DELIMITER = '#' # Lyrics delimiter, can be used for comments
 REPEAT_INDICATOR = '*'
@@ -207,7 +206,7 @@ mysong.set_headers(original_artists, transcript_writer, musical_key)
 
 if RenderModes.HTML in ENABLED_MODES:
     html_path = os.path.join(SONG_DIR_OUT, song_title + '.html')
-    html_path = mysong.write_html(html_path, NOTE_WIDTH, CSS_MODE, CSS_PATH)
+    html_path = mysong.write_html(html_path, CSS_MODE, CSS_PATH)
 
     if html_path != '':
         print('============================================================')

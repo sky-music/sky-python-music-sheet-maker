@@ -16,6 +16,8 @@ class Song():
         self.harp_AspectRatio = 1.455
         self.harp_relspacings = (0.13, 0.1) #Fraction of the harp width that will be allocated to the spacing between harps
 
+        self.HTML_note_width = '1em'
+
         self.SVG_viewPort = (0.0, 0.0, 1334.0, 750.0)
         minDim = self.SVG_viewPort[2]*0.01
         self.SVG_viewPortMargins = (13.0, 7.5)
@@ -140,7 +142,7 @@ class Song():
         '''Calculates the text height in PNG for a standard text depending on the input font size'''
         return fnt.getsize('HQfgjyp')[1]
 
-    def write_html(self, file_path, note_width='1em', css_mode=CSSModes.EMBED, css_path='css/main.css'):
+    def write_html(self, file_path, css_mode=CSSModes.EMBED, css_path='css/main.css'):
 
         try:
             html_file = open(file_path, 'w+', encoding='utf-8', errors='ignore')
@@ -188,7 +190,7 @@ class Song():
                 line_render = '\n'
                 for instrument in line:
                     instrument.set_index(instrument_index)
-                    instrument_render = instrument.render_in_html(note_width)
+                    instrument_render = instrument.render_in_html(self.HTML_note_width)
                     instrument_render += ' '
                     instrument_index += 1
                     line_render += instrument_render

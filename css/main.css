@@ -8,7 +8,7 @@ html {
   }
 }
  
-/* <!-- Define the em unit--> */
+/* <!-- Defines the em unit--> */
 body {
   font-family: "Noto Sans", "Noto Sans CJK JP", "Noto Sans CJK KR", "Noto Sans CJK SC", "Noto Sans CJK TC", "Avenir", Arial, sans-serif;
   font-size: 12pt;
@@ -36,17 +36,7 @@ p, svg text.headers {
 
 /* <!-- Alignment of SVG (HTML only) --> */
 /* <!-- Seems to have no effect ? --> */
-.note-root svg {
-  display: inline-block;
-  vertical-align: middle;
-}
-
-.note-diamond svg {
-  display: inline-block;
-  vertical-align: middle;
-}
-
-.note-circle svg {
+.note-root svg, .note-diamond svg, .note-circle svg {
   display: inline-block;
   vertical-align: middle;
 }
@@ -64,7 +54,6 @@ table {
   border-width: 1px;
   border-color: black;
   border-spacing: 0 auto;
-  
 }
 
 /* <!-- Sky chord chart: a table with rounded edges (SVG only) --> */
@@ -75,12 +64,12 @@ svg rect.harp {
 }
 
 
-/* <!-- The font size affects the note size! (HTML only)--> */
+/* <!-- WARNING: The td font size affects the note size! (HTML only)--> */
 td {
   padding-top: 0px;
   padding-bottom: 0px;
   margin: 0px;
-  font-size: 1em;
+  font-size: 0.5em;
 }
 
 /* <!-- Makes the table disappear in case of broken chord  (HTML only)--> */
@@ -185,18 +174,6 @@ path.instrument-button{
 #transcript {
   margin: 0 0;
 }
-
-/* <!-- This has no effect since it is overidden --> */
-/*
-.highlighted-0 {
-  fill: lightcoral;
-  opacity: 1.0;
-}*/
-
-/* 
-<svg class="note-root harp-button-0" xmlns="https://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 91 91">
-<circle cx="45.4" cy="45.4" r="12" class="instrument-button-icon unhighlighted"/></svg>
- */
 
 
 /* <!-- Small buttons showing notes positions --> */
