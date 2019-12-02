@@ -141,10 +141,12 @@ else:
     print('\nWe detected that you use the following notation: ' + possible_modes[0].value[1] + '.')
     song_notation = possible_modes[0]
 
-if song_notation == 'JIANPU' and QUAVER_DELIMITER =='-':
-    print('\nWarning: quaver delimiter \'-\' is incompatible with Jianpu notation. Please use \'^\' instead.')
-    QUAVER_DELIMITER = '^'
-    myparser.set_delimiters(ICON_DELIMITER, PAUSE, QUAVER_DELIMITER, COMMENT_DELIMITER, REPEAT_INDICATOR)
+#if song_notation == 'JIANPU' and QUAVER_DELIMITER #=='-':
+#    print('\nWarning: quaver delimiter \'-\' is incompatible with Jianpu notation. Please use \'^\' instead.')
+ #   QUAVER_DELIMITER = '^'
+  #  myparser.set_delimiters(ICON_DELIMITER, PAUSE, QUAVER_DELIMITER, COMMENT_DELIMITER, REPEAT_INDICATOR)
+
+myparser.check_delimiters()
 
 myparser.set_input_mode(song_notation)
 
@@ -161,7 +163,9 @@ if song_notation in [InputModes.WESTERN, InputModes.DOREMI, InputModes.JIANPU]:
         print("\nYour song can be transposed in Sky with the following keys: " + str(musickeys))
         #TODO: allow user to choose key
         # Temporarily choose first key for now
-        song_key = musickeys[0]
+        song_key = ''
+        while song_key not in musickeys:
+        	song_key = str(input('Choose your key:'))
 
 if song_notation in [InputModes.WESTERN, InputModes.DOREMI, InputModes.JIANPU, InputModes.WESTERNCHORDS]:
     try:
