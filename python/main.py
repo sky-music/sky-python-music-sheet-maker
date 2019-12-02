@@ -178,6 +178,9 @@ if song_notation in [InputModes.WESTERN, InputModes.DOREMI, InputModes.JIANPU, I
 else:
     note_shift = 0
 
+if song_notation in [InputModes.SKYKEYBOARD, InputModes.SKY]:
+    song_key = 'C'
+
 # Parses song line by line
 mysong = Song()
 for song_line in song_lines:
