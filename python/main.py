@@ -159,13 +159,14 @@ if song_notation in [InputModes.WESTERN, InputModes.DOREMI, InputModes.JIANPU]:
         print("\nYour song cannot be transposed exactly in Sky.")
         print("\nDefault key will be set to C.")
         song_key = 'C'
+    elif len(musickeys) == 1:
+        song_key = str(musickeys[0])
+        print("\nYour song can be transposed in Sky with the following key: " + song_key)
     else:
-        print("\nYour song can be transposed in Sky with the following keys: " + str(musickeys))
-        #TODO: allow user to choose key
-        # Temporarily choose first key for now
+        print("\nYour song can be transposed in Sky with the following keys: " + ', '.join(musickeys))
         song_key = ''
         while song_key not in musickeys:
-        	song_key = str(input('Choose your key:'))
+            song_key = str(input('Choose your key:'))
 
 if song_notation in [InputModes.WESTERN, InputModes.DOREMI, InputModes.JIANPU, InputModes.WESTERNCHORDS]:
     try:
