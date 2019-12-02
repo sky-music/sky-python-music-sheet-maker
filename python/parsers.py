@@ -22,11 +22,6 @@ class SongParser:
         self.repeat_indicator = '*'
 
 
-
-#        self.columns = 5
-#        self.lines = 3
-
-
 #        self.Cmajor = [['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'],
 #                      ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']]
 #        self.onemajor = [['1', '2b', '2', '3b', '3', '4', '5b', '5', '6b', '6', '7b', '7'],
@@ -39,6 +34,29 @@ class SongParser:
                 '1': 'C', '2' : 'D', '3': 'E', '4': 'F', '5': 'G', '6': 'A', '7': 'B',
                 'C':'C', 'D':'D', 'E':'E', 'F':'F', 'G':'G', 'A':'A', 'B':'B'
                 }
+                
+    def check_delimiters(self):
+    	
+    	delims = [self.icon_delimiter, self.pause, self.quaver_delimiter, self.repeat_indicator]
+    	    	
+    	parser = self.get_note_parser()
+    	if parser == None or self.input_mode == None:
+    		return
+    	
+    	if self.input_mode == InputModes.JIANPU:
+    		if self.pause != '0':
+    			print('Jianpu notation is used: setting 0 as the pause character instead of '+self.pause)
+    			self.pause = 0
+    			
+    		for delim in delims:
+    			if delim=='+' or delim=='-':
+    				print('Invalid delimiter: + and - are reserves for octaves in '+self.input_mode.value[1]+': '+delim)
+    	
+    	for delim in delims:
+    			if parser.not_note_name_regex.match(delim) == None or parser.not_octave_regex.match(delim) == None:
+    				print('You chose an invalid delimiter for notation'+self.input_mode.value[1]+': '+delim)
+
+
 
     def get_possible_modes(self, song_lines=None):
 
@@ -53,7 +71,6 @@ class SongParser:
             self.input_mode = input_mode
             self.set_note_parser(self.input_mode)
 
-
     def set_delimiters(self, icon_delimiter=' ', pause='.', quaver_delimiter='-', comment_delimiter='#', repeat_indicator='*'):
 
         self.icon_delimiter = icon_delimiter
@@ -62,39 +79,38 @@ class SongParser:
         self.comment_delimiter = comment_delimiter
         self.repeat_indicator = repeat_indicator
 
-
     def get_note_parser(self, input_mode=None):
 
+        if self.note_parser != None:
+        	return self.note_parser
+         
+        if input_mode == None:
+        	input_mode = self.input_mode
+        
         note_parser = None
-
-        if input_mode != None:
-            if input_mode == InputModes.SKYKEYBOARD:
-                note_parser = SkyKeyboardNoteParser()
-            elif input_mode == InputModes.SKY:
-                note_parser = SkyNoteParser()
-            elif input_mode == InputModes.WESTERN:
-                note_parser = WesternNoteParser()
-            elif input_mode == InputModes.DOREMI:
-                note_parser = DoremiNoteParser()
-            elif input_mode == InputModes.JIANPU:
-                note_parser = JianpuNoteParser()
-            elif input_mode == InputModes.WESTERNCHORDS:
-                note_parser = WesternNoteParser()
-            else:
-                note_parser = SkyNoteParser()
-        elif self.note_parser != None:
-                note_parser = self.note_parser
-
+        
+        if input_mode == InputModes.SKYKEYBOARD:
+        	note_parser = SkyKeyboardNoteParser()
+        elif input_mode == InputModes.SKY:
+        	note_parser = SkyNoteParser()
+        elif input_mode == InputModes.WESTERN:
+        	note_parser = WesternNoteParser()
+        elif input_mode == InputModes.DOREMI:
+        	note_parser = DoremiNoteParser()
+        elif input_mode == InputModes.JIANPU:
+        	note_parser = JianpuNoteParser()
+        elif input_mode == InputModes.WESTERNCHORDS:
+        	note_parser = WesternNoteParser()
+        	
         return note_parser
 
 
-    def set_note_parser(self, input_mode=InputModes.SKY):
+    def set_note_parser(self, input_mode=None):
 
-        if input_mode != None:
-            self.note_parser = self.get_note_parser(input_mode)
-        else:
-            self.note_parser = self.get_note_parser(self.input_mode)
-
+        if input_mode == None:
+            input_mode = self.input_mode
+        self.note_parser = self.get_note_parser(input_mode)
+        
 
     def get_keyboard_layout(self):
 
@@ -108,10 +124,10 @@ class SongParser:
         except KeyError:
             return notes
 
-    def parse_icon(self, icon, delimiter):
+    def parse_icon(self, icon, delimiter=None):
+        if delimiter == None:
+        	delimiter = self.quaver_delimiter
         return icon.split(delimiter)
-
-
 
     def find_key(self, song_lines):
 
@@ -119,15 +135,20 @@ class SongParser:
            return []#Or None???
 
        if self.note_parser == None:
-           self.get_note_parser()
-
+           self.set_note_parser()
+       #print('note parser is:')
+       #print(self.note_parser)
+           
        try:
            possible_keys = [k for k in self.note_parser.CHROMATIC_SCALE_DICT.keys()]
            isNoteRegEx = self.note_parser.note_name_regex
            notNoteRegEx = self.note_parser.not_note_name_regex
+           #print(possible_keys)
+           
        except AttributeError:
+       	   raise AttributeError('error')
            return []
-
+       #print(possible_keys)
        scores = [0]*len(possible_keys)
        num_notes = [0]*len(possible_keys)
        for line in song_lines:
@@ -147,13 +168,13 @@ class SongParser:
                       except SyntaxError:#Wrongly formatted notes are ignored
                          num_notes[i] -= 1
 
-
+       #print(scores)
        num_notes = [1 if x == 0 else x for x in num_notes]
        #Removes zeros to avoid division by zero
        scores = list(map(truediv, scores, num_notes))
        scores = [(1 - score) for score in scores]
 
-
+       #print(scores)
        sorted_idx, sorted_scores = zip(*sorted([(i,e) for i,e in enumerate(scores)], key=itemgetter(1), reverse=True))
        sorted_keys = [possible_keys[i] for i in sorted_idx]
        #print(sorted_scores)
@@ -185,6 +206,7 @@ class SongParser:
 #        position_maps = [SkyNoteParser().position_map, SkyNoteParser().position_map, WesternNoteParser().position_map, DoremiNoteParser().position_map, JianpuNoteParser().position_map, WesternNoteParser().western_chords]
 
         possible_modes = [mode for mode in InputModes]
+        possible_parsers = [self.get_note_parser(mode) for mode in possible_modes]
         position_maps = [self.get_note_parser(mode).position_map for mode in possible_modes]
 
         good_notes = [0]*len(position_maps)
@@ -199,15 +221,14 @@ class SongParser:
                 if line[0] != self.comment_delimiter:
                     icons=line.split(self.icon_delimiter)
                     for icon in icons:
-                        chords = self.parse_icon(icon, self.quaver_delimiter)
+                        chords = self.parse_icon(icon)
                         for chord in chords:
                             for idx, possible_mode in enumerate(possible_modes):
-                                self.input_mode = possible_mode #TODO: remove this, used by chord_split
-                                self.set_note_parser(possible_mode) #Important!
+                                
                                 if possible_mode == InputModes.WESTERNCHORDS:
                                     notes = [chord] #Because abbreviated chord names are not composed of note names
                                 else:
-                                    repeat, notes = self.split_chord(chord)
+                                    repeat, notes = self.split_chord(chord, possible_parsers[idx])
                                 #TODO: use self.map_note_to_position?
                                 good_notes[idx] += sum([int(note in position_maps[idx].keys()) for note in notes])
                                 num_notes[idx] += len(notes)
@@ -271,7 +292,7 @@ class SongParser:
 #        return self.jianpu2western(possible_keys)
 
 
-    def split_chord(self, chord):
+    def split_chord(self, chord, note_parser=None):
 
         try:
             repeat = int(re.split(re.escape(self.repeat_indicator), chord)[1])
@@ -279,8 +300,9 @@ class SongParser:
         except:
             repeat = 0
 
-
-        chord = self.note_parser.note_name_regex.sub(' \\1', chord).split()
+        if note_parser==None:
+        	note_parser = self.note_parser
+        chord = note_parser.note_name_regex.sub(' \\1', chord).split()
 
 #        if self.input_mode == InputModes.SKY:
 #            #chord = chord.upper()
@@ -371,7 +393,7 @@ class SongParser:
                 icons=line.split(self.icon_delimiter)
                  #TODO: Implement logic for parsing line vs single icon.
                 for icon in icons:
-                    chords = self.parse_icon(icon, self.quaver_delimiter)
+                    chords = self.parse_icon(icon)
                     #From here, real chords are still glued, quavers have been split in different list slots
                     chord_skygrid, harp_broken, harp_silent, repeat = self.parse_chords(chords, song_key, note_shift)
                     harp = instruments.Harp()
@@ -689,7 +711,7 @@ class SkyKeyboardNoteParser(NoteParser):
         self.note_name_regex = re.compile(r'(['+regex+'])')
         self.note_name_with_octave_regex = re.compile(r'(['+regex+'])')
         self.not_note_name_regex = re.compile(r'[^ABCabc]+')
-
+        self.not_octave_regex = re.compile(r'.')
 
     def calculate_coordinate_for_note(self, note, song_key, note_shift=0):
         '''
@@ -738,6 +760,7 @@ class SkyNoteParser(NoteParser):
         self.note_name_regex = re.compile(r'([ABCabc]+[1-5]+)')
 #        self.octave_number_regex = re.compile(r'')
         self.not_note_name_regex = re.compile(r'[^ABCabc]+')
+        self.not_octave_regex = re.compile(r'[^123]')
 
 
     def calculate_coordinate_for_note(self, note, song_key, note_shift=0):
@@ -815,6 +838,7 @@ class WesternNoteParser(NoteParser):
         self.note_name_regex = re.compile(r'([ABCDEFGabcdefg][b#]?)')
         self.octave_number_regex = re.compile(r'\d')
         self.not_note_name_regex = re.compile(r'[^ABCDEFGabcdefgb#]+')
+        self.not_octave_regex = re.compile(r'[^\d]')
 
     def decode_chord(self, chord):
         '''
@@ -862,6 +886,7 @@ class DoremiNoteParser(NoteParser):
         self.note_name_regex = re.compile(r'([DRMFSLdrmfsl][OEIAoeia][Ll]?[b#]?)')
         self.octave_number_regex = re.compile(r'\d')
         self.not_note_name_regex = re.compile(r'[^DRMFSLOEIAdrmfsloeiab#]+')
+        self.not_octave_regex = re.compile(r'^[\d]')
 
     def sanitize_note_name(self, note_name):
 
@@ -899,6 +924,7 @@ class JianpuNoteParser(NoteParser):
         self.note_name_regex = re.compile(r'([1234567][b#]?)')
         self.octave_number_regex = re.compile(r'\d')
         self.not_note_name_regex = re.compile(r'[^1234567b#]+')
+        self.not_octave_regex = re.compile(r'[^\\+\\-]+')
 
         self.jianpu2western_map = {
             '1': 'C', '2' : 'D', '3': 'E', '4': 'F', '5': 'G', '6': 'A', '7': 'B',
@@ -939,7 +965,7 @@ class JianpuNoteParser(NoteParser):
 
         westernized_note = self.jianpu2western_map[note_base] + note_alt + str(note_octave)
 
-        print(westernized_note)
+        #print(westernized_note)
 
         return westernized_note
 
