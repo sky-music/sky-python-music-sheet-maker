@@ -34,29 +34,32 @@ class SongParser:
                 '1': 'C', '2' : 'D', '3': 'E', '4': 'F', '5': 'G', '6': 'A', '7': 'B',
                 'C':'C', 'D':'D', 'E':'E', 'F':'F', 'G':'G', 'A':'A', 'B':'B'
                 }
-
+                
     def check_delimiters(self):
-
-    	delims = [self.icon_delimiter, self.pause, self.quaver_delimiter, self.repeat_indicator]
-
-    	parser = self.get_note_parser()
-    	if parser == None or self.input_mode == None:
-    		return
-
+    	    	
     	if self.input_mode == InputModes.JIANPU:
     		if self.pause != '0':
     			print('Jianpu notation is used: setting 0 as the pause character instead of '+self.pause)
-    			self.pause = 0
-
-    		for delim in delims:
-    			if delim=='+' or delim=='-':
-    				print('Invalid delimiter: + and - are reserves for octaves in '+self.input_mode.value[1]+': '+delim)
-
+    			self.pause = '0'
+    		if self.quaver_delimiter == '-':
+    			print('Jianpu notation is used: setting ^ as the quaver delimiter instead of '+self.quaver_delimiter)
+    			self.quaver_delimiter = '^'
+    			
+    	delims = [self.icon_delimiter, self.pause, self.quaver_delimiter, self.repeat_indicator, self.comment_delimiter]
+    	
+    	parser = self.get_note_parser()
+    	if parser == None or self.input_mode == None:
+    		return
+    	
+    		#for delim in delims:
+    			#if delim=='+' or delim=='-':
+    				#print('Invalid delimiter: + and - are reserved for octaves in '+self.input_mode.value[1]+': '+delim)
+    	
     	for delim in delims:
-    			if parser.not_note_name_regex.match(delim) == None or parser.not_octave_regex.match(delim) == None:
+    			if (parser.not_note_name_regex.match(delim) == None or parser.not_octave_regex.match(delim) == None) and delim != self.comment_delimiter:
     				print('You chose an invalid delimiter for notation'+self.input_mode.value[1]+': '+delim)
-
-
+    			if delims.count(delim)>1:
+    				print('You chose twice the same delimiter for notation'+self.input_mode.value[1]+': '+delim)
 
     def get_possible_modes(self, song_lines=None):
 
@@ -83,12 +86,12 @@ class SongParser:
 
         if self.note_parser != None:
         	return self.note_parser
-
+         
         if input_mode == None:
         	input_mode = self.input_mode
-
+        
         note_parser = None
-
+        
         if input_mode == InputModes.SKYKEYBOARD:
         	note_parser = SkyKeyboardNoteParser()
         elif input_mode == InputModes.SKY:
@@ -101,7 +104,7 @@ class SongParser:
         	note_parser = JianpuNoteParser()
         elif input_mode == InputModes.WESTERNCHORDS:
         	note_parser = WesternNoteParser()
-
+        	
         return note_parser
 
 
@@ -110,7 +113,7 @@ class SongParser:
         if input_mode == None:
             input_mode = self.input_mode
         self.note_parser = self.get_note_parser(input_mode)
-
+        
 
     def get_keyboard_layout(self):
 
@@ -138,15 +141,13 @@ class SongParser:
            self.set_note_parser()
        #print('note parser is:')
        #print(self.note_parser)
-
+           
        try:
            possible_keys = [k for k in self.note_parser.CHROMATIC_SCALE_DICT.keys()]
            isNoteRegEx = self.note_parser.note_name_regex
            notNoteRegEx = self.note_parser.not_note_name_regex
            #print(possible_keys)
-
        except AttributeError:
-       	   raise AttributeError('error')
            return []
        #print(possible_keys)
        scores = [0]*len(possible_keys)
@@ -224,7 +225,7 @@ class SongParser:
                         chords = self.parse_icon(icon)
                         for chord in chords:
                             for idx, possible_mode in enumerate(possible_modes):
-
+                                
                                 if possible_mode == InputModes.WESTERNCHORDS:
                                     notes = [chord] #Because abbreviated chord names are not composed of note names
                                 else:
@@ -636,7 +637,6 @@ class NoteParser:
         note_in_base_10 = self.convert_base_7_to_base_10(str(octave_number) + str(major_scale_interval))
 
         # shift down, and account for any additional note shift by the player
-
         note_in_base_10 -= self.get_base_of_western_major_scale()*self.get_default_starting_octave()
 
         if self.is_valid_note_name_with_octave(note):
@@ -711,7 +711,7 @@ class SkyKeyboardNoteParser(NoteParser):
         self.note_name_regex = re.compile(r'(['+regex+'])')
         self.note_name_with_octave_regex = re.compile(r'(['+regex+'])')
         self.not_note_name_regex = re.compile(r'[^ABCabc]+')
-        self.not_octave_regex = re.compile(r'\.')
+        self.not_octave_regex = re.compile(r'\\.')
 
     def calculate_coordinate_for_note(self, note, song_key='C', note_shift=0):
         '''
@@ -763,7 +763,7 @@ class SkyNoteParser(NoteParser):
         self.not_octave_regex = re.compile(r'[^123]')
 
 
-    def calculate_coordinate_for_note(self, note, song_key='C', note_shift=0):
+    def calculate_coordinate_for_note(self, note, song_key='C, note_shift=0):
         '''
         Returns a tuple containing the row index and the column index of the note's position.
         '''
@@ -958,7 +958,7 @@ class JianpuNoteParser(NoteParser):
                 note_octave = -len(note_octave.group(0))
             else:
                 note_octave = self.get_default_starting_octave()
-
+        #print(note_base+note_alt+str(note_octave))
         return note_base + note_alt, note_octave
 
     def convert_to_westernized_note(self, note_base, note_alt, note_octave):
