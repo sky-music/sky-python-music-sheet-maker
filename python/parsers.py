@@ -763,7 +763,7 @@ class SkyNoteParser(NoteParser):
         self.not_octave_regex = re.compile(r'[^123]')
 
 
-    def calculate_coordinate_for_note(self, note, song_key='C, note_shift=0):
+    def calculate_coordinate_for_note(self, note, song_key='C', note_shift=0):
         '''
         Returns a tuple containing the row index and the column index of the note's position.
         '''
