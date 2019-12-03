@@ -152,6 +152,7 @@ myparser.set_input_mode(song_notation)
 
 # Attempts to detect key for input written in absolute musical scales (western, Jianpu)
 musickeys  = []
+song_key = None
 if song_notation in [InputModes.WESTERN, InputModes.DOREMI, InputModes.JIANPU]:
     #TODO: update find_keys
     musickeys = myparser.find_key(song_lines)
@@ -177,9 +178,6 @@ if song_notation in [InputModes.WESTERN, InputModes.DOREMI, InputModes.JIANPU, I
         note_shift = 0
 else:
     note_shift = 0
-
-if song_notation in [InputModes.SKYKEYBOARD, InputModes.SKY]:
-    song_key = 'C'
 
 # Parses song line by line
 mysong = Song()
