@@ -134,9 +134,6 @@ class SongParser:
 
     def find_key(self, song_lines):
 
-       if self.input_mode in [InputModes.SKY, InputModes.SKYKEYBOARD]:
-           return []#Or None???
-
        if self.note_parser == None:
            self.set_note_parser()
        #print('note parser is:')
@@ -148,7 +145,8 @@ class SongParser:
            notNoteRegEx = self.note_parser.not_note_name_regex
            #print(possible_keys)
        except AttributeError:
-           return []
+            #Parsers not having a chromatic scale keys should return None, eg Sky and Skykeyboard
+           return None
        #print(possible_keys)
        scores = [0]*len(possible_keys)
        num_notes = [0]*len(possible_keys)
@@ -190,25 +188,23 @@ class SongParser:
           	return [k for i,k in enumerate(sorted_keys) if sorted_scores[i]==1 ]
        elif (sorted_scores[0] > 0.95):
            sorted_scores = list(map(truediv, sorted_scores, [max(sorted_scores)]*len(sorted_scores)))
-       possible_keys = [k for i,k in enumerate(sorted_keys) if sorted_scores[i]>0.9]
-       if len(possible_keys)==0:
-           print('No matching key found.')
-           return []#Or None??
+       sorted_keys = [k for i,k in enumerate(sorted_keys) if sorted_scores[i]>0.9]
+       if len(sorted_keys)==0:
+           #print('No matching key found.')
+           return []
        else:
-           print('One or several best matching keys were found.')
-           return possible_keys
+           #print('One or several best matching keys were found.')
+           return sorted_keys
 
 
     def detect_input_type(self, song_lines):
         '''
-        Attempts to detect input type and notation
+        Attempts to detect input musical notation
         '''
-#        possible_modes = [InputModes.SKYKEYBOARD, InputModes.SKY, InputModes.WESTERN, InputModes.DOREMI, InputModes.JIANPU, InputModes.WESTERNCHORDS]
-#        position_maps = [SkyNoteParser().position_map, SkyNoteParser().position_map, WesternNoteParser().position_map, DoremiNoteParser().position_map, JianpuNoteParser().position_map, WesternNoteParser().western_chords]
-
         possible_modes = [mode for mode in InputModes]
         possible_parsers = [self.get_note_parser(mode) for mode in possible_modes]
         position_maps = [self.get_note_parser(mode).position_map for mode in possible_modes]
+        possible_regex = [parser.note_name_with_octave_regex for parser in possible_parsers]
 
         good_notes = [0]*len(position_maps)
         num_notes = [0]*len(position_maps)
@@ -231,15 +227,19 @@ class SongParser:
                                 else:
                                     repeat, notes = self.split_chord(chord, possible_parsers[idx])
                                 #TODO: use self.map_note_to_position?
-                                good_notes[idx] += sum([int(note in position_maps[idx].keys()) for note in notes])
-                                num_notes[idx] += len(notes)
+                                
+                            
+                                good_notes[idx] += sum([int(possible_regex[idx].search(note) != None) for note in notes if note != self.pause])
+                                #good_notes[idx] += sum([int(note in position_maps[idx].keys()) for note in notes])
+                                num_notes[idx] += sum([1 for note in notes if note != self.pause])
+                                
                                 if possible_mode in [InputModes.WESTERN, InputModes.WESTERNCHORDS]:
                                     DEFG_notes += sum([int(re.search('[D-G]',note) != None) for note in notes])
                                     octaves = [re.search('\d',note) for note in notes]
                                     octaves = sorted([int(octave.group(0)) for octave in octaves if octave != None])
                                     if len(octaves)>0:
                                         octave_span = max(octave_span, octaves[-1] - octaves[0] + 1)
-
+        print(good_notes)
         num_notes = [1 if x == 0 else x for x in num_notes] #Removes zeros to avoid division by zero
 
         ratios = list(map(truediv, good_notes, num_notes))
@@ -708,8 +708,8 @@ class SkyKeyboardNoteParser(NoteParser):
             self.keyboard_layout="QWERT ASDFG ZXCVB"
 
         regex = self.keyboard_layout.replace(' ','') + self.keyboard_layout.replace(' ','').lower()
-        self.note_name_regex = re.compile(r'(['+regex+'])')
-        self.note_name_with_octave_regex = re.compile(r'(['+regex+'])')
+        self.note_name_with_octave_regex = re.compile(r'(\b['+regex+']\b)')
+        self.note_name_regex = re.compile(r'(\b['+regex+'])')
         self.not_note_name_regex = re.compile(r'[^ABCabc]+')
         self.not_octave_regex = re.compile(r'\\.')
 
@@ -756,8 +756,8 @@ class SkyNoteParser(NoteParser):
                 'C1': (2, 0), 'C2': (2, 1), 'C3': (2, 2), 'C4': (2, 3), 'C5': (2, 4)
                 }
 
-        self.note_name_with_octave_regex = re.compile(r'([ABCabc]+[1-5]+)')
-        self.note_name_regex = re.compile(r'([ABCabc]+[1-5]+)')
+        self.note_name_with_octave_regex = re.compile(r'(\b[ABCabc]+[1-5]+\b)')
+        self.note_name_regex = re.compile(r'(\b[ABCabc]+[1-5]+)')
 #        self.octave_number_regex = re.compile(r'')
         self.not_note_name_regex = re.compile(r'[^ABCabc]+')
         self.not_octave_regex = re.compile(r'[^123]')
@@ -834,8 +834,8 @@ class WesternNoteParser(NoteParser):
         self.CHROMATIC_SCALE_DICT = {'C': 0, 'C#': 1, 'Db': 1, 'D': 2, 'D#': 3, 'Eb': 3, 'E': 4, 'F': 5, 'F#': 6, 'Gb': 6, 'G': 7, 'G#': 8, 'Ab': 8, 'A': 9, 'A#': 10, 'Bb': 10, 'B': 11}
 
         # Compile regexes for notes to save before using
-        self.note_name_with_octave_regex = re.compile(r'[ABCDEFGabcdefg][b#]?\d')
-        self.note_name_regex = re.compile(r'([ABCDEFGabcdefg][b#]?)')
+        self.note_name_with_octave_regex = re.compile(r'\b[ABCDEFGabcdefg][b#]?\d\b')
+        self.note_name_regex = re.compile(r'(\b[ABCDEFGabcdefg][b#]?)')
         self.octave_number_regex = re.compile(r'\d')
         self.not_note_name_regex = re.compile(r'[^ABCDEFGabcdefgb#]+')
         self.not_octave_regex = re.compile(r'[^\d]')
@@ -882,8 +882,8 @@ class DoremiNoteParser(NoteParser):
         self.CHROMATIC_SCALE_DICT = {'DO': 0, 'DO#': 1, 'REb': 1, 'RE': 2, 'RE#': 3, 'MIb': 3, 'MI': 4, 'FA': 5, 'FA#': 6, 'SOLb': 6, 'SOL': 7, 'SOL#': 8, 'LAb': 8, 'LA': 9, 'LA#': 10, 'SIb': 10, 'SI': 11}
 
         # Compile regexes for notes to save before using
-        self.note_name_with_octave_regex = re.compile(r'[DRMFSLdrmfsl][OEIAoeia][Ll]?[b#]?\d')
-        self.note_name_regex = re.compile(r'([DRMFSLdrmfsl][OEIAoeia][Ll]?[b#]?)')
+        self.note_name_with_octave_regex = re.compile(r'\b[DRMFSLdrmfsl][OEIAoeia][Ll]?[b#]?\d\b')
+        self.note_name_regex = re.compile(r'(\b[DRMFSLdrmfsl][OEIAoeia][Ll]?[b#]?)')
         self.octave_number_regex = re.compile(r'\d')
         self.not_note_name_regex = re.compile(r'[^DRMFSLOEIAdrmfsloeiab#]+')
         self.not_octave_regex = re.compile(r'^[\d]')
@@ -920,8 +920,8 @@ class JianpuNoteParser(NoteParser):
         self.CHROMATIC_SCALE_DICT = {'1': 0, '1#': 1, '2b': 1, '2': 2, '2#': 3, '3b': 3, '3': 4, '4': 5, '4#': 6, '5b': 6, '5': 7, '5#': 8, '6b': 8, '6': 9, '6#': 10, '7b': 10, '7': 11}
 
         # Compile regexes for notes to save before using
-        self.note_name_with_octave_regex = re.compile(r'[1234567][b#]?[\\+\\-]?')
-        self.note_name_regex = re.compile(r'([1234567][b#]?)')
+        self.note_name_with_octave_regex = re.compile(r'\b[1234567][b#]?[\\+\\-]?\b')
+        self.note_name_regex = re.compile(r'(\b[1234567][b#]?)')
         self.octave_number_regex = re.compile(r'\d')
         self.not_note_name_regex = re.compile(r'[^1234567b#]+')
         self.not_octave_regex = re.compile(r'[^\\+\\-]+')
