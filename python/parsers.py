@@ -940,29 +940,35 @@ class JianpuNoteParser(NoteParser):
         Returns a tuple containing note_name, octave_number for a note in the format self.note_name_with_octave_regex
         '''
 
-        note_base = re.match('[1234567]',note)
-        if note_base != None:
-            note_base = note_base.group()
-        else:
-            raise KeyError('Note was not recognized as Jianpu.')
+ #       note_base = re.match('[1234567]',note)
+#        if note_base != None:
+#            note_base = note_base.group()
+ #       else:
+ #           raise KeyError('Note was not recognized as Jianpu.')
 
-        note_alt = re.search('[#b]',note)
-        if note_alt != None:
-            note_alt = note_alt.group(0)
+ #       note_alt = re.search('[#b]',note)
+#        if note_alt != None:
+#            note_alt = note_alt.group(0)
+#        else:
+#            note_alt = ''
+            
+        note_name = self.note_name_regex.search(note)
+        if note_name != None:
+        	note_name = note_name.group(0)
         else:
-            note_alt = ''
+        	raise KeyError('Note was not recognized as Jianpu.')
 
         note_octave = re.search('(\\+)+',note)
         if note_octave != None:
-            note_octave = len(note_octave.group(0))
+            note_octave = self.get_default_starting_octave()+len(note_octave.group(0))
         else:
             note_octave = re.search('(\\-)+',note)
             if note_octave != None:
-                note_octave = -len(note_octave.group(0))
+                note_octave = self.get_default_starting_octave()-len(note_octave.group(0))
             else:
                 note_octave = self.get_default_starting_octave()
         #print(note_base+note_alt+str(note_octave))
-        return note_base + note_alt, note_octave
+        return note_name, note_octave
 
     def convert_to_westernized_note(self, note_base, note_alt, note_octave):
 
