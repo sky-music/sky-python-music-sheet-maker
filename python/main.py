@@ -139,6 +139,10 @@ if song_notation == 'JIANPU' and QUAVER_DELIMITER =='-':
     print('\nWarning: quaver delimiter \'-\' is incompatible with Jianpu notation. Please use \'^\' instead.')
     QUAVER_DELIMITER = '^'
 
+if song_notation == 'JIANPU' and PAUSE !='0':
+    print('\nWarning: pause in Jianpu is usually ''0''.')
+    PAUSE = '0'
+
 # Attempts to detect key for input written in absolute musical scales (western, Jianpu)
 musickeys  = []
 if song_notation in [InputModes.WESTERN, InputModes.JIANPU]:
