@@ -31,7 +31,7 @@ class SongParser:
                 
     def check_delimiters(self):
                 
-        if self.input_mode == InputModes.JIANPU:
+        if self.input_mode == InputModes.JIANPU or isinstance(self.note_parser, JianpuNoteParser):
             if self.pause != '0':
                 print('Jianpu notation is used: setting 0 as the pause character instead of '+self.pause)
                 self.pause = '0'
@@ -63,6 +63,7 @@ class SongParser:
         if isinstance(input_mode, InputModes):
             self.input_mode = input_mode
             self.set_note_parser(self.input_mode)
+            self.check_delimiters()
 
 
     def get_note_parser(self, input_mode=None):
@@ -172,7 +173,6 @@ class SongParser:
             harp_silent = False
             for note in chord: # Chord is a list of notes
                 #Except InvalidLetterException
-                #print(note)
                 try:
                     if note == self.pause:
                         highlighted_note_position = (-1, -1)
@@ -388,7 +388,8 @@ class SongParser:
             return [k for i,k in enumerate(sorted_items) if sorted_scores[i]==1]
        
         if (sorted_scores[0] < threshold):
-            return sorted_items
+            contrasts = [(score-min(sorted_scores))/(score+min(sorted_scores)) if score!=0 else 0 for score in sorted_scores ]
+            return [k for i,k in enumerate(sorted_items) if sorted_scores[i]>threshold/2]
         else:
             sorted_scores = list(map(truediv, sorted_scores, [max(sorted_scores)]*len(sorted_scores)))
             over_items = [k for i,k in enumerate(sorted_items) if sorted_scores[i]>threshold]
@@ -945,7 +946,7 @@ class JianpuNoteParser(NoteParser):
         if note_name != None:
             note_name = note_name.group(0)
         else:
-            raise KeyError('Note was not recognized as Jianpu.')
+            raise KeyError('Note ' + str(note) + ' was not recognized as Jianpu.')
 
         note_octave = re.search('(\\+)+',note)
         if note_octave != None:
