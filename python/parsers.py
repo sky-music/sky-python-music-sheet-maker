@@ -7,8 +7,6 @@ from operator import truediv, itemgetter
 import math
 
 
-### Parser
-
 class SongParser:
 
     def __init__(self):
@@ -22,58 +20,6 @@ class SongParser:
         self.repeat_indicator = '*'
 
 
-#        self.Cmajor = [['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'],
-#                      ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']]
-#        self.onemajor = [['1', '2b', '2', '3b', '3', '4', '5b', '5', '6b', '6', '7b', '7'],
-#                      ['1', '1#', '2', '2#', '3', '4', '4#', '5', '5#', '6', '6#', '7']]
-#        self.intervals = [0, 2, 4, 5, 7, 9, 11]
-
-        #For find_key only: prints the key in the Western form instead of Jianpu
-        #TODO: checks that it works
-        self.jianpu2western_map = {
-                '1': 'C', '2' : 'D', '3': 'E', '4': 'F', '5': 'G', '6': 'A', '7': 'B',
-                'C':'C', 'D':'D', 'E':'E', 'F':'F', 'G':'G', 'A':'A', 'B':'B'
-                }
-                
-    def check_delimiters(self):
-    	    	
-    	if self.input_mode == InputModes.JIANPU:
-    		if self.pause != '0':
-    			print('Jianpu notation is used: setting 0 as the pause character instead of '+self.pause)
-    			self.pause = '0'
-    		if self.quaver_delimiter == '-':
-    			print('Jianpu notation is used: setting ^ as the quaver delimiter instead of '+self.quaver_delimiter)
-    			self.quaver_delimiter = '^'
-    			
-    	delims = [self.icon_delimiter, self.pause, self.quaver_delimiter, self.repeat_indicator, self.comment_delimiter]
-    	
-    	parser = self.get_note_parser()
-    	if parser == None or self.input_mode == None:
-    		return
-    	
-    		#for delim in delims:
-    			#if delim=='+' or delim=='-':
-    				#print('Invalid delimiter: + and - are reserved for octaves in '+self.input_mode.value[1]+': '+delim)
-    	
-    	for delim in delims:
-    			if (parser.not_note_name_regex.match(delim) == None or parser.not_octave_regex.match(delim) == None) and delim != self.comment_delimiter:
-    				print('You chose an invalid delimiter for notation'+self.input_mode.value[1]+': '+delim)
-    			if delims.count(delim)>1:
-    				print('You chose twice the same delimiter for notation'+self.input_mode.value[1]+': '+delim)
-
-    def get_possible_modes(self, song_lines=None):
-
-        if self.input_mode != None:
-            return [self.input_mode]
-        else:
-            return self.detect_input_type(song_lines)
-
-    def set_input_mode(self, input_mode):
-
-        if isinstance(input_mode, InputModes):
-            self.input_mode = input_mode
-            self.set_note_parser(self.input_mode)
-
     def set_delimiters(self, icon_delimiter=' ', pause='.', quaver_delimiter='-', comment_delimiter='#', repeat_indicator='*'):
 
         self.icon_delimiter = icon_delimiter
@@ -82,29 +28,66 @@ class SongParser:
         self.comment_delimiter = comment_delimiter
         self.repeat_indicator = repeat_indicator
 
+                
+    def check_delimiters(self):
+                
+        if self.input_mode == InputModes.JIANPU:
+            if self.pause != '0':
+                print('Jianpu notation is used: setting 0 as the pause character instead of '+self.pause)
+                self.pause = '0'
+            if self.quaver_delimiter == '-':
+                print('Jianpu notation is used: setting ^ as the quaver delimiter instead of '+self.quaver_delimiter)
+                self.quaver_delimiter = '^'
+                
+        delims = [self.icon_delimiter, self.pause, self.quaver_delimiter, self.comment_delimiter, self.repeat_indicator]
+        
+        parser = self.get_note_parser()
+        if parser != None:
+            for delim in delims:
+                if (parser.not_note_name_regex.match(delim) == None or parser.not_octave_regex.match(delim) == None) and delim != self.comment_delimiter:
+                    print('You chose an invalid delimiter for notation '+self.input_mode.value[1]+': '+delim)
+                if delims.count(delim)>1:
+                    print('You chose twice the same delimiter for notation '+self.input_mode.value[1]+': '+delim)
+
+
+    def get_possible_modes(self, song_lines=None):
+
+        if self.input_mode != None:
+            return [self.input_mode]
+        else:
+            return self.detect_input_type(song_lines)
+
+
+    def set_input_mode(self, input_mode):
+
+        if isinstance(input_mode, InputModes):
+            self.input_mode = input_mode
+            self.set_note_parser(self.input_mode)
+
+
     def get_note_parser(self, input_mode=None):
 
         if self.note_parser != None:
-        	return self.note_parser
+            return self.note_parser
          
         if input_mode == None:
-        	input_mode = self.input_mode
+            input_mode = self.input_mode
         
         note_parser = None
         
         if input_mode == InputModes.SKYKEYBOARD:
-        	note_parser = SkyKeyboardNoteParser()
+            note_parser = SkyKeyboardNoteParser()
         elif input_mode == InputModes.SKY:
-        	note_parser = SkyNoteParser()
+            note_parser = SkyNoteParser()
         elif input_mode == InputModes.WESTERN:
-        	note_parser = WesternNoteParser()
+            note_parser = WesternNoteParser()
         elif input_mode == InputModes.DOREMI:
-        	note_parser = DoremiNoteParser()
+            note_parser = DoremiNoteParser()
         elif input_mode == InputModes.JIANPU:
-        	note_parser = JianpuNoteParser()
+            note_parser = JianpuNoteParser()
         elif input_mode == InputModes.WESTERNCHORDS:
-        	note_parser = WesternChordsNoteParser()
-        	
+            note_parser = WesternChordsNoteParser()
+            
         return note_parser
 
 
@@ -119,18 +102,144 @@ class SongParser:
 
         return SkyKeyboardNoteParser().keyboard_layout
 
-    #For find_key only: prints the key in the Western form instead of Jianpu
-    #TODO: checks that it works
-    def jianpu2western(self,notes):
-        try:
-            return [self.jianpu2western_map[note] for note in notes]
-        except KeyError:
-            return notes
 
-    def parse_icon(self, icon, delimiter=None):
+    def split_icon(self, icon, delimiter=None):
+        '''
+        An icon is a collection of chords assembled with '-': ['A1C2-F3D4', 'C#4B4-Gb3A2']
+        This method splits an icon into alist of chords:  ['A1C2', 'F3D4', 'C#4B4', 'Gb3A2']   
+        '''
         if delimiter == None:
-        	delimiter = self.quaver_delimiter
+            delimiter = self.quaver_delimiter
         return icon.split(delimiter)
+
+
+    def split_chord(self, chord, note_parser=None):
+        '''
+        A chord is a collection of notes glued together:  ['A1C2', 'F3D4', 'C#4B4', 'Gb3A2']
+        This method splits each chord into a list of notes: [['A1',C2'], ['F3','D4'],...]
+        '''
+        try:
+            repeat = int(re.split(re.escape(self.repeat_indicator), chord)[1])
+            chord = re.split(re.escape(self.repeat_indicator), chord)[0]
+        except:
+            repeat = 0
+
+        if note_parser == None:
+            note_parser = self.note_parser
+        
+        try:
+            chord = note_parser.note_name_regex.sub(' \\1', chord).split()
+        except AttributeError as err:
+            print(err)
+
+        return repeat, chord
+
+
+
+    def parse_chords(self, chords, song_key='C', note_shift=0):
+        #Individual note is a single-element list: chords=['A5']
+        #Real chord is a single element list: chords=['B1A1A3']
+        #Triplets and quavers are a list of notes or chords: chords=['B2', 'B3B1', 'B4', 'B5', 'C1', 'C2']
+        harp_broken = True
+        chord_skygrid = {}
+
+        #print(chord)
+        if len(chords)>1:
+            idx0 = 1 #Notes in quavers and triplets have a frame index >1
+        else:
+            idx0 = 0 #Single note or note in chord jas a frame index ==0
+
+        for chord_idx, chord in enumerate(chords):
+            # Create a skygrid of the harp's chords
+            # For each chord, set the highlighted state of each note accordingly (whether True or False)
+            chord = re.sub(re.escape(self.pause), '.', chord) #Replaces the pause character by the default
+
+            if self.note_parser == None:
+                self.set_note_parser(self.input_mode)
+
+            if self.input_mode == InputModes.WESTERNCHORDS:
+                chord = self.note_parser.decode_chord(chord, self.note_parser.western_chords)
+
+            repeat, chord = self.split_chord(chord)
+            #Now the real chord has been split in notes (1 note = 1 list slot)
+
+            harp_broken = False
+            harp_silent = False
+            for note in chord: # Chord is a list of notes
+                #Except InvalidLetterException
+                try:
+                    if note == self.pause:
+                        highlighted_note_position = (-1, -1)
+                    else:
+                        highlighted_note_position = self.note_parser.calculate_coordinate_for_note(note, song_key, note_shift)
+                except (KeyError, SyntaxError) as err:
+                    print(err)
+                    harp_broken = True
+                else:
+                    chord_skygrid[highlighted_note_position] = {}
+                    chord_skygrid[highlighted_note_position][idx0+chord_idx] = True
+                    harp_silent = False
+                    if highlighted_note_position[0] < 0 and highlighted_note_position[1] < 0: #Note is a silence
+                        chord_skygrid[highlighted_note_position][idx0+chord_idx] = False
+                        harp_silent = True
+
+        results = [chord_skygrid, harp_broken, harp_silent, repeat]
+        return results
+
+
+    def parse_line(self, line, song_key='C', note_shift=0):
+        '''
+        Returns instrument_line: a list of chord 'skygrid' (1 chord = 1 dict)
+        '''
+        instrument_line = []
+        line = line.strip()
+        re.sub(re.escape(self.icon_delimiter)+'{2,'+str(max(2,len(line)))+'}',self.icon_delimiter,line)#removes surnumerous spaces
+        if len(line)>0:
+            if line[0] == self.comment_delimiter:
+                lyrics = line.split(self.comment_delimiter)
+                for lyric in lyrics:
+                    if len(lyric)>0:
+                        voice = instruments.Voice()
+                        voice.set_lyric(lyric.strip())
+                        instrument_line.append(voice)
+            else:
+                icons=line.split(self.icon_delimiter)
+                 #TODO: Implement logic for parsing line vs single icon.
+                for icon in icons:
+                    chords = self.split_icon(icon)
+                    #From here, real chords are still glued, quavers have been split in different list slots
+                    chord_skygrid, harp_broken, harp_silent, repeat = self.parse_chords(chords, song_key, note_shift)
+                    harp = instruments.Harp()
+                    harp.set_repeat(repeat)
+                    harp.set_is_silent(harp_silent)
+                    harp.set_is_broken(harp_broken)
+                    harp.set_chord_skygrid(chord_skygrid)
+
+                    instrument_line.append(harp)
+
+        return instrument_line
+
+#    def map_note_to_position(self, note, position_map, note_shift=0):
+#        '''
+#        Returns a tuple containing the row index and the column index of the note's position.
+#        '''
+#        note = note.upper()
+#
+#        if note in position_map.keys(): # Note Shift (ie transposition in Sky)
+#            pos=position_map[note] #tuple
+#            if (pos[0] < 0) and (pos[1] < 0): #Special character
+#                return pos
+#            else:
+#                idx = pos[0]*self.columns+pos[1]
+#                idx = idx+note_shift
+#                pos = (int(idx/self.columns), idx-self.columns*int(idx/self.columns))
+#                if pos>=(0,0) and pos<=(2,4):
+#                    return pos
+#                else:
+#                    raise KeyError('Note was not in range of the Sky keyboard.')
+#        else:
+#            raise KeyError('Note was not found in the position_map dictionary.')
+
 
     def find_key(self, song_lines):
 
@@ -161,7 +270,7 @@ class SongParser:
                       num_notes[i] += 1
                       try:
                           #TODO: Support for Jianpu which uses a different octave indexing system
-                      	  self.note_parser.calculate_coordinate_for_note(note, k, note_shift=0)
+                            self.note_parser.calculate_coordinate_for_note(note, k, note_shift=0)
                       except KeyError:
                          scores[i]+=1
                       except SyntaxError:#Wrongly formatted notes are ignored
@@ -181,11 +290,11 @@ class SongParser:
 
        if sorted_scores[0] == 1:
           if (sorted_scores[1] < 1) or (sorted_scores[2] < 1 and self.CHROMATIC_SCALE_DICT[sorted_keys[0]]==self.CHROMATIC_SCALE_DICT[sorted_keys[1]]):
-       	      print('A unique key was found.')
-       	      return [sorted_keys[0]]
+                 print('A unique key was found.')
+                 return [sorted_keys[0]]
           else:
-          	print('Several matching keys were found.')
-          	return [k for i,k in enumerate(sorted_keys) if sorted_scores[i]==1 ]
+              print('Several matching keys were found.')
+              return [k for i,k in enumerate(sorted_keys) if sorted_scores[i]==1 ]
        elif (sorted_scores[0] > 0.95):
            sorted_scores = list(map(truediv, sorted_scores, [max(sorted_scores)]*len(sorted_scores)))
        sorted_keys = [k for i,k in enumerate(sorted_keys) if sorted_scores[i]>0.9]
@@ -218,7 +327,7 @@ class SongParser:
                 if line[0] != self.comment_delimiter:
                     icons=line.split(self.icon_delimiter)
                     for icon in icons:
-                        chords = self.parse_icon(icon)
+                        chords = self.split_icon(icon)
                         for chord in chords:
                             for idx, possible_mode in enumerate(possible_modes):
                                 
@@ -295,141 +404,9 @@ class SongParser:
 #        return self.jianpu2western(possible_keys)
 
 
-    def split_chord(self, chord, note_parser=None):
-
-        try:
-            repeat = int(re.split(re.escape(self.repeat_indicator), chord)[1])
-            chord = re.split(re.escape(self.repeat_indicator), chord)[0]
-        except:
-            repeat = 0
-
-        if note_parser == None:
-        	note_parser = self.note_parser
-        
-        chord = note_parser.note_name_regex.sub(' \\1', chord).split()
-
-#        if self.input_mode == InputModes.SKY:
-#            #chord = chord.upper()
-#            #chord = self.note_parser.note_name_regex.sub( ' \\1', chord).split()
-#        elif self.input_mode in [InputModes.WESTERN, InputModes.WESTERNCHORDS]:
-#            #chord = self.note_parser.note_name_regex.sub( ' \\1', chord).split()
-#            for note in chord:
-#                note = self.note_parser.sanitize_note_name(note)
-#        elif self.input_mode  == InputModes.DOREMI:
-#            #chord = self.note_parser.note_name_regex.sub( ' \\1', chord).split()
-#        elif self.input_mode  == InputModes.JIANPU:
-#            #chord = self.note_parser.note_name_regex.sub( ' \\1', chord).split()
-#        elif self.input_mode == InputModes.SKYKEYBOARD:
-#            #chord = chord.upper()
-            #chord = self.note_parser.note_name_regex.sub( ' \\1', chord).split()
-
-        return repeat, chord
 
 
 
-    def parse_chords(self, chords, song_key='C', note_shift=0):
-        #Individual note is a single-element list: chords=['A5']
-        #Real chord is a single element list: chords=['B1A1A3']
-        #Triplets and quavers are a list of notes or chords: chords=['B2', 'B3B1', 'B4', 'B5', 'C1', 'C2']
-        harp_broken = True
-        chord_skygrid = {}
-
-        #print(chord)
-        if len(chords)>1:
-            idx0 = 1 #Notes in quavers and triplets have a frame index >1
-        else:
-            idx0 = 0 #Single note or note in chord jas a frame index ==0
-
-        for chord_idx, chord in enumerate(chords):
-            # Create a skygrid of the harp's chords
-            # For each chord, set the highlighted state of each note accordingly (whether True or False)
-            chord = re.sub(re.escape(self.pause), '.', chord) #Replaces the pause character by the default
-
-            if self.note_parser == None:
-                self.set_note_parser(self.input_mode)
-
-            if self.input_mode == InputModes.WESTERNCHORDS:
-                chord = self.note_parser.decode_chord(chord, self.note_parser.western_chords)
-
-            repeat, chord = self.split_chord(chord)
-            #Now the real chord has been split in notes (1 note = 1 list slot)
-
-            harp_broken = False
-            harp_silent = False
-            for note in chord: # Chord is a list of notes
-                #Except InvalidLetterException
-                try:
-                    if note == self.pause:
-                        highlighted_note_position = (-1, -1)
-                    else:
-                        highlighted_note_position = self.note_parser.calculate_coordinate_for_note(note, song_key, note_shift)
-                except (KeyError, SyntaxError) as err:
-                    print(err)
-                    harp_broken = True
-                else:
-                    chord_skygrid[highlighted_note_position] = {}
-                    chord_skygrid[highlighted_note_position][idx0+chord_idx] = True
-                    harp_silent = False
-                    if highlighted_note_position[0] < 0 and highlighted_note_position[1] < 0: #Note is a silence
-                        chord_skygrid[highlighted_note_position][idx0+chord_idx] = False
-                        harp_silent = True
-
-        results = [chord_skygrid, harp_broken, harp_silent, repeat]
-        return results
-
-
-    def parse_line(self, line, song_key='C', note_shift=0):
-        '''
-        Returns instrument_line: a list of chord 'skygrid' (1 chord = 1 dict)
-        '''
-        instrument_line = []
-        line = line.strip()
-        re.sub(re.escape(self.icon_delimiter)+'{2,'+str(max(2,len(line)))+'}',self.icon_delimiter,line)#removes surnumerous spaces
-        if len(line)>0:
-            if line[0] == self.comment_delimiter:
-                lyrics = line.split(self.comment_delimiter)
-                for lyric in lyrics:
-                    if len(lyric)>0:
-                        voice = instruments.Voice()
-                        voice.set_lyric(lyric.strip())
-                        instrument_line.append(voice)
-            else:
-                icons=line.split(self.icon_delimiter)
-                 #TODO: Implement logic for parsing line vs single icon.
-                for icon in icons:
-                    chords = self.parse_icon(icon)
-                    #From here, real chords are still glued, quavers have been split in different list slots
-                    chord_skygrid, harp_broken, harp_silent, repeat = self.parse_chords(chords, song_key, note_shift)
-                    harp = instruments.Harp()
-                    harp.set_repeat(repeat)
-                    harp.set_is_silent(harp_silent)
-                    harp.set_is_broken(harp_broken)
-                    harp.set_chord_skygrid(chord_skygrid)
-
-                    instrument_line.append(harp)
-
-        return instrument_line
-
-#    def map_note_to_position(self, note, position_map, note_shift=0):
-#        '''
-#        Returns a tuple containing the row index and the column index of the note's position.
-#        '''
-#        note = note.upper()
-#
-#        if note in position_map.keys(): # Note Shift (ie transposition in Sky)
-#            pos=position_map[note] #tuple
-#            if (pos[0] < 0) and (pos[1] < 0): #Special character
-#                return pos
-#            else:
-#                idx = pos[0]*self.columns+pos[1]
-#                idx = idx+note_shift
-#                pos = (int(idx/self.columns), idx-self.columns*int(idx/self.columns))
-#                if pos>=(0,0) and pos<=(2,4):
-#                    return pos
-#                else:
-#                    raise KeyError('Note was not in range of the Sky keyboard.')
-#        else:
-#            raise KeyError('Note was not found in the position_map dictionary.')
 
 
 class NoteParser:
@@ -937,6 +914,14 @@ class JianpuNoteParser(NoteParser):
             '1': 'C', '2' : 'D', '3': 'E', '4': 'F', '5': 'G', '6': 'A', '7': 'B',
             'C':'C', 'D':'D', 'E':'E', 'F':'F', 'G':'G', 'A':'A', 'B':'B'
             }
+     #For find_key only: prints the key in the Western form instead of Jianpu
+    #TODO: checks that it works
+    def jianpu2western(self,notes):
+        try:
+            return [self.jianpu2western_map[note] for note in notes]
+        except KeyError:
+            return notes
+
 
     def parse_note(self, note):
 
@@ -958,9 +943,9 @@ class JianpuNoteParser(NoteParser):
             
         note_name = self.note_name_regex.search(note)
         if note_name != None:
-        	note_name = note_name.group(0)
+            note_name = note_name.group(0)
         else:
-        	raise KeyError('Note was not recognized as Jianpu.')
+            raise KeyError('Note was not recognized as Jianpu.')
 
         note_octave = re.search('(\\+)+',note)
         if note_octave != None:
@@ -973,7 +958,9 @@ class JianpuNoteParser(NoteParser):
                 note_octave = self.get_default_starting_octave()
         #print(note_base+note_alt+str(note_octave))
         return note_name, note_octave
-
+    
+    
+    
     def convert_to_westernized_note(self, note_base, note_alt, note_octave):
 
         westernized_note = self.jianpu2western_map[note_base] + note_alt + str(note_octave)
@@ -981,6 +968,14 @@ class JianpuNoteParser(NoteParser):
         #print(westernized_note)
 
         return westernized_note
+#        self.Cmajor = [['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'],
+#                      ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']]
+#        self.onemajor = [['1', '2b', '2', '3b', '3', '4', '5b', '5', '6b', '6', '7b', '7'],
+#                      ['1', '1#', '2', '2#', '3', '4', '4#', '5', '5#', '6', '6#', '7']]
+#        self.intervals = [0, 2, 4, 5, 7, 9, 11]
+
+        #For find_key only: prints the key in the Western form instead of Jianpu
+        #TODO: checks that it works
 
 
 #mytestparser = WesternNoteParser()
