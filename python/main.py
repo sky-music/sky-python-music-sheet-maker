@@ -4,10 +4,7 @@ from parsers import SongParser
 from songs import Song
 import os
 
-### Define Errors
-#class Error(Exception):
-#    """Base class for exceptions in this module."""
-#    pass
+
 def ask_for_mode(modes):
 
     mydict = {}
@@ -73,7 +70,7 @@ ICON_DELIMITER = ' ' # Chords separation
 PAUSE = '.'
 COMMENT_DELIMITER = '#' # Lyrics delimiter, can be used for comments
 REPEAT_INDICATOR = '*'
-SONG_DIR_IN = 'songs_in'
+SONG_DIR_IN = 'test_songs'
 SONG_DIR_OUT = 'songs_out'
 CSS_PATH = 'css/main.css'
 CSS_MODE = CSSModes.EMBED
@@ -146,9 +143,8 @@ else:
  #   QUAVER_DELIMITER = '^'
   #  myparser.set_delimiters(ICON_DELIMITER, PAUSE, QUAVER_DELIMITER, COMMENT_DELIMITER, REPEAT_INDICATOR)
 
-myparser.check_delimiters()
-
 myparser.set_input_mode(song_notation)
+
 
 # Attempts to detect key for input written in absolute musical scales (western, Jianpu)
 musickeys  = []
