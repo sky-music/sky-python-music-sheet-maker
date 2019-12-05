@@ -55,7 +55,7 @@ class SongParser:
         if self.input_mode != None:
             return [self.input_mode]
         else:
-            return self.detect_input_type(song_lines)
+            return self.detect_input_mode(song_lines)
 
 
     def set_input_mode(self, input_mode):
@@ -265,31 +265,34 @@ class SongParser:
        scores = list(map(truediv, scores, num_notes))
        scores = [(1 - score) for score in scores]
 
+       #duplicate_dict = self.CHROMATIC_SCALE_DICT
+       return self.most_likely(scores, possible_keys, 0.9, self.note_parser.CHROMATIC_SCALE_DICT)
+
        #print(scores)
-       sorted_idx, sorted_scores = zip(*sorted([(i,e) for i,e in enumerate(scores)], key=itemgetter(1), reverse=True))
-       sorted_keys = [possible_keys[i] for i in sorted_idx]
-       #print(sorted_scores)
-       #print(sorted_keys)
+#       sorted_idx, sorted_scores = zip(*sorted([(i,e) for i,e in enumerate(scores)], key=itemgetter(1), reverse=True))
+#       sorted_keys = [possible_keys[i] for i in sorted_idx]
+#       #print(sorted_scores)
+#       #print(sorted_keys)
+#
+#       if sorted_scores[0] == 1:
+#          if (sorted_scores[1] < 1) or (sorted_scores[2] < 1 and self.CHROMATIC_SCALE_DICT[sorted_keys[0]]==self.CHROMATIC_SCALE_DICT[sorted_keys[1]]):
+#                 print('A unique key was found.')
+#                 return [sorted_keys[0]]
+#          else:
+#              print('Several matching keys were found.')
+#              return [k for i,k in enumerate(sorted_keys) if sorted_scores[i]==1 ]
+#       elif (sorted_scores[0] > 0.95):
+#           sorted_scores = list(map(truediv, sorted_scores, [max(sorted_scores)]*len(sorted_scores)))
+#       sorted_keys = [k for i,k in enumerate(sorted_keys) if sorted_scores[i]>0.9]
+#       if len(sorted_keys)==0:
+#           #print('No matching key found.')
+#           return []
+#       else:
+#           #print('One or several best matching keys were found.')
+#           return sorted_keys
 
-       if sorted_scores[0] == 1:
-          if (sorted_scores[1] < 1) or (sorted_scores[2] < 1 and self.CHROMATIC_SCALE_DICT[sorted_keys[0]]==self.CHROMATIC_SCALE_DICT[sorted_keys[1]]):
-                 print('A unique key was found.')
-                 return [sorted_keys[0]]
-          else:
-              print('Several matching keys were found.')
-              return [k for i,k in enumerate(sorted_keys) if sorted_scores[i]==1 ]
-       elif (sorted_scores[0] > 0.95):
-           sorted_scores = list(map(truediv, sorted_scores, [max(sorted_scores)]*len(sorted_scores)))
-       sorted_keys = [k for i,k in enumerate(sorted_keys) if sorted_scores[i]>0.9]
-       if len(sorted_keys)==0:
-           #print('No matching key found.')
-           return []
-       else:
-           #print('One or several best matching keys were found.')
-           return sorted_keys
 
-
-    def detect_input_type(self, song_lines):
+    def detect_input_mode(self, song_lines):
         '''
         Attempts to detect input musical notation
         '''
@@ -334,25 +337,67 @@ class SongParser:
         
         num_notes = [1 if x == 0 else x for x in num_notes] #Removes zeros to avoid division by zero
 
-        ratios = list(map(truediv, good_notes, num_notes))
+        scores = list(map(truediv, good_notes, num_notes))
         DEFG_notes /= num_notes[possible_modes.index(InputModes.WESTERN)]
         print(DEFG_notes)
         if ((DEFG_notes == 0) or (DEFG_notes < 0.01 and octave_span > 2)) and (num_notes[possible_modes.index(InputModes.WESTERN)] > 10):
-            ratios[possible_modes.index(InputModes.WESTERN)] *= 0.5
-        print(ratios)
-        sorted_inds, sorted_ratios = zip(*sorted([(i,e) for i,e in enumerate(ratios)], key=itemgetter(1), reverse=True))
-        if sorted_ratios[0] == 1 and sorted_ratios[1] < 1:
-            self.input_mode = possible_modes[sorted_inds[0]]
-            return [self.input_mode]
-        elif (sorted_ratios[0] > 0.9):
-            sorted_ratios = list(map(truediv, sorted_ratios, [max(sorted_ratios)]*len(sorted_ratios)))
-            if sorted_ratios[1] < 0.9:
-                return [possible_modes[sorted_inds[0]]]
-            else:
-                return possible_modes
-        else:
-            return possible_modes
+            scores[possible_modes.index(InputModes.WESTERN)] *= 0.5
+        print(scores)
+        
+        return self.most_likely(scores, possible_modes, 0.9)
+        
+#        sorted_inds, sorted_scores = zip(*sorted([(i,e) for i,e in enumerate(scores)], key=itemgetter(1), reverse=True))
+#        if sorted_scores[0] == 1 and sorted_scores[1] < 1:
+#            self.input_mode = possible_modes[sorted_inds[0]]
+#            return [self.input_mode]
+#        elif (sorted_scores[0] > 0.9):
+#            sorted_scores = list(map(truediv, sorted_scores, [max(sorted_scores)]*len(sorted_scores)))
+#            if sorted_scores[1] < 0.9:
+#                return [possible_modes[sorted_inds[0]]]
+#            else:
+#                return possible_modes
+#        else:
+#            return possible_modes
 
+
+
+    def most_likely(self,scores, items, threshold=0.9, duplicates_dict=None):
+
+        if len(scores) == 0:
+            return None
+        if len(scores) == 1:
+            return [items[0]]
+				
+        sorted_idx, sorted_scores = zip(*sorted([(i,e) for i,e in enumerate(scores)], key=itemgetter(1), reverse=True))
+			
+        sorted_items = [items[i] for i in sorted_idx]
+       #print(sorted_scores)
+       #print(sorted_items)
+
+        if sorted_scores[0] == 1 and sorted_scores[1] < 1:
+            return [sorted_items[0]]
+      
+        if sorted_scores[0] == 1 and sorted_scores[1] == 1:
+            if duplicate_dict != None:
+                try:
+                    if sorted_scores[2] < 1 and duplicate_dict[sorted_items[0]] == duplicate_dict[sorted_items[1]]:
+                        return [sorted_items[0]]
+                except (IndexError,KeyError):
+                    pass
+            return [k for i,k in enumerate(sorted_items) if sorted_scores[i]==1]
+       
+        if (sorted_scores[0] < threshold):
+            return sorted_items
+        else:
+            sorted_scores = list(map(truediv, sorted_scores, [max(sorted_scores)]*len(sorted_scores)))
+            over_items = [k for i,k in enumerate(sorted_items) if sorted_scores[i]>threshold]
+            if len(sorted_keys)==0:
+           #print('No matching item found.')
+               return sorted_items
+            else:
+           #print('One or several best matching items were found.')
+                return over_items
+        return sorted_items
 
 #    def find_key(self, song_lines, comment_delimiter='#', input_mode=InputModes.SKY):
 #        '''
@@ -655,54 +700,6 @@ class NoteParser:
         else:
             return False
 
-class SkyKeyboardNoteParser(NoteParser):
-
-    def __init__(self):
-
-        super().__init__()
-
-        if (os.getenv('LANG') == 'fr') or (os.getenv('LANG') == 'be'):
-            self.position_map = {'.': (-1, -1), 'A': (0, 0), 'Z': (0, 1), 'E': (0, 2), 'R': (0, 3), 'T': (0, 4), 'Q': (1, 0), 'S': (1, 1), 'D': (1, 2), 'F': (1, 3), 'G': (1, 4), 'W': (2, 0), 'X': (2, 1), 'C': (2, 2), 'V': (2, 3), 'B': (2, 4)}
-            self.keyboard_layout="AZERT QSDFG WXCVB"
-        else:
-            self.position_map = {'.': (-1, -1), 'Q': (0, 0), 'W': (0, 1), 'E': (0, 2), 'R': (0, 3), 'T': (0, 4), 'A': (1, 0), 'S': (1, 1), 'D': (1, 2), 'F': (1, 3), 'G': (1, 4), 'Z': (2, 0), 'X': (2, 1), 'C': (2, 2), 'V': (2, 3), 'B': (2, 4)}
-            self.keyboard_layout="QWERT ASDFG ZXCVB"
-
-        regex = self.keyboard_layout.replace(' ','') + self.keyboard_layout.replace(' ','').lower()
-        self.note_name_with_octave_regex = re.compile(r'(['+regex+'])')
-        self.note_name_regex = self.note_name_with_octave_regex
-        self.single_note_name_regex = re.compile(r'(\b['+regex+']\b)')
-        self.not_note_name_regex = re.compile(r'[^'+regex+']+')
-        self.not_octave_regex = re.compile(r'\\.')
-
-    def calculate_coordinate_for_note(self, note, song_key='C', note_shift=0):
-        '''
-        Returns a tuple containing the row index and the column index of the note's position.
-        '''
-        note = note.upper()
-
-        if note in self.position_map.keys(): # Note Shift (ie transposition in Sky)
-            pos=self.position_map[note] #tuple
-            if (pos[0] < 0) and (pos[1] < 0): #Special character
-                return pos
-            else:
-                idx = pos[0]*self.columns+pos[1]
-                idx = idx+note_shift
-                pos = (int(idx/self.columns), idx-self.columns*int(idx/self.columns))
-                if pos>=(0,0) and pos<=(2,4):
-                    return pos
-                else:
-                    raise KeyError('Note was not in range of the Sky keyboard.')
-        else:
-            raise KeyError('Note was not found in the position_map dictionary.')
-
-    def sanitize_note_name(self, note_name):
-
-        # make sure the first letter of the note is uppercase, for western note's dictionary keys
-        note_name = note_name.capitalize()
-        return note_name
-
-
 class SkyNoteParser(NoteParser):
 
     def __init__(self):
@@ -749,6 +746,27 @@ class SkyNoteParser(NoteParser):
         # make sure the first letter of the note is uppercase, for western note's dictionary keys
         note_name = note_name.capitalize()
         return note_name
+
+
+class SkyKeyboardNoteParser(SkyNoteParser):
+
+    def __init__(self):
+
+        super().__init__()
+
+        if (os.getenv('LANG') == 'fr') or (os.getenv('LANG') == 'be'):
+            self.position_map = {'.': (-1, -1), 'A': (0, 0), 'Z': (0, 1), 'E': (0, 2), 'R': (0, 3), 'T': (0, 4), 'Q': (1, 0), 'S': (1, 1), 'D': (1, 2), 'F': (1, 3), 'G': (1, 4), 'W': (2, 0), 'X': (2, 1), 'C': (2, 2), 'V': (2, 3), 'B': (2, 4)}
+            self.keyboard_layout="AZERT QSDFG WXCVB"
+        else:
+            self.position_map = {'.': (-1, -1), 'Q': (0, 0), 'W': (0, 1), 'E': (0, 2), 'R': (0, 3), 'T': (0, 4), 'A': (1, 0), 'S': (1, 1), 'D': (1, 2), 'F': (1, 3), 'G': (1, 4), 'Z': (2, 0), 'X': (2, 1), 'C': (2, 2), 'V': (2, 3), 'B': (2, 4)}
+            self.keyboard_layout="QWERT ASDFG ZXCVB"
+
+        regex = self.keyboard_layout.replace(' ','') + self.keyboard_layout.replace(' ','').lower()
+        self.note_name_with_octave_regex = re.compile(r'(['+regex+'])')
+        self.note_name_regex = self.note_name_with_octave_regex
+        self.single_note_name_regex = re.compile(r'(\b['+regex+']\b)')
+        self.not_note_name_regex = re.compile(r'[^'+regex+']+')
+        self.not_octave_regex = re.compile(r'\\.')
 
 
 class WesternNoteParser(NoteParser):
@@ -863,7 +881,7 @@ class JianpuNoteParser(NoteParser):
 
         super().__init__()
 
-        #Next lines: for retro-caompatibility of find_input_type
+        #Next lines: for retro-compatibility of find_input_type
         #TODO: change find_input_type and delete these lines
 #        self.position_map = {
 #                '.': (-1, -1),
