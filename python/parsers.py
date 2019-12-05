@@ -172,6 +172,7 @@ class SongParser:
             harp_silent = False
             for note in chord: # Chord is a list of notes
                 #Except InvalidLetterException
+                #print(note)
                 try:
                     if note == self.pause:
                         highlighted_note_position = (-1, -1)
@@ -322,7 +323,7 @@ class SongParser:
                                     good_notes[idx] += sum([int(note in possible_parsers[idx].western_chords.keys()) for note in notes])
                                 else:
                                     repeat, notes = self.split_chord(chord, possible_parsers[idx])
-                                    good_notes[idx] += sum([int(possible_regex[idx].search(note) != None) for note in notes if note != self.pause])
+                                    good_notes[idx] += sum([int(possible_regex[idx].match(note) != None) for note in notes if note != self.pause])
                                 #TODO: use self.map_note_to_position?
                                 
                                 num_notes[idx] += sum([1 for note in notes if note != self.pause])
@@ -339,7 +340,7 @@ class SongParser:
 
         scores = list(map(truediv, good_notes, num_notes))
         DEFG_notes /= num_notes[possible_modes.index(InputModes.WESTERN)]
-        print(DEFG_notes)
+        
         if ((DEFG_notes == 0) or (DEFG_notes < 0.01 and octave_span > 2)) and (num_notes[possible_modes.index(InputModes.WESTERN)] > 10):
             scores[possible_modes.index(InputModes.WESTERN)] *= 0.5
         print(scores)
@@ -391,7 +392,7 @@ class SongParser:
         else:
             sorted_scores = list(map(truediv, sorted_scores, [max(sorted_scores)]*len(sorted_scores)))
             over_items = [k for i,k in enumerate(sorted_items) if sorted_scores[i]>threshold]
-            if len(sorted_keys)==0:
+            if len(sorted_items)==0:
            #print('No matching item found.')
                return sorted_items
             else:
@@ -546,14 +547,13 @@ class NoteParser:
         '''
         
         if self.is_valid_note_name_with_octave(note) == True:
-
             note_name = self.get_note_name_regex().search(note).group(0)
             #TODO: will probably want to isolate the int() and make this more generic, in the case of Jianpu, octave is denoted by ++ or -- etc.
             octave_number = int(self.get_octave_number_regex().search(note).group(0))
             return (note_name, octave_number)
         else:
-
             if self.is_valid_note_name(note) == True:
+                
                 # Player has given note name without specifying an octave
                 note_name = note
                 octave_number = self.get_default_starting_octave()
@@ -569,8 +569,7 @@ class NoteParser:
         '''
         
         if self.is_valid_note_name(note_name):
-
-            note_name = self.sanitize_note_name(note_name)
+           note_name = self.sanitize_note_name(note_name)
         else:
             #Error: note is not formatted right, output broken harp
             raise SyntaxError('Note was not formatted correctly. ' + str(note_name))
@@ -803,6 +802,10 @@ class WesternNoteParser(NoteParser):
         self.not_note_name_regex = re.compile(r'[^ABCDEFGabcdefgb#]+')
         self.not_octave_regex = re.compile(r'[^\d]+')
 
+    def sanitize_note_name(self, note_name):
+        # make sure the first letter of the note is uppercase, for western note's dictionary keys
+        note_name = note_name.capitalize()
+        return note_name
 
 class WesternChordsNoteParser(WesternNoteParser):
 
@@ -900,7 +903,7 @@ class JianpuNoteParser(NoteParser):
         self.CHROMATIC_SCALE_DICT = {'1': 0, '1#': 1, '2b': 1, '2': 2, '2#': 3, '3b': 3, '3': 4, '4': 5, '4#': 6, '5b': 6, '5': 7, '5#': 8, '6b': 8, '6': 9, '6#': 10, '7b': 10, '7': 11}
 
         # Compile regexes for notes to save before using
-        self.note_name_with_octave_regex = re.compile(r'([1234567][b#]?[\\+\\-]?)')
+        self.note_name_with_octave_regex = re.compile(r'([1234567][b#]?[\\+\\-]+)')
         self.note_name_regex = re.compile(r'([1234567][b#]?)')
         self.single_note_name_regex = re.compile(r'\b[1234567][b#]?[\\+\\-]?\b')
         self.octave_number_regex = re.compile(r'[\\+\\-]?')
