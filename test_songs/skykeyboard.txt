@@ -1,0 +1,12 @@
+#All Notes:
+Q W E R T A S D F G Z X C V B
+#Chords:
+QW ERT
+#Some quavers #and chords:
+Q-W-E-R T-ASD
+#Pauses:
+Q . W . . E
+#Errors:
+K + : 0
+#lowercase and #multiple #spaces:
+   q-w-e-r  a-sdf
