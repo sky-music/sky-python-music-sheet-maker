@@ -8,33 +8,38 @@ import os
 #class Error(Exception):
 #    """Base class for exceptions in this module."""
 #    pass
+
 def ask_for_mode(modes):
 
     mydict = {}
     i = 0
     print('Please choose your note format:\n')
-    if InputModes.SKYKEYBOARD in modes:
+    if (InputModes.SKYKEYBOARD in modes) or len(modes)==0:
         i += 1
-        print(str(i) + ') ' + InputModes.SKYKEYBOARD.value[2] + '\n   ' + myparser.keyboard_layout.replace(' ','\n   ') + ':')
+        print(str(i) + ') ' + InputModes.SKYKEYBOARD.value[2] + '\n   ' + myparser.get_keyboard_layout().replace(' ','\n   ') + ':')
         mydict[i] = InputModes.SKYKEYBOARD
-    if InputModes.SKY in modes:
+    if (InputModes.SKY in modes) or len(modes)==0:
         i += 1
         print(str(i) + ') ' + InputModes.SKY.value[2])
         mydict[i] = InputModes.SKY
-    if InputModes.WESTERN in modes:
+    if (InputModes.WESTERN in modes) or len(modes)==0:
         i += 1
         print(str(i) + ') ' + InputModes.WESTERN.value[2])
         mydict[i] = InputModes.WESTERN
-    if InputModes.JIANPU in modes:
+    if (InputModes.DOREMI in modes) or len(modes)==0:
+        i += 1
+        print(str(i) + ') ' + InputModes.DOREMI.value[2])
+        mydict[i] = InputModes.DOREMI
+    if (InputModes.JIANPU in modes) or len(modes)==0:
         i += 1
         print(str(i) + ') ' + InputModes.JIANPU.value[2])
         mydict[i] = InputModes.JIANPU
-    if InputModes.WESTERNCHORDS in modes:
+    if (InputModes.WESTERNCHORDS in modes) or len(modes)==0:
         i += 1
         print(str(i) + ') ' + InputModes.WESTERNCHORDS.value[2])
         mydict[i] = InputModes.WESTERNCHORDS
     try:
-        song_notation = int(input("Mode (1-" + str(i) + "): ").strip())
+        song_notation = int(input('Mode (1-' + str(i) + "): ").strip())
         mode = mydict[song_notation]
     except (ValueError, KeyError):
         mode = InputModes.SKY
