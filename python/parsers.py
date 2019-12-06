@@ -561,7 +561,7 @@ class NoteParser:
                 return (note_name, octave_number)
             else:
                 # Raise error, not a valid note
-                raise SyntaxError('Note was not formatted correctly. ' + str(note))
+                raise SyntaxError('Note ' + note + ' was not formatted correctly. ' + str(note))
 
     def convert_note_name_into_chromatic_position(self, note_name):
     	
@@ -573,14 +573,14 @@ class NoteParser:
            note_name = self.sanitize_note_name(note_name)
         else:
             #Error: note is not formatted right, output broken harp
-            raise SyntaxError('Note was not formatted correctly. ' + str(note_name))
+            raise SyntaxError('Note ' + note_name + ' was not formatted correctly. ' + str(note_name))
 
         chromatic_scale_dict = self.get_chromatic_scale_dict()
 
         if note_name in chromatic_scale_dict.keys():
             return chromatic_scale_dict[note_name]
         else:
-            raise KeyError('Note was not found in the chromatic scale. ' + str(note_name))
+            raise KeyError('Note ' + note_name + ' was not found in the chromatic scale. ' + str(note_name))
 
     def convert_semitone_interval_to_major_scale_interval(self, semitone_interval):
 
@@ -622,9 +622,9 @@ class NoteParser:
             note_name_chromatic_equivalent = self.convert_note_name_into_chromatic_position(note_name)
         except KeyError:
             # will output broken harp
-            raise KeyError('Note was not found in the chromatic scale. ' + note_name)
+            raise KeyError('Note ' + note_name + ' was not found in the chromatic scale. ' + note_name)
         except SyntaxError:
-            raise SyntaxError('Note was not formatted correctly' + note_name)
+            raise SyntaxError('Note ' + note_name + ' was not formatted correctly' + note_name)
 
         interval_in_semitones = note_name_chromatic_equivalent - song_key_chromatic_equivalent
         if interval_in_semitones < 0:
@@ -635,6 +635,8 @@ class NoteParser:
             # need to subtract 1 from the octave number after adding an octave to the interval_in_semitones. this is mathematically saying subtracting 3 is the same as adding 4 then taking away 7
             octave_number -= 1
 
+        octave_number_str = self.convert_base_10_to_base_7(octave_number)
+
         try:
             major_scale_interval = self.convert_semitone_interval_to_major_scale_interval(interval_in_semitones)
         except KeyError:
@@ -642,7 +644,7 @@ class NoteParser:
             raise KeyError('Note is not in the song key. ' + note)
 
         # Convert note to base 10 for arithmetic
-        note_in_base_10 = self.convert_base_7_to_base_10(str(octave_number) + str(major_scale_interval))
+        note_in_base_10 = self.convert_base_7_to_base_10(octave_number_str + str(major_scale_interval))
 
         # shift down, and account for any additional note shift by the player
         note_in_base_10 -= self.get_base_of_western_major_scale()*self.get_default_starting_octave()
@@ -660,6 +662,13 @@ class NoteParser:
             # Coordinate is not in range of the two octaves of the Sky piano
             raise KeyError('Note ' + note + ' is not in range of the two octaves of the Sky piano: ' + str(note_coordinate))
             #TODO: define custom errors
+
+    def convert_base_10_to_base_7(self, num):
+    	
+        numstr = ['0']*2
+        numstr[-1] = str(num % self.get_base_of_western_major_scale())
+        numstr[-2] = str(math.floor(num / self.get_base_of_western_major_scale()))
+        return ''.join(numstr)
 
     def convert_base_7_to_base_10(self, num_in_base_7):
 
@@ -737,9 +746,9 @@ class SkyNoteParser(NoteParser):
                 if pos>=(0,0) and pos<=(2,4):
                     return pos
                 else:
-                    raise KeyError('Note was not in range of the Sky keyboard.')
+                    raise KeyError('Note ' + note + ' was not in range of the Sky keyboard.')
         else:
-            raise KeyError('Note was not found in the position_map dictionary.')
+            raise KeyError('Note ' + note + ' was not found in the position_map dictionary.')
 
     def sanitize_note_name(self, note_name):
 
