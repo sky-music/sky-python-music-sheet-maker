@@ -266,7 +266,7 @@ class SongParser:
        scores = list(map(truediv, scores, num_notes))
        scores = [(1 - score) for score in scores]
 
-       #duplicate_dict = self.CHROMATIC_SCALE_DICT
+       #duplicates_dict = self.CHROMATIC_SCALE_DICT
        return self.most_likely(scores, possible_keys, 0.9, self.note_parser.CHROMATIC_SCALE_DICT)
 
        #print(scores)
@@ -379,9 +379,9 @@ class SongParser:
             return [sorted_items[0]]
       
         if sorted_scores[0] == 1 and sorted_scores[1] == 1:
-            if duplicate_dict != None:
+            if duplicates_dict != None:
                 try:
-                    if sorted_scores[2] < 1 and duplicate_dict[sorted_items[0]] == duplicate_dict[sorted_items[1]]:
+                    if sorted_scores[2] < 1 and duplicates_dict[sorted_items[0]] == duplicates_dict[sorted_items[1]]:
                         return [sorted_items[0]]
                 except (IndexError,KeyError):
                     pass
@@ -389,16 +389,19 @@ class SongParser:
        
         if (sorted_scores[0] < threshold):
             contrasts = [(score-min(sorted_scores))/(score+min(sorted_scores)) if score!=0 else 0 for score in sorted_scores ]
-            return [k for i,k in enumerate(sorted_items) if sorted_scores[i]>threshold/2]
+            sorted_items = [k for i,k in enumerate(sorted_items) if sorted_scores[i]>threshold/2]
         else:
             sorted_scores = list(map(truediv, sorted_scores, [max(sorted_scores)]*len(sorted_scores)))
             over_items = [k for i,k in enumerate(sorted_items) if sorted_scores[i]>threshold]
-            if len(sorted_items)==0:
-           #print('No matching item found.')
-               return sorted_items
-            else:
-           #print('One or several best matching items were found.')
-                return over_items
+            if len(over_items)!=0:
+               sorted_items = over_items
+               
+        if duplicates_dict != None:
+            #Remove synonyms
+            for i in range(1,len(sorted_items),2):
+                if duplicates_dict[sorted_items[i]] == duplicates_dict[sorted_items[i-1]]:
+                    sorted_items[i] = None
+            sorted_items = [item for item in sorted_items if item != None]
         return sorted_items
 
 #    def find_key(self, song_lines, comment_delimiter='#', input_mode=InputModes.SKY):
