@@ -833,11 +833,14 @@ class WesternChordsNoteParser(WesternNoteParser):
         '''
             Splits a chord abbreviated name into individual note names
         '''
+        chord = self.sanitize_chord_name(chord)
         try:
             return  self.western_chords[chord]
         except:
             return chord
-
+            
+    def sanitize_chord_name(self, chord):
+         chord = chord.lower().capitalize()
 
 class DoremiNoteParser(NoteParser):
 
@@ -862,7 +865,7 @@ class DoremiNoteParser(NoteParser):
 #                'LA': (1, 0), 'SI': (1, 1)
 #                }
 
-        self.CHROMATIC_SCALE_DICT = {'DO': 0, 'DO#': 1, 'REb': 1, 'RE': 2, 'RE#': 3, 'MIb': 3, 'MI': 4, 'FA': 5, 'FA#': 6, 'SOLb': 6, 'SOL': 7, 'SOL#': 8, 'LAb': 8, 'LA': 9, 'LA#': 10, 'SIb': 10, 'SI': 11}
+        self.CHROMATIC_SCALE_DICT = {'do': 0, 'do#': 1, 'reb': 1, 're': 2, 're#': 3, 'mib': 3, 'mi': 4, 'fa': 5, 'fa#': 6, 'solb': 6, 'sol': 7, 'sol#': 8, 'lab': 8, 'la': 9, 'la#': 10, 'sib': 10, 'si': 11}
 
         # Compile regexes for notes to save before using
         self.note_name_with_octave_regex = re.compile(r'([DRMFSLdrmfsl][OEIAoeia][Ll]?[b#]?\d)')
@@ -875,7 +878,7 @@ class DoremiNoteParser(NoteParser):
     def sanitize_note_name(self, note_name):
 
         # make sure the first letter of the note is uppercase, for western note's dictionary keys
-        note_name = note_name.upper()
+        note_name = note_name.lower()
         return note_name
 
 
