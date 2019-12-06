@@ -7,8 +7,8 @@ A1-A2-A3-A4 A5-B1B2B3
 #Pauses:
 A1 . A2 . . A3
 #Errors:
-X + : 0 a b c
+X + 0 a
 #out of #range:
-A6 B7 C8 D1
+C8 D1
 #lowercase and #multiple #spaces:
-   a1-a2-a3-a4   a5-b1b2b3
+   a1-a2-a3-a4  a5-b1b2b3
