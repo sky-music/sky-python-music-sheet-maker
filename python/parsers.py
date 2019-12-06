@@ -664,11 +664,18 @@ class NoteParser:
             #TODO: define custom errors
 
     def convert_base_10_to_base_7(self, num):
-    	
-        numstr = ['0']*2
-        numstr[-1] = str(num % self.get_base_of_western_major_scale())
-        numstr[-2] = str(math.floor(num / self.get_base_of_western_major_scale()))
-        return ''.join(numstr)
+        n=3
+        numstr = [0]*n
+        base = self.get_base_of_western_major_scale()
+        for i in range(n-1,-1,-1):
+            numstr[i] = int(num/(base**i))
+            num -= numstr[i]*(base**i)
+        numstr=list(map(str,numstr))
+        return ''.join(numstr[::-1]).lstrip('0')
+#        numstr = ['0']*2
+#        numstr[-1] = str(num % self.get_base_of_western_major_scale())
+#        numstr[-2] = str(math.floor(num / self.get_base_of_western_major_scale()))
+#        return ''.join(numstr)
 
     def convert_base_7_to_base_10(self, num_in_base_7):
 
