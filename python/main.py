@@ -248,6 +248,6 @@ if RenderModes.WESTERNASCII in ENABLED_MODES:
         western_ascii_path = mysong.write_ascii(western_ascii_path, RenderModes.WESTERNASCII)
         if western_ascii_path != '':
             print('--------------------------------------------------')
-            print('Your song in TXT converted to Western notation is located at:', western_ascii_path)
+            print('Your song in TXT converted to Western notation with C key is located at:', western_ascii_path)
 
 os.chdir(mycwd)
