@@ -786,7 +786,7 @@ class SkyKeyboardNoteParser(SkyNoteParser):
         self.note_name_regex = self.note_name_with_octave_regex
         self.single_note_name_regex = re.compile(r'(\b['+regex+r']\b)')
         self.not_note_name_regex = re.compile(r'[^'+regex+r']+')
-        self.not_octave_regex = re.compile(r'\\.')
+        self.not_octave_regex = re.compile(r'.')
 
 
 class WesternNoteParser(NoteParser):
