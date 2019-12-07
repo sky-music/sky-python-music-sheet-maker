@@ -343,7 +343,7 @@ class SongParser:
         
         if ((DEFG_notes == 0) or (DEFG_notes < 0.01 and octave_span > 2)) and (num_notes[possible_modes.index(InputModes.WESTERN)] > 10):
             scores[possible_modes.index(InputModes.WESTERN)] *= 0.5
-        print(scores)
+        #print(scores)
         
         return self.most_likely(scores, possible_modes, 0.9)
         
@@ -359,7 +359,6 @@ class SongParser:
 #                return possible_modes
 #        else:
 #            return possible_modes
-
 
 
     def most_likely(self,scores, items, threshold=0.9, duplicates_dict=None):
@@ -402,7 +401,11 @@ class SongParser:
                 if duplicates_dict[sorted_items[i]] == duplicates_dict[sorted_items[i-1]]:
                     sorted_items[i] = None
             sorted_items = [item for item in sorted_items if item != None]
-        return sorted_items
+        
+        if len(sorted_items) == 0:
+            return items
+        else:
+            return sorted_items
 
 #    def find_key(self, song_lines, comment_delimiter='#', input_mode=InputModes.SKY):
 #        '''
