@@ -4,7 +4,6 @@ from parsers import SongParser
 from songs import Song
 import os
 
-
 def ask_for_mode(modes):
 
     mydict = {}
@@ -42,27 +41,52 @@ def ask_for_mode(modes):
     return mode
 
 
-def is_file(string):
-    isfile = False
+def load_file(string):
+    '''
+    if string is a file name, loads the file, else return None
+    '''
     fp = os.path.join(SONG_DIR_IN, os.path.normpath(string))
     isfile = os.path.isfile(fp)
 
+    #Assumes that user has forgotten extension
     if not(isfile):
         fp = os.path.join(SONG_DIR_IN, os.path.normpath(string+'.txt'))
         isfile = os.path.isfile(fp)
 
     if not(isfile):
-        fp = os.path.join(os.path.normpath(string))
-        isfile = os.path.isfile(fp)
-
-    if not(isfile):
+        fp = None
         splitted = os.path.splitext(string)
         if len(splitted[0])>0 and len(splitted[1])>2 and len(splitted[1])<=5: #then probably a file name
-            while not(isfile) and len(fp)>2:
+            while fp==None:
                 print('\nFile not found.')
-                isfile, fp = load_file(input('File name (in ' + os.path.normpath(SONG_DIR_IN) + '/): ').strip())
+                fp = load_file(input('File name (in ' + os.path.normpath(SONG_DIR_IN) + '/): ').strip())
+                isfile = os.path.isfile(fp)        
+    if isfile:
+        return fp
+    else:
+        return None
 
-    return isfile, fp
+def read_lines(fp=None):
+	'''
+     Read song lines in fp, or asks the user to type each line in the console
+	'''
+	song_lines = []
+	if fp != None:
+	    try:
+	        for song_line in open(fp,mode='r', encoding='utf-8', errors='ignore'):
+	            song_lines.append(song_line)
+	    except (OSError, IOError) as err:
+	         print('Error opening file.')
+	         raise err
+	    print('(Song imported from ' + os.path.abspath(fp)+')')
+	else:
+	    song_line = first_line
+	    while song_line:
+	        song_line = song_line.split(os.linesep)
+	        for line in song_line:
+	            song_lines.append(line)
+	        song_line = input('Type next line: ')
+	return song_lines
 
 # Parameters that can be changed by advanced users
 QUAVER_DELIMITER = '-' # Dash-separated list of chords
@@ -70,8 +94,8 @@ ICON_DELIMITER = ' ' # Chords separation
 PAUSE = '.'
 COMMENT_DELIMITER = '#' # Lyrics delimiter, can be used for comments
 REPEAT_INDICATOR = '*'
-SONG_DIR_IN = 'songs'
-SONG_DIR_OUT = 'songs'
+SONG_DIR_IN = 'test_songs'
+SONG_DIR_OUT = 'songs_out'
 CSS_PATH = 'css/main.css'
 CSS_MODE = CSSModes.EMBED
 ENABLED_MODES = [RenderModes.HTML, RenderModes.SVG, RenderModes.PNG, RenderModes.SKYASCII, RenderModes.JIANPUASCII, RenderModes.WESTERNASCII]
@@ -85,7 +109,6 @@ if not os.path.isdir(SONG_DIR_OUT):
     os.mkdir(SONG_DIR_OUT)
 
 ### MAIN SCRIPT
-
 print('===== VISUAL MUSIC SHEETS FOR SKY:CHILDREN OF THE LIGHT =====')
 print('\nAccepted music notes formats:')
 print('\n* ' + InputModes.SKYKEYBOARD.value[2] + '\n   ' + myparser.get_keyboard_layout().replace(' ','\n   '))
@@ -105,25 +128,9 @@ print('============================================================')
 
 first_line = input('Type or copy-paste notes, or enter file name (in ' + os.path.normpath(SONG_DIR_IN) + '/): ').strip()
 
-isfile, fp = is_file(first_line)
+fp = load_file(first_line) #loads file or asks for next line
 
-song_lines = []
-if isfile:
-    try:
-        for song_line in open(fp,mode='r', encoding='utf-8', errors='ignore'):
-            song_lines.append(song_line)
-    except (OSError, IOError) as err:
-         print('Error opening file.')
-         raise err
-    print('(Song imported from ' + os.path.abspath(fp)+')')
-else:
-    song_line = first_line
-    while song_line:
-        song_line = song_line.split(os.linesep)
-        for line in song_line:
-            song_lines.append(line)
-        song_line = input('Type next line: ')
-
+song_lines = read_lines(fp)
 
 myparser.set_delimiters(ICON_DELIMITER, PAUSE, QUAVER_DELIMITER, COMMENT_DELIMITER, REPEAT_INDICATOR)
 possible_modes = myparser.get_possible_modes(song_lines)
@@ -138,22 +145,16 @@ else:
     print('\nWe detected that you use the following notation: ' + possible_modes[0].value[1] + '.')
     song_notation = possible_modes[0]
 
-#if song_notation == 'JIANPU' and QUAVER_DELIMITER #=='-':
-#    print('\nWarning: quaver delimiter \'-\' is incompatible with Jianpu notation. Please use \'^\' instead.')
- #   QUAVER_DELIMITER = '^'
-  #  myparser.set_delimiters(ICON_DELIMITER, PAUSE, QUAVER_DELIMITER, COMMENT_DELIMITER, REPEAT_INDICATOR)
-
 myparser.set_input_mode(song_notation)
-
 
 # Attempts to detect key for input written in absolute musical scales (western, Jianpu)
 musickeys  = []
 song_key = None
 if song_notation in [InputModes.WESTERN, InputModes.DOREMI, InputModes.JIANPU]:
-    #TODO: update find_keys
     musickeys = myparser.find_key(song_lines)
     if len(musickeys) == 0:
         print("\nYour song cannot be transposed exactly in Sky.")
+        #trans = input('Enter a key or a number to transpose your song within the chromatic scale:')
         print("\nDefault key will be set to C.")
         song_key = 'C'
     elif len(musickeys) == 1:
@@ -202,7 +203,7 @@ if song_title=='':
 original_artists = input('Original artist(s): ')
 transcript_writer = input('Transcribed by: ')
 
-# Renders the song
+#===== Renders the song
 mysong.set_title(song_title)
 mysong.set_headers(original_artists, transcript_writer, musical_key)
 
