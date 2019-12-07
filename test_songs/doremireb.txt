@@ -20,6 +20,6 @@ X + : 0
 #Out of range #notes:
 reb3 fa6 mib6
 #Mixed case and #multiple #spaces:
-   REB4-MIB4    Fa4-SoL4-laB4-SiB4    
+   REb4-MIb4    Fa4-SoL4-lAb4-Sib4    
 #Mixed case #without #octaves:
-reB MIb f SoLb lAB SIB DO
+reb MIb f SoLb lAb SIb DO
