@@ -9,7 +9,7 @@ class Instrument:
     def __init__(self):
         self.type = 'undefined'
         self.chord_skygrid = {}
-        self.repeat = 0
+        self.repeat = 1
         self.index = 0
         self.is_silent = True
         self.is_broken = False
@@ -45,7 +45,7 @@ class Instrument:
         self.repeat = repeat
 
     def get_repeat(self):
-        '''Returns the number of times the chord must be repeated'''
+        '''Returns the number of times the chord must be played'''
         return self.repeat
 
     def set_index(self, index):
@@ -285,7 +285,7 @@ class Harp(Instrument):
 
         harp_render += '</table>'
         
-        if self.get_repeat() > 0:
+        if self.get_repeat() > 1:
             harp_render += '<table class=\"harp-' + str(self.get_index()) + ' repeat\">'
             harp_render += '<tr>'
             harp_render += '<td>'
