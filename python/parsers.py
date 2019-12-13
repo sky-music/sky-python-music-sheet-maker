@@ -137,7 +137,7 @@ class Parser:
             repeat = int(re.split(re.escape(repeat_indicator), chord)[1])
             chord = re.split(re.escape(repeat_indicator), chord)[0]
         except:
-            repeat = 0
+            repeat = 1
 
         chord = chord.upper()
 
