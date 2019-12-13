@@ -384,7 +384,7 @@ class Song():
                 instrument_render = instrument.render_in_svg(x, '%.2f'%(100.0*self.SVG_harp_size[0]/self.SVG_line_width)+'%', '100%', self.harp_AspectRatio)
 
                 # REPEAT
-                if instrument.get_repeat()>0:
+                if instrument.get_repeat()>1:
                     instrument_render += '\n<svg x=\"' + '%.2f'%(x+self.SVG_harp_size[0]) + '\" y=\"0%\" class=\"repeat\" width=\"' + '%.2f'%(100.0*self.SVG_harp_size[0]/self.SVG_line_width)+'%' + '\" height=\"100%\">'
                     instrument_render += '\n<text x=\"2%\" y=\"98%\" class=\"repeat\">x' + str(instrument.get_repeat()) + '</text></svg>'
                     x += self.SVG_harp_spacings[0]
@@ -552,7 +552,7 @@ class Song():
                 x += self.png_harp_size[0]
 
                 # REPEAT
-                if instrument.get_repeat()>0:
+                if instrument.get_repeat()>1:
                     repeat_im = instrument.get_repeat_png(self.png_harp_spacings[0], harp_rescale)
                     line_render = trans_paste(line_render, repeat_im, (int(x),int(y+self.png_harp_size[1]-repeat_im.size[1])))
                     x += max(repeat_im.size[0], self.png_harp_spacings[0])
