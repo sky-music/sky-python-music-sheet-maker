@@ -1,5 +1,11 @@
 import os
-from PIL import Image, ImageDraw, ImageFont
+
+try:
+    from PIL import Image, ImageDraw, ImageFont
+    no_PIL_module = False
+except (ImportError,ModuleNotFoundError):
+    no_PIL_module = True
+
 from notes import Note, NoteRoot, NoteCircle, NoteDiamond
 from modes import RenderModes
 ### Instrument classes
