@@ -26,10 +26,6 @@ def ask_for_mode(modes):
         i += 1
         print(str(i) + ') ' + InputModes.WESTERN.value[2])
         mydict[i] = InputModes.WESTERN
-    if (InputModes.DOREMI in modes) or len(modes)==0:
-        i += 1
-        print(str(i) + ') ' + InputModes.DOREMI.value[2])
-        mydict[i] = InputModes.DOREMI
     if (InputModes.JIANPU in modes) or len(modes)==0:
         i += 1
         print(str(i) + ') ' + InputModes.JIANPU.value[2])
