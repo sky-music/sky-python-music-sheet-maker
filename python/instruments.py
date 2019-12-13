@@ -6,6 +6,12 @@ try:
 except (ImportError,ModuleNotFoundError):
     no_PIL_module = True
 
+try:
+    import mido
+    no_MIDI_module = False
+except (ImportError,ModuleNotFoundError):
+    no_MIDI_module = True
+
 from notes import Note, NoteRoot, NoteCircle, NoteDiamond
 from modes import RenderModes
 ### Instrument classes
@@ -30,7 +36,11 @@ class Instrument:
         self.font = 'fonts/NotoSansCJKjp-Regular.otf'  
         self.font_size = 38
         self.repeat_height = None
-                   
+        
+        self.midi_relspacing = 0.1 #Spacing between midi notes, as a ratio of note duration
+        self.midi_pause_relduration = 1 #Spacing between midi notes, as a ratio of note duration
+        self.midi_quaver_relspacing = 0.5
+         
     def set_chord_skygrid(self, chord_skygrid):
         self.chord_skygrid = chord_skygrid
 
@@ -51,7 +61,7 @@ class Instrument:
         self.repeat = repeat
 
     def get_repeat(self):
-        '''Returns the number of times the chord must be repeated'''
+        '''Returns the number of times the chord must be played'''
         return self.repeat
 
     def set_index(self, index):
@@ -396,3 +406,41 @@ class Harp(Instrument):
             harp_render = harp_render.resize((int(harp_render.size[0]*rescale),int(harp_render.size[1]*rescale)), resample=Image.LANCZOS)
             
         return harp_render
+    
+    def render_in_midi(self, note_duration=960, silent_duration=960):
+        harp_silent = self.get_is_silent()
+        harp_broken = self.get_is_broken()
+        
+        if harp_broken:
+            harp_render = [mido.Message('note_on', note=115, velocity=127, time=int(self.midi_relspacing*note_duration)),
+                           mido.Message('note_off', note=115, velocity=127, time=int(self.midi_relspacing*note_duration))]
+        elif harp_silent:
+            harp_render = [mido.Message('note_on', note=115, velocity=0, time=int(self.midi_relspacing*note_duration)),
+                           mido.Message('note_off', note=115, velocity=0, time=int(self.midi_pause_relduration*note_duration))]
+        else:
+            harp_render = []
+            durations = [self.midi_relspacing*note_duration, note_duration]
+            for i, event_type in enumerate(['note_on', 'note_off']):
+                t = durations[i]
+                for row in range(self.get_row_count()):
+                    for col in range(self.get_column_count()):                   
+                        note = self.get_note_from_position((row, col))                
+                        frames = note.get_highlighted_frames()
+                        
+                        note_render = note.render_in_midi(event_type, t)
+                                
+                        if isinstance(note_render, mido.Message):
+                            harp_render.append(note_render)
+                            #Below a complicated way to handle quavers
+                            if frames[0] == 0 or event_type=='note_off':
+                                t = 0
+                            elif frames[0] > 0 and event_type == 'note_on':
+                                t = durations[0] + durations[1]
+                            else:
+                                t = durations[i]
+            
+        return harp_render
+        
+        
+        
+    

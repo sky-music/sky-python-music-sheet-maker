@@ -4,6 +4,12 @@ try:
 except (ImportError,ModuleNotFoundError):
     no_PIL_module = True
 
+try:
+    import mido
+    no_MIDI_module = False
+except (ImportError,ModuleNotFoundError):
+    no_MIDI_module = True
+
 class Note:
 
     def __init__(self, instrument, pos=None):
@@ -38,6 +44,9 @@ class Note:
         self.diamond_highlighted_pngs = ['elements/diamond-highlighted-' + str(i) +'.png' for i in range(1,8)]
         self.circle_highlighted_pngs = ['elements/circle-highlighted-' + str(i) +'.png' for i in range(1,8)]
         self.png_size = None
+        
+        self.midi_root_pitch = 60 #C4
+        self.midi_semitones = [0, 2, 4, 5, 7, 9, 11]
 
     def get_position(self):
         '''Return the note position as a tuple row/column'''
@@ -179,7 +188,24 @@ class Note:
             note_render = note_render.resize((int(note_render.size[0]*rescale),int(note_render.size[1]*rescale)), resample=Image.LANCZOS)
 
         return note_render
-
+    
+    
+    def render_in_midi(self, event_type, t=0):
+        octave = int(self.get_index()/7)
+        semi = self.midi_semitones[self.get_index()%7]
+        note_pitch = self.midi_root_pitch + octave*12 + semi 
+ 
+        if not(self.harp_is_broken) and not(self.harp_is_silent):
+            if len(self.get_highlighted_frames())==0:
+                note_render = None
+            else:
+                note_render = mido.Message(event_type, note=note_pitch, velocity=127, time=int(t))
+        else:
+            note_render = None
+        
+        return note_render
+    
+    
 class NoteCircle(Note):
 
     def __init__(self, chord, pos):

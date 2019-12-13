@@ -106,6 +106,9 @@ class Parser:
     def get_keyboard_position_map(self):
         return self.keyboard_position_map
 
+    def get_keyboard_layout(self):
+        return self.keyboard_layout
+    
     def get_sky_position_map(self):
         return self.sky_position_map
 

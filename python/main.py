@@ -70,11 +70,12 @@ ICON_DELIMITER = ' ' # Chords separation
 PAUSE = '.'
 COMMENT_DELIMITER = '#' # Lyrics delimiter, can be used for comments
 REPEAT_INDICATOR = '*'
-SONG_DIR_IN = 'songs'
-SONG_DIR_OUT = 'songs'
+SONG_DIR_IN = 'songs_in'
+SONG_DIR_OUT = 'songs_out'
 CSS_PATH = 'css/main.css'
 CSS_MODE = CSSModes.EMBED
-ENABLED_MODES = [RenderModes.HTML, RenderModes.SVG, RenderModes.PNG, RenderModes.SKYASCII, RenderModes.JIANPUASCII, RenderModes.WESTERNASCII]
+ENABLED_MODES = [mode for mode in RenderModes]
+#ENABLED_MODES = [RenderModes.HTML, RenderModes.SVG, RenderModes.PNG, RenderModes.SKYASCII, RenderModes.JIANPUASCII, RenderModes.WESTERNASCII, RenderModes.MIDI]
 
 myparser = Parser() # Create a parser object
 
@@ -236,5 +237,13 @@ if RenderModes.WESTERNASCII in ENABLED_MODES:
         if western_ascii_path != '':
             print('--------------------------------------------------')
             print('Your song in TXT converted to Western notation with C key is located at:', western_ascii_path)
+
+if RenderModes.MIDI in ENABLED_MODES:
+    midi_path = os.path.join(SONG_DIR_OUT, song_title + '.mid')
+    midi_ascii_path = mysong.write_midi(midi_path)
+    if midi_ascii_path != '':
+        print('--------------------------------------------------')
+        print('Your song in MIDI is located at:', midi_ascii_path)
+
 
 os.chdir(mycwd)

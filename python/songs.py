@@ -7,6 +7,13 @@ try:
     no_PIL_module = False
 except (ImportError,ModuleNotFoundError):
     no_PIL_module = True
+
+try:
+    import mido
+    no_MIDI_module = False
+except (ImportError,ModuleNotFoundError):
+    no_MIDI_module = True
+
     
 class Song():
 
@@ -55,6 +62,9 @@ class Song():
             self.png_title_font_size = 48
             self.png_font = 'fonts/NotoSansCJKjp-Regular.otf'
 
+
+        self.midi_note_duration = 0.3 #seconds
+        self.midi_bpm=120 #Beats per minute
 
     def add_line(self, line):
         '''Adds a line of Instrument to the Song'''
@@ -573,3 +583,39 @@ class Song():
             filenum, file_path = self.write_png(file_path0, end_row, filenum+1)
 
         return filenum, file_path
+
+
+    def write_midi(self, file_path):
+        global no_MIDI_module
+        
+        if no_MIDI_module == True:
+            print('\n**** WARNING: MIDI was not created because mido module was not found. ****\n')
+            return 0,''
+
+        mid = mido.MidiFile(type=0)
+        track = mido.MidiTrack()
+        mid.tracks.append(track)
+        tempo = mido.bpm2tempo(self.midi_bpm)
+        sec = mido.second2tick(1,ticks_per_beat=mid.ticks_per_beat,tempo=tempo)
+        
+        note_ticks = self.midi_note_duration*sec
+
+        track.append(mido.MetaMessage('key_signature', key='C'))
+        track.append(mido.MetaMessage('set_tempo', tempo=tempo))
+        #track.append(mido.Message('program_change', program=12, time=0))
+
+        for line in self.lines:
+            if len(line) > 0:
+                if line[0].get_type() != 'voice':
+                    instrument_index = 0
+                    for instrument in line:
+                        instrument.set_index(instrument_index)
+                        instrument_render = instrument.render_in_midi(note_ticks)
+                        for i in range(0,instrument.get_repeat()):
+                            for note_render in instrument_render:
+                                track.append(note_render)
+                            instrument_index += 1                
+        
+        mid.save(file_path)
+
+        return file_path
