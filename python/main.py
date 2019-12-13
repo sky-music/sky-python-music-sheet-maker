@@ -14,26 +14,12 @@ def ask_for_mode(modes):
     mydict = {}
     i = 0
     print('Please choose your note format:\n')
-    if (InputModes.SKYKEYBOARD in modes) or len(modes)==0:
-        i += 1
-        print(str(i) + ') ' + InputModes.SKYKEYBOARD.value[2] + '\n   ' + myparser.get_keyboard_layout().replace(' ','\n   ') + ':')
-        mydict[i] = InputModes.SKYKEYBOARD
-    if (InputModes.SKY in modes) or len(modes)==0:
-        i += 1
-        print(str(i) + ') ' + InputModes.SKY.value[2])
-        mydict[i] = InputModes.SKY
-    if (InputModes.WESTERN in modes) or len(modes)==0:
-        i += 1
-        print(str(i) + ') ' + InputModes.WESTERN.value[2])
-        mydict[i] = InputModes.WESTERN
-    if (InputModes.JIANPU in modes) or len(modes)==0:
-        i += 1
-        print(str(i) + ') ' + InputModes.JIANPU.value[2])
-        mydict[i] = InputModes.JIANPU
-    if (InputModes.WESTERNCHORDS in modes) or len(modes)==0:
-        i += 1
-        print(str(i) + ') ' + InputModes.WESTERNCHORDS.value[2])
-        mydict[i] = InputModes.WESTERNCHORDS
+    for mode in modes:
+       i += 1
+       print(str(i) + ') ' + mode.value[2])
+       if mode == InputModes.SKYKEYBOARD:
+           print('   ' + myparser.get_keyboard_layout().replace(' ','\n   ') + ':')          
+       mydict[i] = mode
     try:
         song_notation = int(input('Mode (1-' + str(i) + "): ").strip())
         mode = mydict[song_notation]
@@ -88,11 +74,10 @@ if not os.path.isdir(SONG_DIR_OUT):
 
 print('===== VISUAL MUSIC SHEETS FOR SKY:CHILDREN OF THE LIGHT =====')
 print('\nAccepted music notes formats:')
-print('\n* ' + InputModes.SKYKEYBOARD.value[2] + '\n   ' + myparser.keyboard_layout.replace(' ','\n   '))
-print('\n* ' + InputModes.SKY.value[2])
-print('\n* ' + InputModes.WESTERN.value[2])
-print('\n* ' + InputModes.JIANPU.value[2])
-print('\n* ' + InputModes.WESTERNCHORDS.value[2])
+for mode in InputModes:
+    print('\n* ' + mode.value[2])
+    if mode == InputModes.SKYKEYBOARD:
+        print('   ' + myparser.get_keyboard_layout().replace(' ','\n   ') + ':')          
 print('\nNotes composing a chord must be glued together (e.g. A1B1C1).')
 print('Separate chords with \"' + ICON_DELIMITER + '\".')
 print('Use \"' + PAUSE + '\" for a silence (rest).')
