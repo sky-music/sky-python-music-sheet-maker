@@ -125,7 +125,7 @@ class SongParser:
             repeat = int(re.split(re.escape(self.repeat_indicator), chord)[1])
             chord = re.split(re.escape(self.repeat_indicator), chord)[0]
         except:
-            repeat = 0
+            repeat = 1
 
         if note_parser == None:
             note_parser = self.note_parser
