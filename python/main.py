@@ -3,6 +3,7 @@ from modes import InputModes, RenderModes, CSSModes
 from parsers import Parser
 from songs import Song
 import os
+import re
 
 ### Define Errors
 #class Error(Exception):
@@ -43,7 +44,7 @@ def is_file(string):
 
     if not(isfile):
         splitted = os.path.splitext(string)
-        if len(splitted[0])>0 and len(splitted[1])>2 and len(splitted[1])<=5: #then probably a file name
+        if len(splitted[0])>0 and len(splitted[1])>2 and len(splitted[1])<=5 and re.search('\\.',splitted[0])==None: #then probably a file name
             while not(isfile) and len(fp)>2:
                 print('\nFile not found.')
                 isfile, fp = is_file(input('File name (in ' + os.path.normpath(SONG_DIR_IN) + '/): ').strip())
