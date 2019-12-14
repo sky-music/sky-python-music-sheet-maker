@@ -3,6 +3,7 @@ from modes import InputModes, RenderModes, CSSModes
 from parsers import SongParser
 from songs import Song
 import os
+import re
 
 def ask_for_mode(modes):
 
@@ -38,7 +39,7 @@ def load_file(string):
     if not(isfile):
         fp = None
         splitted = os.path.splitext(string)
-        if len(splitted[0])>0 and len(splitted[1])>2 and len(splitted[1])<=5: #then probably a file name
+        if len(splitted[0])>0 and len(splitted[1])>2 and len(splitted[1])<=5 and re.search('\\.',splitted[0])==None: #then probably a file name
             while fp==None:
                 print('\nFile not found.')
                 fp = load_file(input('File name (in ' + os.path.normpath(SONG_DIR_IN) + '/): ').strip())
