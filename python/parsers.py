@@ -199,7 +199,7 @@ class SongParser:
         '''
         instrument_line = []
         line = line.strip()
-        re.sub(re.escape(self.icon_delimiter)+'{2,'+str(max(2,len(line)))+'}',self.icon_delimiter,line)#removes surnumerous spaces
+        line = re.sub(re.escape(self.icon_delimiter)+'{2,'+str(max(2,len(line)))+'}',self.icon_delimiter,line)#removes surnumerous spaces
         if len(line)>0:
             if line[0] == self.comment_delimiter:
                 lyrics = line.split(self.comment_delimiter)
@@ -309,7 +309,7 @@ class SongParser:
 
         for line in song_lines:
             line = line.strip()
-            re.sub(re.escape(self.icon_delimiter)+'{2,'+str(max(2,len(line)))+'}',self.icon_delimiter,line)#removes surnumerous spaces
+            line = re.sub(re.escape(self.icon_delimiter)+'{2,'+str(max(2,len(line)))+'}',self.icon_delimiter,line)#removes surnumerous spaces
             if len(line) > 0:
                 if line[0] != self.comment_delimiter:
                     icons=line.split(self.icon_delimiter)
