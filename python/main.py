@@ -78,8 +78,8 @@ ICON_DELIMITER = ' ' # Chords separation
 PAUSE = '.'
 COMMENT_DELIMITER = '#' # Lyrics delimiter, can be used for comments
 REPEAT_INDICATOR = '*'
-SONG_DIR_IN = 'test_songs'
-SONG_DIR_OUT = 'songs_out'
+SONG_DIR_IN = 'songs'
+SONG_DIR_OUT = 'songs'
 CSS_PATH = 'css/main.css'
 CSS_MODE = CSSModes.EMBED
 ENABLED_MODES = [RenderModes.HTML, RenderModes.SVG, RenderModes.PNG, RenderModes.SKYASCII, RenderModes.JIANPUASCII, RenderModes.WESTERNASCII]
@@ -128,6 +128,10 @@ else:
     song_notation = possible_modes[0]
 
 myparser.set_input_mode(song_notation)
+
+if song_notation == 'JIANPU' and PAUSE !='0':
+    print('\nWarning: pause in Jianpu is usually ''0''.')
+    PAUSE = '0'
 
 # Attempts to detect key for input written in absolute musical scales (western, Jianpu)
 musickeys  = []

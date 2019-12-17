@@ -1,4 +1,8 @@
-from PIL import Image
+try:
+    from PIL import Image
+    no_PIL_module = False
+except (ImportError,ModuleNotFoundError):
+    no_PIL_module = True
 
 class Note:
 
