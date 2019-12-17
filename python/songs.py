@@ -10,9 +10,9 @@ except (ImportError,ModuleNotFoundError):
 
 try:
     import mido
-    no_MIDI_module = False
+    no_mido_module = False
 except (ImportError,ModuleNotFoundError):
-    no_MIDI_module = True
+    no_mido_module = True
 
     
 class Song():
@@ -586,9 +586,9 @@ class Song():
 
 
     def write_midi(self, file_path):
-        global no_MIDI_module
+        global no_mido_module
         
-        if no_MIDI_module == True:
+        if no_mido_module == True:
             print('\n**** WARNING: MIDI was not created because mido module was not found. ****\n')
             return 0,''
 
