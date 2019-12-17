@@ -8,9 +8,9 @@ except (ImportError,ModuleNotFoundError):
 
 try:
     import mido
-    no_MIDI_module = False
+    no_mido_module = False
 except (ImportError,ModuleNotFoundError):
-    no_MIDI_module = True
+    no_mido_module = True
 
 from notes import Note, NoteRoot, NoteCircle, NoteDiamond
 from modes import RenderModes
