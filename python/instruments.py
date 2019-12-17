@@ -51,7 +51,7 @@ class Instrument:
         self.repeat = repeat
 
     def get_repeat(self):
-        '''Returns the number of times the chord must be repeated'''
+        '''Returns the number of times the chord must be played'''
         return self.repeat
 
     def set_index(self, index):
