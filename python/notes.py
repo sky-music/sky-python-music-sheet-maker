@@ -6,9 +6,9 @@ except (ImportError,ModuleNotFoundError):
 
 try:
     import mido
-    no_MIDI_module = False
+    no_mido_module = False
 except (ImportError,ModuleNotFoundError):
-    no_MIDI_module = True
+    no_mido_module = True
 
 class Note:
 
@@ -45,8 +45,8 @@ class Note:
         self.circle_highlighted_pngs = ['elements/circle-highlighted-' + str(i) +'.png' for i in range(1,8)]
         self.png_size = None
         
-        self.midi_root_pitch = 60 #C4
-        self.midi_semitones = [0, 2, 4, 5, 7, 9, 11]
+        self.midi_root_pitch = 60 #C4. Value will be changed when Western_scales is merged
+        self.midi_semitones = [0, 2, 4, 5, 7, 9, 11] #May no longer be used when Western_scales is merged
 
     def get_position(self):
         '''Return the note position as a tuple row/column'''
@@ -191,6 +191,9 @@ class Note:
     
     
     def render_in_midi(self, event_type, t=0):
+        '''
+            Starts or ends a MIDI note, assuming a chromatic scale (12 semitones)
+        '''
         octave = int(self.get_index()/7)
         semi = self.midi_semitones[self.get_index()%7]
         note_pitch = self.midi_root_pitch + octave*12 + semi 
