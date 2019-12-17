@@ -7,7 +7,7 @@
 </style>  
 </defs>
 <svg x="0" y="0" class="note-diamond harp-button-11" width="100%" height="100%" viewBox="0 0 91 91">
-<rect x="0" y="0" width="100%" height="100%" class="white-background"/>
+<rect x="0" y="0" width="100%" height="100%" class="note-background"/>
 <path class="instrument-button highlighted-0" d="M90.7 76.5c0 7.8-6.3 14.2-14.2 14.2H14.2C6.3 90.7 0 84.4 0 76.5V14.2C0 6.3 6.3 0 14.2 0h62.3c7.8 0 14.2 6.3 14.2 14.2V76.5z"/>
 <rect x="22.6" y="22.7" transform="matrix(-0.7071 -0.7071 0.7071 -0.7071 45.3002 109.5842)" width="45.4" height="45.4" class="instrument-button-icon highlighted-0"/>
 </svg>

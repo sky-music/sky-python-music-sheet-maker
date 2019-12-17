@@ -7,6 +7,6 @@
 </style> 
 </defs>
 <svg x="0" y="0" class="note-root harp-button-7" width="100%" height="100%" viewBox="0 0 91 91">
-<rect x="0" y="0" width="100%" height="100%" class="white-background"/>
+<rect x="0" y="0" width="100%" height="100%" class="note-background"/>
 <text x="45.4" y="45.4" class="broken" style="fill:red;font-size:50px;dominant-baseline:middle;text-anchor:middle;stroke-width:1.5;stroke:red">?</text></svg>
 </svg>
