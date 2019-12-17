@@ -8,7 +8,7 @@
 </defs>
 <svg x="0" y="0" width="100%" height="100%" class="instrument-harp harp-0">
 <rect x="0" y="0" width="100%" height="100%" class="harp-background"/>
-<rect x="1.0%" y="1.5%" width="98%" height="97%" rx="6%" ry="9%" class="harp harp-0"/>
+<rect x="1.0%" y="1.5%" width="98%" height="97%" rx="6%" ry="9%" class="harp-png harp-0"/>
 
 <svg x="2.32%" y="6.36%" class="note-root harp-button-0" width="21.00%" height="21.00%" viewBox="0 0 91 91">
 <circle cx="45.4" cy="45.4" r="12" class="instrument-button-icon unhighlighted"/></svg>
