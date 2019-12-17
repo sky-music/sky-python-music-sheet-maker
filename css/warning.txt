@@ -1,0 +1,12 @@
+This style sheet is essential to the Music Sheet Maker program, for:
+* HTMl output
+* SVG output
+* building the PNG elements
+
+It should NOT be tempered with or moved.
+
+The only reason for which a non-advanced user may want to modify this CSS is to change the note size in html or svg output.
+In this case he has 2 options:
+
+1) Change the 'font-size' value of the 'body' element. This will resize *all* the elements in the page.
+2) Change the 'font-size' value of the 'td' element. This will resize notes without affecting text.
