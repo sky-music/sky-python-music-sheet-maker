@@ -1,5 +1,5 @@
 #Some chords:
-C D F G Dm EmbA+ C6 Am9 Fmaj Dm11 Cmaj7
+C D F G Dm Em A+ C6 Am9 Fmaj Dm11 Cmaj7
 #Some quavers
 C-D
 #Pauses:
