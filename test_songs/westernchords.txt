@@ -1,0 +1,12 @@
+#Some chords:
+C D F G Dm Em A+ C6 Am9 Fmaj Dm11 Cmaj7
+#Some quavers
+C-D
+#Pauses:
+C . D . . F
+#Errors:
+X + : 0
+#incorrect case:
+c-dm11 FMAJ7 dM11 cmAj7
+#multiple #spaces:
+     C     Dm    C6

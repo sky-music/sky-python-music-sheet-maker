@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from modes import InputModes, RenderModes, CSSModes
-from parsers import Parser
+from parsers import SongParser
 from songs import Song
 import os
 import re
@@ -14,7 +14,7 @@ def ask_for_mode(modes):
        i += 1
        print(str(i) + ') ' + mode.value[2])
        if mode == InputModes.SKYKEYBOARD:
-           print('   ' + myparser.get_keyboard_layout().replace(' ','\n   ') + ':')          
+           print('   ' + myparser.get_keyboard_layout().replace(' ','\n   ') + ':')
        mydict[i] = mode
     try:
         song_notation = int(input('Mode (1-' + str(i) + "): ").strip())
@@ -42,7 +42,7 @@ def load_file(string):
             while fp==None:
                 print('\nFile not found.')
                 fp = load_file(input('File name (in ' + os.path.normpath(SONG_DIR_IN) + '/): ').strip())
-                isfile = os.path.isfile(fp)        
+                isfile = os.path.isfile(fp)
     if isfile:
         return fp
     else:
@@ -77,14 +77,14 @@ ICON_DELIMITER = ' ' # Chords separation
 PAUSE = '.'
 COMMENT_DELIMITER = '#' # Lyrics delimiter, can be used for comments
 REPEAT_INDICATOR = '*'
-SONG_DIR_IN = 'songs'
-SONG_DIR_OUT = 'songs'
+SONG_DIR_IN = 'test_songs'
+SONG_DIR_OUT = 'songs_out'
 CSS_PATH = 'css/main.css'
 CSS_MODE = CSSModes.EMBED
 ENABLED_MODES = [mode for mode in RenderModes]
 #ENABLED_MODES = [RenderModes.HTML, RenderModes.SVG, RenderModes.PNG, RenderModes.SKYASCII, RenderModes.JIANPUASCII, RenderModes.WESTERNASCII, RenderModes.MIDI]
 
-myparser = Parser() # Create a parser object
+myparser = SongParser() # Create a parser object
 
 ### Change directory
 mycwd = os.getcwd()
@@ -98,13 +98,13 @@ print('\nAccepted music notes formats:')
 for mode in InputModes:
     print('\n* ' + mode.value[2])
     if mode == InputModes.SKYKEYBOARD:
-        print('   ' + myparser.get_keyboard_layout().replace(' ','\n   ') + ':')          
+        print('   ' + myparser.get_keyboard_layout().replace(' ','\n   ') + ':')
 print('\nNotes composing a chord must be glued together (e.g. A1B1C1).')
 print('Separate chords with \"' + ICON_DELIMITER + '\".')
 print('Use \"' + PAUSE + '\" for a silence (rest).')
 print('Use \"' + QUAVER_DELIMITER + '\" to link notes within an icon, for triplets, quavers... (e.g. A1' + QUAVER_DELIMITER + 'B1' + QUAVER_DELIMITER + 'C1).')
 print('Add ' + REPEAT_INDICATOR + '2 after a chord to indicate repetition.')
-print('Sharps # and flats b (semitones) are not yet supported.')
+print('Sharps # and flats b (semitones) are supported for Western notation.')
 print('============================================================')
 
 
@@ -114,7 +114,8 @@ fp = load_file(first_line) #loads file or asks for next line
 
 song_lines = read_lines(fp)
 
-possible_modes = myparser.detect_input_type(song_lines, ICON_DELIMITER, PAUSE, QUAVER_DELIMITER, COMMENT_DELIMITER, REPEAT_INDICATOR)
+myparser.set_delimiters(ICON_DELIMITER, PAUSE, QUAVER_DELIMITER, COMMENT_DELIMITER, REPEAT_INDICATOR)
+possible_modes = myparser.get_possible_modes(song_lines)
 
 if len(possible_modes) > 1:
     print('\nSeveral possible notations detected.')
@@ -126,10 +127,7 @@ else:
     print('\nWe detected that you use the following notation: ' + possible_modes[0].value[1] + '.')
     song_notation = possible_modes[0]
 
-
-if song_notation == InputModes.JIANPU and QUAVER_DELIMITER =='-':
-    print('\nWarning: quaver delimiter \'-\' is incompatible with Jianpu notation. Please use \'^\' instead.')
-    QUAVER_DELIMITER = '^'
+myparser.set_input_mode(song_notation)
 
 if song_notation == InputModes.JIANPU and PAUSE !='0':
     print('\nWarning: pause in Jianpu is usually ''0''.')
@@ -138,10 +136,11 @@ if song_notation == InputModes.JIANPU and PAUSE !='0':
 # Attempts to detect key for input written in absolute musical scales (western, Jianpu)
 musickeys  = []
 song_key = None
-if song_notation in [InputModes.WESTERN, InputModes.JIANPU]:
-    musickeys = myparser.find_key(song_lines, COMMENT_DELIMITER, song_notation)
+if song_notation in [InputModes.WESTERN, InputModes.DOREMI, InputModes.JIANPU]:
+    musickeys = myparser.find_key(song_lines)
     if len(musickeys) == 0:
         print("\nYour song cannot be transposed exactly in Sky.")
+        #trans = input('Enter a key or a number to transpose your song within the chromatic scale:')
         print("\nDefault key will be set to C.")
         song_key = 'C'
     elif len(musickeys) == 1:
@@ -153,8 +152,10 @@ if song_notation in [InputModes.WESTERN, InputModes.JIANPU]:
         while song_key not in musickeys:
             song_key = str(input('Choose your key:'))
 
-if song_notation in [InputModes.WESTERN, InputModes.JIANPU, InputModes.WESTERNCHORDS]:
+if song_notation in [InputModes.WESTERN, InputModes.DOREMI, InputModes.JIANPU, InputModes.WESTERNCHORDS]:
     try:
+        #TODO: print default range for each mode
+
         note_shift = int(input('Shift notes by n positions ? (-21 ; +21): ').strip())
     except ValueError:
         note_shift = 0
@@ -164,7 +165,7 @@ else:
 # Parses song line by line
 mysong = Song()
 for song_line in song_lines:
-    instrument_line = myparser.parse_line(song_line, ICON_DELIMITER, PAUSE, QUAVER_DELIMITER, COMMENT_DELIMITER, song_notation, note_shift, REPEAT_INDICATOR)
+    instrument_line = myparser.parse_line(song_line, song_key, note_shift)
     mysong.add_line(instrument_line)
 
 
@@ -221,7 +222,7 @@ if RenderModes.PNG in ENABLED_MODES:
               'between ' + os.path.split(png_path0)[1] + ' and ' + os.path.split(png_path)[1])
 
 if RenderModes.SKYASCII in ENABLED_MODES:
-    if song_notation in [InputModes.WESTERN, InputModes.JIANPU, InputModes.WESTERNCHORDS]:
+    if song_notation in [InputModes.WESTERN, InputModes.DOREMI, InputModes.JIANPU, InputModes.WESTERNCHORDS]:
         sky_ascii_path = os.path.join(SONG_DIR_OUT, song_title + '_sky.txt')
         res = mysong.write_ascii(sky_ascii_path, RenderModes.SKYASCII)
         if sky_ascii_path != '':

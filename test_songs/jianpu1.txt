@@ -1,0 +1,14 @@
+#All Notes:
+1 2 3 4 5 6 7 1+ 2+ 3+ 4+ 5+ 6+ 7+ 1++
+#Chords:
+12 345
+#Some quavers #and chords:
+1^2^3^4 5^671+
+#Pauses:
+1 0 2 0 0 3
+#Notes #without #octave:
+1 2 3 4 5 6 7
+#Errors:
+X + - : 0 1-2 9
+#out of range:
+1-- 2+++++++
