@@ -652,7 +652,7 @@ class NoteParser:
             major_scale_interval = self.convert_semitone_interval_to_major_scale_interval(interval_in_semitones)
         except KeyError:
             # Turn note into a broken harp, since note is not in the song_key
-            raise KeyError('Note ' + str(note) + 'is not in the song key.')
+            raise KeyError('Note ' + str(note) + ' is not in the song key.')
 
         # Convert note to base 10 for arithmetic
         note_in_base_10 = self.convert_base_7_to_base_10(octave_number_str + str(major_scale_interval))
