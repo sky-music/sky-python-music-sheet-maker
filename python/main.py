@@ -150,7 +150,7 @@ if song_notation in [InputModes.WESTERN, InputModes.DOREMI, InputModes.JIANPU]:
         print("\nYour song can be transposed in Sky with the following keys: " + ', '.join(musickeys))
         song_key = ''
         while song_key not in musickeys:
-            song_key = str(input('Choose your key:'))
+            song_key = str(input('Choose your key: '))
 
 if song_notation in [InputModes.WESTERN, InputModes.DOREMI, InputModes.JIANPU, InputModes.WESTERNCHORDS]:
     try:
