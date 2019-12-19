@@ -1,0 +1,22 @@
+#All Notes:
+C4 D4 E4 F4 G4 A4 B4 C5 D5 E5 F5 G5 A5 B5 C6
+#Chords:
+C4D4 E4F4G4
+#Some quavers #and chords:
+C4-D4-E4-F4 G4-A4B4C5
+#Pauses:
+C4 . D4 . . E4
+#Notes #without #octave:
+C D E F G A B
+#Chords #without #octaves:
+CD EFG
+#quavers #without #octaves:
+C-D EFG-ABCD
+#Errors:
+X + : 0
+#Out of range #notes:
+C1 C2 C7 C8
+#lowercase and #multiple #spaces:
+   c4-d4    e4f4g4-a4-b4-c5-d5   
+#lowercase #without #octaves:
+c d e f g a b

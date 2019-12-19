@@ -1,0 +1,12 @@
+#All Notes:
+2b 3b 4 5b 6b 7b 1+ 2b+ 3b+ 4+ 5b+ 6b+ 7b+ 1++ 2b++
+#Chords:
+2b3b 45b6b
+#Some quavers #and chords:
+2b^3b^4^5b 6b^7b1+2b+3b+
+#Pauses:
+2b 0 3b 0 0 4
+#Errors:
+X + - : 0 1-2 9
+#Out of range #notes:
+2b-- 4+++++

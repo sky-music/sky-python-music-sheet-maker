@@ -1,0 +1,24 @@
+#All Notes with flats:
+Db4 Eb4 F4 Gb4 Ab4 Bb4 C5 Db5 Eb5 F5 Gb5 Ab5 Bb5 C6 Db6
+#All Notes with sharps:
+C#4 D#4 F4 F#4 G#4 A#4 C5 C#5 D#5 F5 F#5 G#5 A#5 C6 C#6
+#Chords:
+Db4Eb4 F4Gb4Ab4
+#Some quavers #and chords:
+Db4-Eb4-F4-Gb4 Ab4-Bb4C5Db5
+#Pauses:
+Db4 . Eb4 . . F4
+#Notes #without #octave:
+Db Eb F Gb Ab Bb C C# D# F F# G# A#
+#Chords #without #octaves:
+DbEb FGbAb
+#quavers #without #octaves:
+Db-Eb-F-Gb Ab-BbC5Db
+#Errors:
+X + : 0
+#Out of range #notes:
+Db3 F6 Eb6
+#lowercase and #multiple #spaces:
+   db4-eb4    ab4-bb4-c5-db5    
+#lowercase #without #octaves:
+db eb f gb ab bb c

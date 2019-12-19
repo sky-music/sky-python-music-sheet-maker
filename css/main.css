@@ -7,7 +7,7 @@ html {
     scroll-behavior: auto;
   }
 }
- 
+
 /* <!-- Defines the em unit--> */
 body {
   font-family: "Noto Sans", "Noto Sans CJK JP", "Noto Sans CJK KR", "Noto Sans CJK SC", "Noto Sans CJK TC", "Avenir", Arial, sans-serif;
@@ -160,7 +160,7 @@ hr {
   opacity: 1;
   padding: 0;
   margin-top: 0px;
-  margin-bottom: 4px;   
+  margin-bottom: 4px;
 }
 
 svg line.divide {
@@ -170,13 +170,13 @@ svg line.divide {
 
 
 /* <!-- TODO: Check if this has no effect ??? --> */
-/* 
+/*
 path.instrument-button{
 	fill:#FF0000;
 	opacity:0.4;
 }
  */
- 
+
 /* <!-- TODO: Check if this has no effect ??? --> */
 #transcript {
   margin: 0 0;
@@ -306,11 +306,11 @@ Set to none to have a transparent SVG, and a transparent PNG with alpha layer (R
 Set to white to make the background white in RGB mode, and the PNG background white when converted to RGB
 --> */
 svg rect.harp-background {
-	fill:white;	
+	fill:white;
 }
 
 svg rect.note-background {
-	fill:white;	
+	fill:white;
 }
 
 /* <!-- Below the styles for buttons in a quaver --> */
@@ -394,7 +394,7 @@ svg rect.note-background {
 
 /* <!-- Button styles if chord has en broken --> */
 /* <!-- TODO: Check if this has no effect ??? --> */
-/* 
+/*
 .instrument-button-icon.silent {
   fill: red;
   stroke: red;
@@ -405,5 +405,3 @@ svg rect.note-background {
   stroke: red;
 }
  */
-
-
