@@ -951,19 +951,6 @@ class JianpuNoteParser(NoteParser):
         self.not_note_name_regex = re.compile(r'[^1234567b#]+')
         self.not_octave_regex = re.compile(r'[^\\+\\-]+')
 
-        self.jianpu2western_map = {
-            '1': 'C', '2' : 'D', '3': 'E', '4': 'F', '5': 'G', '6': 'A', '7': 'B',
-            'C':'C', 'D':'D', 'E':'E', 'F':'F', 'G':'G', 'A':'A', 'B':'B'
-            }
-     #For find_key only: prints the key in the Western form instead of Jianpu
-    #TODO: checks that it works
-    def jianpu2western(self,notes):
-        try:
-            return [self.jianpu2western_map[note] for note in notes]
-        except KeyError:
-            return notes
-
-
     def parse_note(self, note):
 
         '''
@@ -999,13 +986,3 @@ class JianpuNoteParser(NoteParser):
                 note_octave = self.get_default_starting_octave()
         #print(note_base+note_alt+str(note_octave))
         return note_name, note_octave
-
-
-
-    def convert_to_westernized_note(self, note_base, note_alt, note_octave):
-
-        westernized_note = self.jianpu2western_map[note_base] + note_alt + str(note_octave)
-
-        #print(westernized_note)
-
-        return westernized_note
