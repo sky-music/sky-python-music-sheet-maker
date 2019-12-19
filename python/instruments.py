@@ -1,5 +1,11 @@
 import os
-from PIL import Image, ImageDraw, ImageFont
+
+try:
+    from PIL import Image, ImageDraw, ImageFont
+    no_PIL_module = False
+except (ImportError,ModuleNotFoundError):
+    no_PIL_module = True
+
 from notes import Note, NoteRoot, NoteCircle, NoteDiamond
 from modes import RenderModes
 ### Instrument classes
@@ -45,7 +51,7 @@ class Instrument:
         self.repeat = repeat
 
     def get_repeat(self):
-        '''Returns the number of times the chord must be repeated'''
+        '''Returns the number of times the chord must be played'''
         return self.repeat
 
     def set_index(self, index):

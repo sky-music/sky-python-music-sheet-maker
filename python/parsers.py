@@ -28,9 +28,9 @@ class SongParser:
         self.comment_delimiter = comment_delimiter
         self.repeat_indicator = repeat_indicator
 
-                
+
     def check_delimiters(self):
-                
+
         if self.input_mode == InputModes.JIANPU or isinstance(self.note_parser, JianpuNoteParser):
             if self.pause != '0':
                 print('Jianpu notation is used: setting 0 as the pause character instead of '+self.pause)
@@ -38,9 +38,9 @@ class SongParser:
             if self.quaver_delimiter == '-':
                 print('Jianpu notation is used: setting ^ as the quaver delimiter instead of '+self.quaver_delimiter)
                 self.quaver_delimiter = '^'
-                
+
         delims = [self.icon_delimiter, self.pause, self.quaver_delimiter, self.comment_delimiter, self.repeat_indicator]
-        
+
         parser = self.get_note_parser()
         if parser != None:
             for delim in delims:
@@ -70,12 +70,12 @@ class SongParser:
 
         if self.note_parser != None:
             return self.note_parser
-         
+
         if input_mode == None:
             input_mode = self.input_mode
-        
+
         note_parser = None
-        
+
         if input_mode == InputModes.SKYKEYBOARD:
             note_parser = SkyKeyboardNoteParser()
         elif input_mode == InputModes.SKY:
@@ -88,7 +88,7 @@ class SongParser:
             note_parser = JianpuNoteParser()
         elif input_mode == InputModes.WESTERNCHORDS:
             note_parser = WesternChordsNoteParser()
-            
+
         return note_parser
 
 
@@ -97,20 +97,19 @@ class SongParser:
         if input_mode == None:
             input_mode = self.input_mode
         self.note_parser = self.get_note_parser(input_mode)
-        
+
 
     def get_keyboard_layout(self):
 
         return SkyKeyboardNoteParser().keyboard_layout
 
-
     def split_icon(self, icon, delimiter=None):
-    	
+
         '''
         An icon is a collection of chords assembled with '-': ['A1C2-F3D4', 'C#4B4-Gb3A2']
-        This method splits an icon into alist of chords:  ['A1C2', 'F3D4', 'C#4B4', 'Gb3A2']   
+        This method splits an icon into alist of chords:  ['A1C2', 'F3D4', 'C#4B4', 'Gb3A2']
         '''
-        
+
         if delimiter == None:
             delimiter = self.quaver_delimiter
         return icon.split(delimiter)
@@ -129,7 +128,7 @@ class SongParser:
 
         if note_parser == None:
             note_parser = self.note_parser
-        
+
         try:
             chord = note_parser.note_name_regex.sub(' \\1', chord).split()
         except AttributeError as err:
@@ -145,6 +144,12 @@ class SongParser:
         #Triplets and quavers are a list of notes or chords: chords=['B2', 'B3B1', 'B4', 'B5', 'C1', 'C2']
         harp_broken = True
         chord_skygrid = {}
+
+        try:
+            repeat = int(re.split(re.escape(repeat_indicator), chord)[1])
+            chord = re.split(re.escape(repeat_indicator), chord)[0]
+        except:
+            repeat = 1
 
         #print(chord)
         if len(chords)>1:
@@ -164,7 +169,7 @@ class SongParser:
             #chord = re.sub(re.escape(self.pause), '.', chord) #Replaces the pause character by the default
 
             if isinstance(self.note_parser, WesternChordsNoteParser):
-                chord = self.note_parser.decode_chord(chord, self.note_parser.western_chords)
+                chord = self.note_parser.decode_chord(chord)
 
             repeat, chord = self.split_chord(chord)
             #Now the real chord has been split in notes (1 note = 1 list slot)
@@ -231,7 +236,7 @@ class SongParser:
            self.set_note_parser()
        #print('note parser is:')
        #print(self.note_parser)
-           
+
        try:
            possible_keys = [k for k in self.note_parser.CHROMATIC_SCALE_DICT.keys()]
            isNoteRegEx = self.note_parser.note_name_regex
@@ -317,7 +322,7 @@ class SongParser:
                         chords = self.split_icon(icon)
                         for chord in chords:
                             for idx, possible_mode in enumerate(possible_modes):
-                                
+
                                 if possible_mode == InputModes.WESTERNCHORDS:
                                     notes = [chord] #Because abbreviated chord names are not composed of note names
                                     good_notes[idx] += sum([int(note in possible_parsers[idx].western_chords.keys()) for note in notes])
@@ -325,28 +330,28 @@ class SongParser:
                                     repeat, notes = self.split_chord(chord, possible_parsers[idx])
                                     good_notes[idx] += sum([int(possible_regex[idx].match(note) != None) for note in notes if note != self.pause])
                                 #TODO: use self.map_note_to_position?
-                                
+
                                 num_notes[idx] += sum([1 for note in notes if note != self.pause])
-                                
+
                                 if possible_mode == InputModes.WESTERN:
                                     DEFG_notes += sum([int(re.search('[D-G]',note) != None) for note in notes])
                                     octaves = [re.search('\d',note) for note in notes]
-                                    
+
                                     octaves = sorted([int(octave.group(0)) for octave in octaves if octave != None])
                                     if len(octaves)>0:
                                         octave_span = max(octave_span, octaves[-1] - octaves[0] + 1)
-        
+
         num_notes = [1 if x == 0 else x for x in num_notes] #Removes zeros to avoid division by zero
 
         scores = list(map(truediv, good_notes, num_notes))
         DEFG_notes /= num_notes[possible_modes.index(InputModes.WESTERN)]
-        
+
         if ((DEFG_notes == 0) or (DEFG_notes < 0.01 and octave_span > 2)) and (num_notes[possible_modes.index(InputModes.WESTERN)] > 10):
             scores[possible_modes.index(InputModes.WESTERN)] *= 0.5
         #print(scores)
-        
+
         return self.most_likely(scores, possible_modes, 0.9)
-        
+
 #        sorted_inds, sorted_scores = zip(*sorted([(i,e) for i,e in enumerate(scores)], key=itemgetter(1), reverse=True))
 #        if sorted_scores[0] == 1 and sorted_scores[1] < 1:
 #            self.input_mode = possible_modes[sorted_inds[0]]
@@ -367,16 +372,16 @@ class SongParser:
             return None
         if len(scores) == 1:
             return [items[0]]
-				
+
         sorted_idx, sorted_scores = zip(*sorted([(i,e) for i,e in enumerate(scores)], key=itemgetter(1), reverse=True))
-			
+
         sorted_items = [items[i] for i in sorted_idx]
        #print(sorted_scores)
        #print(sorted_items)
 
         if sorted_scores[0] == 1 and sorted_scores[1] < 1:
             return [sorted_items[0]]
-      
+
         if sorted_scores[0] == 1 and sorted_scores[1] == 1:
             if duplicates_dict != None:
                 try:
@@ -385,7 +390,7 @@ class SongParser:
                 except (IndexError,KeyError):
                     pass
             return [k for i,k in enumerate(sorted_items) if sorted_scores[i]==1]
-       
+
         if (sorted_scores[0] < threshold):
             contrasts = [(score-min(sorted_scores))/(score+min(sorted_scores)) if score!=0 else 0 for score in sorted_scores ]
             sorted_items = [k for i,k in enumerate(sorted_items) if sorted_scores[i]>threshold/2]
@@ -394,14 +399,14 @@ class SongParser:
             over_items = [k for i,k in enumerate(sorted_items) if sorted_scores[i]>threshold]
             if len(over_items)!=0:
                sorted_items = over_items
-               
+
         if duplicates_dict != None:
             #Remove synonyms
             for i in range(1,len(sorted_items),2):
                 if duplicates_dict[sorted_items[i]] == duplicates_dict[sorted_items[i-1]]:
                     sorted_items[i] = None
             sorted_items = [item for item in sorted_items if item != None]
-        
+
         if len(sorted_items) == 0:
             return items
         else:
@@ -446,11 +451,11 @@ class SongParser:
 
 
 class NoteParser:
-	
+
     '''
     A generic NoteParser for parsing notes of a major scale, and turning them into the corresponding coordinate on Sky's 3*5 piano.
     '''
-    
+
     def __init__(self):
 
         self.columns = 5
@@ -475,8 +480,7 @@ class NoteParser:
         self.default_starting_octave = 4
 
         # Compile regexes for notes to save before using
-        #TODO: not sure what regex to put for the generic note parser
-        # I think we can set it to None. The real question behind this is: do we want to parse a song without knowing the notation first?
+        # these regexes are used for validating whether an individual note is formatted correctly.
         self.note_name_with_octave_regex = None
         self.note_name_regex = None
         self.octave_number_regex = None
@@ -548,11 +552,11 @@ class NoteParser:
             return False
 
     def parse_note(self, note):
-    	
+
         '''
         Returns a tuple containing note_name, octave_number for a note in the format self.note_name_with_octave_regex
         '''
-        
+
         if self.is_valid_note_name_with_octave(note) == True:
             note_name = self.get_note_name_regex().search(note).group(0)
             #TODO: will probably want to isolate the int() and make this more generic, in the case of Jianpu, octave is denoted by ++ or -- etc.
@@ -560,7 +564,7 @@ class NoteParser:
             return (note_name, octave_number)
         else:
             if self.is_valid_note_name(note) == True:
-                
+
                 # Player has given note name without specifying an octave
                 note_name = note
                 octave_number = self.get_default_starting_octave()
@@ -570,11 +574,11 @@ class NoteParser:
                 raise SyntaxError('Note ' + str(note) + ' was not formatted correctly.')
 
     def convert_note_name_into_chromatic_position(self, note_name):
-    	
+
         '''
         Returns the numeric equivalent of the note in the chromatic scale
         '''
-        
+
         if self.is_valid_note_name(note_name):
            note_name = self.sanitize_note_name(note_name)
         else:
@@ -598,7 +602,7 @@ class NoteParser:
             raise KeyError('Interval ' + str(semitone_interval) + ' is not in the major scale.')
 
     def calculate_coordinate_for_note(self, note, song_key='C', note_shift=0):
-    	
+
         '''
         For a note in the format self.note_name_with_octave_regex, this method returns the corresponding coordinate on the Sky piano (in the form of a tuple)
 
@@ -619,6 +623,8 @@ class NoteParser:
 
         # Find the major scale interval from the song_key to the note_name
         # Find the semitone interval from the song_key to the note_name first
+        if song_key == None:
+            song_key = 'C'
         try:
             song_key_chromatic_equivalent = self.convert_note_name_into_chromatic_position(song_key)
         except (KeyError, SyntaxError):
@@ -647,7 +653,7 @@ class NoteParser:
             major_scale_interval = self.convert_semitone_interval_to_major_scale_interval(interval_in_semitones)
         except KeyError:
             # Turn note into a broken harp, since note is not in the song_key
-            raise KeyError('Note ' + str(note) + 'is not in the song key.')
+            raise KeyError('Note ' + str(note) + ' is not in the song key.')
 
         # Convert note to base 10 for arithmetic
         note_in_base_10 = self.convert_base_7_to_base_10(octave_number_str + str(major_scale_interval))
@@ -693,11 +699,11 @@ class NoteParser:
         return num_in_base_10
 
     def convert_base_10_to_coordinate_of_another_base(self, num, base):
-    	
+
         '''
         Convert a number in base 10 to base `self.columns` (using mod and floor), and return as a tuple
         '''
-        
+
         remainder = num % base
         quotient = math.floor(num / base)
 
@@ -852,18 +858,26 @@ class WesternChordsNoteParser(WesternNoteParser):
         'Asus':'A4D5E5', 'D7sus':'D4G4A4C5', 'E7sus':'E4A4B4D5', 'G7sus':'G4C5D5F5', 'A7sus':'A4D5E5G5'
         }
 
+        # use WesternNoteParser as a helper parser for the individual notes
+        self.helper_parser = WesternNoteParser()
+
     def decode_chord(self, chord):
         '''
             Splits a chord abbreviated name into individual note names
         '''
         chord = self.sanitize_chord_name(chord)
         try:
-            return  self.western_chords[chord]
+            return self.western_chords[chord]
         except:
             return chord
-            
+
     def sanitize_chord_name(self, chord):
          chord = chord.lower().capitalize()
+         return chord
+
+    def calculate_coordinate_for_note(self, note, song_key='C', note_shift=0):
+
+        return self.helper_parser.calculate_coordinate_for_note(note, song_key, note_shift)
 
 class DoremiNoteParser(NoteParser):
 
@@ -967,7 +981,7 @@ class JianpuNoteParser(NoteParser):
 #            note_alt = note_alt.group(0)
 #        else:
 #            note_alt = ''
-            
+
         note_name = self.note_name_regex.search(note)
         if note_name != None:
             note_name = note_name.group(0)
@@ -985,9 +999,9 @@ class JianpuNoteParser(NoteParser):
                 note_octave = self.get_default_starting_octave()
         #print(note_base+note_alt+str(note_octave))
         return note_name, note_octave
-    
-    
-    
+
+
+
     def convert_to_westernized_note(self, note_base, note_alt, note_octave):
 
         westernized_note = self.jianpu2western_map[note_base] + note_alt + str(note_octave)
@@ -995,18 +1009,3 @@ class JianpuNoteParser(NoteParser):
         #print(westernized_note)
 
         return westernized_note
-        
-        
-#mytestparser = WesternNoteParser()
-#print(mytestparser.calculate_coordinate_for_note(note='Ab5', song_key='Ab')) # expect (1,2)
-#print(mytestparser.calculate_coordinate_for_note('Ab6', 'Ab')) # expect (2,4)
-#print(mytestparser.calculate_coordinate_for_note('C#6', 'E')) # expect (2,2)
-#print(mytestparser.calculate_coordinate_for_note('Bb4', 'Eb')) # expect (0,4)
-#print(mytestparser.calculate_coordinate_for_note('B4', 'Eb')) # expect error not in major scale
-#print(mytestparser.calculate_coordinate_for_note('C1', 'C')) # expect error not in range of two octaves
-
-#mytestparser = JianpuNoteParser()
-#print(mytestparser.calculate_coordinate_for_note('1++++', 'C')) # expect (0,0)
-#print(mytestparser.calculate_coordinate_for_note('1++++', 'E'))
-
-#TODO: set up unit tests

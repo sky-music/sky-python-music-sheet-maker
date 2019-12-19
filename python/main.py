@@ -14,7 +14,7 @@ def ask_for_mode(modes):
        i += 1
        print(str(i) + ') ' + mode.value[2])
        if mode == InputModes.SKYKEYBOARD:
-           print('   ' + myparser.get_keyboard_layout().replace(' ','\n   ') + ':')          
+           print('   ' + myparser.get_keyboard_layout().replace(' ','\n   ') + ':')
        mydict[i] = mode
     try:
         song_notation = int(input('Mode (1-' + str(i) + "): ").strip())
@@ -22,7 +22,6 @@ def ask_for_mode(modes):
     except (ValueError, KeyError):
         mode = InputModes.SKY
     return mode
-
 
 def load_file(string):
     '''
@@ -43,11 +42,12 @@ def load_file(string):
             while fp==None:
                 print('\nFile not found.')
                 fp = load_file(input('File name (in ' + os.path.normpath(SONG_DIR_IN) + '/): ').strip())
-                isfile = os.path.isfile(fp)        
+                isfile = os.path.isfile(fp)
     if isfile:
         return fp
     else:
         return None
+
 
 def read_lines(fp=None):
 	'''
@@ -81,7 +81,8 @@ SONG_DIR_IN = 'test_songs'
 SONG_DIR_OUT = 'songs_out'
 CSS_PATH = 'css/main.css'
 CSS_MODE = CSSModes.EMBED
-ENABLED_MODES = [RenderModes.HTML, RenderModes.SVG, RenderModes.PNG, RenderModes.SKYASCII, RenderModes.JIANPUASCII, RenderModes.WESTERNASCII]
+ENABLED_MODES = [mode for mode in RenderModes]
+#ENABLED_MODES = [RenderModes.HTML, RenderModes.SVG, RenderModes.PNG, RenderModes.SKYASCII, RenderModes.JIANPUASCII, RenderModes.WESTERNASCII, RenderModes.MIDI]
 
 myparser = SongParser() # Create a parser object
 
@@ -97,7 +98,7 @@ print('\nAccepted music notes formats:')
 for mode in InputModes:
     print('\n* ' + mode.value[2])
     if mode == InputModes.SKYKEYBOARD:
-        print('   ' + myparser.get_keyboard_layout().replace(' ','\n   ') + ':')          
+        print('   ' + myparser.get_keyboard_layout().replace(' ','\n   ') + ':')
 print('\nNotes composing a chord must be glued together (e.g. A1B1C1).')
 print('Separate chords with \"' + ICON_DELIMITER + '\".')
 print('Use \"' + PAUSE + '\" for a silence (rest).')
@@ -128,6 +129,10 @@ else:
 
 myparser.set_input_mode(song_notation)
 
+if song_notation == InputModes.JIANPU and PAUSE !='0':
+    print('\nWarning: pause in Jianpu is usually ''0''.')
+    PAUSE = '0'
+
 # Attempts to detect key for input written in absolute musical scales (western, Jianpu)
 musickeys  = []
 song_key = None
@@ -145,7 +150,7 @@ if song_notation in [InputModes.WESTERN, InputModes.DOREMI, InputModes.JIANPU]:
         print("\nYour song can be transposed in Sky with the following keys: " + ', '.join(musickeys))
         song_key = ''
         while song_key not in musickeys:
-            song_key = str(input('Choose your key:'))
+            song_key = str(input('Choose your key: '))
 
 if song_notation in [InputModes.WESTERN, InputModes.DOREMI, InputModes.JIANPU, InputModes.WESTERNCHORDS]:
     try:
