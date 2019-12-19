@@ -169,7 +169,7 @@ class SongParser:
             #chord = re.sub(re.escape(self.pause), '.', chord) #Replaces the pause character by the default
 
             if isinstance(self.note_parser, WesternChordsNoteParser):
-                chord = self.note_parser.decode_chord(chord, self.note_parser.western_chords)
+                chord = self.note_parser.decode_chord(chord)
 
             repeat, chord = self.split_chord(chord)
             #Now the real chord has been split in notes (1 note = 1 list slot)
@@ -480,8 +480,7 @@ class NoteParser:
         self.default_starting_octave = 4
 
         # Compile regexes for notes to save before using
-        #TODO: not sure what regex to put for the generic note parser
-        # I think we can set it to None. The real question behind this is: do we want to parse a song without knowing the notation first?
+        # these regexes are used for validating whether an individual note is formatted correctly.
         self.note_name_with_octave_regex = None
         self.note_name_regex = None
         self.octave_number_regex = None
@@ -624,6 +623,8 @@ class NoteParser:
 
         # Find the major scale interval from the song_key to the note_name
         # Find the semitone interval from the song_key to the note_name first
+        if song_key == None:
+            song_key = 'C'
         try:
             song_key_chromatic_equivalent = self.convert_note_name_into_chromatic_position(song_key)
         except (KeyError, SyntaxError):
@@ -857,18 +858,26 @@ class WesternChordsNoteParser(WesternNoteParser):
         'Asus':'A4D5E5', 'D7sus':'D4G4A4C5', 'E7sus':'E4A4B4D5', 'G7sus':'G4C5D5F5', 'A7sus':'A4D5E5G5'
         }
 
+        # use WesternNoteParser as a helper parser for the individual notes
+        self.helper_parser = WesternNoteParser()
+
     def decode_chord(self, chord):
         '''
             Splits a chord abbreviated name into individual note names
         '''
         chord = self.sanitize_chord_name(chord)
         try:
-            return  self.western_chords[chord]
+            return self.western_chords[chord]
         except:
             return chord
 
     def sanitize_chord_name(self, chord):
          chord = chord.lower().capitalize()
+         return chord
+
+    def calculate_coordinate_for_note(self, note, song_key='C', note_shift=0):
+
+        return self.helper_parser.calculate_coordinate_for_note(note, song_key, note_shift)
 
 class DoremiNoteParser(NoteParser):
 
@@ -1000,18 +1009,3 @@ class JianpuNoteParser(NoteParser):
         #print(westernized_note)
 
         return westernized_note
-
-
-#mytestparser = WesternNoteParser()
-#print(mytestparser.calculate_coordinate_for_note(note='Ab5', song_key='Ab')) # expect (1,2)
-#print(mytestparser.calculate_coordinate_for_note('Ab6', 'Ab')) # expect (2,4)
-#print(mytestparser.calculate_coordinate_for_note('C#6', 'E')) # expect (2,2)
-#print(mytestparser.calculate_coordinate_for_note('Bb4', 'Eb')) # expect (0,4)
-#print(mytestparser.calculate_coordinate_for_note('B4', 'Eb')) # expect error not in major scale
-#print(mytestparser.calculate_coordinate_for_note('C1', 'C')) # expect error not in range of two octaves
-
-#mytestparser = JianpuNoteParser()
-#print(mytestparser.calculate_coordinate_for_note('1++++', 'C')) # expect (0,0)
-#print(mytestparser.calculate_coordinate_for_note('1++++', 'E'))
-
-#TODO: set up unit tests
