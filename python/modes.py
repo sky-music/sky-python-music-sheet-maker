@@ -15,6 +15,7 @@ class RenderModes(Enum):
     SKYASCII = 4
     WESTERNASCII = 5
     JIANPUASCII = 6
+    DOREMIASCII = 7
 
 class CSSModes(Enum):
     XML = 1

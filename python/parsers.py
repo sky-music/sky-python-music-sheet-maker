@@ -741,6 +741,13 @@ class SkyNoteParser(NoteParser):
                 'C1': (2, 0), 'C2': (2, 1), 'C3': (2, 2), 'C4': (2, 3), 'C5': (2, 4)
                 }
 
+        self.inverse_position_map = {
+                (-1, -1): '.',
+                (0, 0): 'A1', (0, 1): 'A2', (0, 2): 'A3', (0, 3): 'A4', (0, 4): 'A5',
+                (1, 0): 'B1', (1, 1): 'B2', (1, 2): 'B3', (1, 3): 'B4', (1, 4): 'B5',
+                (2, 0): 'C1', (2, 1): 'C2', (2, 2): 'C3', (2, 3): 'C4', (2, 4): 'C5'
+                }
+
         self.note_name_with_octave_regex = re.compile(r'([ABCabc][1-5])')
         self.note_name_regex = self.note_name_with_octave_regex
         self.single_note_name_regex = re.compile(r'(\b[ABCabc][1-5]\b)')
@@ -768,6 +775,15 @@ class SkyNoteParser(NoteParser):
                     raise KeyError('Note ' + str(note) + ' was not in range of the Sky keyboard.')
         else:
             raise KeyError('Note ' + str(note) + ' was not found in the position_map dictionary.')
+
+    def get_note_from_coordinate(self, coord):
+        
+        try:
+            note = self.inverse_position_map[coord]
+        except KeyError: 
+            note = 'X'
+            
+        return note
 
     def sanitize_note_name(self, note_name):
 
@@ -804,25 +820,13 @@ class WesternNoteParser(NoteParser):
 
         super().__init__()
 
-        #Next lines: for retro-compatibility of find_input_type
-        #TODO: change find_input_type and delete these lines
-        #self.position_map = {
-#                '.': (-1, -1),
-#                'F0': (-5, 0), 'G0': (-5, 1), 'A0': (-5, 2), 'B0': (-5, 3), 'C1': (-5, 4),
-#                'D1': (-4, 0), 'E1': (-4, 1), 'F1': (-4, 2), 'G1': (-4, 3), 'A1': (-4, 4),
-#                'B1': (-3, 0), 'C2': (-3, 1), 'D2': (-3, 2), 'E2': (-3, 3), 'F2': (-3, 4),
-#                'G2': (-2, 0), 'A2': (-2, 1), 'B2': (-2, 2), 'C3': (-2, 3), 'D3': (-2, 4),
-#                'E3': (-1, 0), 'F3': (-1, 1), 'G3': (-1, 2), 'A3': (-1, 3), 'B3': (-1, 4),
-#                'C4': (0, 0), 'D4': (0, 1), 'E4': (0, 2), 'F4': (0, 3), 'G4': (0, 4),
-#                'A4': (1, 0), 'B4': (1, 1), 'C5': (1, 2), 'D5': (1, 3), 'E5': (1, 4),
-#                'F5': (2, 0), 'G5': (2, 1), 'A5': (2, 2), 'B5': (2, 3), 'C6': (2, 4),
-#                'D6': (3, 0), 'E6': (3, 1), 'F6': (3, 2), 'G6': (3, 3), 'A6': (3, 4),
-#                'B6': (4, 0), 'C7': (4, 1), 'D7': (4, 2), 'E7': (4, 3), 'F7': (4, 4),
-#                'C': (0, 0), 'D': (0, 1), 'E': (0, 2), 'F': (0, 3), 'G': (0, 4),
-#                'A': (1, 0), 'B': (1, 1)
-# #               }
-
         self.CHROMATIC_SCALE_DICT = {'C': 0, 'C#': 1, 'Db': 1, 'D': 2, 'D#': 3, 'Eb': 3, 'E': 4, 'F': 5, 'F#': 6, 'Gb': 6, 'G': 7, 'G#': 8, 'Ab': 8, 'A': 9, 'A#': 10, 'Bb': 10, 'B': 11}
+
+        self.inverse_position_map = {
+                (0, 0): 'C4', (0, 1): 'D4', (0, 2): 'E4', (0, 3): 'F4', (0, 4): 'G4',
+                (1, 0): 'A4', (1, 1): 'B4', (1, 2): 'C5', (1, 3): 'D5', (1, 4): 'E5',
+                (2, 0): 'F5', (2, 1): 'G5', (2, 2): 'A6', (2, 3): 'B6', (2, 4): 'C6'
+                }
 
         # Compile regexes for notes to save before using
         self.note_name_with_octave_regex = re.compile(r'([ABCDEFGabcdefg][b#]?\d)')
@@ -836,6 +840,17 @@ class WesternNoteParser(NoteParser):
         # make sure the first letter of the note is uppercase, for western note's dictionary keys
         note_name = note_name.capitalize()
         return note_name
+
+
+    def get_note_from_coordinate(self, coord):
+        
+        try:
+            note = self.inverse_position_map[coord]
+        except KeyError: 
+            note = 'X'
+            
+        return note
+
 
 class WesternChordsNoteParser(WesternNoteParser):
 
@@ -887,6 +902,12 @@ class DoremiNoteParser(NoteParser):
 
         self.CHROMATIC_SCALE_DICT = {'do': 0, 'do#': 1, 'reb': 1, 're': 2, 're#': 3, 'mib': 3, 'mi': 4, 'fa': 5, 'fa#': 6, 'solb': 6, 'sol': 7, 'sol#': 8, 'lab': 8, 'la': 9, 'la#': 10, 'sib': 10, 'tib': 10, 'si': 11, 'ti': 11}
 
+        self.inverse_position_map = {
+                (0, 0): 'do4', (0, 1): 're4', (0, 2): 'mi4', (0, 3): 'fa4', (0, 4): 'sol4',
+                (1, 0): 'la4', (1, 1): 'si4', (1, 2): 'do5', (1, 3): 're5', (1, 4): 'mi5',
+                (2, 0): 'fa5', (2, 1): 'sol5', (2, 2): 'la6', (2, 3): 'si6', (2, 4): 'do6'
+                }
+
         # Compile regexes for notes to save before using
         self.note_name_with_octave_regex = re.compile(r'([DRMFSLTdrmfslt][OEIAoeia][Ll]?[b#]?\d)')
         self.note_name_regex = re.compile(r'([DRMFSLTdrmfslt][OEIAoeia][Ll]?[b#]?)')
@@ -901,28 +922,21 @@ class DoremiNoteParser(NoteParser):
         note_name = note_name.lower()
         return note_name
 
+    def get_note_from_coordinate(self, coord):
+        
+        try:
+            note = self.inverse_position_map[coord]
+        except KeyError: 
+            note = 'X'
+            
+        return note
+
 
 class JianpuNoteParser(NoteParser):
 
     def __init__(self):
 
         super().__init__()
-
-        #Next lines: for retro-compatibility of find_input_type
-        #TODO: change find_input_type and delete these lines
-#        self.position_map = {
-#                '.': (-1, -1),
-#                '4----': (-5, 0), '5----': (-5, 1), '6----': (-5, 2), '7----': (-5, 3), '1---': (-5, 4),
-#                '2---': (-4, 0), '3---': (-4, 1), '4---': (-4, 2), '5---': (-4, 3), '6---': (-4, 4),
-#                '7---': (-3, 0), '1--': (-3, 1), '2--': (-3, 2), '3--': (-3, 3), '4--': (-3, 4),
-#                '5--': (-2, 0), '6--': (-2, 1), '7--': (-2, 2), '1-': (-2, 3), '2-': (-2, 4),
-#                '3-': (-1, 0), '4-': (-1, 1), '5-': (-1, 2), '6-': (-1, 3), '7-': (-1, 4),
-#                '1': (0, 0), '2': (0, 1), '3': (0, 2), '4': (0, 3), '5': (0, 4),
-#                '6': (1, 0), '7': (1, 1), '1+': (1, 2), '2+': (1, 3), '3+': (1, 4),
-#                '4+': (2, 0), '5+': (2, 1), '6+': (2, 2), '7+': (2, 3), '1++': (2, 4),
-#                '2++': (3, 0), '3++': (3, 1), '4++': (3, 2), '5++': (3, 3), '6++': (3, 4),
-#                '7++': (4, 0), '1+++': (4, 1), '2+++': (4, 2), '3+++': (4, 3), '4+++': (4, 4)
-#                }
 
         self.CHROMATIC_SCALE_DICT = {'1': 0, '1#': 1, '2b': 1, '2': 2, '2#': 3, '3b': 3, '3': 4, '4': 5, '4#': 6, '5b': 6, '5': 7, '5#': 8, '6b': 8, '6': 9, '6#': 10, '7b': 10, '7': 11}
 
@@ -938,13 +952,28 @@ class JianpuNoteParser(NoteParser):
             '1': 'C', '2' : 'D', '3': 'E', '4': 'F', '5': 'G', '6': 'A', '7': 'B',
             'C':'C', 'D':'D', 'E':'E', 'F':'F', 'G':'G', 'A':'A', 'B':'B'
             }
-     #For find_key only: prints the key in the Western form instead of Jianpu
-    #TODO: checks that it works
-    def jianpu2western(self,notes):
+
+        self.inverse_position_map = {
+                (0, 0): '1', (0, 1): '2', (0, 2): '3', (0, 3): '4', (0, 4): '5',
+                (1, 0): '6', (1, 1): '7', (1, 2): '1+', (1, 3): '2+', (1, 4): '3+',
+                (2, 0): '4+', (2, 1): '5+', (2, 2): '6+', (2, 3): '7+', (2, 4): '1++'
+                }
+
+    def get_note_from_coordinate(self, coord):
+        
         try:
-            return [self.jianpu2western_map[note] for note in notes]
-        except KeyError:
-            return notes
+            note = self.inverse_position_map[coord]
+        except KeyError: 
+            note = 'X'
+            
+        return note
+
+
+#    def jianpu2western(self,notes):
+#        try:
+#            return [self.jianpu2western_map[note] for note in notes]
+#        except KeyError:
+#            return notes
 
 
     def parse_note(self, note):
@@ -952,18 +981,6 @@ class JianpuNoteParser(NoteParser):
         '''
         Returns a tuple containing note_name, octave_number for a note in the format self.note_name_with_octave_regex
         '''
-
- #       note_base = re.match('[1234567]',note)
-#        if note_base != None:
-#            note_base = note_base.group()
- #       else:
- #           raise KeyError('Note was not recognized as Jianpu.')
-
- #       note_alt = re.search('[#b]',note)
-#        if note_alt != None:
-#            note_alt = note_alt.group(0)
-#        else:
-#            note_alt = ''
 
         note_name = self.note_name_regex.search(note)
         if note_name != None:
