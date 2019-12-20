@@ -860,7 +860,7 @@ class DoremiNoteParser(NoteParser):
 
         super().__init__()
 
-        self.CHROMATIC_SCALE_DICT = {'do': 0, 'do#': 1, 'reb': 1, 're': 2, 're#': 3, 'mib': 3, 'mi': 4, 'fa': 5, 'fa#': 6, 'solb': 6, 'sol': 7, 'sol#': 8, 'lab': 8, 'la': 9, 'la#': 10, 'sib': 10, 'tib': 10, 'si': 11, 'ti': 11}
+        self.CHROMATIC_SCALE_DICT = {'do': 0, 'do#': 1, 'reb': 1, 're': 2, 're#': 3, 'mib': 3, 'mi': 4, 'fa': 5, 'fa#': 6, 'solb': 6, 'sob': 6, 'sol': 7, 'so': 7, 'sol#': 8, 'so#': 8, 'lab': 8, 'la': 9, 'la#': 10, 'sib': 10, 'tib': 10, 'si': 11, 'ti': 11}
 
         self.inverse_position_map = {
                 (0, 0): 'do4', (0, 1): 're4', (0, 2): 'mi4', (0, 3): 'fa4', (0, 4): 'sol4',
