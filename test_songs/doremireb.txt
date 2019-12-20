@@ -11,8 +11,8 @@ reb4-mib4-fa4-solb4 lab4-sib4do5reb5
 #Pauses:
 reb4 . mib4 . . fa4
 #Notes #without #octave:
-reb mib fa solb lab sib do
-do# re# fabfa# sol#bla# do
+reb mib fa solb lab sib
+do# re# fa fa# sol# la#
 #Chords #without #octaves:
 rebmib fasolblab
 #quavers #without #octaves:
