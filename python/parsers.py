@@ -80,14 +80,14 @@ class SongParser:
             note_parser = SkyKeyboardNoteParser()
         elif input_mode == InputModes.SKY:
             note_parser = SkyNoteParser()
-        elif input_mode == InputModes.WESTERN:
-            note_parser = WesternNoteParser()
+        elif input_mode == InputModes.ENGLISH:
+            note_parser = EnglishNoteParser()
         elif input_mode == InputModes.DOREMI:
             note_parser = DoremiNoteParser()
         elif input_mode == InputModes.JIANPU:
             note_parser = JianpuNoteParser()
-        elif input_mode == InputModes.WESTERNCHORDS:
-            note_parser = WesternChordsNoteParser()
+        elif input_mode == InputModes.ENGLISHCHORDS:
+            note_parser = EnglishChordsNoteParser()
 
         return note_parser
 
@@ -168,7 +168,7 @@ class SongParser:
             #TODO: this line is useless since we don't use position maps anymore.
             #chord = re.sub(re.escape(self.pause), '.', chord) #Replaces the pause character by the default
 
-            if isinstance(self.note_parser, WesternChordsNoteParser):
+            if isinstance(self.note_parser, EnglishChordsNoteParser):
                 chord = self.note_parser.decode_chord(chord)
 
             repeat, chord = self.split_chord(chord)
@@ -323,9 +323,9 @@ class SongParser:
                         for chord in chords:
                             for idx, possible_mode in enumerate(possible_modes):
 
-                                if possible_mode == InputModes.WESTERNCHORDS:
+                                if possible_mode == InputModes.ENGLISHCHORDS:
                                     notes = [chord] #Because abbreviated chord names are not composed of note names
-                                    good_notes[idx] += sum([int(note in possible_parsers[idx].western_chords.keys()) for note in notes])
+                                    good_notes[idx] += sum([int(note in possible_parsers[idx].english_chords.keys()) for note in notes])
                                 else:
                                     repeat, notes = self.split_chord(chord, possible_parsers[idx])
                                     good_notes[idx] += sum([int(possible_regex[idx].match(note) != None) for note in notes if note != self.pause])
@@ -333,7 +333,7 @@ class SongParser:
 
                                 num_notes[idx] += sum([1 for note in notes if note != self.pause])
 
-                                if possible_mode == InputModes.WESTERN:
+                                if possible_mode == InputModes.ENGLISH:
                                     DEFG_notes += sum([int(re.search('[D-G]',note) != None) for note in notes])
                                     octaves = [re.search('\d',note) for note in notes]
 
@@ -344,10 +344,10 @@ class SongParser:
         num_notes = [1 if x == 0 else x for x in num_notes] #Removes zeros to avoid division by zero
 
         scores = list(map(truediv, good_notes, num_notes))
-        DEFG_notes /= num_notes[possible_modes.index(InputModes.WESTERN)]
+        DEFG_notes /= num_notes[possible_modes.index(InputModes.ENGLISH)]
 
-        if ((DEFG_notes == 0) or (DEFG_notes < 0.01 and octave_span > 2)) and (num_notes[possible_modes.index(InputModes.WESTERN)] > 10):
-            scores[possible_modes.index(InputModes.WESTERN)] *= 0.5
+        if ((DEFG_notes == 0) or (DEFG_notes < 0.01 and octave_span > 2)) and (num_notes[possible_modes.index(InputModes.ENGLISH)] > 10):
+            scores[possible_modes.index(InputModes.ENGLISH)] *= 0.5
         #print(scores)
 
         return self.most_likely(scores, possible_modes, 0.9)
@@ -411,43 +411,6 @@ class SongParser:
             return items
         else:
             return sorted_items
-
-#    def find_key(self, song_lines, comment_delimiter='#', input_mode=InputModes.SKY):
-#        '''
-#        Finds musical key from notes in a song file
-#        '''
-#        if input_mode == InputModes.WESTERN:
-#            scale = self.get_westernkeys().copy()
-#            isNoteRegExp = '([A-G])'
-#            notNoteRegExp = '[^A-Gb#]'
-#        elif input_mode == InputModes.JIANPU:
-#            scale = self.get_jianpukeys().copy()
-#            isNoteRegExp = '([1-7])'
-#            notNoteRegExp = '[^1-7b#]'
-#        else:
-#            return ['']
-#        indices = self.get_intervals()
-#        possible_keys = scale[0].copy()
-#
-#        for line in song_lines:
-#            if len(line)>0 and any([musickey!='' for musickey in possible_keys]):
-#                if line[0] != comment_delimiter:
-#                    notes = re.sub(isNoteRegExp,' \\1',re.sub(notNoteRegExp,'',line)).split() # Clean-up, adds space and split
-#                    for key_idx, musickey in enumerate(possible_keys):
-#                        if musickey!='':
-#                            key_scale = [[scale[0][j] for j in indices], [scale[1][j] for j in indices]]
-#                            if not all([(note in key_scale[0]) or (note in key_scale[1]) for note in notes]):
-#                                possible_keys[key_idx]=''
-#                        scale[0] = scale[0][1::] + scale[0][:1:] # circ shift
-#                        scale[1] = scale[1][1::] + scale[1][:1:] # circ shift
-#
-#        possible_keys = [musickey for musickey in possible_keys if musickey != ''] # return reduced set of possible keys
-#        return self.jianpu2western(possible_keys)
-
-
-
-
-
 
 
 class NoteParser:
@@ -684,10 +647,7 @@ class NoteParser:
             num -= numstr[i]*(base**i)
         numstr=list(map(str,numstr))
         return ''.join(numstr[::-1]).lstrip('0')
-#        numstr = ['0']*2
-#        numstr[-1] = str(num % self.get_base_of_western_major_scale())
-#        numstr[-2] = str(math.floor(num / self.get_base_of_western_major_scale()))
-#        return ''.join(numstr)
+
 
     def convert_base_7_to_base_10(self, num_in_base_7):
 
@@ -787,7 +747,7 @@ class SkyNoteParser(NoteParser):
 
     def sanitize_note_name(self, note_name):
 
-        # make sure the first letter of the note is uppercase, for western note's dictionary keys
+        # make sure the first letter of the note is uppercase, for sky note's dictionary keys
         note_name = note_name.capitalize()
         return note_name
 
@@ -814,7 +774,7 @@ class SkyKeyboardNoteParser(SkyNoteParser):
         self.not_octave_regex = re.compile(r'.')
 
 
-class WesternNoteParser(NoteParser):
+class EnglishNoteParser(NoteParser):
 
     def __init__(self):
 
@@ -837,7 +797,7 @@ class WesternNoteParser(NoteParser):
         self.not_octave_regex = re.compile(r'[^\d]+')
 
     def sanitize_note_name(self, note_name):
-        # make sure the first letter of the note is uppercase, for western note's dictionary keys
+        # make sure the first letter of the note is uppercase, for english note's dictionary keys
         note_name = note_name.capitalize()
         return note_name
 
@@ -852,13 +812,13 @@ class WesternNoteParser(NoteParser):
         return note
 
 
-class WesternChordsNoteParser(WesternNoteParser):
+class EnglishChordsNoteParser(EnglishNoteParser):
 
     def __init__(self):
 
         super().__init__()
 
-        self.western_chords = {
+        self.english_chords = {
         'C':'C4E4G4', 'D':'D4A4', 'F':'F4A4C5', 'G':'G4B4D5', 'Dm':'D4F4A4', 'Em':'E4G4B4',
         'Am':'A4C5E5', 'Bm':'B4D5', 'Bdim':'B4D5F5', 'A+':'A4C5F5', 'Csus2':'C4D4G4',
         'Dsus2':'C4E4A4', 'Fsus2':'F4G4C5', 'Gsus2':'G4A4D5', 'Asus2':'A4B4E5',
@@ -873,8 +833,8 @@ class WesternChordsNoteParser(WesternNoteParser):
         'Asus':'A4D5E5', 'D7sus':'D4G4A4C5', 'E7sus':'E4A4B4D5', 'G7sus':'G4C5D5F5', 'A7sus':'A4D5E5G5'
         }
 
-        # use WesternNoteParser as a helper parser for the individual notes
-        self.helper_parser = WesternNoteParser()
+        # use EnglishNoteParser as a helper parser for the individual notes
+        self.helper_parser = EnglishNoteParser()
 
     def decode_chord(self, chord):
         '''
@@ -882,7 +842,7 @@ class WesternChordsNoteParser(WesternNoteParser):
         '''
         chord = self.sanitize_chord_name(chord)
         try:
-            return self.western_chords[chord]
+            return self.english_chords[chord]
         except:
             return chord
 
@@ -918,7 +878,7 @@ class DoremiNoteParser(NoteParser):
 
     def sanitize_note_name(self, note_name):
 
-        # make sure the first letter of the note is uppercase, for western note's dictionary keys
+        # make sure the first letter of the note is uppercase, for doremi note's dictionary keys
         note_name = note_name.lower()
         return note_name
 
@@ -948,7 +908,7 @@ class JianpuNoteParser(NoteParser):
         self.not_note_name_regex = re.compile(r'[^1234567b#]+')
         self.not_octave_regex = re.compile(r'[^\\+\\-]+')
 
-        self.jianpu2western_map = {
+        self.jianpu2english_map = {
             '1': 'C', '2' : 'D', '3': 'E', '4': 'F', '5': 'G', '6': 'A', '7': 'B',
             'C':'C', 'D':'D', 'E':'E', 'F':'F', 'G':'G', 'A':'A', 'B':'B'
             }
@@ -1001,11 +961,8 @@ class JianpuNoteParser(NoteParser):
         return note_name, note_octave
 
 
+    def convert_to_english_note(self, note_base, note_alt, note_octave):
 
-    def convert_to_westernized_note(self, note_base, note_alt, note_octave):
+        english_note = self.jianpu2english_map[note_base] + note_alt + str(note_octave)
 
-        westernized_note = self.jianpu2western_map[note_base] + note_alt + str(note_octave)
-
-        #print(westernized_note)
-
-        return westernized_note
+        return english_note

@@ -224,8 +224,8 @@ class Song():
 
         if render_mode == RenderModes.SKYASCII:
             note_parser = parsers.SkyNoteParser()
-        elif render_mode == RenderModes.WESTERNASCII:
-            note_parser = parsers.WesternNoteParser()
+        elif render_mode == RenderModes.ENGLISHASCII:
+            note_parser = parsers.EnglishNoteParser()
         elif render_mode == RenderModes.JIANPUASCII:
             note_parser = parsers.JianpuNoteParser()
         elif render_mode == RenderModes.DOREMIASCII:
