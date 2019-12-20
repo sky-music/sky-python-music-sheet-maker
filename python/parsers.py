@@ -80,14 +80,14 @@ class SongParser:
             note_parser = SkyKeyboardNoteParser()
         elif input_mode == InputModes.SKY:
             note_parser = SkyNoteParser()
-        elif input_mode == InputModes.WESTERN:
-            note_parser = WesternNoteParser()
+        elif input_mode == InputModes.ENGLISH:
+            note_parser = EnglishNoteParser()
         elif input_mode == InputModes.DOREMI:
             note_parser = DoremiNoteParser()
         elif input_mode == InputModes.JIANPU:
             note_parser = JianpuNoteParser()
-        elif input_mode == InputModes.WESTERNCHORDS:
-            note_parser = WesternChordsNoteParser()
+        elif input_mode == InputModes.ENGLISHCHORDS:
+            note_parser = EnglishChordsNoteParser()
 
         return note_parser
 
@@ -168,7 +168,7 @@ class SongParser:
             #TODO: this line is useless since we don't use position maps anymore.
             #chord = re.sub(re.escape(self.pause), '.', chord) #Replaces the pause character by the default
 
-            if isinstance(self.note_parser, WesternChordsNoteParser):
+            if isinstance(self.note_parser, EnglishChordsNoteParser):
                 chord = self.note_parser.decode_chord(chord)
 
             repeat, chord = self.split_chord(chord)
@@ -323,9 +323,9 @@ class SongParser:
                         for chord in chords:
                             for idx, possible_mode in enumerate(possible_modes):
 
-                                if possible_mode == InputModes.WESTERNCHORDS:
+                                if possible_mode == InputModes.ENGLISHCHORDS:
                                     notes = [chord] #Because abbreviated chord names are not composed of note names
-                                    good_notes[idx] += sum([int(note in possible_parsers[idx].western_chords.keys()) for note in notes])
+                                    good_notes[idx] += sum([int(note in possible_parsers[idx].english_chords.keys()) for note in notes])
                                 else:
                                     repeat, notes = self.split_chord(chord, possible_parsers[idx])
                                     good_notes[idx] += sum([int(possible_regex[idx].match(note) != None) for note in notes if note != self.pause])
@@ -333,7 +333,7 @@ class SongParser:
 
                                 num_notes[idx] += sum([1 for note in notes if note != self.pause])
 
-                                if possible_mode == InputModes.WESTERN:
+                                if possible_mode == InputModes.ENGLISH:
                                     DEFG_notes += sum([int(re.search('[D-G]',note) != None) for note in notes])
                                     octaves = [re.search('\d',note) for note in notes]
 
@@ -344,10 +344,10 @@ class SongParser:
         num_notes = [1 if x == 0 else x for x in num_notes] #Removes zeros to avoid division by zero
 
         scores = list(map(truediv, good_notes, num_notes))
-        DEFG_notes /= num_notes[possible_modes.index(InputModes.WESTERN)]
+        DEFG_notes /= num_notes[possible_modes.index(InputModes.ENGLISH)]
 
-        if ((DEFG_notes == 0) or (DEFG_notes < 0.01 and octave_span > 2)) and (num_notes[possible_modes.index(InputModes.WESTERN)] > 10):
-            scores[possible_modes.index(InputModes.WESTERN)] *= 0.5
+        if ((DEFG_notes == 0) or (DEFG_notes < 0.01 and octave_span > 2)) and (num_notes[possible_modes.index(InputModes.ENGLISH)] > 10):
+            scores[possible_modes.index(InputModes.ENGLISH)] *= 0.5
         #print(scores)
 
         return self.most_likely(scores, possible_modes, 0.9)
@@ -411,43 +411,6 @@ class SongParser:
             return items
         else:
             return sorted_items
-
-#    def find_key(self, song_lines, comment_delimiter='#', input_mode=InputModes.SKY):
-#        '''
-#        Finds musical key from notes in a song file
-#        '''
-#        if input_mode == InputModes.WESTERN:
-#            scale = self.get_westernkeys().copy()
-#            isNoteRegExp = '([A-G])'
-#            notNoteRegExp = '[^A-Gb#]'
-#        elif input_mode == InputModes.JIANPU:
-#            scale = self.get_jianpukeys().copy()
-#            isNoteRegExp = '([1-7])'
-#            notNoteRegExp = '[^1-7b#]'
-#        else:
-#            return ['']
-#        indices = self.get_intervals()
-#        possible_keys = scale[0].copy()
-#
-#        for line in song_lines:
-#            if len(line)>0 and any([musickey!='' for musickey in possible_keys]):
-#                if line[0] != comment_delimiter:
-#                    notes = re.sub(isNoteRegExp,' \\1',re.sub(notNoteRegExp,'',line)).split() # Clean-up, adds space and split
-#                    for key_idx, musickey in enumerate(possible_keys):
-#                        if musickey!='':
-#                            key_scale = [[scale[0][j] for j in indices], [scale[1][j] for j in indices]]
-#                            if not all([(note in key_scale[0]) or (note in key_scale[1]) for note in notes]):
-#                                possible_keys[key_idx]=''
-#                        scale[0] = scale[0][1::] + scale[0][:1:] # circ shift
-#                        scale[1] = scale[1][1::] + scale[1][:1:] # circ shift
-#
-#        possible_keys = [musickey for musickey in possible_keys if musickey != ''] # return reduced set of possible keys
-#        return self.jianpu2western(possible_keys)
-
-
-
-
-
 
 
 class NoteParser:
@@ -684,10 +647,7 @@ class NoteParser:
             num -= numstr[i]*(base**i)
         numstr=list(map(str,numstr))
         return ''.join(numstr[::-1]).lstrip('0')
-#        numstr = ['0']*2
-#        numstr[-1] = str(num % self.get_base_of_western_major_scale())
-#        numstr[-2] = str(math.floor(num / self.get_base_of_western_major_scale()))
-#        return ''.join(numstr)
+
 
     def convert_base_7_to_base_10(self, num_in_base_7):
 
@@ -741,6 +701,13 @@ class SkyNoteParser(NoteParser):
                 'C1': (2, 0), 'C2': (2, 1), 'C3': (2, 2), 'C4': (2, 3), 'C5': (2, 4)
                 }
 
+        self.inverse_position_map = {
+                (-1, -1): '.',
+                (0, 0): 'A1', (0, 1): 'A2', (0, 2): 'A3', (0, 3): 'A4', (0, 4): 'A5',
+                (1, 0): 'B1', (1, 1): 'B2', (1, 2): 'B3', (1, 3): 'B4', (1, 4): 'B5',
+                (2, 0): 'C1', (2, 1): 'C2', (2, 2): 'C3', (2, 3): 'C4', (2, 4): 'C5'
+                }
+
         self.note_name_with_octave_regex = re.compile(r'([ABCabc][1-5])')
         self.note_name_regex = self.note_name_with_octave_regex
         self.single_note_name_regex = re.compile(r'(\b[ABCabc][1-5]\b)')
@@ -769,9 +736,18 @@ class SkyNoteParser(NoteParser):
         else:
             raise KeyError('Note ' + str(note) + ' was not found in the position_map dictionary.')
 
+    def get_note_from_coordinate(self, coord):
+
+        try:
+            note = self.inverse_position_map[coord]
+        except KeyError:
+            note = 'X'
+
+        return note
+
     def sanitize_note_name(self, note_name):
 
-        # make sure the first letter of the note is uppercase, for western note's dictionary keys
+        # make sure the first letter of the note is uppercase, for sky note's dictionary keys
         note_name = note_name.capitalize()
         return note_name
 
@@ -798,31 +774,19 @@ class SkyKeyboardNoteParser(SkyNoteParser):
         self.not_octave_regex = re.compile(r'.')
 
 
-class WesternNoteParser(NoteParser):
+class EnglishNoteParser(NoteParser):
 
     def __init__(self):
 
         super().__init__()
 
-        #Next lines: for retro-compatibility of find_input_type
-        #TODO: change find_input_type and delete these lines
-        #self.position_map = {
-#                '.': (-1, -1),
-#                'F0': (-5, 0), 'G0': (-5, 1), 'A0': (-5, 2), 'B0': (-5, 3), 'C1': (-5, 4),
-#                'D1': (-4, 0), 'E1': (-4, 1), 'F1': (-4, 2), 'G1': (-4, 3), 'A1': (-4, 4),
-#                'B1': (-3, 0), 'C2': (-3, 1), 'D2': (-3, 2), 'E2': (-3, 3), 'F2': (-3, 4),
-#                'G2': (-2, 0), 'A2': (-2, 1), 'B2': (-2, 2), 'C3': (-2, 3), 'D3': (-2, 4),
-#                'E3': (-1, 0), 'F3': (-1, 1), 'G3': (-1, 2), 'A3': (-1, 3), 'B3': (-1, 4),
-#                'C4': (0, 0), 'D4': (0, 1), 'E4': (0, 2), 'F4': (0, 3), 'G4': (0, 4),
-#                'A4': (1, 0), 'B4': (1, 1), 'C5': (1, 2), 'D5': (1, 3), 'E5': (1, 4),
-#                'F5': (2, 0), 'G5': (2, 1), 'A5': (2, 2), 'B5': (2, 3), 'C6': (2, 4),
-#                'D6': (3, 0), 'E6': (3, 1), 'F6': (3, 2), 'G6': (3, 3), 'A6': (3, 4),
-#                'B6': (4, 0), 'C7': (4, 1), 'D7': (4, 2), 'E7': (4, 3), 'F7': (4, 4),
-#                'C': (0, 0), 'D': (0, 1), 'E': (0, 2), 'F': (0, 3), 'G': (0, 4),
-#                'A': (1, 0), 'B': (1, 1)
-# #               }
-
         self.CHROMATIC_SCALE_DICT = {'C': 0, 'C#': 1, 'Db': 1, 'D': 2, 'D#': 3, 'Eb': 3, 'E': 4, 'F': 5, 'F#': 6, 'Gb': 6, 'G': 7, 'G#': 8, 'Ab': 8, 'A': 9, 'A#': 10, 'Bb': 10, 'B': 11}
+
+        self.inverse_position_map = {
+                (0, 0): 'C4', (0, 1): 'D4', (0, 2): 'E4', (0, 3): 'F4', (0, 4): 'G4',
+                (1, 0): 'A4', (1, 1): 'B4', (1, 2): 'C5', (1, 3): 'D5', (1, 4): 'E5',
+                (2, 0): 'F5', (2, 1): 'G5', (2, 2): 'A6', (2, 3): 'B6', (2, 4): 'C6'
+                }
 
         # Compile regexes for notes to save before using
         self.note_name_with_octave_regex = re.compile(r'([ABCDEFGabcdefg][b#]?\d)')
@@ -833,17 +797,28 @@ class WesternNoteParser(NoteParser):
         self.not_octave_regex = re.compile(r'[^\d]+')
 
     def sanitize_note_name(self, note_name):
-        # make sure the first letter of the note is uppercase, for western note's dictionary keys
+        # make sure the first letter of the note is uppercase, for english note's dictionary keys
         note_name = note_name.capitalize()
         return note_name
 
-class WesternChordsNoteParser(WesternNoteParser):
+
+    def get_note_from_coordinate(self, coord):
+
+        try:
+            note = self.inverse_position_map[coord]
+        except KeyError:
+            note = 'X'
+
+        return note
+
+
+class EnglishChordsNoteParser(EnglishNoteParser):
 
     def __init__(self):
 
         super().__init__()
 
-        self.western_chords = {
+        self.english_chords = {
         'C':'C4E4G4', 'D':'D4A4', 'F':'F4A4C5', 'G':'G4B4D5', 'Dm':'D4F4A4', 'Em':'E4G4B4',
         'Am':'A4C5E5', 'Bm':'B4D5', 'Bdim':'B4D5F5', 'A+':'A4C5F5', 'Csus2':'C4D4G4',
         'Dsus2':'C4E4A4', 'Fsus2':'F4G4C5', 'Gsus2':'G4A4D5', 'Asus2':'A4B4E5',
@@ -858,8 +833,8 @@ class WesternChordsNoteParser(WesternNoteParser):
         'Asus':'A4D5E5', 'D7sus':'D4G4A4C5', 'E7sus':'E4A4B4D5', 'G7sus':'G4C5D5F5', 'A7sus':'A4D5E5G5'
         }
 
-        # use WesternNoteParser as a helper parser for the individual notes
-        self.helper_parser = WesternNoteParser()
+        # use EnglishNoteParser as a helper parser for the individual notes
+        self.helper_parser = EnglishNoteParser()
 
     def decode_chord(self, chord):
         '''
@@ -867,7 +842,7 @@ class WesternChordsNoteParser(WesternNoteParser):
         '''
         chord = self.sanitize_chord_name(chord)
         try:
-            return self.western_chords[chord]
+            return self.english_chords[chord]
         except:
             return chord
 
@@ -885,38 +860,36 @@ class DoremiNoteParser(NoteParser):
 
         super().__init__()
 
-        #Next lines: for retro-caompatibility of find_input_type
-        #TODO: change find_input_type and delete these lines
-#        self.position_map = {
-#                'FA0': (-5, 0), 'SOL0': (-5, 1), 'LA0': (-5, 2), 'SI0': (-5, 3), 'DO1': (-5, 4),
-#                'RE1': (-4, 0), 'MI1': (-4, 1), 'FA1': (-4, 2), 'SOL1': (-4, 3), 'LA1': (-4, 4),
-#                'SI1': (-3, 0), 'DO2': (-3, 1), 'RE2': (-3, 2), 'MI2': (-3, 3), 'FA2': (-3, 4),
-#                'SOL2': (-2, 0), 'LA2': (-2, 1), 'SI2': (-2, 2), 'DO3': (-2, 3), 'RE3': (-2, 4),
-#                'MI3': (-1, 0), 'FA3': (-1, 1), 'SOL3': (-1, 2), 'LA3': (-1, 3), 'SI3': (-1, 4),
-#                'DO4': (0, 0), 'RE4': (0, 1), 'MI4': (0, 2), 'FA4': (0, 3), 'SOL4': (0, 4),
-#                'LA4': (1, 0), 'SI4': (1, 1), 'DO5': (1, 2), 'RE5': (1, 3), 'MI5': (1, 4),
-#                'FA5': (2, 0), 'SOL5': (2, 1), 'LA5': (2, 2), 'SI5': (2, 3), 'DO6': (2, 4),
-#                'RE6': (3, 0), 'MI6': (3, 1), 'FA6': (3, 2), 'SOL6': (3, 3), 'LA6': (3, 4),
-#                'SI6': (4, 0), 'DO7': (4, 1), 'RE7': (4, 2), 'MI7': (4, 3), 'FA7': (4, 4),
-#                'DO': (0, 0), 'RE': (0, 1), 'MI': (0, 2), 'FA': (0, 3), 'SOL': (0, 4),
-#                'LA': (1, 0), 'SI': (1, 1)
-#                }
+        self.CHROMATIC_SCALE_DICT = {'do': 0, 'do#': 1, 'reb': 1, 're': 2, 're#': 3, 'mib': 3, 'mi': 4, 'fa': 5, 'fa#': 6, 'solb': 6, 'sob': 6, 'sol': 7, 'so': 7, 'sol#': 8, 'so#': 8, 'lab': 8, 'la': 9, 'la#': 10, 'sib': 10, 'tib': 10, 'si': 11, 'ti': 11}
 
-        self.CHROMATIC_SCALE_DICT = {'do': 0, 'do#': 1, 'reb': 1, 're': 2, 're#': 3, 'mib': 3, 'mi': 4, 'fa': 5, 'fa#': 6, 'solb': 6, 'sol': 7, 'sol#': 8, 'lab': 8, 'la': 9, 'la#': 10, 'sib': 10, 'si': 11}
+        self.inverse_position_map = {
+                (0, 0): 'do4', (0, 1): 're4', (0, 2): 'mi4', (0, 3): 'fa4', (0, 4): 'sol4',
+                (1, 0): 'la4', (1, 1): 'si4', (1, 2): 'do5', (1, 3): 're5', (1, 4): 'mi5',
+                (2, 0): 'fa5', (2, 1): 'sol5', (2, 2): 'la6', (2, 3): 'si6', (2, 4): 'do6'
+                }
 
         # Compile regexes for notes to save before using
-        self.note_name_with_octave_regex = re.compile(r'([DRMFSLdrmfsl][OEIAoeia][Ll]?[b#]?\d)')
-        self.note_name_regex = re.compile(r'([DRMFSLdrmfsl][OEIAoeia][Ll]?[b#]?)')
-        self.single_note_name_regex = re.compile(r'\b[DRMFSLdrmfsl][OEIAoeia][Ll]?[b#]?\d?\b')
+        self.note_name_with_octave_regex = re.compile(r'([DRMFSLTdrmfslt][OEIAoeia][Ll]?[b#]?\d)')
+        self.note_name_regex = re.compile(r'([DRMFSLTdrmfslt][OEIAoeia][Ll]?[b#]?)')
+        self.single_note_name_regex = re.compile(r'\b[DRMFSLTdrmfslt][OEIAoeia][Ll]?[b#]?\d?\b')
         self.octave_number_regex = re.compile(r'\d')
-        self.not_note_name_regex = re.compile(r'[^DRMFSLOEIAdrmfsloeiab#]+')
+        self.not_note_name_regex = re.compile(r'[^DRMFSLTOEIAdrmfsltoeiab#]+')
         self.not_octave_regex = re.compile(r'[^\d]+')
 
     def sanitize_note_name(self, note_name):
 
-        # make sure the first letter of the note is uppercase, for western note's dictionary keys
+        # make sure the first letter of the note is uppercase, for doremi note's dictionary keys
         note_name = note_name.lower()
         return note_name
+
+    def get_note_from_coordinate(self, coord):
+
+        try:
+            note = self.inverse_position_map[coord]
+        except KeyError:
+            note = 'X'
+
+        return note
 
 
 class JianpuNoteParser(NoteParser):
@@ -924,22 +897,6 @@ class JianpuNoteParser(NoteParser):
     def __init__(self):
 
         super().__init__()
-
-        #Next lines: for retro-compatibility of find_input_type
-        #TODO: change find_input_type and delete these lines
-#        self.position_map = {
-#                '.': (-1, -1),
-#                '4----': (-5, 0), '5----': (-5, 1), '6----': (-5, 2), '7----': (-5, 3), '1---': (-5, 4),
-#                '2---': (-4, 0), '3---': (-4, 1), '4---': (-4, 2), '5---': (-4, 3), '6---': (-4, 4),
-#                '7---': (-3, 0), '1--': (-3, 1), '2--': (-3, 2), '3--': (-3, 3), '4--': (-3, 4),
-#                '5--': (-2, 0), '6--': (-2, 1), '7--': (-2, 2), '1-': (-2, 3), '2-': (-2, 4),
-#                '3-': (-1, 0), '4-': (-1, 1), '5-': (-1, 2), '6-': (-1, 3), '7-': (-1, 4),
-#                '1': (0, 0), '2': (0, 1), '3': (0, 2), '4': (0, 3), '5': (0, 4),
-#                '6': (1, 0), '7': (1, 1), '1+': (1, 2), '2+': (1, 3), '3+': (1, 4),
-#                '4+': (2, 0), '5+': (2, 1), '6+': (2, 2), '7+': (2, 3), '1++': (2, 4),
-#                '2++': (3, 0), '3++': (3, 1), '4++': (3, 2), '5++': (3, 3), '6++': (3, 4),
-#                '7++': (4, 0), '1+++': (4, 1), '2+++': (4, 2), '3+++': (4, 3), '4+++': (4, 4)
-#                }
 
         self.CHROMATIC_SCALE_DICT = {'1': 0, '1#': 1, '2b': 1, '2': 2, '2#': 3, '3b': 3, '3': 4, '4': 5, '4#': 6, '5b': 6, '5': 7, '5#': 8, '6b': 8, '6': 9, '6#': 10, '7b': 10, '7': 11}
 
@@ -951,17 +908,25 @@ class JianpuNoteParser(NoteParser):
         self.not_note_name_regex = re.compile(r'[^1234567b#]+')
         self.not_octave_regex = re.compile(r'[^\\+\\-]+')
 
-        self.jianpu2western_map = {
+        self.jianpu2english_map = {
             '1': 'C', '2' : 'D', '3': 'E', '4': 'F', '5': 'G', '6': 'A', '7': 'B',
             'C':'C', 'D':'D', 'E':'E', 'F':'F', 'G':'G', 'A':'A', 'B':'B'
             }
-     #For find_key only: prints the key in the Western form instead of Jianpu
-    #TODO: checks that it works
-    def jianpu2western(self,notes):
+
+        self.inverse_position_map = {
+                (0, 0): '1', (0, 1): '2', (0, 2): '3', (0, 3): '4', (0, 4): '5',
+                (1, 0): '6', (1, 1): '7', (1, 2): '1+', (1, 3): '2+', (1, 4): '3+',
+                (2, 0): '4+', (2, 1): '5+', (2, 2): '6+', (2, 3): '7+', (2, 4): '1++'
+                }
+
+    def get_note_from_coordinate(self, coord):
+
         try:
-            return [self.jianpu2western_map[note] for note in notes]
+            note = self.inverse_position_map[coord]
         except KeyError:
-            return notes
+            note = 'X'
+
+        return note
 
 
     def parse_note(self, note):
@@ -969,18 +934,6 @@ class JianpuNoteParser(NoteParser):
         '''
         Returns a tuple containing note_name, octave_number for a note in the format self.note_name_with_octave_regex
         '''
-
- #       note_base = re.match('[1234567]',note)
-#        if note_base != None:
-#            note_base = note_base.group()
- #       else:
- #           raise KeyError('Note was not recognized as Jianpu.')
-
- #       note_alt = re.search('[#b]',note)
-#        if note_alt != None:
-#            note_alt = note_alt.group(0)
-#        else:
-#            note_alt = ''
 
         note_name = self.note_name_regex.search(note)
         if note_name != None:
@@ -1001,11 +954,8 @@ class JianpuNoteParser(NoteParser):
         return note_name, note_octave
 
 
+    def convert_to_english_note(self, note_base, note_alt, note_octave):
 
-    def convert_to_westernized_note(self, note_base, note_alt, note_octave):
+        english_note = self.jianpu2english_map[note_base] + note_alt + str(note_octave)
 
-        westernized_note = self.jianpu2western_map[note_base] + note_alt + str(note_octave)
-
-        #print(westernized_note)
-
-        return westernized_note
+        return english_note
