@@ -2,4 +2,5 @@
 *.pyc
 *.png
 *.svg
-*.txt
+/songs_out
+/songs

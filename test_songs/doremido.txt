@@ -1,5 +1,7 @@
 #All Notes:
 do4 re4 mi4 fa4 sol4 la4 si4 do5 re5 mi5 fa5 sol5 la5 si5 do6
+# English
+Do re mi fa so la ti do
 #si versus ti:
 si5 ti5
 #Chords:
