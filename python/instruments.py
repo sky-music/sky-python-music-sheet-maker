@@ -13,7 +13,7 @@ except (ImportError,ModuleNotFoundError):
     no_mido_module = True
 
 from notes import Note, NoteRoot, NoteCircle, NoteDiamond
-from modes import RenderModes
+
 ### Instrument classes
 
 class Instrument:
@@ -186,25 +186,7 @@ class Harp(Instrument):
         self.type = 'harp'
         self.column_count = 5
         self.row_count = 3
-        #self.highlighted_states_skygrid = []      
-
-        self.sky_inverse_position_map = {
-                (0, 0): 'A1', (0, 1): 'A2', (0, 2): 'A3', (0, 3): 'A4', (0, 4): 'A5',
-                (1, 0): 'B1', (1, 1): 'B2', (1, 2): 'B3', (1, 3): 'B4', (1, 4): 'B5',
-                (2, 0): 'C1', (2, 1): 'C2', (2, 2): 'C3', (2, 3): 'C4', (2, 4): 'C5'
-                }
-        
-        self.western_inverse_position_map = {
-                (0, 0): 'C4', (0, 1): 'D4', (0, 2): 'E4', (0, 3): 'F4', (0, 4): 'G4',
-                (1, 0): 'A4', (1, 1): 'B4', (1, 2): 'C5', (1, 3): 'D5', (1, 4): 'E5',
-                (2, 0): 'F5', (2, 1): 'G5', (2, 2): 'A6', (2, 3): 'B6', (2, 4): 'C6'
-                }
-        
-        self.jianpu_inverse_position_map = {
-                (0, 0): '1', (0, 1): '2', (0, 2): '3', (0, 3): '4', (0, 4): '5',
-                (1, 0): '6', (1, 1): '7', (1, 2): '1+', (1, 3): '2+', (1, 4): '3+',
-                (2, 0): '4+', (2, 1): '5+', (2, 2): '6+', (2, 3): '7+', (2, 4): '1++'
-                }               
+        #self.highlighted_states_skygrid = []                      
 
     def get_row_count(self):
         return self.row_count
@@ -244,17 +226,9 @@ class Harp(Instrument):
             return NoteDiamond(self, pos)
          
 
-    def render_in_ascii(self, render_mode=RenderModes.SKYASCII):
+    def render_in_ascii(self, note_parser):
         
         ascii_chord = ''
-        if render_mode == RenderModes.SKYASCII:
-            inverse_map = self.sky_inverse_position_map
-        elif render_mode == RenderModes.WESTERNASCII:
-            inverse_map = self.western_inverse_position_map
-        elif render_mode == RenderModes.JIANPUASCII:
-            inverse_map = self.jianpu_inverse_position_map  
-        else:
-            inverse_map  = self.sky_inverse_position_map              
         
         if self.get_is_broken():
             ascii_chord = 'X'
@@ -265,9 +239,9 @@ class Harp(Instrument):
             for k in chord_skygrid: # Cycle over positions in a frame
                 for f in chord_skygrid[k]: # Cycle over triplets & quavers
                     if chord_skygrid[k][f]==True: # Button is highlighted
-                        ascii_chord += inverse_map[k]
+                        ascii_chord += note_parser.get_note_from_coordinate(k)
         return ascii_chord        
-        
+       
 
     def render_in_html(self, note_width):
 

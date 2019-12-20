@@ -1,6 +1,7 @@
 from modes import RenderModes, CSSModes
 import instruments
 import os
+import parsers
 
 try:
     from PIL import Image, ImageDraw, ImageFont
@@ -231,6 +232,18 @@ class Song():
             print('Could not create text file.')
             return ''
 
+        if render_mode == RenderModes.SKYASCII:
+            note_parser = parsers.SkyNoteParser()
+        elif render_mode == RenderModes.ENGLISHASCII:
+            note_parser = parsers.EnglishNoteParser()
+        elif render_mode == RenderModes.JIANPUASCII:
+            note_parser = parsers.JianpuNoteParser()
+        elif render_mode == RenderModes.DOREMIASCII:
+            note_parser = parsers.DoremiNoteParser()
+        else:
+            note_parser = parsers.SkyNoteParser()
+
+
         ascii_file.write('#' + self.title + '\n')
 
         for i in range(len(self.headers[0])):
@@ -242,7 +255,7 @@ class Song():
             line_render = ''
             for instrument in line:
                 instrument.set_index(instrument_index)
-                instrument_render = instrument.render_in_ascii(render_mode)
+                instrument_render = instrument.render_in_ascii(note_parser)
                 instrument_index += 1
                 line_render += instrument_render + ' '
             song_render += '\n' + line_render
