@@ -104,7 +104,7 @@ print('Separate chords with \"' + ICON_DELIMITER + '\".')
 print('Use \"' + PAUSE + '\" for a silence (rest).')
 print('Use \"' + QUAVER_DELIMITER + '\" to link notes within an icon, for triplets, quavers... (e.g. A1' + QUAVER_DELIMITER + 'B1' + QUAVER_DELIMITER + 'C1).')
 print('Add ' + REPEAT_INDICATOR + '2 after a chord to indicate repetition.')
-print('Sharps # and flats b (semitones) are supported for Western notation.')
+print('Sharps # and flats b (semitones) are supported for Western and Jianpu notations.')
 print('============================================================')
 
 
@@ -130,7 +130,7 @@ else:
 myparser.set_input_mode(song_notation)
 
 if song_notation == InputModes.JIANPU and PAUSE !='0':
-    print('\nWarning: pause in Jianpu is usually ''0''.')
+    print('\nWarning: pause in Jianpu has been reset to ''0''.')
     PAUSE = '0'
 
 # Attempts to detect key for input written in absolute musical scales (western, Jianpu)
@@ -176,7 +176,8 @@ if error_ratio==0:
 elif error_ratio<0.05:
     print('Song successfully read with few errors!')
 else:
-    print('Your song contains many errors.')
+    print('WARNING: Your song contains many errors. Please check for typos and read the manual at '
+           'https://sky.bloomexperiment.com/t/summary-of-input-modes/403')
 print('\nPlease fill song info or press ENTER to skip:')
 if len(musickeys)>0:
     musical_key = musickeys[0]
