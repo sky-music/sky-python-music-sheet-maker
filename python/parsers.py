@@ -737,12 +737,12 @@ class SkyNoteParser(NoteParser):
             raise KeyError('Note ' + str(note) + ' was not found in the position_map dictionary.')
 
     def get_note_from_coordinate(self, coord):
-        
+
         try:
             note = self.inverse_position_map[coord]
-        except KeyError: 
+        except KeyError:
             note = 'X'
-            
+
         return note
 
     def sanitize_note_name(self, note_name):
@@ -803,12 +803,12 @@ class EnglishNoteParser(NoteParser):
 
 
     def get_note_from_coordinate(self, coord):
-        
+
         try:
             note = self.inverse_position_map[coord]
-        except KeyError: 
+        except KeyError:
             note = 'X'
-            
+
         return note
 
 
@@ -883,12 +883,12 @@ class DoremiNoteParser(NoteParser):
         return note_name
 
     def get_note_from_coordinate(self, coord):
-        
+
         try:
             note = self.inverse_position_map[coord]
-        except KeyError: 
+        except KeyError:
             note = 'X'
-            
+
         return note
 
 
@@ -920,20 +920,13 @@ class JianpuNoteParser(NoteParser):
                 }
 
     def get_note_from_coordinate(self, coord):
-        
+
         try:
             note = self.inverse_position_map[coord]
-        except KeyError: 
+        except KeyError:
             note = 'X'
-            
+
         return note
-
-
-#    def jianpu2western(self,notes):
-#        try:
-#            return [self.jianpu2western_map[note] for note in notes]
-#        except KeyError:
-#            return notes
 
 
     def parse_note(self, note):
