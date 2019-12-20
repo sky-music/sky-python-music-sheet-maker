@@ -897,7 +897,7 @@ class DoremiNoteParser(NoteParser):
 #                'LA': (1, 0), 'SI': (1, 1)
 #                }
 
-        self.CHROMATIC_SCALE_DICT = {'do': 0, 'do#': 1, 'reb': 1, 're': 2, 're#': 3, 'mib': 3, 'mi': 4, 'fa': 5, 'fa#': 6, 'solb': 6, 'sol': 7, 'sol#': 8, 'lab': 8, 'la': 9, 'la#': 10, 'sib': 10, 'si': 11}
+        self.CHROMATIC_SCALE_DICT = {'do': 0, 'do#': 1, 'reb': 1, 're': 2, 're#': 3, 'mib': 3, 'mi': 4, 'fa': 5, 'fa#': 6, 'solb': 6, 'sol': 7, 'sol#': 8, 'lab': 8, 'la': 9, 'la#': 10, 'sib': 10, 'tib': 10, 'si': 11, 'ti': 11}
 
         # Compile regexes for notes to save before using
         self.note_name_with_octave_regex = re.compile(r'([DRMFSLdrmfsl][OEIAoeia][Ll]?[b#]?\d)')
