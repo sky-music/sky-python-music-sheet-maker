@@ -885,31 +885,14 @@ class DoremiNoteParser(NoteParser):
 
         super().__init__()
 
-        #Next lines: for retro-caompatibility of find_input_type
-        #TODO: change find_input_type and delete these lines
-#        self.position_map = {
-#                'FA0': (-5, 0), 'SOL0': (-5, 1), 'LA0': (-5, 2), 'SI0': (-5, 3), 'DO1': (-5, 4),
-#                'RE1': (-4, 0), 'MI1': (-4, 1), 'FA1': (-4, 2), 'SOL1': (-4, 3), 'LA1': (-4, 4),
-#                'SI1': (-3, 0), 'DO2': (-3, 1), 'RE2': (-3, 2), 'MI2': (-3, 3), 'FA2': (-3, 4),
-#                'SOL2': (-2, 0), 'LA2': (-2, 1), 'SI2': (-2, 2), 'DO3': (-2, 3), 'RE3': (-2, 4),
-#                'MI3': (-1, 0), 'FA3': (-1, 1), 'SOL3': (-1, 2), 'LA3': (-1, 3), 'SI3': (-1, 4),
-#                'DO4': (0, 0), 'RE4': (0, 1), 'MI4': (0, 2), 'FA4': (0, 3), 'SOL4': (0, 4),
-#                'LA4': (1, 0), 'SI4': (1, 1), 'DO5': (1, 2), 'RE5': (1, 3), 'MI5': (1, 4),
-#                'FA5': (2, 0), 'SOL5': (2, 1), 'LA5': (2, 2), 'SI5': (2, 3), 'DO6': (2, 4),
-#                'RE6': (3, 0), 'MI6': (3, 1), 'FA6': (3, 2), 'SOL6': (3, 3), 'LA6': (3, 4),
-#                'SI6': (4, 0), 'DO7': (4, 1), 'RE7': (4, 2), 'MI7': (4, 3), 'FA7': (4, 4),
-#                'DO': (0, 0), 'RE': (0, 1), 'MI': (0, 2), 'FA': (0, 3), 'SOL': (0, 4),
-#                'LA': (1, 0), 'SI': (1, 1)
-#                }
-
-        self.CHROMATIC_SCALE_DICT = {'do': 0, 'do#': 1, 'reb': 1, 're': 2, 're#': 3, 'mib': 3, 'mi': 4, 'fa': 5, 'fa#': 6, 'solb': 6, 'sol': 7, 'sol#': 8, 'lab': 8, 'la': 9, 'la#': 10, 'sib': 10, 'si': 11}
+        self.CHROMATIC_SCALE_DICT = {'do': 0, 'do#': 1, 'reb': 1, 're': 2, 're#': 3, 'mib': 3, 'mi': 4, 'fa': 5, 'fa#': 6, 'solb': 6, 'sol': 7, 'sol#': 8, 'lab': 8, 'la': 9, 'la#': 10, 'sib': 10, 'tib': 10, 'si': 11, 'ti': 11}
 
         # Compile regexes for notes to save before using
-        self.note_name_with_octave_regex = re.compile(r'([DRMFSLdrmfsl][OEIAoeia][Ll]?[b#]?\d)')
-        self.note_name_regex = re.compile(r'([DRMFSLdrmfsl][OEIAoeia][Ll]?[b#]?)')
-        self.single_note_name_regex = re.compile(r'\b[DRMFSLdrmfsl][OEIAoeia][Ll]?[b#]?\d?\b')
+        self.note_name_with_octave_regex = re.compile(r'([DRMFSLTdrmfslt][OEIAoeia][Ll]?[b#]?\d)')
+        self.note_name_regex = re.compile(r'([DRMFSLTdrmfslt][OEIAoeia][Ll]?[b#]?)')
+        self.single_note_name_regex = re.compile(r'\b[DRMFSLTdrmfslt][OEIAoeia][Ll]?[b#]?\d?\b')
         self.octave_number_regex = re.compile(r'\d')
-        self.not_note_name_regex = re.compile(r'[^DRMFSLOEIAdrmfsloeiab#]+')
+        self.not_note_name_regex = re.compile(r'[^DRMFSLTOEIAdrmfsltoeiab#]+')
         self.not_octave_regex = re.compile(r'[^\d]+')
 
     def sanitize_note_name(self, note_name):
