@@ -82,7 +82,7 @@ SONG_DIR_OUT = 'songs_out'
 CSS_PATH = 'css/main.css'
 CSS_MODE = CSSModes.EMBED
 ENABLED_MODES = [mode for mode in RenderModes]
-#ENABLED_MODES = [RenderModes.HTML, RenderModes.SVG, RenderModes.PNG, RenderModes.SKYASCII, RenderModes.JIANPUASCII, RenderModes.WESTERNASCII, RenderModes.MIDI]
+#ENABLED_MODES = [RenderModes.HTML, RenderModes.SVG, RenderModes.PNG, RenderModes.SKYASCII, RenderModes.JIANPUASCII, RenderModes.ENGLISHASCII, RenderModes.MIDI]
 
 myparser = SongParser() # Create a parser object
 
@@ -104,7 +104,7 @@ print('Separate chords with \"' + ICON_DELIMITER + '\".')
 print('Use \"' + PAUSE + '\" for a silence (rest).')
 print('Use \"' + QUAVER_DELIMITER + '\" to link notes within an icon, for triplets, quavers... (e.g. A1' + QUAVER_DELIMITER + 'B1' + QUAVER_DELIMITER + 'C1).')
 print('Add ' + REPEAT_INDICATOR + '2 after a chord to indicate repetition.')
-print('Sharps # and flats b (semitones) are supported for Western notation.')
+print('Sharps # and flats b (semitones) are supported for Western and Jianpu notations.')
 print('============================================================')
 
 
@@ -130,13 +130,13 @@ else:
 myparser.set_input_mode(song_notation)
 
 if song_notation == InputModes.JIANPU and PAUSE !='0':
-    print('\nWarning: pause in Jianpu is usually ''0''.')
+    print('\nWarning: pause in Jianpu has been reset to ''0''.')
     PAUSE = '0'
 
 # Attempts to detect key for input written in absolute musical scales (western, Jianpu)
 musickeys  = []
 song_key = None
-if song_notation in [InputModes.WESTERN, InputModes.DOREMI, InputModes.JIANPU]:
+if song_notation in [InputModes.ENGLISH, InputModes.DOREMI, InputModes.JIANPU]:
     musickeys = myparser.find_key(song_lines)
     if len(musickeys) == 0:
         print("\nYour song cannot be transposed exactly in Sky.")
@@ -152,7 +152,7 @@ if song_notation in [InputModes.WESTERN, InputModes.DOREMI, InputModes.JIANPU]:
         while song_key not in musickeys:
             song_key = str(input('Choose your key: '))
 
-if song_notation in [InputModes.WESTERN, InputModes.DOREMI, InputModes.JIANPU, InputModes.WESTERNCHORDS]:
+if song_notation in [InputModes.ENGLISH, InputModes.DOREMI, InputModes.JIANPU, InputModes.ENGLISHCHORDS]:
     try:
         #TODO: print default range for each mode
 
@@ -176,7 +176,8 @@ if error_ratio==0:
 elif error_ratio<0.05:
     print('Song successfully read with few errors!')
 else:
-    print('Your song contains many errors.')
+    print('WARNING: Your song contains many errors. Please check for typos and read the manual at '
+           'https://sky.bloomexperiment.com/t/summary-of-input-modes/403')
 print('\nPlease fill song info or press ENTER to skip:')
 if len(musickeys)>0:
     musical_key = musickeys[0]
@@ -222,19 +223,19 @@ if RenderModes.PNG in ENABLED_MODES:
               'between ' + os.path.split(png_path0)[1] + ' and ' + os.path.split(png_path)[1])
 
 if RenderModes.SKYASCII in ENABLED_MODES:
-    if song_notation in [InputModes.WESTERN, InputModes.DOREMI, InputModes.JIANPU, InputModes.WESTERNCHORDS]:
+    if song_notation in [InputModes.ENGLISH, InputModes.DOREMI, InputModes.JIANPU, InputModes.ENGLISHCHORDS]:
         sky_ascii_path = os.path.join(SONG_DIR_OUT, song_title + '_sky.txt')
         res = mysong.write_ascii(sky_ascii_path, RenderModes.SKYASCII)
         if sky_ascii_path != '':
             print('--------------------------------------------------')
             print('Your song in TXT converted to Sky notation is located at:', sky_ascii_path)
 
-if RenderModes.WESTERNASCII in ENABLED_MODES:
+if RenderModes.ENGLISHASCII in ENABLED_MODES:
     if song_notation in [InputModes.SKY, InputModes.SKYKEYBOARD]:
-        western_ascii_path = os.path.join(SONG_DIR_OUT, song_title + '_western.txt')
-        western_ascii_path = mysong.write_ascii(western_ascii_path, RenderModes.WESTERNASCII)
-        if western_ascii_path != '':
+        english_ascii_path = os.path.join(SONG_DIR_OUT, song_title + '_english.txt')
+        english_ascii_path = mysong.write_ascii(english_ascii_path, RenderModes.ENGLISHASCII)
+        if english_ascii_path != '':
             print('--------------------------------------------------')
-            print('Your song in TXT converted to Western notation with C key is located at:', western_ascii_path)
+            print('Your song in TXT converted to English notation with C key is located at:', english_ascii_path)
 
 os.chdir(mycwd)
