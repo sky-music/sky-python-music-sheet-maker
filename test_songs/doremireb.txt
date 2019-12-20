@@ -24,4 +24,4 @@ reb3 fa6 mib6
 #Mixed case and #multiple #spaces:
    REb4-MIb4    Fa4-SoLb4-lAb4-Sib4    
 #Mixed case #without #octaves:
-reb MIb f SoLb lAb SIb DO
+reb MIb f SoLb lAb SIb DO#
