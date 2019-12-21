@@ -18,8 +18,10 @@ except (ImportError,ModuleNotFoundError):
     
 class Song():
 
-    def __init__(self):
+    def __init__(self, music_key='C'):
 
+        self.music_key = music_key
+        
         self.lines = []
         self.title = 'Untitled'
         self.headers = [['Original Artist(s):', 'Transcript:', 'Musical key:'], ['', '', '']]
@@ -63,9 +65,14 @@ class Song():
             self.png_title_font_size = 48
             self.png_font = 'fonts/NotoSansCJKjp-Regular.otf'
 
-
-        self.midi_note_duration = 0.3 #seconds
-        self.midi_bpm=120 #Beats per minute
+        if no_mido_module == False:
+            #WARNING: instrument codes correspond to General Midi codes (see Wikipedia) minus 1 
+            #Instrument will sound very strange if played outside its natural pitch range
+            midi_instruments = {'piano': 0, 'guitar': 24, 'flute': 73, 'pan': 75}
+            self.midi_note_duration = 0.3 #note duration is seconds for 120 bpm
+            self.midi_bpm=120 #Beats per minute
+            self.midi_instrument = midi_instruments['piano']
+            
 
     def add_line(self, line):
         '''Adds a line of Instrument to the Song'''
@@ -79,6 +86,10 @@ class Song():
             return self.lines[row]
         except:
             return [[]]
+
+    def get_music_key(self):
+        
+        return self.music_key
 
     def get_song(self):
         '''Returns the Song, a list of lists of Instruments'''
@@ -608,14 +619,29 @@ class Song():
         mid = mido.MidiFile(type=0)
         track = mido.MidiTrack()
         mid.tracks.append(track)
-        tempo = mido.bpm2tempo(self.midi_bpm)
-        sec = mido.second2tick(1,ticks_per_beat=mid.ticks_per_beat,tempo=tempo)
-        
-        note_ticks = self.midi_note_duration*sec
 
-        track.append(mido.MetaMessage('key_signature', key='C'))
-        track.append(mido.MetaMessage('set_tempo', tempo=tempo))
-        #track.append(mido.Message('program_change', program=12, time=0))
+        try:
+            tempo = mido.bpm2tempo(self.midi_bpm)
+            track.append(mido.MetaMessage('set_tempo', tempo=tempo))
+        except ValueError:
+            print('Warning: invalid tempo passed to MIDI renderer. Using 120 bpm instead.')
+            tempo = mido.bpm2tempo(120)
+            track.append(mido.MetaMessage('set_tempo', tempo=tempo))
+
+        sec = mido.second2tick(1,ticks_per_beat=mid.ticks_per_beat,tempo=tempo)#1 second in ticks        
+        note_ticks = self.midi_note_duration*sec*120/self.midi_bpm#note duration in ticks
+
+        try:
+            track.append(mido.MetaMessage('key_signature', key=self.music_key))
+        except ValueError:
+            print('Warning: invalid key passed to MIDI renderer. Using C instead.')
+            track.append(mido.MetaMessage('key_signature', key='C'))
+        try:
+            track.append(mido.Message('program_change', program=self.midi_instrument, time=0))
+        except ValueError:
+            print('Warning: invalid instrument passed to MIDI renderer. Using piano instead.')
+            track.append(mido.Message('program_change', program=1, time=0))
+            
 
         for line in self.lines:
             if len(line) > 0:
@@ -623,7 +649,7 @@ class Song():
                     instrument_index = 0
                     for instrument in line:
                         instrument.set_index(instrument_index)
-                        instrument_render = instrument.render_in_midi(note_ticks)
+                        instrument_render = instrument.render_in_midi(note_ticks, self.music_key)
                         for i in range(0,instrument.get_repeat()):
                             for note_render in instrument_render:
                                 track.append(note_render)

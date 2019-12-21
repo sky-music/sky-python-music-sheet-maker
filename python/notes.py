@@ -45,7 +45,8 @@ class Note:
         self.circle_highlighted_pngs = ['elements/circle-highlighted-' + str(i) +'.png' for i in range(1,8)]
         self.png_size = None
         
-        self.midi_root_pitch = 60 #C4. Value will be changed when Western_scales is merged
+        #self.midi_root_pitch = 60 #C4. Value will be changed when Western_scales is merged
+        self.midi_pitches = {'C': 60, 'D': 62, 'E': 64, 'F': 65, 'G': 67, 'A': 69, 'B': 71}
         self.midi_semitones = [0, 2, 4, 5, 7, 9, 11] #May no longer be used when Western_scales is merged
 
     def get_position(self):
@@ -190,19 +191,23 @@ class Note:
         return note_render
     
     
-    def render_in_midi(self, event_type, t=0):
+    def render_in_midi(self, event_type, t=0, music_key='C'):
         '''
             Starts or ends a MIDI note, assuming a chromatic scale (12 semitones)
         '''
         octave = int(self.get_index()/7)
         semi = self.midi_semitones[self.get_index()%7]
-        note_pitch = self.midi_root_pitch + octave*12 + semi 
+        try:
+            root_pitch = self.midi_pitches[music_key]
+        except KeyError:
+            root_pitch = self.midi_pitches['C']
+        note_pitch = root_pitch + octave*12 + semi 
  
         if not(self.harp_is_broken) and not(self.harp_is_silent):
             if len(self.get_highlighted_frames())==0:
                 note_render = None
             else:
-                note_render = mido.Message(event_type, note=note_pitch, velocity=127, time=int(t))
+                note_render = mido.Message(event_type, channel=0, note=note_pitch, velocity=127, time=int(t))
         else:
             note_render = None
         

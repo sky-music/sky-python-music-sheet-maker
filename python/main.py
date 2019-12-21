@@ -134,23 +134,26 @@ if song_notation == InputModes.JIANPU and PAUSE !='0':
     PAUSE = '0'
 
 # Attempts to detect key for input written in absolute musical scales (western, Jianpu)
-musickeys  = []
+possible_keys  = []
 song_key = None
 if song_notation in [InputModes.ENGLISH, InputModes.DOREMI, InputModes.JIANPU]:
-    musickeys = myparser.find_key(song_lines)
-    if len(musickeys) == 0:
+    possible_keys = myparser.find_key(song_lines)
+    if len(possible_keys) == 0:
         print("\nYour song cannot be transposed exactly in Sky.")
         #trans = input('Enter a key or a number to transpose your song within the chromatic scale:')
         print("\nDefault key will be set to C.")
         song_key = 'C'
-    elif len(musickeys) == 1:
-        song_key = str(musickeys[0])
+    elif len(possible_keys) == 1:
+        song_key = str(possible_keys[0])
         print("\nYour song can be transposed in Sky with the following key: " + song_key)
     else:
-        print("\nYour song can be transposed in Sky with the following keys: " + ', '.join(musickeys))
+        print("\nYour song can be transposed in Sky with the following keys: " + ', '.join(possible_keys))
         song_key = ''
-        while song_key not in musickeys:
+        while song_key not in possible_keys:
             song_key = str(input('Choose your key: '))
+else:
+    song_key = str(input('Recommended key to play the visual pattern: '))
+
 
 if song_notation in [InputModes.ENGLISH, InputModes.DOREMI, InputModes.JIANPU, InputModes.ENGLISHCHORDS]:
     try:
@@ -163,7 +166,7 @@ else:
     note_shift = 0
 
 # Parses song line by line
-mysong = Song()
+mysong = Song(song_key)
 for song_line in song_lines:
     instrument_line = myparser.parse_line(song_line, song_key, note_shift)
     mysong.add_line(instrument_line)
@@ -179,10 +182,6 @@ else:
     print('WARNING: Your song contains many errors. Please check for typos and read the manual at '
            'https://sky.bloomexperiment.com/t/summary-of-input-modes/403')
 print('\nPlease fill song info or press ENTER to skip:')
-if len(musickeys)>0:
-    musical_key = musickeys[0]
-else:
-    musical_key = input('Recommended key to play the visual pattern: ')
 
 song_title = input('Song title (also used for the file name): ')
 if song_title=='':
@@ -192,7 +191,7 @@ transcript_writer = input('Transcribed by: ')
 
 #===== Renders the song
 mysong.set_title(song_title)
-mysong.set_headers(original_artists, transcript_writer, musical_key)
+mysong.set_headers(original_artists, transcript_writer, song_key)
 
 if RenderModes.HTML in ENABLED_MODES:
     html_path = os.path.join(SONG_DIR_OUT, song_title + '.html')

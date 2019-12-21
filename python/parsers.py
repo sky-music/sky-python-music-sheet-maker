@@ -145,12 +145,6 @@ class SongParser:
         harp_broken = True
         chord_skygrid = {}
 
-        try:
-            repeat = int(re.split(re.escape(repeat_indicator), chord)[1])
-            chord = re.split(re.escape(repeat_indicator), chord)[0]
-        except:
-            repeat = 1
-
         #print(chord)
         if len(chords)>1:
             idx0 = 1 #Notes in quavers and triplets have a frame index >1
@@ -392,7 +386,7 @@ class SongParser:
             return [k for i,k in enumerate(sorted_items) if sorted_scores[i]==1]
 
         if (sorted_scores[0] < threshold):
-            contrasts = [(score-min(sorted_scores))/(score+min(sorted_scores)) if score!=0 else 0 for score in sorted_scores ]
+            #contrasts = [(score-min(sorted_scores))/(score+min(sorted_scores)) if score!=0 else 0 for score in sorted_scores ]
             sorted_items = [k for i,k in enumerate(sorted_items) if sorted_scores[i]>threshold/2]
         else:
             sorted_scores = list(map(truediv, sorted_scores, [max(sorted_scores)]*len(sorted_scores)))
