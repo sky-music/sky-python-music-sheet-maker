@@ -82,7 +82,7 @@ SONG_DIR_OUT = 'songs_out'
 CSS_PATH = 'css/main.css'
 CSS_MODE = CSSModes.EMBED
 ENABLED_MODES = [mode for mode in RenderModes]
-#ENABLED_MODES = [RenderModes.HTML, RenderModes.SVG, RenderModes.PNG, RenderModes.SKYASCII, RenderModes.JIANPUASCII, RenderModes.WESTERNASCII, RenderModes.MIDI]
+#ENABLED_MODES = [RenderModes.HTML, RenderModes.SVG, RenderModes.PNG, RenderModes.SKYASCII, RenderModes.JIANPUASCII, RenderModes.ENGLISHASCII, RenderModes.MIDI]
 
 myparser = SongParser() # Create a parser object
 
