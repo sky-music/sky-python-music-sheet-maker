@@ -165,8 +165,12 @@ if song_notation in [InputModes.ENGLISH, InputModes.DOREMI, InputModes.JIANPU, I
 else:
     note_shift = 0
 
+#print('Your key is: '+song_key)
+#print('Your key in English is: '+)
+english_song_key = myparser.english_note_name(song_key)
+
 # Parses song line by line
-mysong = Song(song_key)
+mysong = Song(english_song_key)
 for song_line in song_lines:
     instrument_line = myparser.parse_line(song_line, song_key, note_shift)
     mysong.add_line(instrument_line)
