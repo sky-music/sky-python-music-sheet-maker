@@ -145,12 +145,6 @@ class SongParser:
         harp_broken = True
         chord_skygrid = {}
 
-        try:
-            repeat = int(re.split(re.escape(repeat_indicator), chord)[1])
-            chord = re.split(re.escape(repeat_indicator), chord)[0]
-        except:
-            repeat = 1
-
         #print(chord)
         if len(chords)>1:
             idx0 = 1 #Notes in quavers and triplets have a frame index >1
