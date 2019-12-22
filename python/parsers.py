@@ -99,12 +99,12 @@ class SongParser:
         self.note_parser = self.get_note_parser(input_mode)
 
 
-    def english_note_name(self, note_name):
+    def english_note_name(self, note_name, reverse=False):
         if self.note_parser == None:
-            print('no note parser defined')
+            print('Warning: no note parser defined.')
             return ''
         else:
-            return self.note_parser.english_note_name(note_name)
+            return self.note_parser.english_note_name(note_name, reverse)
 
 
     def get_keyboard_layout(self):
@@ -503,26 +503,33 @@ class NoteParser:
         else:
             return False
 
-    def english_note_name(self, note_name):
+    def english_note_name(self, note_name, reverse=False):
 
-        note_name = self.note_name_regex.match(str(note_name))
+        if reverse:
+            native_parser = EnglishNoteParser()
+            foreign_parser = self
+        else:
+            native_parser = self
+            foreign_parser = EnglishNoteParser()
+        
+        note_name = native_parser.note_name_regex.match(str(note_name))
         if note_name != None:
-            note_name = self.sanitize_note_name(note_name.group(0))
+            note_name = native_parser.sanitize_note_name(note_name.group(0))
         else:
             return None
                 
         try:
-            chromatic_value = self.get_chromatic_scale_dict()[note_name]
-            english_dict = EnglishNoteParser().get_chromatic_scale_dict()
-            english_note_name = list(english_dict.keys())[list(english_dict.values()).index(chromatic_value)]
+            chromatic_value = native_parser.get_chromatic_scale_dict()[note_name]
+            foreign_dict = foreign_parser.get_chromatic_scale_dict()
+            foreign_note_name = list(foreign_dict.keys())[list(foreign_dict.values()).index(chromatic_value)]
         except:
-            note_name = EnglishNoteParser().note_name_regex.match(str(note_name))
-            if note_name != None:
-                english_note_name = note_name.group(0)
+            foreign_note_name = foreign_parser.note_name_regex.match(str(note_name))
+            if foreign_note_name != None:
+                foreign_note_name = foreign_note_name.group(0)
             else:
-                english_note_name = None
+                foreign_note_name = None
         
-        return english_note_name
+        return foreign_note_name
     
 
     def is_valid_note_name(self, note_name):
