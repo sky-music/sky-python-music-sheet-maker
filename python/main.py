@@ -157,22 +157,20 @@ else:
 
 if song_notation in [InputModes.ENGLISH, InputModes.DOREMI, InputModes.JIANPU, InputModes.ENGLISHCHORDS]:
     try:
-        #TODO: print default range for each mode
-
-        note_shift = int(input('Shift notes by n positions ? (-21 ; +21): ').strip())
-    except ValueError:
+        note_shift = int(7*eval(input('Shift song by how many octaves? (-n ; +n): ').strip()))
+    except:
         note_shift = 0
 else:
     note_shift = 0
 
 #print('Your key is: '+song_key)
-#print('Your key in English is: '+)
+#print('Your key in English is: '+myparser.english_note_name(song_key))
 english_song_key = myparser.english_note_name(song_key)
 
 # Parses song line by line
-mysong = Song(english_song_key)
+mysong = Song(english_song_key)#The song key must be in English format
 for song_line in song_lines:
-    instrument_line = myparser.parse_line(song_line, song_key, note_shift)
+    instrument_line = myparser.parse_line(song_line, song_key, note_shift)#The song key must be in the original format
     mysong.add_line(instrument_line)
 
 
@@ -183,7 +181,9 @@ if error_ratio==0:
 elif error_ratio<0.05:
     print('Song successfully read with few errors!')
 else:
-    print('WARNING: Your song contains many errors. Please check for typos and read the manual at '
+    print('**WARNING**: Your song contains many errors. Please check the following:'
+          '\n- All your notes are within octaves 4 and 6. If not, try again with an octave shift.'
+          '\n- Your song is free of typos. Please check this website for full instructions: '
            'https://sky.bloomexperiment.com/t/summary-of-input-modes/403')
 print('\nPlease fill song info or press ENTER to skip:')
 
