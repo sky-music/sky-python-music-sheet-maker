@@ -2,6 +2,7 @@ from modes import RenderModes, CSSModes
 import instruments
 import os
 import parsers
+import re
 
 try:
     from PIL import Image, ImageDraw, ImageFont
@@ -19,8 +20,12 @@ except (ImportError,ModuleNotFoundError):
 class Song():
 
     def __init__(self, music_key='C'):
-
-        self.music_key = music_key
+ 
+        if isinstance(music_key, str):
+            self.music_key = music_key
+        else:
+            print('Warning: Invalid song key: using C instead')
+            self.music_key = 'C'        
         
         self.lines = []
         self.title = 'Untitled'
@@ -72,7 +77,11 @@ class Song():
             self.midi_note_duration = 0.3 #note duration is seconds for 120 bpm
             self.midi_bpm=120 #Beats per minute
             self.midi_instrument = midi_instruments['piano']
-            
+            try:
+                self.midi_key = re.sub(r'#','#m',self.music_key)#For mido sharped keys are minor
+            except:
+                print('Warning: Invalid music key passed to the MIDI renderer: using C instead')
+                self.midi_key = 'C'            
 
     def add_line(self, line):
         '''Adds a line of Instrument to the Song'''
@@ -630,9 +639,9 @@ class Song():
 
         sec = mido.second2tick(1,ticks_per_beat=mid.ticks_per_beat,tempo=tempo)#1 second in ticks        
         note_ticks = self.midi_note_duration*sec*120/self.midi_bpm#note duration in ticks
-
-        try:
-            track.append(mido.MetaMessage('key_signature', key=self.music_key))
+                        
+        try:       
+            track.append(mido.MetaMessage('key_signature', key=self.midi_key))
         except ValueError:
             print('Warning: invalid key passed to MIDI renderer. Using C instead.')
             track.append(mido.MetaMessage('key_signature', key='C'))
@@ -649,7 +658,7 @@ class Song():
                     instrument_index = 0
                     for instrument in line:
                         instrument.set_index(instrument_index)
-                        instrument_render = instrument.render_in_midi(note_ticks, self.music_key)
+                        instrument_render = instrument.render_in_midi(note_duration=note_ticks, music_key=self.music_key)
                         for i in range(0,instrument.get_repeat()):
                             for note_render in instrument_render:
                                 track.append(note_render)

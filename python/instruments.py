@@ -381,7 +381,7 @@ class Harp(Instrument):
             
         return harp_render
     
-    def render_in_midi(self, note_duration=960, silent_duration=960, music_key='C'):
+    def render_in_midi(self, note_duration=960, music_key='C'):
         harp_silent = self.get_is_silent()
         harp_broken = self.get_is_broken()
         
