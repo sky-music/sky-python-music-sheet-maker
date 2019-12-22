@@ -507,7 +507,7 @@ class NoteParser:
 
         note_name = self.note_name_regex.match(str(note_name))
         if note_name != None:
-            note_name = note_name.group(0)
+            note_name = self.sanitize_note_name(note_name.group(0))
         else:
             return None
                 
