@@ -156,7 +156,7 @@ if song_notation in [InputModes.ENGLISH, InputModes.DOREMI, InputModes.JIANPU, I
     try:
         #TODO: print default range for each mode
 
-        note_shift = int(input('Shift notes by n positions ? (-21 ; +21): ').strip())
+        note_shift = int(7*eval(input('Shift song by how many octaves? (-n ; +n): ').strip()))
     except ValueError:
         note_shift = 0
 else:
@@ -176,7 +176,9 @@ if error_ratio==0:
 elif error_ratio<0.05:
     print('Song successfully read with few errors!')
 else:
-    print('WARNING: Your song contains many errors. Please check for typos and read the manual at '
+    print('**WARNING**: Your song contains many errors. Please check the following:'
+          '\n- All your notes are within octaves 4 and 6. If not, try again with an octave shift.'
+          '\n- Your song is free of typos. Please check this website for full instructions: '
            'https://sky.bloomexperiment.com/t/summary-of-input-modes/403')
 print('\nPlease fill song info or press ENTER to skip:')
 if len(musickeys)>0:
