@@ -82,7 +82,10 @@ SONG_DIR_OUT = 'songs_out'
 CSS_PATH = 'css/main.css'
 CSS_MODE = CSSModes.EMBED
 ENABLED_MODES = [mode for mode in RenderModes]
-#ENABLED_MODES = [RenderModes.HTML, RenderModes.SVG, RenderModes.PNG, RenderModes.SKYASCII, RenderModes.JIANPUASCII, RenderModes.WESTERNASCII, RenderModes.MIDI]
+#DISABLED_MODES = [RenderModes.JIANPUASCII, RenderModes.DOREMIASCII]
+DISABLED_MODES = []
+ENABLED_MODES = [mode for mode in ENABLED_MODES if mode not in DISABLED_MODES]
+#ENABLED_MODES = [RenderModes.PNG, RenderModes.SKYASCII, RenderModes.WESTERNASCII]
 
 myparser = SongParser() # Create a parser object
 
@@ -225,28 +228,40 @@ if RenderModes.PNG in ENABLED_MODES:
         print('Your song has been split into ' + str(filenum+1) + ' files '
               'between ' + os.path.split(png_path0)[1] + ' and ' + os.path.split(png_path)[1])
 
-if RenderModes.SKYASCII in ENABLED_MODES:
-    if song_notation in [InputModes.ENGLISH, InputModes.DOREMI, InputModes.JIANPU, InputModes.ENGLISHCHORDS]:
-        sky_ascii_path = os.path.join(SONG_DIR_OUT, song_title + '_sky.txt')
-        res = mysong.write_ascii(sky_ascii_path, RenderModes.SKYASCII)
-        if sky_ascii_path != '':
-            print('--------------------------------------------------')
-            print('Your song in TXT converted to Sky notation is located at:', sky_ascii_path)
-
-if RenderModes.ENGLISHASCII in ENABLED_MODES:
-    if song_notation in [InputModes.SKY, InputModes.SKYKEYBOARD]:
-        english_ascii_path = os.path.join(SONG_DIR_OUT, song_title + '_english.txt')
-        english_ascii_path = mysong.write_ascii(english_ascii_path, RenderModes.ENGLISHASCII)
-        if english_ascii_path != '':
-            print('--------------------------------------------------')
-            print('Your song in TXT converted to English notation with C key is located at:', english_ascii_path)
-
 if RenderModes.MIDI in ENABLED_MODES:
     midi_path = os.path.join(SONG_DIR_OUT, song_title + '.mid')
     midi_ascii_path = mysong.write_midi(midi_path)
     if midi_ascii_path != '':
         print('--------------------------------------------------')
         print('Your song in MIDI is located at:', midi_ascii_path)
+
+if RenderModes.SKYASCII in ENABLED_MODES and song_notation not in [InputModes.SKY, InputModes.SKYKEYBOARD]:
+        sky_ascii_path = os.path.join(SONG_DIR_OUT, song_title + '_sky.txt')
+        res = mysong.write_ascii(sky_ascii_path, RenderModes.SKYASCII)
+        if sky_ascii_path != '':
+            print('--------------------------------------------------')
+            print('Your song in TXT converted to Sky notation is located at:', sky_ascii_path)
+
+if RenderModes.ENGLISHASCII in ENABLED_MODES and song_notation not in [InputModes.ENGLISH, InputModes.ENGLISHCHORDS]:
+        english_ascii_path = os.path.join(SONG_DIR_OUT, song_title + '_english.txt')
+        english_ascii_path = mysong.write_ascii(english_ascii_path, RenderModes.ENGLISHASCII)
+        if english_ascii_path != '':
+            print('--------------------------------------------------')
+            print('Your song in TXT converted to English notation with C key is located at:', english_ascii_path)
+
+if RenderModes.JIANPUASCII in ENABLED_MODES and song_notation != InputModes.JIANPU:
+        jianpu_ascii_path = os.path.join(SONG_DIR_OUT, song_title + '_jianpu.txt')
+        jianpu_ascii_path = mysong.write_ascii(jianpu_ascii_path, RenderModes.JIANPUASCII)
+        if jianpu_ascii_path != '':
+            print('--------------------------------------------------')
+            print('Your song in TXT converted to Jianpu notation with 1 key is located at:', jianpu_ascii_path)
+
+if RenderModes.DOREMIASCII in ENABLED_MODES and song_notation != InputModes.DOREMI:
+        doremi_ascii_path = os.path.join(SONG_DIR_OUT, song_title + '_doremi.txt')
+        doremi_ascii_path = mysong.write_ascii(doremi_ascii_path, RenderModes.DOREMIASCII)
+        if doremi_ascii_path != '':
+            print('--------------------------------------------------')
+            print('Your song in TXT converted to doremi notation with do key is located at:', doremi_ascii_path)
 
 
 os.chdir(mycwd)
