@@ -20,10 +20,8 @@ The output will be HTML, with small icons of the Sky keyboard. If you use Wester
 
 ***
 
-**Co-authors:** Tracey L, JMM
+**Co-authors:** Tracey L, jmmelko
 
 SVG icons are thanks to [madwurmz](http://madwurmz.com).
 
-Website with music sheets made using this program: 
-
-https://sky-music.github.io
+Website with music sheets made using this program: https://sky-music.github.io
