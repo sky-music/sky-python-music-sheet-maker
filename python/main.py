@@ -41,7 +41,7 @@ def load_file(directory, filename):
         if len(splitted[0])>0 and len(splitted[1])>2 and len(splitted[1])<=5 and re.search('\\.',splitted[0])==None: #then probably a file name
             while fp==None:
                 print('\nFile not found.')
-                fp = load_file(input('File name (in ' + os.path.normpath(directory) + '/): ').strip())
+                fp = load_file(directory, input('File name (in ' + os.path.normpath(directory) + '/): ').strip())
                 isfile = os.path.isfile(fp)
     if isfile:
         return fp
