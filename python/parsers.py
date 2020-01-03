@@ -184,7 +184,7 @@ class SongParser:
                     if note == self.pause:
                         highlighted_note_position = (-1, -1)
                     else:
-                        highlighted_note_position = self.note_parser.calculate_coordinate_for_note(note, song_key, note_shift)
+                        highlighted_note_position = self.note_parser.calculate_coordinate_for_note(note, song_key, note_shift, False)
                 except (KeyError, SyntaxError) as err:
                     print(err)
                     harp_broken = True
@@ -260,7 +260,7 @@ class SongParser:
                             num_notes[i] += 1
                             try:
                                 #TODO: Support for Jianpu which uses a different octave indexing system
-                                self.note_parser.calculate_coordinate_for_note(note, k, note_shift=0)
+                                self.note_parser.calculate_coordinate_for_note(note, k, note_shift=0, is_finding_key=True)
                             except KeyError:
                                 scores[i]+=1
                             except SyntaxError:#Wrongly formatted notes are ignored
@@ -545,7 +545,7 @@ class NoteParser:
         else:
             return False
 
-    def parse_note(self, note, song_key):
+    def parse_note(self, note, song_key, is_finding_key=False):
 
         '''
         Returns a tuple containing note_name, octave_number for a note in the format self.note_name_with_octave_regex
@@ -562,7 +562,13 @@ class NoteParser:
                 # Player has given note name without specifying an octave
                 note_name = note
 
-                return self.handle_note_name_without_octave(note, song_key)
+                if not(is_finding_key):
+
+                    octave_number = self.get_default_starting_octave()
+                    return (note_name, octave_number)
+                else:
+                    return self.handle_note_name_without_octave(note_name, song_key)
+
             else:
                 # Raise error, not a valid note
                 raise SyntaxError('Note ' + str(note) + ' was not formatted correctly.')
@@ -610,7 +616,7 @@ class NoteParser:
         else:
             raise KeyError('Interval ' + str(semitone_interval) + ' is not in the major scale.')
 
-    def calculate_coordinate_for_note(self, note, song_key='C', note_shift=0):
+    def calculate_coordinate_for_note(self, note, song_key='C', note_shift=0, is_finding_key=False):
 
         '''
         For a note in the format self.note_name_with_octave_regex, this method returns the corresponding coordinate on the Sky piano (in the form of a tuple)
@@ -628,7 +634,7 @@ class NoteParser:
         '''
 
         # Convert note to base 7
-        note_name, octave_number = self.parse_note(note, song_key)
+        note_name, octave_number = self.parse_note(note, song_key, is_finding_key)
 
         # Find the major scale interval from the song_key to the note_name
         # Find the semitone interval from the song_key to the note_name first
@@ -761,7 +767,7 @@ class SkyNoteParser(NoteParser):
         self.not_octave_regex = re.compile(r'[^123]+')
 
 
-    def calculate_coordinate_for_note(self, note, song_key='C', note_shift=0):
+    def calculate_coordinate_for_note(self, note, song_key='C', note_shift=0, is_finding_key=False):
         '''
         Returns a tuple containing the row index and the column index of the note's position.
         '''
@@ -898,9 +904,9 @@ class EnglishChordsNoteParser(EnglishNoteParser):
          chord = chord.lower().capitalize()
          return chord
 
-    def calculate_coordinate_for_note(self, note, song_key='C', note_shift=0):
+    def calculate_coordinate_for_note(self, note, song_key='C', note_shift=0, is_finding_key=False):
 
-        return self.helper_parser.calculate_coordinate_for_note(note, song_key, note_shift)
+        return self.helper_parser.calculate_coordinate_for_note(note, song_key, note_shift, is_finding_key)
 
 class DoremiNoteParser(NoteParser):
 
@@ -973,7 +979,7 @@ class JianpuNoteParser(NoteParser):
         return note
 
 
-    def parse_note(self, note, song_key):
+    def parse_note(self, note, song_key, is_finding_key=False):
 
         '''
         Returns a tuple containing note_name, octave_number for a note in the format self.note_name_with_octave_regex
@@ -998,4 +1004,4 @@ class JianpuNoteParser(NoteParser):
         return note_name, note_octave
 
 note_parser = EnglishNoteParser()
-print(note_parser.calculate_coordinate_for_note('G', 'Ab', note_shift=0))
+print(note_parser.calculate_coordinate_for_note('G', 'Ab', note_shift=0, is_finding_key=True))
