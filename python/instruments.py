@@ -381,7 +381,7 @@ class Harp(Instrument):
             
         return harp_render
     
-    def render_in_midi(self, note_duration=960, silent_duration=960):
+    def render_in_midi(self, note_duration=960, music_key='C'):
         harp_silent = self.get_is_silent()
         harp_broken = self.get_is_broken()
         
@@ -401,7 +401,7 @@ class Harp(Instrument):
                         note = self.get_note_from_position((row, col))                
                         frames = note.get_highlighted_frames()
                         
-                        note_render = note.render_in_midi(event_type, t)
+                        note_render = note.render_in_midi(event_type, t, music_key)
                                 
                         if isinstance(note_render, mido.Message):
                             harp_render.append(note_render)

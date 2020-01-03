@@ -99,6 +99,14 @@ class SongParser:
         self.note_parser = self.get_note_parser(input_mode)
 
 
+    def english_note_name(self, note_name, reverse=False):
+        if self.note_parser == None:
+            print('Warning: no note parser defined.')
+            return ''
+        else:
+            return self.note_parser.english_note_name(note_name, reverse)
+
+
     def get_keyboard_layout(self):
 
         return SkyKeyboardNoteParser().keyboard_layout
@@ -176,7 +184,7 @@ class SongParser:
                     if note == self.pause:
                         highlighted_note_position = (-1, -1)
                     else:
-                        highlighted_note_position = self.note_parser.calculate_coordinate_for_note(note, song_key, note_shift)
+                        highlighted_note_position = self.note_parser.calculate_coordinate_for_note(note, song_key, note_shift, False)
                 except (KeyError, SyntaxError) as err:
                     print(err)
                     harp_broken = True
@@ -226,47 +234,45 @@ class SongParser:
 
     def find_key(self, song_lines):
 
-       if self.note_parser == None:
-           self.set_note_parser()
-       #print('note parser is:')
-       #print(self.note_parser)
+        if self.note_parser == None:
+            self.set_note_parser()
+        #print('note parser is:')
+        #print(self.note_parser)
 
-       try:
-           possible_keys = [k for k in self.note_parser.CHROMATIC_SCALE_DICT.keys()]
-           isNoteRegEx = self.note_parser.note_name_regex
-           notNoteRegEx = self.note_parser.not_note_name_regex
-           #print(possible_keys)
-       except AttributeError:
-            #Parsers not having a chromatic scale keys should return None, eg Sky and Skykeyboard
-           return None
-       #print(possible_keys)
-       scores = [0]*len(possible_keys)
-       num_notes = [0]*len(possible_keys)
-       for line in song_lines:
-          if len(line)>0:
-             if line[0] != self.comment_delimiter:
+        try:
+            possible_keys = [k for k in self.note_parser.CHROMATIC_SCALE_DICT.keys()]
+            isNoteRegEx = self.note_parser.note_name_regex
+            notNoteRegEx = self.note_parser.not_note_name_regex
+            #print(possible_keys)
+        except AttributeError:
+             #Parsers not having a chromatic scale keys should return None, eg Sky and Skykeyboard
+            return None
+        #print(possible_keys)
+        scores = [0]*len(possible_keys)
+        num_notes = [0]*len(possible_keys)
+        for line in song_lines:
+            if len(line)>0:
+                if line[0] != self.comment_delimiter:
+                    notes = isNoteRegEx.sub(' \\1',notNoteRegEx.sub('',line)).split() # Clean-up, adds space and split
+                    for i,k in enumerate(possible_keys):
+                        for note in notes:
+                            num_notes[i] += 1
+                            try:
+                                #TODO: Support for Jianpu which uses a different octave indexing system
+                                self.note_parser.calculate_coordinate_for_note(note, k, note_shift=0, is_finding_key=True)
+                            except KeyError:
+                                scores[i]+=1
+                            except SyntaxError:#Wrongly formatted notes are ignored
+                                num_notes[i] -= 1
 
-                notes = isNoteRegEx.sub(' \\1',notNoteRegEx.sub('',line)).split() # Clean-up, adds space and split
-                #print(notes)
-                for i,k in enumerate(possible_keys):
-                   for note in notes:
-                      num_notes[i] += 1
-                      try:
-                          #TODO: Support for Jianpu which uses a different octave indexing system
-                            self.note_parser.calculate_coordinate_for_note(note, k, note_shift=0)
-                      except KeyError:
-                         scores[i]+=1
-                      except SyntaxError:#Wrongly formatted notes are ignored
-                         num_notes[i] -= 1
 
-       #print(scores)
-       num_notes = [1 if x == 0 else x for x in num_notes]
-       #Removes zeros to avoid division by zero
-       scores = list(map(truediv, scores, num_notes))
-       scores = [(1 - score) for score in scores]
+        num_notes = [1 if x == 0 else x for x in num_notes]
+        #Removes zeros to avoid division by zero
+        scores = list(map(truediv, scores, num_notes))
+        scores = [(1 - score) for score in scores]
 
-       #duplicates_dict = self.CHROMATIC_SCALE_DICT
-       return self.most_likely(scores, possible_keys, 0.9, self.note_parser.CHROMATIC_SCALE_DICT)
+        #duplicates_dict = self.CHROMATIC_SCALE_DICT
+        return self.most_likely(scores, possible_keys, 0.9, self.note_parser.CHROMATIC_SCALE_DICT)
 
        #print(scores)
 #       sorted_idx, sorted_scores = zip(*sorted([(i,e) for i,e in enumerate(scores)], key=itemgetter(1), reverse=True))
@@ -386,7 +392,7 @@ class SongParser:
             return [k for i,k in enumerate(sorted_items) if sorted_scores[i]==1]
 
         if (sorted_scores[0] < threshold):
-            contrasts = [(score-min(sorted_scores))/(score+min(sorted_scores)) if score!=0 else 0 for score in sorted_scores ]
+            #contrasts = [(score-min(sorted_scores))/(score+min(sorted_scores)) if score!=0 else 0 for score in sorted_scores ]
             sorted_items = [k for i,k in enumerate(sorted_items) if sorted_scores[i]>threshold/2]
         else:
             sorted_scores = list(map(truediv, sorted_scores, [max(sorted_scores)]*len(sorted_scores)))
@@ -495,6 +501,35 @@ class NoteParser:
         else:
             return False
 
+    def english_note_name(self, note_name, reverse=False):
+
+        if reverse:
+            native_parser = EnglishNoteParser()
+            foreign_parser = self
+        else:
+            native_parser = self
+            foreign_parser = EnglishNoteParser()
+
+        note_name = native_parser.note_name_regex.match(str(note_name))
+        if note_name != None:
+            note_name = native_parser.sanitize_note_name(note_name.group(0))
+        else:
+            return None
+
+        try:
+            chromatic_value = native_parser.get_chromatic_scale_dict()[note_name]
+            foreign_dict = foreign_parser.get_chromatic_scale_dict()
+            foreign_note_name = list(foreign_dict.keys())[list(foreign_dict.values()).index(chromatic_value)]
+        except:
+            foreign_note_name = foreign_parser.note_name_regex.match(str(note_name))
+            if foreign_note_name != None:
+                foreign_note_name = foreign_note_name.group(0)
+            else:
+                foreign_note_name = None
+
+        return foreign_note_name
+
+
     def is_valid_note_name(self, note_name):
 
         '''
@@ -508,7 +543,7 @@ class NoteParser:
         else:
             return False
 
-    def parse_note(self, note):
+    def parse_note(self, note, song_key, is_finding_key=False):
 
         '''
         Returns a tuple containing note_name, octave_number for a note in the format self.note_name_with_octave_regex
@@ -524,11 +559,32 @@ class NoteParser:
 
                 # Player has given note name without specifying an octave
                 note_name = note
-                octave_number = self.get_default_starting_octave()
-                return (note_name, octave_number)
+
+                if not(is_finding_key):
+
+                    octave_number = self.get_default_starting_octave()
+                    return (note_name, octave_number)
+                else:
+                    return self.handle_note_name_without_octave(note_name, song_key)
+
             else:
                 # Raise error, not a valid note
                 raise SyntaxError('Note ' + str(note) + ' was not formatted correctly.')
+
+    def handle_note_name_without_octave(self, note_name, song_key):
+
+        '''
+        Handle notes specified without octaves (e.g. the note G in the key of Ab)
+        '''
+
+        octave_number = self.get_default_starting_octave()
+
+        chromatic_interval = self.convert_note_name_into_chromatic_position(note_name) - self.convert_note_name_into_chromatic_position(song_key)
+
+        if chromatic_interval < 0:
+            octave_number += 1
+
+        return (note_name, octave_number)
 
     def convert_note_name_into_chromatic_position(self, note_name):
 
@@ -558,13 +614,15 @@ class NoteParser:
         else:
             raise KeyError('Interval ' + str(semitone_interval) + ' is not in the major scale.')
 
-    def calculate_coordinate_for_note(self, note, song_key='C', note_shift=0):
+    def calculate_coordinate_for_note(self, note, song_key='C', note_shift=0, is_finding_key=False):
 
         '''
         For a note in the format self.note_name_with_octave_regex, this method returns the corresponding coordinate on the Sky piano (in the form of a tuple)
 
         song_key will be determined by the find_keys method, and is expected to match CHROMATIC_SCALE_DICT, otherwise the default key will be C.
         note_shift is the variable set by the user.
+
+        When this method is being used to find the key, `is_finding_key` should be set to True.
 
         KeyError will be raised if:
         - note is not in the major scale of song key (using the dict)
@@ -576,7 +634,7 @@ class NoteParser:
         '''
 
         # Convert note to base 7
-        note_name, octave_number = self.parse_note(note)
+        note_name, octave_number = self.parse_note(note, song_key, is_finding_key)
 
         # Find the major scale interval from the song_key to the note_name
         # Find the semitone interval from the song_key to the note_name first
@@ -709,7 +767,7 @@ class SkyNoteParser(NoteParser):
         self.not_octave_regex = re.compile(r'[^123]+')
 
 
-    def calculate_coordinate_for_note(self, note, song_key='C', note_shift=0):
+    def calculate_coordinate_for_note(self, note, song_key='C', note_shift=0, is_finding_key=False):
         '''
         Returns a tuple containing the row index and the column index of the note's position.
         '''
@@ -766,6 +824,8 @@ class SkyKeyboardNoteParser(SkyNoteParser):
         self.single_note_name_regex = re.compile(r'(\b['+regex+r']\b)')
         self.not_note_name_regex = re.compile(r'[^'+regex+r']+')
         self.not_octave_regex = re.compile(r'.')
+
+
 
 
 class EnglishNoteParser(NoteParser):
@@ -844,9 +904,9 @@ class EnglishChordsNoteParser(EnglishNoteParser):
          chord = chord.lower().capitalize()
          return chord
 
-    def calculate_coordinate_for_note(self, note, song_key='C', note_shift=0):
+    def calculate_coordinate_for_note(self, note, song_key='C', note_shift=0, is_finding_key=False):
 
-        return self.helper_parser.calculate_coordinate_for_note(note, song_key, note_shift)
+        return self.helper_parser.calculate_coordinate_for_note(note, song_key, note_shift, is_finding_key)
 
 class DoremiNoteParser(NoteParser):
 
@@ -886,6 +946,7 @@ class DoremiNoteParser(NoteParser):
         return note
 
 
+
 class JianpuNoteParser(NoteParser):
 
     def __init__(self):
@@ -901,11 +962,6 @@ class JianpuNoteParser(NoteParser):
         self.octave_number_regex = re.compile(r'[\\+\\-]?')
         self.not_note_name_regex = re.compile(r'[^1234567b#]+')
         self.not_octave_regex = re.compile(r'[^\\+\\-]+')
-
-        self.jianpu2english_map = {
-            '1': 'C', '2' : 'D', '3': 'E', '4': 'F', '5': 'G', '6': 'A', '7': 'B',
-            'C':'C', 'D':'D', 'E':'E', 'F':'F', 'G':'G', 'A':'A', 'B':'B'
-            }
 
         self.inverse_position_map = {
                 (0, 0): '1', (0, 1): '2', (0, 2): '3', (0, 3): '4', (0, 4): '5',
@@ -923,7 +979,7 @@ class JianpuNoteParser(NoteParser):
         return note
 
 
-    def parse_note(self, note):
+    def parse_note(self, note, song_key, is_finding_key=False):
 
         '''
         Returns a tuple containing note_name, octave_number for a note in the format self.note_name_with_octave_regex
@@ -947,9 +1003,5 @@ class JianpuNoteParser(NoteParser):
         #print(note_base+note_alt+str(note_octave))
         return note_name, note_octave
 
-
-    def convert_to_english_note(self, note_base, note_alt, note_octave):
-
-        english_note = self.jianpu2english_map[note_base] + note_alt + str(note_octave)
-
-        return english_note
+note_parser = EnglishNoteParser()
+print(note_parser.calculate_coordinate_for_note('G', 'Ab', note_shift=0, is_finding_key=True))
