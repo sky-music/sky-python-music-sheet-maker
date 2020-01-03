@@ -254,7 +254,6 @@ class SongParser:
             if len(line)>0:
                 if line[0] != self.comment_delimiter:
                     notes = isNoteRegEx.sub(' \\1',notNoteRegEx.sub('',line)).split() # Clean-up, adds space and split
-                    print(notes)
                     for i,k in enumerate(possible_keys):
                         for note in notes:
                             num_notes[i] += 1
@@ -265,9 +264,8 @@ class SongParser:
                                 scores[i]+=1
                             except SyntaxError:#Wrongly formatted notes are ignored
                                 num_notes[i] -= 1
-            #print(scores)
 
-        #print(scores)
+
         num_notes = [1 if x == 0 else x for x in num_notes]
         #Removes zeros to avoid division by zero
         scores = list(map(truediv, scores, num_notes))
