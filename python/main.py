@@ -5,23 +5,24 @@ from songs import Song
 import os
 import re
 
-def ask_for_mode(modes):
 
+def ask_for_mode(modes):
     mydict = {}
     i = 0
     print('Please choose your note format:\n')
     for mode in modes:
-       i += 1
-       print(str(i) + ') ' + mode.value[2])
-       if mode == InputModes.SKYKEYBOARD:
-           print('   ' + myparser.get_keyboard_layout().replace(' ','\n   ') + ':')
-       mydict[i] = mode
+        i += 1
+        print(str(i) + ') ' + mode.value[2])
+        if mode == InputModes.SKYKEYBOARD:
+            print('   ' + myparser.get_keyboard_layout().replace(' ', '\n   ') + ':')
+        mydict[i] = mode
     try:
         song_notation = int(input('Mode (1-' + str(i) + "): ").strip())
         mode = mydict[song_notation]
     except (ValueError, KeyError):
         mode = InputModes.SKY
     return mode
+
 
 def load_file(directory, filename):
     """
@@ -32,13 +33,13 @@ def load_file(directory, filename):
 
     # Assumes that user has forgotten extension
     if not isfile:
-        fp = os.path.join(filename, os.path.normpath(filename+'.txt'))
+        fp = os.path.join(filename, os.path.normpath(filename + '.txt'))
         isfile = os.path.isfile(fp)
 
     if not isfile:
         fp = None
         splitted = os.path.splitext(filename)
-        if len(splitted[0])>0 and 2 < len(splitted[1]) <= 5 and re.search('\\.', splitted[0]) is None:
+        if len(splitted[0]) > 0 and 2 < len(splitted[1]) <= 5 and re.search('\\.', splitted[0]) is None:
             # then probably a file name
             while fp is None:
                 print('\nFile not found.')
@@ -57,12 +58,12 @@ def read_lines(fp=None):
     song_lines = []
     if fp is not None:
         try:
-            for song_line in open(fp,mode='r', encoding='utf-8', errors='ignore'):
+            for song_line in open(fp, mode='r', encoding='utf-8', errors='ignore'):
                 song_lines.append(song_line)
         except (OSError, IOError) as err:
-             print('Error opening file.')
-             raise err
-        print('(Song imported from ' + os.path.abspath(fp)+')')
+            print('Error opening file.')
+            raise err
+        print('(Song imported from ' + os.path.abspath(fp) + ')')
     else:
         song_line = first_line
         while song_line:
@@ -76,10 +77,10 @@ def read_lines(fp=None):
 if __name__ == "__main__":
 
     # Parameters that can be changed by advanced users
-    QUAVER_DELIMITER = '-' # Dash-separated list of chords
-    ICON_DELIMITER = ' ' # Chords separation
+    QUAVER_DELIMITER = '-'  # Dash-separated list of chords
+    ICON_DELIMITER = ' '  # Chords separation
     PAUSE = '.'
-    COMMENT_DELIMITER = '#' # Lyrics delimiter, can be used for comments
+    COMMENT_DELIMITER = '#'  # Lyrics delimiter, can be used for comments
     REPEAT_INDICATOR = '*'
     SONG_DIR_IN = 'test_songs'
     SONG_DIR_OUT = 'songs_out'
@@ -91,7 +92,7 @@ if __name__ == "__main__":
     ENABLED_MODES = [mode for mode in ENABLED_MODES if mode not in DISABLED_MODES]
     # ENABLED_MODES = [RenderModes.PNG, RenderModes.SKYASCII, RenderModes.WESTERNASCII]
 
-    myparser = SongParser() # Create a parser object
+    myparser = SongParser()  # Create a parser object
 
     ### Change directory
     mycwd = os.getcwd()
@@ -105,18 +106,20 @@ if __name__ == "__main__":
     for mode in InputModes:
         print('\n* ' + mode.value[2])
         if mode == InputModes.SKYKEYBOARD:
-            print('   ' + myparser.get_keyboard_layout().replace(' ','\n   ') + ':')
+            print('   ' + myparser.get_keyboard_layout().replace(' ', '\n   ') + ':')
     print('\nNotes composing a chord must be glued together (e.g. A1B1C1).')
     print('Separate chords with \"' + ICON_DELIMITER + '\".')
     print('Use \"' + PAUSE + '\" for a silence (rest).')
-    print('Use \"' + QUAVER_DELIMITER + '\" to link notes within an icon, for triplets, quavers... (e.g. A1' + QUAVER_DELIMITER + 'B1' + QUAVER_DELIMITER + 'C1).')
+    print(
+        'Use \"' + QUAVER_DELIMITER + '\" to link notes within an icon, for triplets, quavers... (e.g. A1' + QUAVER_DELIMITER + 'B1' + QUAVER_DELIMITER + 'C1).')
     print('Add ' + REPEAT_INDICATOR + '2 after a chord to indicate repetition.')
     print('Sharps # and flats b (semitones) are supported for Western and Jianpu notations.')
     print('============================================================')
 
-    first_line = input('Type or copy-paste notes, or enter file name (in ' + os.path.normpath(SONG_DIR_IN) + '/): ').strip()
+    first_line = input(
+        'Type or copy-paste notes, or enter file name (in ' + os.path.normpath(SONG_DIR_IN) + '/): ').strip()
 
-    fp = load_file(SONG_DIR_IN, first_line) # loads file or asks for next line
+    fp = load_file(SONG_DIR_IN, first_line)  # loads file or asks for next line
 
     song_lines = read_lines(fp)
 
@@ -135,7 +138,7 @@ if __name__ == "__main__":
 
     myparser.set_input_mode(song_notation)
 
-    if song_notation == InputModes.JIANPU and PAUSE !='0':
+    if song_notation == InputModes.JIANPU and PAUSE != '0':
         print('\nWarning: pause in Jianpu has been reset to ''0''.')
         PAUSE = '0'
 
@@ -162,7 +165,7 @@ if __name__ == "__main__":
 
     if song_notation in [InputModes.ENGLISH, InputModes.DOREMI, InputModes.JIANPU, InputModes.ENGLISHCHORDS]:
         try:
-            note_shift = int(7*eval(input('Shift song by how many octaves? (-n ; +n): ').strip()))
+            note_shift = int(7 * eval(input('Shift song by how many octaves? (-n ; +n): ').strip()))
         except:
             note_shift = 0
     else:
@@ -173,16 +176,17 @@ if __name__ == "__main__":
     english_song_key = myparser.english_note_name(song_key)
 
     # Parses song line by line
-    mysong = Song(english_song_key)#The song key must be in English format
+    mysong = Song(english_song_key)  # The song key must be in English format
     for song_line in song_lines:
-        instrument_line = myparser.parse_line(song_line, song_key, note_shift)#The song key must be in the original format
+        instrument_line = myparser.parse_line(song_line, song_key,
+                                              note_shift)  # The song key must be in the original format
         mysong.add_line(instrument_line)
 
     print('============================================================')
-    error_ratio = mysong.get_num_broken()/max(1,mysong.get_num_instruments())
-    if error_ratio==0:
+    error_ratio = mysong.get_num_broken() / max(1, mysong.get_num_instruments())
+    if error_ratio == 0:
         print('Song successfully read with no errors!')
-    elif error_ratio<0.05:
+    elif error_ratio < 0.05:
         print('Song successfully read with few errors!')
     else:
         print('**WARNING**: Your song contains many errors. Please check the following:'
@@ -216,8 +220,9 @@ if __name__ == "__main__":
         if svg_path != '':
             print('--------------------------------------------------')
             print('Your song in SVG is located in:', SONG_DIR_OUT)
-            print('Your song has been split into ' + str(filenum+1) + ' files '
-                  'between ' + os.path.split(svg_path0)[1] + ' and ' + os.path.split(svg_path)[1])
+            print('Your song has been split into ' + str(filenum + 1) + ' files '
+                                                                        'between ' + os.path.split(svg_path0)[
+                      1] + ' and ' + os.path.split(svg_path)[1])
 
     if RenderModes.PNG in ENABLED_MODES:
         png_path0 = os.path.join(SONG_DIR_OUT, song_title + '.png')
@@ -226,8 +231,9 @@ if __name__ == "__main__":
         if png_path != '':
             print('--------------------------------------------------')
             print('Your song in PNG is located in:', SONG_DIR_OUT)
-            print('Your song has been split into ' + str(filenum+1) + ' files '
-                  'between ' + os.path.split(png_path0)[1] + ' and ' + os.path.split(png_path)[1])
+            print('Your song has been split into ' + str(filenum + 1) + ' files '
+                                                                        'between ' + os.path.split(png_path0)[
+                      1] + ' and ' + os.path.split(png_path)[1])
 
     if RenderModes.MIDI in ENABLED_MODES:
         midi_path = os.path.join(SONG_DIR_OUT, song_title + '.mid')
@@ -243,7 +249,8 @@ if __name__ == "__main__":
             print('--------------------------------------------------')
             print('Your song in TXT converted to Sky notation is located at:', sky_ascii_path)
 
-    if RenderModes.ENGLISHASCII in ENABLED_MODES and song_notation not in [InputModes.ENGLISH, InputModes.ENGLISHCHORDS]:
+    if RenderModes.ENGLISHASCII in ENABLED_MODES and song_notation not in [InputModes.ENGLISH,
+                                                                           InputModes.ENGLISHCHORDS]:
         english_ascii_path = os.path.join(SONG_DIR_OUT, song_title + '_english.txt')
         english_ascii_path = mysong.write_ascii(english_ascii_path, RenderModes.ENGLISHASCII)
         if english_ascii_path != '':

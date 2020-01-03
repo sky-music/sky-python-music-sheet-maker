@@ -614,11 +614,8 @@ class NoteParser:
 
         interval_in_semitones = note_name_chromatic_equivalent - song_key_chromatic_equivalent
         if interval_in_semitones < 0:
-            # Circular shift the interval back to a positive number, to be used for the SEMITONE_INTERVAL_TO_MAJOR_SCALE_INTERVAL_DICT
+            # Circular shift the interval back to a positive number
             interval_in_semitones += self.get_chromatic_scale_count()
-
-            # The interval_in_semitones is later converted to a major_scale_interval to be used as the 7^0 digit in base 7
-            # need to subtract 1 from the octave number after adding an octave to the interval_in_semitones. this is mathematically saying subtracting 3 is the same as adding 4 then taking away 7
             octave_number -= 1
 
         octave_number_str = self.convert_base_10_to_base_7(octave_number)
@@ -631,15 +628,12 @@ class NoteParser:
 
         # Convert note to base 10 for arithmetic
         note_in_base_10 = self.convert_base_7_to_base_10(octave_number_str + str(major_scale_interval))
-
-        # shift down, and account for any additional note shift by the player
         note_in_base_10 -= self.get_base_of_western_major_scale() * self.get_default_starting_octave()
 
         if self.is_valid_note_name_with_octave(note):
             # Skip the note shift if no octave is specified
             note_in_base_10 += note_shift
 
-        # Convert number to base self.columns (using mod and floor), and return as a tuple
         note_coordinate = self.convert_base_10_to_coordinate_of_another_base(note_in_base_10, self.get_column_count())
 
         if self.is_coordinate_in_range(note_coordinate):
