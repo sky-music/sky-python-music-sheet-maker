@@ -24,22 +24,23 @@ def ask_for_mode(modes):
     return mode
 
 def load_file(directory, filename):
-    '''
+    """
     if string is a file name, loads the file, else return None
-    '''
+    """
     fp = os.path.join(directory, os.path.normpath(filename))
     isfile = os.path.isfile(fp)
 
-    #Assumes that user has forgotten extension
-    if not(isfile):
+    # Assumes that user has forgotten extension
+    if not isfile:
         fp = os.path.join(filename, os.path.normpath(filename+'.txt'))
         isfile = os.path.isfile(fp)
 
-    if not(isfile):
+    if not isfile:
         fp = None
         splitted = os.path.splitext(filename)
-        if len(splitted[0])>0 and len(splitted[1])>2 and len(splitted[1])<=5 and re.search('\\.',splitted[0])==None: #then probably a file name
-            while fp==None:
+        if len(splitted[0])>0 and 2 < len(splitted[1]) <= 5 and re.search('\\.', splitted[0]) is None:
+            # then probably a file name
+            while fp is None:
                 print('\nFile not found.')
                 fp = load_file(directory, input('File name (in ' + os.path.normpath(directory) + '/): ').strip())
                 isfile = os.path.isfile(fp)
@@ -50,26 +51,26 @@ def load_file(directory, filename):
 
 
 def read_lines(fp=None):
-	'''
+    """
      Read song lines in fp, or asks the user to type each line in the console
-	'''
-	song_lines = []
-	if fp != None:
-	    try:
-	        for song_line in open(fp,mode='r', encoding='utf-8', errors='ignore'):
-	            song_lines.append(song_line)
-	    except (OSError, IOError) as err:
-	         print('Error opening file.')
-	         raise err
-	    print('(Song imported from ' + os.path.abspath(fp)+')')
-	else:
-	    song_line = first_line
-	    while song_line:
-	        song_line = song_line.split(os.linesep)
-	        for line in song_line:
-	            song_lines.append(line)
-	        song_line = input('Type next line: ')
-	return song_lines
+    """
+    song_lines = []
+    if fp is not None:
+        try:
+            for song_line in open(fp,mode='r', encoding='utf-8', errors='ignore'):
+                song_lines.append(song_line)
+        except (OSError, IOError) as err:
+             print('Error opening file.')
+             raise err
+        print('(Song imported from ' + os.path.abspath(fp)+')')
+    else:
+        song_line = first_line
+        while song_line:
+            song_line = song_line.split(os.linesep)
+            for line in song_line:
+                song_lines.append(line)
+            song_line = input('Type next line: ')
+    return song_lines
 
 
 if __name__ == "__main__":
@@ -85,10 +86,10 @@ if __name__ == "__main__":
     CSS_PATH = 'css/main.css'
     CSS_MODE = CSSModes.EMBED
     ENABLED_MODES = [mode for mode in RenderModes]
-    #DISABLED_MODES = [RenderModes.JIANPUASCII, RenderModes.DOREMIASCII]
+    # DISABLED_MODES = [RenderModes.JIANPUASCII, RenderModes.DOREMIASCII]
     DISABLED_MODES = []
     ENABLED_MODES = [mode for mode in ENABLED_MODES if mode not in DISABLED_MODES]
-    #ENABLED_MODES = [RenderModes.PNG, RenderModes.SKYASCII, RenderModes.WESTERNASCII]
+    # ENABLED_MODES = [RenderModes.PNG, RenderModes.SKYASCII, RenderModes.WESTERNASCII]
 
     myparser = SongParser() # Create a parser object
 
@@ -113,10 +114,9 @@ if __name__ == "__main__":
     print('Sharps # and flats b (semitones) are supported for Western and Jianpu notations.')
     print('============================================================')
 
-
     first_line = input('Type or copy-paste notes, or enter file name (in ' + os.path.normpath(SONG_DIR_IN) + '/): ').strip()
 
-    fp = load_file(SONG_DIR_IN, first_line) #loads file or asks for next line
+    fp = load_file(SONG_DIR_IN, first_line) # loads file or asks for next line
 
     song_lines = read_lines(fp)
 
@@ -140,13 +140,13 @@ if __name__ == "__main__":
         PAUSE = '0'
 
     # Attempts to detect key for input written in absolute musical scales (western, Jianpu)
-    possible_keys  = []
+    possible_keys = []
     song_key = None
     if song_notation in [InputModes.ENGLISH, InputModes.DOREMI, InputModes.JIANPU]:
         possible_keys = myparser.find_key(song_lines)
         if len(possible_keys) == 0:
             print("\nYour song cannot be transposed exactly in Sky.")
-            #trans = input('Enter a key or a number to transpose your song within the chromatic scale:')
+            # trans = input('Enter a key or a number to transpose your song within the chromatic scale:')
             print("\nDefault key will be set to C.")
             song_key = 'C'
         elif len(possible_keys) == 1:
@@ -160,7 +160,6 @@ if __name__ == "__main__":
     else:
         song_key = str(input('Recommended key to play the visual pattern: '))
 
-
     if song_notation in [InputModes.ENGLISH, InputModes.DOREMI, InputModes.JIANPU, InputModes.ENGLISHCHORDS]:
         try:
             note_shift = int(7*eval(input('Shift song by how many octaves? (-n ; +n): ').strip()))
@@ -169,8 +168,8 @@ if __name__ == "__main__":
     else:
         note_shift = 0
 
-    #print('Your key is: '+song_key)
-    #print('Your key in English is: '+myparser.english_note_name(song_key))
+    # print('Your key is: '+song_key)
+    # print('Your key in English is: '+myparser.english_note_name(song_key))
     english_song_key = myparser.english_note_name(song_key)
 
     # Parses song line by line
@@ -178,7 +177,6 @@ if __name__ == "__main__":
     for song_line in song_lines:
         instrument_line = myparser.parse_line(song_line, song_key, note_shift)#The song key must be in the original format
         mysong.add_line(instrument_line)
-
 
     print('============================================================')
     error_ratio = mysong.get_num_broken()/max(1,mysong.get_num_instruments())
@@ -190,16 +188,16 @@ if __name__ == "__main__":
         print('**WARNING**: Your song contains many errors. Please check the following:'
               '\n- All your notes are within octaves 4 and 6. If not, try again with an octave shift.'
               '\n- Your song is free of typos. Please check this website for full instructions: '
-               'https://sky.bloomexperiment.com/t/summary-of-input-modes/403')
+              'https://sky.bloomexperiment.com/t/summary-of-input-modes/403')
     print('\nPlease fill song info or press ENTER to skip:')
 
     song_title = input('Song title (also used for the file name): ')
-    if song_title=='':
-        song_title='untitled'
+    if song_title == '':
+        song_title = 'untitled'
     original_artists = input('Original artist(s): ')
     transcript_writer = input('Transcribed by: ')
 
-    #===== Renders the song
+    # ===== Renders the song
     mysong.set_title(song_title)
     mysong.set_headers(original_artists, transcript_writer, song_key)
 
@@ -239,32 +237,31 @@ if __name__ == "__main__":
             print('Your song in MIDI is located at:', midi_ascii_path)
 
     if RenderModes.SKYASCII in ENABLED_MODES and song_notation not in [InputModes.SKY, InputModes.SKYKEYBOARD]:
-            sky_ascii_path = os.path.join(SONG_DIR_OUT, song_title + '_sky.txt')
-            res = mysong.write_ascii(sky_ascii_path, RenderModes.SKYASCII)
-            if sky_ascii_path != '':
-                print('--------------------------------------------------')
-                print('Your song in TXT converted to Sky notation is located at:', sky_ascii_path)
+        sky_ascii_path = os.path.join(SONG_DIR_OUT, song_title + '_sky.txt')
+        res = mysong.write_ascii(sky_ascii_path, RenderModes.SKYASCII)
+        if sky_ascii_path != '':
+            print('--------------------------------------------------')
+            print('Your song in TXT converted to Sky notation is located at:', sky_ascii_path)
 
     if RenderModes.ENGLISHASCII in ENABLED_MODES and song_notation not in [InputModes.ENGLISH, InputModes.ENGLISHCHORDS]:
-            english_ascii_path = os.path.join(SONG_DIR_OUT, song_title + '_english.txt')
-            english_ascii_path = mysong.write_ascii(english_ascii_path, RenderModes.ENGLISHASCII)
-            if english_ascii_path != '':
-                print('--------------------------------------------------')
-                print('Your song in TXT converted to English notation with C key is located at:', english_ascii_path)
+        english_ascii_path = os.path.join(SONG_DIR_OUT, song_title + '_english.txt')
+        english_ascii_path = mysong.write_ascii(english_ascii_path, RenderModes.ENGLISHASCII)
+        if english_ascii_path != '':
+            print('--------------------------------------------------')
+            print('Your song in TXT converted to English notation with C key is located at:', english_ascii_path)
 
     if RenderModes.JIANPUASCII in ENABLED_MODES and song_notation != InputModes.JIANPU:
-            jianpu_ascii_path = os.path.join(SONG_DIR_OUT, song_title + '_jianpu.txt')
-            jianpu_ascii_path = mysong.write_ascii(jianpu_ascii_path, RenderModes.JIANPUASCII)
-            if jianpu_ascii_path != '':
-                print('--------------------------------------------------')
-                print('Your song in TXT converted to Jianpu notation with 1 key is located at:', jianpu_ascii_path)
+        jianpu_ascii_path = os.path.join(SONG_DIR_OUT, song_title + '_jianpu.txt')
+        jianpu_ascii_path = mysong.write_ascii(jianpu_ascii_path, RenderModes.JIANPUASCII)
+        if jianpu_ascii_path != '':
+            print('--------------------------------------------------')
+            print('Your song in TXT converted to Jianpu notation with 1 key is located at:', jianpu_ascii_path)
 
     if RenderModes.DOREMIASCII in ENABLED_MODES and song_notation != InputModes.DOREMI:
-            doremi_ascii_path = os.path.join(SONG_DIR_OUT, song_title + '_doremi.txt')
-            doremi_ascii_path = mysong.write_ascii(doremi_ascii_path, RenderModes.DOREMIASCII)
-            if doremi_ascii_path != '':
-                print('--------------------------------------------------')
-                print('Your song in TXT converted to doremi notation with do key is located at:', doremi_ascii_path)
-
+        doremi_ascii_path = os.path.join(SONG_DIR_OUT, song_title + '_doremi.txt')
+        doremi_ascii_path = mysong.write_ascii(doremi_ascii_path, RenderModes.DOREMIASCII)
+        if doremi_ascii_path != '':
+            print('--------------------------------------------------')
+            print('Your song in TXT converted to doremi notation with do key is located at:', doremi_ascii_path)
 
     os.chdir(mycwd)
