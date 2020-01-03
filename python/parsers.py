@@ -265,9 +265,9 @@ class SongParser:
                                 scores[i]+=1
                             except SyntaxError:#Wrongly formatted notes are ignored
                                 num_notes[i] -= 1
-            print(scores)
+            #print(scores)
 
-        print(scores)
+        #print(scores)
         num_notes = [1 if x == 0 else x for x in num_notes]
         #Removes zeros to avoid division by zero
         scores = list(map(truediv, scores, num_notes))
@@ -623,6 +623,8 @@ class NoteParser:
 
         song_key will be determined by the find_keys method, and is expected to match CHROMATIC_SCALE_DICT, otherwise the default key will be C.
         note_shift is the variable set by the user.
+
+        When this method is being used to find the key, `is_finding_key` should be set to True.
 
         KeyError will be raised if:
         - note is not in the major scale of song key (using the dict)
