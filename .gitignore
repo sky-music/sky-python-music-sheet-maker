@@ -4,3 +4,5 @@
 *.svg
 /songs_out
 /songs
+/venv
+.idea

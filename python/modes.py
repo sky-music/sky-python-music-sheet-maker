@@ -16,6 +16,7 @@ class RenderModes(Enum):
     ENGLISHASCII = 5
     JIANPUASCII = 6
     DOREMIASCII = 7
+    MIDI = 8
 
 class CSSModes(Enum):
     XML = 1
