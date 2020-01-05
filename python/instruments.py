@@ -17,7 +17,7 @@ except (ImportError, ModuleNotFoundError):
 from notes import Note, NoteRoot, NoteCircle, NoteDiamond
 
 
-### Instrument classes
+# ## Instrument classes
 
 class Instrument:
 
