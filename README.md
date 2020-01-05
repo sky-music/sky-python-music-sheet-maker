@@ -20,8 +20,8 @@ The output will be HTML, with small icons of the Sky keyboard. If you use Wester
 
 ***
 
-SVG icons are thanks to [madwurmz](http://madwurmz.com), and thanks to mimizan for support for importing TXT files and using ABC1-5 notation, Jianpu notation and Western notation.
+**Co-authors:** Tracey L, jmmelko
 
-Website with music sheets made using this program: 
+SVG icons are thanks to [madwurmz](http://madwurmz.com).
 
-https://sky-music.github.io
+Website with music sheets made using this program: https://sky-music.github.io
