@@ -74,7 +74,9 @@ class Song():
             # self.png_color = (54, 57, 63)    #Discord colors
             self.png_font_size = 36
             self.png_title_font_size = 48
-            self.png_font = 'fonts/NotoSansCJKjp-Regular.otf'
+            self.mycwd = os.getcwd()
+            self.mycwd = os.path.join(self.mycwd, 'sky-python-music-sheet-maker')
+            self.png_font = os.path.join(self.mycwd, 'fonts/NotoSansCJKjp-Regular.otf')
 
         if no_mido_module == False:
             # WARNING: instrument codes correspond to General Midi codes (see Wikipedia) minus 1
@@ -254,13 +256,7 @@ class Song():
 
         return file_path
 
-    def write_ascii(self, file_path, render_mode=RenderModes.SKYASCII):
-
-        try:
-            ascii_file = open(file_path, 'w+', encoding='utf-8', errors='ignore')
-        except:
-            print('Could not create text file.')
-            return ''
+    def write_ascii(self, render_mode=RenderModes.SKYASCII):
 
         if render_mode == RenderModes.SKYASCII:
             note_parser = parsers.SkyNoteParser()
@@ -273,10 +269,9 @@ class Song():
         else:
             note_parser = parsers.SkyNoteParser()
 
-        ascii_file.write('#' + self.title + '\n')
 
-        for i in range(len(self.headers[0])):
-            ascii_file.write('#' + self.headers[0][i] + ' ' + self.headers[1][i] + '\n')
+
+
 
         song_render = '\n'
         instrument_index = 0
@@ -289,9 +284,9 @@ class Song():
                 line_render += instrument_render + ' '
             song_render += '\n' + line_render
 
-        ascii_file.write(song_render)
 
-        return file_path
+
+        return song_render
 
     def write_svg(self, file_path0, css_mode=CSSModes.EMBED, css_path='css/main.css', start_row=0, filenum=0):
 

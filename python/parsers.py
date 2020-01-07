@@ -399,7 +399,7 @@ class NoteParser:
         self.BASE_OF_MAJOR_SCALE = 7
 
         # Specify the default starting octave of the harp, in this case, it's 4 (C4 D4 E4 etc.)
-        self.default_starting_octave = 4
+        self.default_starting_octave = 1
 
         # Compile regexes for notes to save before using
         # these regexes are used for validating whether an individual note is formatted correctly.
@@ -959,7 +959,3 @@ class JianpuNoteParser(NoteParser):
                 note_octave = self.get_default_starting_octave()
         # print(note_base+note_alt+str(note_octave))
         return note_name, note_octave
-
-
-note_parser = EnglishNoteParser()
-print(note_parser.calculate_coordinate_for_note('G', 'Ab', note_shift=0, is_finding_key=True))

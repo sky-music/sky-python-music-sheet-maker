@@ -28,11 +28,13 @@ class Instrument:
         self.index = 0
         self.is_silent = True
         self.is_broken = False
-        self.empty_chord_png = os.path.normpath('elements/empty-chord.png')  # blank harp
+        self.mycwd = os.getcwd()
+        self.mycwd = os.path.join(self.mycwd, 'sky-python-music-sheet-maker')
+        self.empty_chord_png = os.path.normpath(os.path.join(self.mycwd, 'elements/empty-chord.png'))  # blank harp
         self.unhighlighted_chord_png = os.path.normpath(
-            'elements/unhighlighted-chord.png')  # harp with unhighlighted notes
-        self.broken_png = os.path.normpath('elements/broken-symbol.png')
-        self.silent_png = os.path.normpath('elements/silent-symbol.png')
+            os.path.join(self.mycwd,'elements/unhighlighted-chord.png') ) # harp with unhighlighted notes
+        self.broken_png = os.path.normpath(os.path.join(self.mycwd,'elements/broken-symbol.png'))
+        self.silent_png = os.path.normpath(os.path.join(self.mycwd,'elements/silent-symbol.png'))
         self.png_chord_size = None
         self.text_bkg = (255, 255, 255, 0)  # Transparent white
         self.song_bkg = (255, 255, 255)  # White paper sheet
@@ -126,7 +128,9 @@ class Voice(Instrument):  # Lyrics or comments
         self.lyric = ''
         # self.text_bkg = (255, 255, 255, 0)#Uncomment to make it different from the inherited class
         # self.font_color = (255,255,255)#Uncomment to make it different from the inherited class
-        self.font = 'fonts/NotoSansCJKjp-Regular.otf'
+        self.mycwd = os.getcwd()
+        self.mycwd = os.path.join(self.mycwd, 'sky-python-music-sheet-maker')
+        self.font = os.path.join(self.mycwd, 'fonts/NotoSansCJKjp-Regular.otf')
         self.font_size = 32
         self.lyric_height = None
         self.lyric_width = None

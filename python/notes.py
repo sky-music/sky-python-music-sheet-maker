@@ -12,6 +12,7 @@ try:
 except (ImportError, ModuleNotFoundError):
     no_mido_module = True
 
+import os
 
 class Note:
 
@@ -29,23 +30,25 @@ class Note:
         self.harp_is_silent = instrument.get_is_silent()
         self.row_count = instrument.get_row_count()
         self.column_count = instrument.get_column_count()
-        self.A_root_png = 'elements/A-root.png'
-        self.A_diamond_png = 'elements/A-diamond.png'
-        self.A_circle_png = 'elements/A-circle.png'
-        self.B_root_png = 'elements/B-root.png'
-        self.B_diamond_png = 'elements/B-diamond.png'
-        self.B_circle_png = 'elements/B-circle.png'
-        self.C_root_png = 'elements/C-root.png'
-        self.C_diamond_png = 'elements/C-diamond.png'
-        self.C_circle_png = 'elements/C-circle.png'
-        self.dead_png = 'elements/dead-note.png'
-        self.dead_png = 'elements/dead-note.png'
-        self.A_unhighlighted_png = 'elements/A-unhighlighted.png'
-        self.B_unhighlighted_png = 'elements/B-unhighlighted.png'
-        self.C_unhighlighted_png = 'elements/C-unhighlighted.png'
-        self.root_highlighted_pngs = ['elements/root-highlighted-' + str(i) + '.png' for i in range(1, 8)]
-        self.diamond_highlighted_pngs = ['elements/diamond-highlighted-' + str(i) + '.png' for i in range(1, 8)]
-        self.circle_highlighted_pngs = ['elements/circle-highlighted-' + str(i) + '.png' for i in range(1, 8)]
+        self.mycwd = os.getcwd()
+        self.mycwd = os.path.join(self.mycwd, 'sky-python-music-sheet-maker')
+        self.A_root_png = os.path.join(self.mycwd, 'elements/A-root.png')
+        self.A_diamond_png = os.path.join(self.mycwd, 'elements/A-diamond.png')
+        self.A_circle_png = os.path.join(self.mycwd, 'elements/A-circle.png')
+        self.B_root_png = os.path.join(self.mycwd, 'elements/B-root.png')
+        self.B_diamond_png = os.path.join(self.mycwd, 'elements/B-diamond.png')
+        self.B_circle_png = os.path.join(self.mycwd, 'elements/B-circle.png')
+        self.C_root_png = os.path.join(self.mycwd, 'elements/C-root.png')
+        self.C_diamond_png = os.path.join(self.mycwd, 'elements/C-diamond.png')
+        self.C_circle_png = os.path.join(self.mycwd, 'elements/C-circle.png')
+        self.dead_png = os.path.join(self.mycwd, 'elements/dead-note.png')
+        self.dead_png = os.path.join(self.mycwd, 'elements/dead-note.png')
+        self.A_unhighlighted_png = os.path.join(self.mycwd, 'elements/A-unhighlighted.png')
+        self.B_unhighlighted_png = os.path.join(self.mycwd, 'elements/B-unhighlighted.png')
+        self.C_unhighlighted_png = os.path.join(self.mycwd, 'elements/C-unhighlighted.png')
+        self.root_highlighted_pngs = [os.path.join(self.mycwd, 'elements/root-highlighted-') + str(i) + '.png' for i in range(1, 8)]
+        self.diamond_highlighted_pngs = [os.path.join(self.mycwd, 'elements/diamond-highlighted-') + str(i) + '.png' for i in range(1, 8)]
+        self.circle_highlighted_pngs = [os.path.join(self.mycwd, 'elements/circle-highlighted-') + str(i) + '.png' for i in range(1, 8)]
         self.png_size = None
 
         self.midi_pitches = {'C': 60, 'C#': 61, 'Db': 61, 'D': 62, 'D#': 63, 'Eb': 63, 'E': 64, \
