@@ -632,7 +632,7 @@ class Song():
                 instrument_render = instrument.render_in_png(harp_rescale)
                 line_render = trans_paste(line_render, instrument_render, (int(x), int(y)))
                     
-                x += self.png_harp_size[0]
+                x += max(self.png_harp_size[0],instrument_render.size[0])
 
                 # REPEAT
                 if instrument.get_repeat() > 1:
@@ -664,7 +664,7 @@ class Song():
 
         if no_mido_module == True:
             print('\n**** WARNING: MIDI was not created because mido module was not found. ****\n')
-            return 0, ''
+            return ''
 
         mid = mido.MidiFile(type=0)
         track = mido.MidiTrack()
