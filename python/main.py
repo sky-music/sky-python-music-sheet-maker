@@ -237,10 +237,10 @@ if __name__ == "__main__":
 
     if RenderModes.MIDI in ENABLED_MODES:
         midi_path = os.path.join(SONG_DIR_OUT, song_title + '.mid')
-        midi_ascii_path = mysong.write_midi(midi_path)
-        if midi_ascii_path != '':
+        midi_path = mysong.write_midi(midi_path)
+        if midi_path != '':
             print('--------------------------------------------------')
-            print('Your song in MIDI is located at:', midi_ascii_path)
+            print('Your song in MIDI is located at:', midi_path)
 
     if RenderModes.SKYASCII in ENABLED_MODES and song_notation not in [InputModes.SKY, InputModes.SKYKEYBOARD]:
         sky_ascii_path = os.path.join(SONG_DIR_OUT, song_title + '_sky.txt')
