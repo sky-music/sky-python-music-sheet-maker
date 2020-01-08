@@ -51,7 +51,7 @@ def load_file(directory, filename):
         return None
 
 
-def read_lines(filepath=None):
+def read_lines(filepath=None, first_line=None):
     """
      Read song lines in fp, or asks the user to type each line in the console
     """
@@ -121,7 +121,7 @@ if __name__ == "__main__":
 
     fp = load_file(SONG_DIR_IN, first_line)  # loads file or asks for next line
 
-    song_lines = read_lines(fp)
+    song_lines = read_lines(fp, first_line)
 
     myparser.set_delimiters(ICON_DELIMITER, PAUSE, QUAVER_DELIMITER, COMMENT_DELIMITER, REPEAT_INDICATOR)
     possible_modes = myparser.get_possible_modes(song_lines)
