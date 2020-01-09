@@ -197,7 +197,6 @@ class Harp(Instrument):
         self.type = 'harp'
         self.column_count = 5
         self.row_count = 3
-        # self.highlighted_states_skygrid = []
 
     def get_row_count(self):
         return self.row_count

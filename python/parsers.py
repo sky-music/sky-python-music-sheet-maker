@@ -63,6 +63,10 @@ class SongParser:
             self.set_note_parser(self.input_mode)
             self.check_delimiters()
 
+    def get_input_mode(self):
+
+        return self.input_mode
+
     def get_note_parser(self, input_mode=None):
 
         if self.note_parser is not None:
@@ -245,7 +249,7 @@ class SongParser:
             if len(line) > 0:
                 if line[0] != self.comment_delimiter:
                     notes = is_note_regex.sub(' \\1',
-                                            not_note_regex.sub('', line)).split()  # Clean-up, adds space and split
+                                              not_note_regex.sub('', line)).split()  # Clean-up, adds space and split
                     for i, k in enumerate(possible_keys):
                         for note in notes:
                             num_notes[i] += 1
@@ -959,7 +963,3 @@ class JianpuNoteParser(NoteParser):
                 note_octave = self.get_default_starting_octave()
         # print(note_base+note_alt+str(note_octave))
         return note_name, note_octave
-
-
-note_parser = EnglishNoteParser()
-print(note_parser.calculate_coordinate_for_note('G', 'Ab', note_shift=0, is_finding_key=True))

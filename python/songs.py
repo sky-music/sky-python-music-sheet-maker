@@ -37,7 +37,7 @@ class Song():
         self.maxFiles = 10
         self.harp_AspectRatio = 1.455
         self.harp_relspacings = (
-        0.13, 0.1)  # Fraction of the harp width that will be allocated to the spacing between harps
+            0.13, 0.1)  # Fraction of the harp width that will be allocated to the spacing between harps
 
         self.HTML_note_width = '1em'
 
@@ -49,12 +49,13 @@ class Song():
         self.SVG_text_height = self.fontpt * self.pt2px  # In principle this should be in em
         self.SVG_line_width = self.SVG_viewPort[2] - self.SVG_viewPortMargins[0]
         SVG_harp_width = max(minDim, (self.SVG_viewPort[2] - self.SVG_viewPortMargins[0]) / (
-                    1.0 * self.maxIconsPerLine * (1 + self.harp_relspacings[0])))
+                1.0 * self.maxIconsPerLine * (1 + self.harp_relspacings[0])))
         self.SVG_harp_size = (SVG_harp_width, max(minDim, SVG_harp_width / self.harp_AspectRatio))
         self.SVG_harp_spacings = (
-        self.harp_relspacings[0] * SVG_harp_width, self.harp_relspacings[1] * SVG_harp_width / self.harp_AspectRatio)
+            self.harp_relspacings[0] * SVG_harp_width,
+            self.harp_relspacings[1] * SVG_harp_width / self.harp_AspectRatio)
 
-        if no_PIL_module == False:
+        if not no_PIL_module:
             self.png_size = (1334 * 2, 750 * 2)  # must be an integer tuple
             self.png_margins = (13, 7)
             self.png_harp_size0 = instruments.Harp().render_in_png().size  # A tuple
@@ -76,7 +77,7 @@ class Song():
             self.png_title_font_size = 48
             self.png_font = 'fonts/NotoSansCJKjp-Regular.otf'
 
-        if no_mido_module == False:
+        if not no_mido_module:
             # WARNING: instrument codes correspond to General Midi codes (see Wikipedia) minus 1
             # Instrument will sound very strange if played outside its natural pitch range
             midi_instruments = {'piano': 0, 'guitar': 24, 'flute': 73, 'pan': 75}
@@ -89,14 +90,18 @@ class Song():
                 print('Warning: Invalid music key passed to the MIDI renderer: using C instead')
                 self.midi_key = 'C'
 
+    def get_title(self):
+
+        return self.title
+
     def add_line(self, line):
-        '''Adds a line of Instrument to the Song'''
+        """Adds a line of Instrument to the Song"""
         if len(line) > 0:
             if isinstance(line[0], instruments.Instrument):
                 self.lines.append(line)
 
     def get_line(self, row):
-        '''Returns line #row, if row is in the Song, or else returns an empty list'''
+        """Returns line #row, if row is in the Song, or else returns an empty list"""
         try:
             return self.lines[row]
         except:
@@ -107,18 +112,19 @@ class Song():
         return self.music_key
 
     def get_song(self):
-        '''Returns the Song, a list of lists of Instruments'''
+        """Returns the Song, a list of lists of Instruments"""
         return self.lines
 
     def get_instrument(self, row, col):
-        '''Returns the Instrument object at row, col in the Song'''
+        """Returns the Instrument object at row, col in the Song"""
         try:
             return self.lines[row][col]
-        except:
+        except Exception as ex:
             return []
+            raise ex
 
     def get_num_lines(self):
-        '''Returns the number of lines n the Song'''
+        """Returns the number of lines n the Song"""
         return len(self.lines)
 
     def __len__(self):
@@ -129,14 +135,14 @@ class Song():
                + str(self.get_num_instruments()) + ' instruments, ' + str(self.get_num_broken()) + ' errors>'
 
     def get_num_instruments(self):
-        '''Returns the number of instruments in the Song'''
+        """Returns the number of instruments in the Song"""
         c = 0
         for line in self.lines:
             c += len(line)
         return c
 
     def get_num_broken(self):
-        '''Returns the number of broken instruments in the Song'''
+        """Returns the number of broken instruments in the Song"""
         b = 0
         for line in self.lines:
             for instr in line:
@@ -147,7 +153,7 @@ class Song():
         return b
 
     def get_max_instruments_per_line(self):
-        '''Returns the number of instruments in the longest line'''
+        """Returns the number of instruments in the longest line"""
         if len(self.lines) > 0:
             return max(list(map(len, self.lines)))
         else:
@@ -160,33 +166,34 @@ class Song():
         self.headers[1] = [original_artists, transcript_writer, musical_key]
 
     def get_voice_SVG_height(self):
-        '''Tries to predict the height of the lyrics text when rendered in SVG'''
+        """Tries to predict the height of the lyrics text when rendered in SVG"""
         return self.fontpt * self.pt2px
 
     def set_png_harp_size(self):
-        '''Shrinks the Harp image, so that the longest line fits up to max_instruments_per_line instruments'''
-        if self.png_harp_size == None or self.png_harp_spacings == None:
+        """Shrinks the Harp image, so that the longest line fits up to max_instruments_per_line instruments"""
+        if self.png_harp_size is None or self.png_harp_spacings is None:
             Nmax = max(1, min(self.maxIconsPerLine, self.get_max_instruments_per_line()))
             new_harp_width = min(self.png_harp_size0[0],
                                  (self.png_size[0] - self.png_margins[0]) / (Nmax * (1.0 + self.harp_relspacings[0])))
             self.png_harp_size = (new_harp_width, new_harp_width / self.harp_AspectRatio)
             self.png_harp_spacings = (
-            self.harp_relspacings[0] * self.png_harp_size[0], self.harp_relspacings[1] * self.png_harp_size[1])
+                self.harp_relspacings[0] * self.png_harp_size[0], self.harp_relspacings[1] * self.png_harp_size[1])
             self.png_lyric_size = (self.png_harp_size[0], (self.png_harp_size[1] / self.png_harp_size0[1]))
 
     def set_png_voice_size(self):
         self.png_lyric_size = (
-        self.png_lyric_size0[0] * self.get_png_harp_rescale(), self.png_lyric_size0[1] * self.get_png_harp_rescale())
+            self.png_lyric_size0[0] * self.get_png_harp_rescale(),
+            self.png_lyric_size0[1] * self.get_png_harp_rescale())
 
     def get_png_harp_rescale(self):
-        '''Gets the rescale factor to from the original .png Harp image'''
-        if self.png_harp_size[0] != None:
+        """Gets the rescale factor to from the original .png Harp image"""
+        if self.png_harp_size[0] is not None:
             return 1.0 * self.png_harp_size[0] / self.png_harp_size0[0]
         else:
             return 1.0
 
     def get_png_text_height(self, fnt):
-        '''Calculates the text height in PNG for a standard text depending on the input font size'''
+        """Calculates the text height in PNG for a standard text depending on the input font size"""
         return fnt.getsize('HQfgjyp')[1]
 
     def write_html(self, file_path, css_mode=CSSModes.EMBED, css_path='css/main.css'):
@@ -348,7 +355,7 @@ class Song():
         song_header = ('\n<svg x=\"' + '%.2f' % self.SVG_viewPortMargins[0] + '\" y=\"' + '%.2f' %
                        self.SVG_viewPortMargins[1] + \
                        '\" width=\"' + '%.2f' % self.SVG_line_width + '\" height=\"' + '%.2f' % (
-                                   self.SVG_viewPort[3] - self.SVG_viewPortMargins[1]) + '\">')
+                               self.SVG_viewPort[3] - self.SVG_viewPortMargins[1]) + '\">')
 
         x = 0
         y = self.SVG_text_height  # Because the origin of text elements of the bottom-left corner
@@ -366,10 +373,11 @@ class Song():
         # Dividing line
         y += self.SVG_text_height
         song_header += (
-                    '\n<svg x=\"0" y=\"' + '%.2f' % y + '\" width=\"' + '%.2f' % self.SVG_line_width + '\" height=\"' + '%.2f' % (
-                        self.SVG_harp_spacings[1] / 2.0) + '\">'
-                                                           '\n<line x1=\"0\" y1=\"50%\" x2=\"100%\" y2=\"50%\" class=\"divide\"/>'
-                                                           '\n</svg>')
+                '\n<svg x=\"0" y=\"' + '%.2f' % y + '\" width=\"' + '%.2f' % self.SVG_line_width + '\" height=\"' + '%.2f' % (
+                self.SVG_harp_spacings[1] / 2.0) + '\">'
+                                                   '\n<line x1=\"0\" y1=\"50%\" x2=\"100%\" y2=\"50%\" '
+                                                   'class=\"divide\"/> '
+                                                   '\n</svg>')
         y += self.SVG_text_height
 
         song_header += '\n</svg>'
@@ -380,7 +388,7 @@ class Song():
         ysong = y
         song_render = '\n<svg x=\"' + '%.2f' % self.SVG_viewPortMargins[
             0] + '\" y=\"' + '%.2f' % y + '\" width=\"' + '%.2f' % self.SVG_line_width + '\" height=\"' + '%.2f' % (
-                                  self.SVG_viewPort[3] - y) + '\" class=\"song\">'
+                              self.SVG_viewPort[3] - y) + '\" class=\"song\">'
         y = 0  # Because we are nested in a new SVG
         x = 0
 
@@ -418,7 +426,7 @@ class Song():
                 # Dividing line
                 y += self.SVG_harp_spacings[1] / 4.0
                 song_render += '\n<svg x=\"0" y=\"' + '%.2f' % y + '\" width=\"' + '%.2f' % self.SVG_line_width + '\" height=\"' + '%.2f' % (
-                            self.SVG_harp_spacings[1] / 2.0) + '\">'
+                        self.SVG_harp_spacings[1] / 2.0) + '\">'
                 song_render += '\n<line x1=\"0\" y1=\"50%\" x2=\"100%\" y2=\"50%\" class=\"divide\"/>'
                 song_render += '\n</svg>'
                 y += self.SVG_harp_spacings[1] / 4.0
@@ -453,14 +461,14 @@ class Song():
 
                 # INSTRUMENT RENDER
                 instrument_render = instrument.render_in_svg(x, '%.2f' % (
-                            100.0 * self.SVG_harp_size[0] / self.SVG_line_width) + '%', '100%', self.harp_AspectRatio)
+                        100.0 * self.SVG_harp_size[0] / self.SVG_line_width) + '%', '100%', self.harp_AspectRatio)
 
                 # REPEAT
                 if instrument.get_repeat() > 1:
                     instrument_render += '\n<svg x=\"' + '%.2f' % (
-                                x + self.SVG_harp_size[0]) + '\" y=\"0%\" class=\"repeat\" width=\"' + '%.2f' % (
-                                                     100.0 * self.SVG_harp_size[
-                                                 0] / self.SVG_line_width) + '%' + '\" height=\"100%\">'
+                            x + self.SVG_harp_size[0]) + '\" y=\"0%\" class=\"repeat\" width=\"' + '%.2f' % (
+                                                 100.0 * self.SVG_harp_size[
+                                             0] / self.SVG_line_width) + '%' + '\" height=\"100%\">'
                     instrument_render += '\n<text x=\"2%\" y=\"98%\" class=\"repeat\">x' + str(
                         instrument.get_repeat()) + '</text></svg>'
                     x += self.SVG_harp_spacings[0]
@@ -486,7 +494,7 @@ class Song():
     def write_png(self, file_path0, start_row=0, filenum=0):
         global no_PIL_module
 
-        if no_PIL_module == True:
+        if no_PIL_module:
             print('\n**** WARNING: PNG was not rendered because PIL module was not found. ****\n')
             return 0, ''
 
@@ -581,7 +589,7 @@ class Song():
 
             if linetype == 'voice':
                 ypredict = yline_in_song + (self.png_lyric_size[1] + self.png_harp_spacings[1] / 2.0) * (
-                            nsublines + 1) + self.png_harp_spacings[1] / 2.0
+                        nsublines + 1) + self.png_harp_spacings[1] / 2.0
             else:
                 ypredict = yline_in_song + (self.png_harp_size[1] + self.png_harp_spacings[1]) * (nsublines + 1) + \
                            self.png_harp_spacings[1] / 2.0
@@ -661,7 +669,7 @@ class Song():
     def write_midi(self, file_path):
         global no_mido_module
 
-        if no_mido_module == True:
+        if no_mido_module:
             print('\n**** WARNING: MIDI was not created because mido module was not found. ****\n')
             return 0, ''
 

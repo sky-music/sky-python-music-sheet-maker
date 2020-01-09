@@ -48,8 +48,8 @@ class Note:
         self.circle_highlighted_pngs = ['elements/circle-highlighted-' + str(i) + '.png' for i in range(1, 8)]
         self.png_size = None
 
-        self.midi_pitches = {'C': 60, 'C#': 61, 'Db': 61, 'D': 62, 'D#': 63, 'Eb': 63, 'E': 64, \
-                             'F': 65, 'F#': 66, 'Gb': 66, 'G': 67, 'G#': 68, 'Ab': 68, 'A': 69, \
+        self.midi_pitches = {'C': 60, 'C#': 61, 'Db': 61, 'D': 62, 'D#': 63, 'Eb': 63, 'E': 64,
+                             'F': 65, 'F#': 66, 'Gb': 66, 'G': 67, 'G#': 68, 'Ab': 68, 'A': 69,
                              'A#': 70, 'Bb': 70, 'B': 71}
         self.midi_semitones = [0, 2, 4, 5, 7, 9, 11]  # May no longer be used when Western_scales is merged
 

@@ -32,3 +32,8 @@ class CSSModes(Enum):
     IMPORT = 2
     EMBED = 3
     HARD = EMBED
+
+
+class ResponseModes(Enum):
+    COMMAND_LINE = 1
+    BOT = 2
