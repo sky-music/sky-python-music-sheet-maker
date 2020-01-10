@@ -28,6 +28,10 @@ class SongParser:
         self.comment_delimiter = comment_delimiter
         self.repeat_indicator = repeat_indicator
 
+    def get_pause(self):
+
+        return self.pause
+
     def check_delimiters(self):
 
         if self.input_mode == InputModes.JIANPU or isinstance(self.note_parser, JianpuNoteParser):
