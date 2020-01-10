@@ -80,7 +80,7 @@ class Instrument:
         return self.is_silent
 
     def get_is_broken(self):
-        """Returns whether the Harp is broken (notes were not recongized by the Parser)"""
+        """Returns whether the Harp is broken (notes were not recognized by the Parser)"""
         return self.is_broken
 
     def set_is_broken(self, is_broken=True):

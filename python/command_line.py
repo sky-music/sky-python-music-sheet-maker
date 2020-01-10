@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from modes import InputModes, RenderModes, CSSModes
+from modes import InputMode, RenderMode, CSSMode
 from parsers import SongParser
 from songs import Song
 import os
@@ -15,9 +15,9 @@ if __name__ == "command_line":
     # ## MAIN SCRIPT
     print('===== VISUAL MUSIC SHEETS FOR SKY:CHILDREN OF THE LIGHT =====')
     print('\nAccepted music notes formats:')
-    for mode in InputModes:
+    for mode in InputMode:
         print('\n* ' + mode.value[2])
-        if mode == InputModes.SKYKEYBOARD:
+        if mode == InputMode.SKYKEYBOARD:
             print('   ' + myparser.get_keyboard_layout().replace(' ', '\n   ') + ':')
     print('\nNotes composing a chord must be glued together (e.g. A1B1C1).')
     print('Separate chords with \"' + ICON_DELIMITER + '\".')

@@ -11,7 +11,7 @@ import re
 import math
 from main import load_file, read_lines, ask_for_mode
 from parsers import SongParser
-from modes import InputModes
+from modes import InputMode
 
 dodeca_sharps = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
 dodeca_flats = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B']
@@ -34,7 +34,7 @@ def parse_chords(chords, note_shift=0):
             if note_shift != 0:
                 try:
                     (note_name, octave_number) = skyparser.get_note_parser().parse_note(note)
-                    if note_name != None:
+                    if note_name is not None:
                         if note_name in dodeca_sharps:
                             idx = dodeca_sharps.index(note_name)
                             idx_shift = (idx + note_shift) % n
@@ -138,7 +138,7 @@ else:
 
 skyparser.set_input_mode(song_notation)
 
-if song_notation == InputModes.JIANPU and PAUSE != '0':
+if song_notation == InputMode.JIANPU and PAUSE != '0':
     print('\nWarning: pause in Jianpu has been reset to ''0''.')
     PAUSE = '0'
 

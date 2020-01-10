@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from modes import InputModes, RenderModes, CSSModes, ResponseModes
+from modes import InputMode, RenderMode, CSSMode, ResponseMode
 from parsers import SongParser
 from songs import Song
 import os
@@ -13,13 +13,13 @@ class Responder:
         self.song_dir_in = "test_songs"
         self.song_dir_out = "songs_out"
         self.css_path = "css/main.css"
-        self.css_mode = CSSModes.EMBED
-        self.render_modes_enabled = [mode for mode in RenderModes]
-        # self.render_modes_disabled = [RenderModes.JIANPUASCII, RenderModes.DOREMIASCII]
+        self.css_mode = CSSMode.EMBED
+        self.render_modes_enabled = [mode for mode in RenderMode]
+        # self.render_modes_disabled = [RenderMode.JIANPUASCII, RenderMode.DOREMIASCII]
         self.render_modes_disabled = []
         self.render_modes_enabled = [mode for mode in self.render_modes_enabled if
                                      mode not in self.render_modes_disabled]
-        # self.render_modes_enabled = [RenderModes.PNG, RenderModes.SKYASCII, RenderModes.WESTERNASCII]
+        # self.render_modes_enabled = [RenderMode.PNG, RenderMode.SKYASCII, RenderMode.WESTERNASCII]
 
         self.response_mode = ''
 
@@ -38,13 +38,13 @@ class Responder:
     def get_song_dir_out(self):
 
         return self.song_dir_out
-    
+
     def get_css_mode(self):
-        
+
         return self.css_mode
-    
+
     def get_css_path(self):
-        
+
         return self.css_path
 
     def get_render_modes_enabled(self):
@@ -79,7 +79,7 @@ class Responder:
         for mode in modes:
             i += 1
             instructions += str(i) + ') ' + mode.value[2] + "\n"
-            if mode == InputModes.SKYKEYBOARD:
+            if mode == InputMode.SKYKEYBOARD:
                 instructions += "   " + self.get_parser().get_keyboard_layout().replace(" ", "\n   ") + ":"
             modes_list[i] = mode
         self.output(instructions)
@@ -87,7 +87,7 @@ class Responder:
             notation = int(self.ask('Mode (1-' + str(i) + "): ").strip())
             mode = modes_list[notation]
         except (ValueError, KeyError):
-            mode = InputModes.SKY
+            mode = InputMode.SKY
         return mode
 
     def set_response_mode(self, response_mode):
@@ -99,17 +99,18 @@ class Responder:
 
         return self.response_mode
 
-    def ask(self):
+    def ask(self, question):
 
-        if self.get_response_mode() == ResponseModes.BOT:
+        if self.get_response_mode() == ResponseMode.BOT:
 
+            # TODO: I don't know how to do this
             pass
 
-        elif self.get_response_mode() == ResponseModes.COMMAND_LINE:
+        elif self.get_response_mode() == ResponseMode.COMMAND_LINE:
 
-            pass
+            user_response = input(question)
 
-        return ""
+        return user_response
 
     def output(self, output):
 
@@ -147,7 +148,7 @@ class Responder:
          Read song lines in fp, or asks the user to type each line in the console
         """
 
-        if self.get_response_mode() == ResponseModes.COMMAND_LINE:
+        if self.get_response_mode() == ResponseMode.COMMAND_LINE:
             lines = []
             if filepath is not None:
                 try:
@@ -199,7 +200,7 @@ class Responder:
         """Attempts to detect key for input written in absolute musical scales (western, Jianpu)"""
         possible_keys = []
         song_key = None
-        if song_notation in [InputModes.ENGLISH, InputModes.DOREMI, InputModes.JIANPU]:
+        if song_notation in [InputMode.ENGLISH, InputMode.DOREMI, InputMode.JIANPU]:
             possible_keys = self.get_parser().find_key(song_lines)
             if len(possible_keys) == 0:
                 print("\nYour song cannot be transposed exactly in Sky.")
@@ -221,8 +222,8 @@ class Responder:
 
     def ask_note_shift(self):
 
-        if self.get_parser().get_input_mode() in [InputModes.ENGLISH, InputModes.DOREMI, InputModes.JIANPU,
-                                                  InputModes.ENGLISHCHORDS]:
+        if self.get_parser().get_input_mode() in [InputMode.ENGLISH, InputMode.DOREMI, InputMode.JIANPU,
+                                                  InputMode.ENGLISHCHORDS]:
             try:
                 note_shift = int(7 * eval(input('Shift song by how many octaves? (-n ; +n): ').strip()))
             except (NameError, SyntaxError):
@@ -235,8 +236,8 @@ class Responder:
         # Parses song line by line
         song = Song(english_song_key)  # The song key must be in English format
         for song_line in song_lines:
-            instrument_line = myparser.parse_line(song_line, song_key,
-                                                  note_shift)  # The song key must be in the original format
+            instrument_line = self.get_parser().parse_line(song_line, song_key,
+                                                           note_shift)  # The song key must be in the original format
             song.add_line(instrument_line)
 
     def calculate_error_ratio(self):
@@ -256,7 +257,7 @@ class Responder:
 
         """Renders the song"""
 
-        if self.is_render_mode_enabled(RenderModes.HTML):
+        if self.is_render_mode_enabled(RenderMode.HTML):
             html_path = os.path.join(self.get_song_dir_out(), self.get_song().get_title() + '.html')
             html_path = self.get_song().write_html(html_path, self.get_css_mode(), self.get_css_path())
 
@@ -264,7 +265,7 @@ class Responder:
                 print('============================================================')
                 print('Your song in HTML is located at:', html_path)
 
-        if self.is_render_mode_enabled(RenderModes.SVG):
+        if self.is_render_mode_enabled(RenderMode.SVG):
             svg_path0 = os.path.join(self.get_song_dir_out(), self.get_song().get_title() + '.svg')
             filenum, svg_path = self.get_song().write_svg(svg_path0, self.get_css_mode(), self.get_css_path())
 
@@ -275,7 +276,7 @@ class Responder:
                                                                             'between ' + os.path.split(svg_path0)[
                           1] + ' and ' + os.path.split(svg_path)[1])
 
-        if self.is_render_mode_enabled(RenderModes.PNG):
+        if self.is_render_mode_enabled(RenderMode.PNG):
             png_path0 = os.path.join(self.get_song_dir_out(), self.get_song().get_title() + '.png')
             filenum, png_path = self.get_song().write_png(png_path0)
 
@@ -286,42 +287,42 @@ class Responder:
                                                                             'between ' + os.path.split(png_path0)[
                           1] + ' and ' + os.path.split(png_path)[1])
 
-        if self.is_render_mode_enabled(RenderModes.MIDI):
+        if self.is_render_mode_enabled(RenderMode.MIDI):
             midi_path = os.path.join(self.get_song_dir_out(), self.get_song().get_title() + '.mid')
             midi_ascii_path = self.get_song().write_midi(midi_path)
             if midi_ascii_path != '':
                 print('--------------------------------------------------')
                 print('Your song in MIDI is located at:', midi_ascii_path)
 
-        if self.is_render_mode_enabled(RenderModes.SKYASCII) and self.get_parser().get_input_mode() not in [
-            InputModes.SKY, InputModes.SKYKEYBOARD]:
+        if self.is_render_mode_enabled(RenderMode.SKYASCII) and self.get_parser().get_input_mode() not in [
+                InputMode.SKY, InputMode.SKYKEYBOARD]:
             sky_ascii_path = os.path.join(self.get_song_dir_out(), self.get_song().get_title() + '_sky.txt')
-            res = self.get_song().write_ascii(sky_ascii_path, RenderModes.SKYASCII)
+            res = self.get_song().write_ascii(sky_ascii_path, RenderMode.SKYASCII)
             if sky_ascii_path != '':
                 print('--------------------------------------------------')
                 print('Your song in TXT converted to Sky notation is located at:', sky_ascii_path)
 
-        if self.is_render_mode_enabled(RenderModes.ENGLISHASCII) and self.get_parser().get_input_mode() not in [
-            InputModes.ENGLISH,
-            InputModes.ENGLISHCHORDS]:
+        if self.is_render_mode_enabled(RenderMode.ENGLISHASCII) and self.get_parser().get_input_mode() not in [
+                InputMode.ENGLISH,
+                InputMode.ENGLISHCHORDS]:
             english_ascii_path = os.path.join(self.get_song_dir_out(), self.get_song().get_title() + '_english.txt')
-            english_ascii_path = self.get_song().write_ascii(english_ascii_path, RenderModes.ENGLISHASCII)
+            english_ascii_path = self.get_song().write_ascii(english_ascii_path, RenderMode.ENGLISHASCII)
             if english_ascii_path != '':
                 print('--------------------------------------------------')
                 print('Your song in TXT converted to English notation with C key is located at:', english_ascii_path)
 
         if self.is_render_mode_enabled(
-                RenderModes.JIANPUASCII) and self.get_parser().get_input_mode() != InputModes.JIANPU:
+                RenderMode.JIANPUASCII) and self.get_parser().get_input_mode() != InputMode.JIANPU:
             jianpu_ascii_path = os.path.join(self.get_song_dir_out(), self.get_song().get_title() + '_jianpu.txt')
-            jianpu_ascii_path = self.get_song().write_ascii(jianpu_ascii_path, RenderModes.JIANPUASCII)
+            jianpu_ascii_path = self.get_song().write_ascii(jianpu_ascii_path, RenderMode.JIANPUASCII)
             if jianpu_ascii_path != '':
                 print('--------------------------------------------------')
                 print('Your song in TXT converted to Jianpu notation with 1 key is located at:', jianpu_ascii_path)
 
         if self.is_render_mode_enabled(
-                RenderModes.DOREMIASCII) and self.get_parser().get_input_mode() != InputModes.DOREMI:
+                RenderMode.DOREMIASCII) and self.get_parser().get_input_mode() != InputMode.DOREMI:
             doremi_ascii_path = os.path.join(self.get_song_dir_out(), self.get_song().get_title() + '_doremi.txt')
-            doremi_ascii_path = self.get_song().write_ascii(doremi_ascii_path, RenderModes.DOREMIASCII)
+            doremi_ascii_path = self.get_song().write_ascii(doremi_ascii_path, RenderMode.DOREMIASCII)
             if doremi_ascii_path != '':
                 print('--------------------------------------------------')
                 print('Your song in TXT converted to doremi notation with do key is located at:', doremi_ascii_path)

@@ -1,4 +1,4 @@
-from modes import RenderModes, CSSModes
+from modes import RenderMode, CSSMode
 import instruments
 import os
 import parsers
@@ -196,7 +196,7 @@ class Song():
         """Calculates the text height in PNG for a standard text depending on the input font size"""
         return fnt.getsize('HQfgjyp')[1]
 
-    def write_html(self, file_path, css_mode=CSSModes.EMBED, css_path='css/main.css'):
+    def write_html(self, file_path, css_mode=CSSMode.EMBED, css_path='css/main.css'):
 
         try:
             html_file = open(file_path, 'w+', encoding='utf-8', errors='ignore')
@@ -208,7 +208,7 @@ class Song():
                         '\n<html xmlns:svg=\"http://www.w3.org/2000/svg\">')
         html_file.write('\n<head>\n<title>' + self.title + '</title>')
 
-        if css_mode == CSSModes.EMBED:
+        if css_mode == CSSMode.EMBED:
             try:
                 with open(css_path, 'r', encoding='utf-8', errors='ignore') as css_file:
                     css_file = css_file.read()
@@ -218,11 +218,11 @@ class Song():
             html_file.write('\n<style type=\"text/css\">\n')
             html_file.write(css_file)
             html_file.write('\n</style>')
-        elif css_mode == CSSModes.IMPORT:
+        elif css_mode == CSSMode.IMPORT:
             html_file.write('\n<style type=\"text/css\">')
             html_file.write("@import url(\'" + os.path.relpath(css_path, start=os.path.dirname(file_path)).replace('\\',
                                                                                                                    '/') + "\');</style>")
-        elif css_mode == CSSModes.XML:
+        elif css_mode == CSSMode.XML:
             html_file.write('\n<link href=\"' + os.path.relpath(css_path, start=os.path.dirname(
                 file_path)) + '\" rel=\"stylesheet\" />')
 
@@ -261,7 +261,7 @@ class Song():
 
         return file_path
 
-    def write_ascii(self, file_path, render_mode=RenderModes.SKYASCII):
+    def write_ascii(self, file_path, render_mode=RenderMode.SKYASCII):
 
         try:
             ascii_file = open(file_path, 'w+', encoding='utf-8', errors='ignore')
@@ -269,13 +269,13 @@ class Song():
             print('Could not create text file.')
             return ''
 
-        if render_mode == RenderModes.SKYASCII:
+        if render_mode == RenderMode.SKYASCII:
             note_parser = parsers.SkyNoteParser()
-        elif render_mode == RenderModes.ENGLISHASCII:
+        elif render_mode == RenderMode.ENGLISHASCII:
             note_parser = parsers.EnglishNoteParser()
-        elif render_mode == RenderModes.JIANPUASCII:
+        elif render_mode == RenderMode.JIANPUASCII:
             note_parser = parsers.JianpuNoteParser()
-        elif render_mode == RenderModes.DOREMIASCII:
+        elif render_mode == RenderMode.DOREMIASCII:
             note_parser = parsers.DoremiNoteParser()
         else:
             note_parser = parsers.SkyNoteParser()
@@ -300,7 +300,7 @@ class Song():
 
         return file_path
 
-    def write_svg(self, file_path0, css_mode=CSSModes.EMBED, css_path='css/main.css', start_row=0, filenum=0):
+    def write_svg(self, file_path0, css_mode=CSSMode.EMBED, css_path='css/main.css', start_row=0, filenum=0):
 
         if filenum > self.maxFiles:
             print('\nYour song is too long. Stopping at ' + str(self.maxFiles) + ' files.')
@@ -321,7 +321,7 @@ class Song():
         # SVG/XML headers
         svg_file.write('<?xml version=\"1.0\" encoding=\"utf-8\" ?>')
 
-        if css_mode == CSSModes.HREF:
+        if css_mode == CSSMode.HREF:
             svg_file.write('\n<?xml-stylesheet href=\"' + os.path.relpath(css_path, start=os.path.dirname(
                 file_path)) + '\" type=\"text/css\" alternate=\"no\" media=\"all\"?>')
 
@@ -331,7 +331,7 @@ class Song():
             ' viewBox=\"' + ' '.join((str(self.SVG_viewPort[0]), str(self.SVG_viewPort[1]), str(self.SVG_viewPort[2]),
                                       str(self.SVG_viewPort[3]))) + '\" preserveAspectRatio=\"xMinYMin\">')
 
-        if css_mode == CSSModes.EMBED:
+        if css_mode == CSSMode.EMBED:
             try:
                 with open(css_path, 'r', encoding='utf-8', errors='ignore') as css_file:
                     css_file = css_file.read()
@@ -342,7 +342,7 @@ class Song():
             svg_file.write('\n<defs><style type=\"text/css\"><![CDATA[\n')
             svg_file.write(css_file)
             svg_file.write('\n]]></style></defs>')
-        elif css_mode == CSSModes.IMPORT:
+        elif css_mode == CSSMode.IMPORT:
             svg_file.write('\n<defs><style type=\"text/css\">')
             svg_file.write("@import url(\'" + os.path.relpath(css_path, start=os.path.dirname(file_path)).replace('\\',
                                                                                                                   '/') + "\');</style></defs>")
