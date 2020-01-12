@@ -9,7 +9,7 @@ KNOWN BUGS: repeat is imported but not exported
 import os
 import re
 import math
-from main import load_file, read_lines, ask_for_mode
+from responder import load_file, read_lines, ask_for_mode
 from parsers import SongParser
 from modes import InputMode
 
