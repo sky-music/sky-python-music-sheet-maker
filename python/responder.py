@@ -70,6 +70,10 @@ class Responder:
 
         return self.parser
 
+    def set_parser(self, parser):
+
+        self.parser = parser
+
     def ask_for_mode(self, modes):
 
         modes_list = {}
@@ -116,6 +120,34 @@ class Responder:
 
         pass
 
+    def create_song(self):
+
+        self.set_parser(SongParser())
+
+        os.chdir(mycwd)
+
+    def output_instructions(self):
+
+        print('===== VISUAL MUSIC SHEETS FOR SKY:CHILDREN OF THE LIGHT =====')
+        print('\nAccepted music notes formats:')
+        for mode in InputMode:
+            print('\n* ' + mode.value[2])
+            if mode == InputMode.SKYKEYBOARD:
+                print('   ' + self.get_parser().get_keyboard_layout().replace(' ', '\n   ') + ':')
+        print('\nNotes composing a chord must be glued together (e.g. A1B1C1).')
+        print('Separate chords with \"' + ICON_DELIMITER + '\".')
+        print('Use \"' + PAUSE + '\" for a silence (rest).')
+        print(
+            'Use \"' + QUAVER_DELIMITER + '\" to link notes within an icon, for triplets, quavers... (e.g. A1' + QUAVER_DELIMITER + 'B1' + QUAVER_DELIMITER + 'C1).')
+        print('Add ' + REPEAT_INDICATOR + '2 after a chord to indicate repetition.')
+        print('Sharps # and flats b (semitones) are supported for Western and Jianpu notations.')
+        print('============================================================')
+
+    def ask_first_line(self):
+
+        first_line = input(
+            'Type or copy-paste notes, or enter file name (in ' + os.path.normpath(SONG_DIR_IN) + '/): ').strip()
+
     def load_file(self, directory, filename):
         """
         if string is a file name, loads the file, else return None
@@ -147,6 +179,10 @@ class Responder:
         """
          Read song lines in fp, or asks the user to type each line in the console
         """
+
+        fp = self.load_file(SONG_DIR_IN, first_line)  # loads file or asks for next line
+
+        song_lines = self.read_lines(fp)
 
         if self.get_response_mode() == ResponseMode.COMMAND_LINE:
             lines = []
