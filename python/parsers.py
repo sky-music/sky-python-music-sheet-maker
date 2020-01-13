@@ -28,6 +28,26 @@ class SongParser:
         self.comment_delimiter = comment_delimiter
         self.repeat_indicator = repeat_indicator
 
+    def get_icon_delimiter(self):
+
+        return self.icon_delimiter
+
+    def get_pause(self):
+
+        return self.pause
+
+    def get_quaver_delimiter(self):
+
+        return self.quaver_delimiter
+
+    def get_comment_delimiter(self):
+
+        return self.comment_delimiter
+
+    def get_repeat_indicator(self):
+
+        return self.repeat_indicator
+
     def get_pause(self):
 
         return self.pause

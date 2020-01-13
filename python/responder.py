@@ -35,9 +35,17 @@ class Responder:
         if not os.path.isdir(self.song_dir_out):
             os.mkdir(self.song_dir_out)
 
+    def get_cwd(self):
+
+        return self.cwd
+
     def get_song_dir_out(self):
 
         return self.song_dir_out
+
+    def get_song_dir_in(self):
+
+        return self.song_dir_in
 
     def get_css_mode(self):
 
@@ -124,7 +132,13 @@ class Responder:
 
         self.set_parser(SongParser())
 
-        os.chdir(mycwd)
+        os.chdir(self.get_cwd())
+
+        self.output_instructions()
+
+        first_line = self.ask_first_line()
+        fp = self.load_file(self.get_song_dir_in(), first_line)  # loads file or asks for next line
+        song_lines = self.read_lines(fp)
 
     def output_instructions(self):
 
@@ -135,18 +149,23 @@ class Responder:
             if mode == InputMode.SKYKEYBOARD:
                 print('   ' + self.get_parser().get_keyboard_layout().replace(' ', '\n   ') + ':')
         print('\nNotes composing a chord must be glued together (e.g. A1B1C1).')
-        print('Separate chords with \"' + ICON_DELIMITER + '\".')
-        print('Use \"' + PAUSE + '\" for a silence (rest).')
+        print('Separate chords with \"' + self.get_parser().get_icon_delimiter() + '\".')
+        print('Use \"' + self.get_parser().get_pause() + '\" for a silence (rest).')
         print(
-            'Use \"' + QUAVER_DELIMITER + '\" to link notes within an icon, for triplets, quavers... (e.g. A1' + QUAVER_DELIMITER + 'B1' + QUAVER_DELIMITER + 'C1).')
-        print('Add ' + REPEAT_INDICATOR + '2 after a chord to indicate repetition.')
+            'Use \"' + self.get_parser().get_quaver_delimiter() + '\" to link notes within an icon, for triplets, '
+                                                                  'quavers... (e.g. A1' + self.get_parser(
+
+            ).get_quaver_delimiter() + 'B1' + self.get_parser().get_quaver_delimiter() + 'C1).')
+        print('Add ' + self.get_parser().get_repeat_indicator() + '2 after a chord to indicate repetition.')
         print('Sharps # and flats b (semitones) are supported for Western and Jianpu notations.')
         print('============================================================')
 
     def ask_first_line(self):
 
         first_line = input(
-            'Type or copy-paste notes, or enter file name (in ' + os.path.normpath(SONG_DIR_IN) + '/): ').strip()
+            'Type or copy-paste notes, or enter file name (in ' + os.path.normpath(self.get_song_dir_in()) + '/): ').strip()
+
+        return first_line
 
     def load_file(self, directory, filename):
         """
@@ -180,10 +199,6 @@ class Responder:
          Read song lines in fp, or asks the user to type each line in the console
         """
 
-        fp = self.load_file(SONG_DIR_IN, first_line)  # loads file or asks for next line
-
-        song_lines = self.read_lines(fp)
-
         if self.get_response_mode() == ResponseMode.COMMAND_LINE:
             lines = []
             if filepath is not None:
@@ -209,13 +224,13 @@ class Responder:
         if self.get_song().get_title() == '':
             self.get_song().set_title('untitled')
 
-    def ask_song_headers(self):
+    def ask_song_headers(self, song_key):
         print('\nPlease fill song info or press ENTER to skip:')
         original_artists = self.ask('Original artist(s): ')
         transcript_writer = self.ask('Transcribed by: ')
         self.get_song().set_headers(original_artists, transcript_writer, song_key)
 
-    def ask_input_mode(self):
+    def ask_input_mode(self, song_lines):
 
         possible_modes = self.get_parser().get_possible_modes(song_lines)
 
@@ -231,7 +246,7 @@ class Responder:
 
         self.get_parser().set_input_mode(input_mode)
 
-    def ask_song_key(self):
+    def ask_song_key(self, song_notation, song_lines):
 
         """Attempts to detect key for input written in absolute musical scales (western, Jianpu)"""
         possible_keys = []
@@ -254,7 +269,7 @@ class Responder:
         else:
             song_key = str(input('Recommended key to play the visual pattern: '))
 
-        english_song_key = self.get_parser().english_note_name(song_key)
+        return possible_keys, song_key
 
     def ask_note_shift(self):
 
@@ -267,7 +282,11 @@ class Responder:
         else:
             note_shift = 0
 
-    def parse_song(self):
+        return note_shift
+
+    def parse_song(self, song_lines, song_key, note_shift):
+
+        english_song_key = self.get_parser().english_note_name(song_key)
 
         # Parses song line by line
         song = Song(english_song_key)  # The song key must be in English format
