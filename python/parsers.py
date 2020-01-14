@@ -48,10 +48,6 @@ class SongParser:
 
         return self.repeat_indicator
 
-    def get_pause(self):
-
-        return self.pause
-
     def check_delimiters(self):
 
         if self.input_mode == InputMode.JIANPU or isinstance(self.note_parser, JianpuNoteParser):
@@ -404,7 +400,8 @@ class SongParser:
 
 class NoteParser:
     """
-    A generic NoteParser for parsing notes of a major scale, and turning them into the corresponding coordinate on Sky's 3*5 piano.
+    A generic NoteParser for parsing notes of a major scale, and turning them into the corresponding coordinate on
+    Sky's 3*5 piano.
     """
 
     def __init__(self):
@@ -606,10 +603,12 @@ class NoteParser:
     def calculate_coordinate_for_note(self, note, song_key='C', note_shift=0, is_finding_key=False):
 
         """
-        For a note in the format self.note_name_with_octave_regex, this method returns the corresponding coordinate on the Sky piano (in the form of a tuple)
 
-        song_key will be determined by the find_keys method, and is expected to match CHROMATIC_SCALE_DICT, otherwise the default key will be C.
-        note_shift is the variable set by the user.
+        For a note in the format self.note_name_with_octave_regex, this method returns the corresponding coordinate
+        on the Sky piano (in the form of a tuple)
+
+        song_key will be determined by the find_keys method, and is expected to match CHROMATIC_SCALE_DICT,
+        otherwise the default key will be C. note_shift is the variable set by the user.
 
         When this method is being used to find the key, `is_finding_key` should be set to True.
 
@@ -713,8 +712,10 @@ class NoteParser:
     def is_coordinate_in_range(self, coordinate):
 
         """
-        Returns True if the coordinate is in range of the Sky piano (as defined by self.columns and self.lines), return False if not.
-        coordinate is expected to be a tuple.
+
+        Returns True if the coordinate is in range of the Sky piano (as defined by self.columns and self.lines),
+        return False if not. coordinate is expected to be a tuple.
+
         """
 
         if 0 <= coordinate[0] <= self.get_row_count() - 1 and 0 <= coordinate[1] <= self.get_column_count() - 1:

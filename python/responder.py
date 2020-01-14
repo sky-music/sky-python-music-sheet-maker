@@ -106,11 +106,6 @@ class Responder:
             mode = InputMode.SKY
         return mode
 
-    def set_response_mode(self, response_mode):
-
-        # bot or commandline
-        self.response_mode = response_mode
-
     def get_response_mode(self):
 
         return self.response_mode
@@ -273,8 +268,6 @@ class Responder:
     def ask_song_key(self, input_mode, song_lines):
 
         """Attempts to detect key for input written in absolute musical scales (western, Jianpu)"""
-        possible_keys = []
-        song_key = None
         if input_mode in [InputMode.ENGLISH, InputMode.DOREMI, InputMode.JIANPU]:
             possible_keys = self.get_parser().find_key(song_lines)
             if len(possible_keys) == 0:
