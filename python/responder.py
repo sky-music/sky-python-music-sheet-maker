@@ -82,7 +82,11 @@ class Responder:
 
         self.parser = parser
 
-    def ask_for_mode(self, modes):
+    def set_response_mode(self, response_mode):
+
+        self.response_mode = response_mode
+
+    def ask_to_select_mode(self, modes):
 
         modes_list = {}
         instructions = ""
@@ -113,6 +117,8 @@ class Responder:
 
     def ask(self, question):
 
+        user_response = None
+
         if self.get_response_mode() == ResponseMode.BOT:
 
             # TODO: I don't know how to do this
@@ -126,7 +132,9 @@ class Responder:
 
     def output(self, output):
 
-        pass
+        if self.get_response_mode() == ResponseMode.COMMAND_LINE:
+            print(output)
+        # TODO: refactor print and input to use ResponseMode.COMMAND_LINE and BOT
 
     def create_song(self):
 
@@ -139,6 +147,22 @@ class Responder:
         first_line = self.ask_first_line()
         fp = self.load_file(self.get_song_dir_in(), first_line)  # loads file or asks for next line
         song_lines = self.read_lines(fp)
+
+        # Parse song
+        # TODO: refactor song_lines, song_keys, parse_song to be in Song class
+        self.ask_input_mode(song_lines)
+        song_key = self.ask_song_key(self.get_parser().get_input_mode(), song_lines)
+        note_shift = self.ask_note_shift()
+        self.set_song(self.parse_song(song_lines, song_key, note_shift))
+
+        self.calculate_error_ratio()
+
+        # Song information
+        self.ask_song_title()
+        self.ask_song_headers(song_key)
+
+        # Output
+        self.write_songs()
 
     def output_instructions(self):
 
@@ -236,22 +260,22 @@ class Responder:
 
         if len(possible_modes) > 1:
             print('\nSeveral possible notations detected.')
-            input_mode = self.ask_for_mode(possible_modes)
+            input_mode = self.ask_to_select_mode(possible_modes)
         elif len(possible_modes) == 0:
             print('\nCould not detect your note format. Maybe your song contains typo errors?')
-            input_mode = self.ask_for_mode(possible_modes)
+            input_mode = self.ask_to_select_mode(possible_modes)
         else:
             print('\nWe detected that you use the following notation: ' + possible_modes[0].value[1] + '.')
             input_mode = possible_modes[0]
 
         self.get_parser().set_input_mode(input_mode)
 
-    def ask_song_key(self, song_notation, song_lines):
+    def ask_song_key(self, input_mode, song_lines):
 
         """Attempts to detect key for input written in absolute musical scales (western, Jianpu)"""
         possible_keys = []
         song_key = None
-        if song_notation in [InputMode.ENGLISH, InputMode.DOREMI, InputMode.JIANPU]:
+        if input_mode in [InputMode.ENGLISH, InputMode.DOREMI, InputMode.JIANPU]:
             possible_keys = self.get_parser().find_key(song_lines)
             if len(possible_keys) == 0:
                 print("\nYour song cannot be transposed exactly in Sky.")
@@ -269,7 +293,7 @@ class Responder:
         else:
             song_key = str(input('Recommended key to play the visual pattern: '))
 
-        return possible_keys, song_key
+        return song_key
 
     def ask_note_shift(self):
 
@@ -294,6 +318,8 @@ class Responder:
             instrument_line = self.get_parser().parse_line(song_line, song_key,
                                                            note_shift)  # The song key must be in the original format
             song.add_line(instrument_line)
+
+        return song
 
     def calculate_error_ratio(self):
         print('============================================================')

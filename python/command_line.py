@@ -1,18 +1,11 @@
 #!/usr/bin/env python3
-from modes import InputMode, RenderMode, CSSMode
-from parsers import SongParser
-from songs import Song
-import os
-import re
+from responder import Responder
 
+from modes import ResponseMode
 
-if __name__ == "command_line":
-
-    pass
-
-    # ## Change directory
-
-    # ## MAIN SCRIPT
+song_responder = Responder()
+song_responder.set_response_mode(ResponseMode.COMMAND_LINE)
+song_responder.create_song()
 
 
 
