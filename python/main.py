@@ -6,7 +6,9 @@ import os
 import re
 
 
-def ask_for_mode(modes):
+def ask_for_mode(modes, myparser=None):
+    if myparser == None:
+        myparser = SongParser()
     mydict = {}
     i = 0
     print('Please choose your note format:\n')
@@ -128,10 +130,10 @@ if __name__ == "__main__":
 
     if len(possible_modes) > 1:
         print('\nSeveral possible notations detected.')
-        song_notation = ask_for_mode(possible_modes)
+        song_notation = ask_for_mode(possible_modes, myparser)
     elif len(possible_modes) == 0:
         print('\nCould not detect your note format. Maybe your song contains typo errors?')
-        song_notation = ask_for_mode(possible_modes)
+        song_notation = ask_for_mode(possible_modes, myparser)
     else:
         print('\nWe detected that you use the following notation: ' + possible_modes[0].value[1] + '.')
         song_notation = possible_modes[0]
