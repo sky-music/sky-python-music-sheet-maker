@@ -141,7 +141,7 @@ class Responder:
 
         first_line = self.ask_first_line()
         fp = self.load_file(self.get_song_dir_in(), first_line)  # loads file or asks for next line
-        song_lines = self.read_lines(fp)
+        song_lines = self.read_lines(first_line, fp)
 
         # Parse song
         # TODO: refactor song_lines, song_keys, parse_song to be in Song class
@@ -213,7 +213,7 @@ class Responder:
         else:
             return None
 
-    def read_lines(self, first_line, filepath=None):
+    def read_lines(self, first_line=None, filepath=None):
         """
          Read song lines in fp, or asks the user to type each line in the console
         """
