@@ -363,10 +363,10 @@ class Responder:
 
         if self.is_render_mode_enabled(RenderMode.MIDI):
             midi_path = os.path.join(self.get_song_dir_out(), self.get_song().get_title() + '.mid')
-            midi_ascii_path = self.get_song().write_midi(midi_path)
-            if midi_ascii_path != '':
+            midi_path = self.get_song().write_midi(midi_path)
+            if midi_path != '':
                 print('--------------------------------------------------')
-                print('Your song in MIDI is located at:', midi_ascii_path)
+                print('Your song in MIDI is located at:', midi_path)
 
         if self.is_render_mode_enabled(RenderMode.SKYASCII) and self.get_parser().get_input_mode() not in [
                 InputMode.SKY, InputMode.SKYKEYBOARD]:
