@@ -80,7 +80,7 @@ class Instrument:
         return self.is_silent
 
     def get_is_broken(self):
-        """Returns whether the Harp is broken (notes were not recongized by the Parser)"""
+        """Returns whether the Harp is broken (notes were not recognized by the Parser)"""
         return self.is_broken
 
     def set_is_broken(self, is_broken=True):
@@ -203,7 +203,6 @@ class Harp(Instrument):
         self.type = 'harp'
         self.column_count = 5
         self.row_count = 3
-        # self.highlighted_states_skygrid = []
 
     def get_row_count(self):
         return self.row_count

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import re
 import os
-from modes import InputModes
+from modes import InputMode
 import instruments
 from operator import truediv, itemgetter
 import math
@@ -28,9 +28,29 @@ class SongParser:
         self.comment_delimiter = comment_delimiter
         self.repeat_indicator = repeat_indicator
 
+    def get_icon_delimiter(self):
+
+        return self.icon_delimiter
+
+    def get_pause(self):
+
+        return self.pause
+
+    def get_quaver_delimiter(self):
+
+        return self.quaver_delimiter
+
+    def get_comment_delimiter(self):
+
+        return self.comment_delimiter
+
+    def get_repeat_indicator(self):
+
+        return self.repeat_indicator
+
     def check_delimiters(self):
 
-        if self.input_mode == InputModes.JIANPU or isinstance(self.note_parser, JianpuNoteParser):
+        if self.input_mode == InputMode.JIANPU or isinstance(self.note_parser, JianpuNoteParser):
             if self.pause != '0':
                 print('Jianpu notation is used: setting 0 as the pause character instead of ' + self.pause)
                 self.pause = '0'
@@ -58,10 +78,14 @@ class SongParser:
 
     def set_input_mode(self, input_mode):
 
-        if isinstance(input_mode, InputModes):
+        if isinstance(input_mode, InputMode):
             self.input_mode = input_mode
             self.set_note_parser(self.input_mode)
             self.check_delimiters()
+
+    def get_input_mode(self):
+
+        return self.input_mode
 
     def get_note_parser(self, input_mode=None):
 
@@ -73,17 +97,17 @@ class SongParser:
 
         note_parser = None
 
-        if input_mode == InputModes.SKYKEYBOARD:
+        if input_mode == InputMode.SKYKEYBOARD:
             note_parser = SkyKeyboardNoteParser()
-        elif input_mode == InputModes.SKY:
+        elif input_mode == InputMode.SKY:
             note_parser = SkyNoteParser()
-        elif input_mode == InputModes.ENGLISH:
+        elif input_mode == InputMode.ENGLISH:
             note_parser = EnglishNoteParser()
-        elif input_mode == InputModes.DOREMI:
+        elif input_mode == InputMode.DOREMI:
             note_parser = DoremiNoteParser()
-        elif input_mode == InputModes.JIANPU:
+        elif input_mode == InputMode.JIANPU:
             note_parser = JianpuNoteParser()
-        elif input_mode == InputModes.ENGLISHCHORDS:
+        elif input_mode == InputMode.ENGLISHCHORDS:
             note_parser = EnglishChordsNoteParser()
 
         return note_parser
@@ -245,7 +269,7 @@ class SongParser:
             if len(line) > 0:
                 if line[0] != self.comment_delimiter:
                     notes = is_note_regex.sub(' \\1',
-                                            not_note_regex.sub('', line)).split()  # Clean-up, adds space and split
+                                              not_note_regex.sub('', line)).split()  # Clean-up, adds space and split
                     for i, k in enumerate(possible_keys):
                         for note in notes:
                             num_notes[i] += 1
@@ -270,7 +294,7 @@ class SongParser:
         """
         Attempts to detect input musical notation
         """
-        possible_modes = [mode for mode in InputModes]
+        possible_modes = [mode for mode in InputMode]
         possible_parsers = [self.get_note_parser(mode) for mode in possible_modes]
         # position_maps = [self.get_note_parser(mode).position_map for mode in possible_modes]
         possible_regex = [parser.single_note_name_regex for parser in possible_parsers]
@@ -292,7 +316,7 @@ class SongParser:
                         for chord in chords:
                             for idx, possible_mode in enumerate(possible_modes):
 
-                                if possible_mode == InputModes.ENGLISHCHORDS:
+                                if possible_mode == InputMode.ENGLISHCHORDS:
                                     notes = [chord]  # Because abbreviated chord names are not composed of note names
                                     good_notes[idx] += sum(
                                         [int(note in possible_parsers[idx].english_chords.keys()) for note in notes])
@@ -305,7 +329,7 @@ class SongParser:
 
                                 num_notes[idx] += sum([1 for note in notes if note != self.pause])
 
-                                if possible_mode == InputModes.ENGLISH:
+                                if possible_mode == InputMode.ENGLISH:
                                     defg_notes += sum([int(re.search('[D-G]', note) is not None) for note in notes])
                                     octaves = [re.search('\d', note) for note in notes]
 
@@ -316,11 +340,11 @@ class SongParser:
         num_notes = [1 if x == 0 else x for x in num_notes]  # Removes zeros to avoid division by zero
 
         scores = list(map(truediv, good_notes, num_notes))
-        defg_notes /= num_notes[possible_modes.index(InputModes.ENGLISH)]
+        defg_notes /= num_notes[possible_modes.index(InputMode.ENGLISH)]
 
         if ((defg_notes == 0) or (defg_notes < 0.01 and octave_span > 2)) and (
-                num_notes[possible_modes.index(InputModes.ENGLISH)] > 10):
-            scores[possible_modes.index(InputModes.ENGLISH)] *= 0.5
+                num_notes[possible_modes.index(InputMode.ENGLISH)] > 10):
+            scores[possible_modes.index(InputMode.ENGLISH)] *= 0.5
         # print(scores)
 
         return self.most_likely(scores, possible_modes, 0.9)
@@ -352,7 +376,8 @@ class SongParser:
             return [k for i, k in enumerate(sorted_items) if sorted_scores[i] == 1]
 
         if sorted_scores[0] < threshold:
-            # contrasts = [(score-min(sorted_scores))/(score+min(sorted_scores)) if score!=0 else 0 for score in sorted_scores ]
+            # contrasts = [(score-min(sorted_scores))/(score+min(sorted_scores)) if score!=0 else 0 for score in
+            # sorted_scores ]
             sorted_items = [k for i, k in enumerate(sorted_items) if sorted_scores[i] > threshold / 2]
         else:
             sorted_scores = list(map(truediv, sorted_scores, [max(sorted_scores)] * len(sorted_scores)))
@@ -375,7 +400,8 @@ class SongParser:
 
 class NoteParser:
     """
-    A generic NoteParser for parsing notes of a major scale, and turning them into the corresponding coordinate on Sky's 3*5 piano.
+    A generic NoteParser for parsing notes of a major scale, and turning them into the corresponding coordinate on
+    Sky's 3*5 piano.
     """
 
     def __init__(self):
@@ -509,7 +535,8 @@ class NoteParser:
 
         if self.is_valid_note_name_with_octave(note):
             note_name = self.get_note_name_regex().search(note).group(0)
-            # TODO: will probably want to isolate the int() and make this more generic, in the case of Jianpu, octave is denoted by ++ or -- etc.
+            # TODO: will probably want to isolate the int() and make this more generic, in the case of Jianpu,
+            #  octave is denoted by ++ or -- etc.
             octave_number = int(self.get_octave_number_regex().search(note).group(0))
             return note_name, octave_number
         else:
@@ -576,10 +603,12 @@ class NoteParser:
     def calculate_coordinate_for_note(self, note, song_key='C', note_shift=0, is_finding_key=False):
 
         """
-        For a note in the format self.note_name_with_octave_regex, this method returns the corresponding coordinate on the Sky piano (in the form of a tuple)
 
-        song_key will be determined by the find_keys method, and is expected to match CHROMATIC_SCALE_DICT, otherwise the default key will be C.
-        note_shift is the variable set by the user.
+        For a note in the format self.note_name_with_octave_regex, this method returns the corresponding coordinate
+        on the Sky piano (in the form of a tuple)
+
+        song_key will be determined by the find_keys method, and is expected to match CHROMATIC_SCALE_DICT,
+        otherwise the default key will be C. note_shift is the variable set by the user.
 
         When this method is being used to find the key, `is_finding_key` should be set to True.
 
@@ -683,8 +712,10 @@ class NoteParser:
     def is_coordinate_in_range(self, coordinate):
 
         """
-        Returns True if the coordinate is in range of the Sky piano (as defined by self.columns and self.lines), return False if not.
-        coordinate is expected to be a tuple.
+
+        Returns True if the coordinate is in range of the Sky piano (as defined by self.columns and self.lines),
+        return False if not. coordinate is expected to be a tuple.
+
         """
 
         if 0 <= coordinate[0] <= self.get_row_count() - 1 and 0 <= coordinate[1] <= self.get_column_count() - 1:
@@ -967,14 +998,10 @@ class JianpuNoteParser(NoteParser):
         if note_octave is not None:
             note_octave = self.get_default_starting_octave() + len(note_octave.group(0))
         else:
-            note_octave = re.search('(\\-)+', note)
+            note_octave = re.search('(-)+', note)
             if note_octave is not None:
                 note_octave = self.get_default_starting_octave() - len(note_octave.group(0))
             else:
                 note_octave = self.get_default_starting_octave()
         # print(note_base+note_alt+str(note_octave))
         return note_name, note_octave
-
-
-note_parser = EnglishNoteParser()
-print(note_parser.calculate_coordinate_for_note('G', 'Ab', note_shift=0, is_finding_key=True))

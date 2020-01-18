@@ -9,9 +9,9 @@ KNOWN BUGS: repeat is imported but not exported
 import os
 import re
 import math
-from main import load_file, read_lines, ask_for_mode
+from responder import load_file, read_lines, ask_for_mode
 from parsers import SongParser
-from modes import InputModes
+from modes import InputMode
 
 dodeca_sharps = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
 dodeca_flats = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B']
@@ -33,8 +33,8 @@ def parse_chords(chords, note_shift=0, song_jet='C'):
         for idx_in_chord, note in enumerate(chord):  # Chord is a list of notes
             if note_shift != 0:
                 try:
-                    (note_name, octave_number) = skyparser.get_note_parser().parse_note(note,song_key)
-                    if note_name != None:
+                    (note_name, octave_number) = skyparser.get_note_parser().parse_note(note, song_key)
+                    if note_name is not None:
                         if note_name in dodeca_sharps:
                             idx = dodeca_sharps.index(note_name)
                             idx_shift = (idx + note_shift) % n
@@ -138,32 +138,31 @@ else:
 
 skyparser.set_input_mode(song_notation)
 
-if song_notation == InputModes.JIANPU and PAUSE != '0':
+if song_notation == InputMode.JIANPU and PAUSE != '0':
     print('\nWarning: pause in Jianpu has been reset to ''0''.')
     PAUSE = '0'
 
 # Attempts to detect key for input written in absolute musical scales (western, Jianpu)
 possible_keys = []
 song_key = None
-if song_notation in [InputModes.ENGLISH, InputModes.DOREMI, InputModes.JIANPU]:
-  possible_keys = skyparser.find_key(song_lines)
-  if len(possible_keys) == 0:
-    #print("\nYour song cannot be transposed exactly in Sky.")
-    # trans = input('Enter a key or a number to transpose your song within the chromatic scale:')
-    #print("\nDefault key will be set to C.")
-    song_key = 'C'
-  elif len(possible_keys) == 1:
-    song_key = str(possible_keys[0])
-    print("\nYour song can be transposed in Sky with the following key: " + song_key)
-  else:
-    #print("\nYour song can be transposed in Sky with the following keys: " + ', '.join(possible_keys))
-    #song_key = ''
-    #while song_key not in possible_keys:
-      #song_key = str(input('Choose your key: '))
-     song_key = str(possible_keys[0])
+if song_notation in [InputMode.ENGLISH, InputMode.DOREMI, InputMode.JIANPU]:
+    possible_keys = skyparser.find_key(song_lines)
+    if len(possible_keys) == 0:
+        # print("\nYour song cannot be transposed exactly in Sky.")
+        # trans = input('Enter a key or a number to transpose your song within the chromatic scale:')
+        # print("\nDefault key will be set to C.")
+        song_key = 'C'
+    elif len(possible_keys) == 1:
+        song_key = str(possible_keys[0])
+        print("\nYour song can be transposed in Sky with the following key: " + song_key)
+    else:
+        # print("\nYour song can be transposed in Sky with the following keys: " + ', '.join(possible_keys))
+        # song_key = ''
+        # while song_key not in possible_keys:
+        # song_key = str(input('Choose your key: '))
+        song_key = str(possible_keys[0])
 else:
-  song_key = str(input('Recommended key to play the visual pattern: '))
-
+    song_key = str(input('Recommended key to play the visual pattern: '))
 
 parsed_song = []
 for song_line in song_lines:
