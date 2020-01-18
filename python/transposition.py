@@ -25,7 +25,7 @@ SONG_DIR_IN = 'test_songs'
 SONG_DIR_OUT = 'songs_out'
 
 
-def parse_chords(chords, note_shift=0):
+def parse_chords(chords, note_shift=0, song_jet='C'):
     splitted_chords = []
     n = len(dodeca_sharps)
     for chord_idx, chord in enumerate(chords):
@@ -33,7 +33,7 @@ def parse_chords(chords, note_shift=0):
         for idx_in_chord, note in enumerate(chord):  # Chord is a list of notes
             if note_shift != 0:
                 try:
-                    (note_name, octave_number) = skyparser.get_note_parser().parse_note(note)
+                    (note_name, octave_number) = skyparser.get_note_parser().parse_note(note,song_key)
                     if note_name != None:
                         if note_name in dodeca_sharps:
                             idx = dodeca_sharps.index(note_name)
@@ -57,7 +57,7 @@ def parse_chords(chords, note_shift=0):
     return splitted_chords
 
 
-def parse_line(line, note_shift=0):
+def parse_line(line, note_shift=0, song_key='C'):
     icon_delimiter = skyparser.icon_delimiter
     comment_delimiter = skyparser.comment_delimiter
 
@@ -78,7 +78,7 @@ def parse_line(line, note_shift=0):
             #
             for icon in icons:
                 chords = skyparser.split_icon(icon)
-                splitted_chords = parse_chords(chords, note_shift)
+                splitted_chords = parse_chords(chords, note_shift, song_key)
                 splitted_line.append(splitted_chords)
         return splitted_line
     else:
@@ -115,7 +115,7 @@ first_line = input('Type or copy-paste notes, or enter file name (in ' + os.path
 
 fp = load_file(SONG_DIR_IN, first_line)  # loads file or asks for next line
 
-song_lines = read_lines(fp)
+song_lines = read_lines(fp, first_line)
 
 try:
     note_shift = int(input('Transposition ? (-12 ; +12): ').strip())
@@ -141,6 +141,29 @@ skyparser.set_input_mode(song_notation)
 if song_notation == InputModes.JIANPU and PAUSE != '0':
     print('\nWarning: pause in Jianpu has been reset to ''0''.')
     PAUSE = '0'
+
+# Attempts to detect key for input written in absolute musical scales (western, Jianpu)
+possible_keys = []
+song_key = None
+if song_notation in [InputModes.ENGLISH, InputModes.DOREMI, InputModes.JIANPU]:
+  possible_keys = skyparser.find_key(song_lines)
+  if len(possible_keys) == 0:
+    #print("\nYour song cannot be transposed exactly in Sky.")
+    # trans = input('Enter a key or a number to transpose your song within the chromatic scale:')
+    #print("\nDefault key will be set to C.")
+    song_key = 'C'
+  elif len(possible_keys) == 1:
+    song_key = str(possible_keys[0])
+    print("\nYour song can be transposed in Sky with the following key: " + song_key)
+  else:
+    #print("\nYour song can be transposed in Sky with the following keys: " + ', '.join(possible_keys))
+    #song_key = ''
+    #while song_key not in possible_keys:
+      #song_key = str(input('Choose your key: '))
+     song_key = str(possible_keys[0])
+else:
+  song_key = str(input('Recommended key to play the visual pattern: '))
+
 
 parsed_song = []
 for song_line in song_lines:

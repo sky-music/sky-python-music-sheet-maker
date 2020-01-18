@@ -17,7 +17,7 @@ except (ImportError, ModuleNotFoundError):
 from notes import Note, NoteRoot, NoteCircle, NoteDiamond
 
 
-### Instrument classes
+# ## Instrument classes
 
 class Instrument:
 
@@ -177,16 +177,22 @@ class Voice(Instrument):  # Lyrics or comments
     def render_in_png(self, rescale=1.0):
         """Renders the lyrics text in PNG"""
         chord_size = self.get_png_chord_size()
-        lyric_im = Image.new('RGBA', (int(chord_size[0]), int(self.get_lyric_height())), color=self.text_bkg)
-        draw = ImageDraw.Draw(lyric_im)
         fnt = ImageFont.truetype(self.font, int(self.font_size))
         lyric_width = fnt.getsize(self.lyric)[0]
-        draw.text((int((chord_size[0] - lyric_width) / 2.0), 0), self.lyric, font=fnt, fill=self.font_color)
+        
+        lyric_im = Image.new('RGBA', (int(max(chord_size[0],lyric_width)), int(self.get_lyric_height())), color=self.text_bkg)
+        draw = ImageDraw.Draw(lyric_im)
+        
+        if lyric_width < chord_size[0]:
+            #Draws centered text
+           draw.text((int((chord_size[0] - lyric_width) / 2.0), 0), self.lyric, font=fnt, fill=self.font_color)
+        else:
+            #Draws left-aligned text that spilles over the next icon
+           draw.text((0, 0), self.lyric, font=fnt, fill=self.font_color)
 
         if rescale != 1:
             lyric_im = lyric_im.resize((int(lyric_im.size[0] * rescale), int(lyric_im.size[1] * rescale)),
                                        resample=Image.LANCZOS)
-
         return lyric_im
 
 
