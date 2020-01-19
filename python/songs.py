@@ -21,7 +21,7 @@ except (ImportError, ModuleNotFoundError):
 
 class Song():
 
-    def __init__(self, music_key='C'):
+    def __init__(self, responder, music_key='C'):
 
         if isinstance(music_key, str):
             self.music_key = music_key
@@ -29,6 +29,8 @@ class Song():
             print('Warning: Invalid song key: using C instead')
             self.music_key = 'C'
 
+        self.responder = responder
+        self.directory_base = self.responder.get_directory_base()
         self.lines = []
         self.title = 'Untitled'
         self.headers = [['Original Artist(s):', 'Transcript:', 'Musical key:'], ['', '', '']]
@@ -58,14 +60,14 @@ class Song():
         if not no_PIL_module:
             self.png_size = (1334 * 2, 750 * 2)  # must be an integer tuple
             self.png_margins = (13, 7)
-            self.png_harp_size0 = instruments.Harp().render_in_png().size  # A tuple
+            self.png_harp_size0 = instruments.Harp(self.get_responder()).render_in_png().size  # A tuple
             self.png_harp_spacings0 = (int(self.harp_relspacings[0] * self.png_harp_size0[0]),
                                        int(self.harp_relspacings[1] * self.png_harp_size0[1]))
             self.png_harp_size = None
             self.png_harp_spacings = None
             self.png_line_width = int(self.png_size[0] - self.png_margins[
                 0])  # self.png_lyric_relheight = instruments.Voice().lyric_relheight
-            self.png_lyric_size0 = (self.png_harp_size0[0], instruments.Voice().get_lyric_height())
+            self.png_lyric_size0 = (self.png_harp_size0[0], instruments.Voice(self.get_responder()).get_lyric_height())
             self.png_lyric_size = None
             self.png_dpi = (96 * 2, 96 * 2)
             self.png_compress = 6
@@ -89,6 +91,10 @@ class Song():
             except:
                 print('Warning: Invalid music key passed to the MIDI renderer: using C instead')
                 self.midi_key = 'C'
+
+    def get_responder(self):
+
+        return self.responder
 
     def get_title(self):
 

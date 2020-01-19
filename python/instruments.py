@@ -21,29 +21,37 @@ from notes import Note, NoteRoot, NoteCircle, NoteDiamond
 
 class Instrument:
 
-    def __init__(self):
+    def __init__(self, responder):
         self.type = 'undefined'
         self.chord_skygrid = {}
         self.repeat = 1
         self.index = 0
         self.is_silent = True
         self.is_broken = False
-        self.empty_chord_png = os.path.normpath('elements/empty-chord.png')  # blank harp
-        self.unhighlighted_chord_png = os.path.normpath(
-            'elements/unhighlighted-chord.png')  # harp with unhighlighted notes
-        self.broken_png = os.path.normpath('elements/broken-symbol.png')
-        self.silent_png = os.path.normpath('elements/silent-symbol.png')
+        self.responder = responder
+        self.directory_base = self.get_responder().get_directory_base()
+        self.directory_elements = 'elements'
+        self.directory_fonts = 'fonts'
+        self.empty_chord_png = os.path.normpath(os.path.join(self.get_directory_elements(), 'empty-chord.png'))  # blank harp
+        self.unhighlighted_chord_png = os.path.normpath(os.path.join(self.get_directory_elements(),
+                                                                     'unhighlighted-chord.png'))  # harp with unhighlighted notes
+        self.broken_png = os.path.normpath(os.path.join(self.get_directory_elements(), 'broken-symbol.png'))
+        self.silent_png = os.path.normpath(os.path.join(self.get_directory_elements(), 'silent-symbol.png'))
         self.png_chord_size = None
         self.text_bkg = (255, 255, 255, 0)  # Transparent white
         self.song_bkg = (255, 255, 255)  # White paper sheet
         self.font_color = (0, 0, 0)
-        self.font = 'fonts/NotoSansCJKjp-Regular.otf'
+        self.font = os.path.normpath(os.path.join(self.get_directory_fonts(), 'NotoSansCJKjp-Regular.otf'))
         self.font_size = 38
         self.repeat_height = None
 
         self.midi_relspacing = 0.1  # Spacing between midi notes, as a ratio of note duration
         self.midi_pause_relduration = 1  # Spacing between midi notes, as a ratio of note duration
         self.midi_quaver_relspacing = 0.5
+
+    def get_responder(self):
+
+        return self.responder
 
     def set_chord_skygrid(self, chord_skygrid):
         self.chord_skygrid = chord_skygrid
@@ -117,16 +125,28 @@ class Instrument:
 
         return repeat_im
 
+    def get_directory_base(self):
+
+        return self.directory_base
+
+    def get_directory_fonts(self):
+
+        return os.path.join(self.get_directory_base(), self.directory_fonts)
+
+    def get_directory_elements(self):
+
+        return os.path.join(self.get_directory_base(), self.directory_elements)
+
 
 class Voice(Instrument):  # Lyrics or comments
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, responder):
+        super().__init__(responder)
         self.type = 'voice'
         self.lyric = ''
         # self.text_bkg = (255, 255, 255, 0)#Uncomment to make it different from the inherited class
         # self.font_color = (255,255,255)#Uncomment to make it different from the inherited class
-        self.font = 'fonts/NotoSansCJKjp-Regular.otf'
+        # self.font = 'fonts/NotoSansCJKjp-Regular.otf'
         self.font_size = 32
         self.lyric_height = None
         self.lyric_width = None
@@ -198,8 +218,8 @@ class Voice(Instrument):  # Lyrics or comments
 
 class Harp(Instrument):
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, responder):
+        super().__init__(responder)
         self.type = 'harp'
         self.column_count = 5
         self.row_count = 3

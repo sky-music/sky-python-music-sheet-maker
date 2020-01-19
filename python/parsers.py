@@ -9,7 +9,7 @@ import math
 
 class SongParser:
 
-    def __init__(self):
+    def __init__(self, responder):
 
         self.input_mode = None
         self.note_parser = None
@@ -18,6 +18,8 @@ class SongParser:
         self.quaver_delimiter = '-'
         self.comment_delimiter = '#'
         self.repeat_indicator = '*'
+        self.responder = responder
+        self.directory_base = self.responder.get_directory_base()
 
     def set_delimiters(self, icon_delimiter=' ', pause='.', quaver_delimiter='-', comment_delimiter='#',
                        repeat_indicator='*'):
@@ -47,6 +49,10 @@ class SongParser:
     def get_repeat_indicator(self):
 
         return self.repeat_indicator
+
+    def get_responder(self):
+
+        return self.responder
 
     def check_delimiters(self):
 
@@ -237,7 +243,7 @@ class SongParser:
                     chords = self.split_icon(icon)
                     # From here, real chords are still glued, quavers have been split in different list slots
                     chord_skygrid, harp_broken, harp_silent, repeat = self.parse_chords(chords, song_key, note_shift)
-                    harp = instruments.Harp()
+                    harp = instruments.Harp(self.get_responder())
                     harp.set_repeat(repeat)
                     harp.set_is_silent(harp_silent)
                     harp.set_is_broken(harp_broken)

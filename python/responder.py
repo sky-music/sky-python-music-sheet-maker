@@ -26,18 +26,18 @@ class Responder:
         self.song = None
         self.parser = None
 
-        self.cwd = os.getcwd()
         self.init_working_directory()
+        self.directory_base = os.getcwd()
 
     def init_working_directory(self):
 
-        os.chdir("../..")
+        os.chdir('../')
         if not os.path.isdir(self.song_dir_out):
             os.mkdir(self.song_dir_out)
 
-    def get_cwd(self):
+    def get_directory_base(self):
 
-        return self.cwd
+        return self.directory_base
 
     def get_song_dir_out(self):
 
@@ -133,9 +133,9 @@ class Responder:
 
     def create_song(self):
 
-        self.set_parser(SongParser())
+        self.set_parser(SongParser(self))
 
-        os.chdir(self.get_cwd())
+        os.chdir(self.get_directory_base())
 
         self.output_instructions()
 
@@ -306,7 +306,7 @@ class Responder:
         english_song_key = self.get_parser().english_note_name(song_key)
 
         # Parses song line by line
-        song = Song(english_song_key)  # The song key must be in English format
+        song = Song(responder=self, music_key=english_song_key)  # The song key must be in English format
         for song_line in song_lines:
             instrument_line = self.get_parser().parse_line(song_line, song_key,
                                                            note_shift)  # The song key must be in the original format
