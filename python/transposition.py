@@ -13,8 +13,17 @@ from responder import load_file, read_lines, ask_for_mode # TODO: import Respond
 from parsers import SongParser
 from modes import InputMode
 
-dodeca_sharps = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
-dodeca_flats = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B']
+def set_dodecas(mode):
+    if mode==InputModes.DOREMI:
+        dodeca_sharps = ['do', 'do#', 're', 're#', 'mi', 'fa', 'fa#', 'sol', 'sol#', 'la', 'la#', 'si']
+        dodeca_flats = ['do', 'reb', 're', 'mib', 'mi', 'fa', 'solb', 'sol', 'lab', 'la', 'sib', 'si']
+    elif mode==InputModes.JIANPU:
+        dodeca_sharps = ['1', '1#', '2', '2#', '3', '4', '4#', '5', '5#', '6', '6#', '7']
+        dodeca_flats = ['1', '2b', '2', '3b', '3', '4', '5b', '5', '6b', '6', '7b', '7']
+    else:
+        dodeca_sharps = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
+        dodeca_flats = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B']
+    return (dodeca_sharps,dodeca_flats)
 
 QUAVER_DELIMITER = '-'  # Dash-separated list of chords
 ICON_DELIMITER = ' '  # Chords separation
@@ -163,6 +172,8 @@ if song_notation in [InputMode.ENGLISH, InputMode.DOREMI, InputMode.JIANPU]:
         song_key = str(possible_keys[0])
 else:
     song_key = str(input('Recommended key to play the visual pattern: '))
+
+dodeca_sharps, dodeca_flats = set_dodecas(song_notation)
 
 parsed_song = []
 for song_line in song_lines:
