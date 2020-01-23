@@ -29,19 +29,19 @@ class Instrument:
         self.is_silent = True
         self.is_broken = False
         self.responder = responder
-        self.directory_base = self.get_responder().get_directory_base()
+        self.directory_base = self.responder.get_directory_base()
         self.directory_elements = 'elements'
         self.directory_fonts = 'fonts'
-        self.empty_chord_png = os.path.normpath(os.path.join(self.get_directory_elements(), 'empty-chord.png'))  # blank harp
-        self.unhighlighted_chord_png = os.path.normpath(os.path.join(self.get_directory_elements(),
+        self.empty_chord_png = os.path.normpath(os.path.join(self.directory_elements, 'empty-chord.png'))  # blank harp
+        self.unhighlighted_chord_png = os.path.normpath(os.path.join(self.directory_elements,
                                                                      'unhighlighted-chord.png'))  # harp with unhighlighted notes
-        self.broken_png = os.path.normpath(os.path.join(self.get_directory_elements(), 'broken-symbol.png'))
-        self.silent_png = os.path.normpath(os.path.join(self.get_directory_elements(), 'silent-symbol.png'))
+        self.broken_png = os.path.normpath(os.path.join(self.directory_elements, 'broken-symbol.png'))
+        self.silent_png = os.path.normpath(os.path.join(self.directory_elements, 'silent-symbol.png'))
         self.png_chord_size = None
         self.text_bkg = (255, 255, 255, 0)  # Transparent white
         self.song_bkg = (255, 255, 255)  # White paper sheet
         self.font_color = (0, 0, 0)
-        self.font = os.path.normpath(os.path.join(self.get_directory_fonts(), 'NotoSansCJKjp-Regular.otf'))
+        self.font = os.path.normpath(os.path.join(self.directory_fonts, 'NotoSansCJKjp-Regular.otf'))
         self.font_size = 38
         self.repeat_height = None
 
