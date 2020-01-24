@@ -399,7 +399,7 @@ class NoteParser:
         self.BASE_OF_MAJOR_SCALE = 7
 
         # Specify the default starting octave of the harp, in this case, it's 4 (C4 D4 E4 etc.)
-        self.default_starting_octave = 4
+        self.default_starting_octave = 1
 
         # Compile regexes for notes to save before using
         # these regexes are used for validating whether an individual note is formatted correctly.
@@ -792,10 +792,15 @@ class EnglishNoteParser(NoteParser):
         self.CHROMATIC_SCALE_DICT = {'C': 0, 'C#': 1, 'Db': 1, 'D': 2, 'D#': 3, 'Eb': 3, 'E': 4, 'F': 5, 'F#': 6,
                                      'Gb': 6, 'G': 7, 'G#': 8, 'Ab': 8, 'A': 9, 'A#': 10, 'Bb': 10, 'B': 11}
 
+        oct_str = ''
+        oct_int = self.get_default_starting_octave()
+        if oct_int > 1:
+            oct_str = str(oct_int)
+
         self.inverse_position_map = {
-            (0, 0): 'C4', (0, 1): 'D4', (0, 2): 'E4', (0, 3): 'F4', (0, 4): 'G4',
-            (1, 0): 'A4', (1, 1): 'B4', (1, 2): 'C5', (1, 3): 'D5', (1, 4): 'E5',
-            (2, 0): 'F5', (2, 1): 'G5', (2, 2): 'A6', (2, 3): 'B6', (2, 4): 'C6'
+            (0, 0): 'C'+oct_str, (0, 1): 'D', (0, 2): 'E'+oct_str, (0, 3): 'F'+oct_str, (0, 4): 'G'+oct_str,
+            (1, 0): 'A'+oct_str, (1, 1): 'B'+oct_str, (1, 2): 'C'+str(oct_int+1), (1, 3): 'D'+str(oct_int+1), (1, 4): 'E'+str(oct_int+1),
+            (2, 0): 'F'+str(oct_int+1), (2, 1): 'G'+str(oct_int+1), (2, 2): 'A'+str(oct_int+2), (2, 3): 'B'+str(oct_int+2), (2, 4): 'C'+str(oct_int+2)
         }
 
         # Compile regexes for notes to save before using
@@ -827,21 +832,26 @@ class EnglishChordsNoteParser(EnglishNoteParser):
 
         super().__init__()
 
-        self.english_chords = {
-            'C': 'C4E4G4', 'D': 'D4A4', 'F': 'F4A4C5', 'G': 'G4B4D5', 'Dm': 'D4F4A4', 'Em': 'E4G4B4',
-            'Am': 'A4C5E5', 'Bm': 'B4D5', 'Bdim': 'B4D5F5', 'A+': 'A4C5F5', 'Csus2': 'C4D4G4',
-            'Dsus2': 'C4E4A4', 'Fsus2': 'F4G4C5', 'Gsus2': 'G4A4D5', 'Asus2': 'A4B4E5',
-            'Csus4': 'C4F4G4', 'Dsus4': 'D4G4A4', 'Esus4': 'E4A4B4', 'Gsus4': 'G4C5D5',
-            'Asus4': 'A4D5E5', 'D7sus4': 'D4G4A4C5', 'E7sus4': 'E4A4B4D5', 'G7sus4': 'G4C5D5F5',
-            'A7sus4': 'A4D5E5G5', 'C6': 'C4E4G4A4', 'F6': 'F4A4C5D5', 'G6': 'G4B4D5E5', 'G7': 'G4B4D5F5',
-            'G9': 'G4B4D5F5A5', 'Cmaj7': 'C4E4G4B4', 'Fmaj7': 'F4A4C5E5', 'Cmaj9': 'C4E4G4D5',
-            'Fmaj9': 'F4A4C5E5G5', 'Cmaj11': 'C4E4G4D5F5', 'Dm6': 'D4F4A4B4', 'Dm7': 'D4F4A4C5',
-            'Em7': 'E4G4B4D5', 'Am7': 'A4C5E5G5', 'Dm9': 'D4F4A4C5E5', 'Am9': 'A4C5E5G5B5',
-            'Dm11': 'D4F4A4C5E5G5', 'Am11': 'D4A4C5E5G5B5', 'Cmaj': 'C4E4G4', 'Dmaj': 'D4A4', 'Fmaj': 'F4A4C5',
-            'Gmaj': 'G4B4D5', 'Aaug': 'A4C5F5', 'Csus': 'C4F4G4', 'Dsus': 'D4G4A4', 'Esus': 'E4A4B4', 'Gsus': 'G4C5D5',
-            'Asus': 'A4D5E5', 'D7sus': 'D4G4A4C5', 'E7sus': 'E4A4B4D5', 'G7sus': 'G4C5D5F5', 'A7sus': 'A4D5E5G5'
-        }
+        oct_str = ''
+        oct_int = self.get_default_starting_octave()
+        if oct_int > 1:
+            oct_str = str(oct_int)
+        oct_str2 = str(oct_int+1)
 
+        self.english_chords = {
+            'C': 'C'+oct_str+'E'+oct_str+'G'+oct_str, 'D': 'D'+oct_str+'A'+oct_str, 'F': 'F'+oct_str+'A'+oct_str+'C'+oct_str2, 'G': 'G'+oct_str+'B'+oct_str+'D'+oct_str2, 'Dm': 'D'+oct_str+'F'+oct_str+'A'+oct_str, 'Em': 'E'+oct_str+'G'+oct_str+'B'+oct_str,
+            'Am': 'A'+oct_str+'C'+oct_str2+'E'+oct_str2, 'Bm': 'B'+oct_str+'D'+oct_str2, 'Bdim': 'B'+oct_str+'D'+oct_str2+'F'+oct_str2, 'A+': 'A'+oct_str+'C'+oct_str2+'F'+oct_str2, 'Csus2': 'C'+oct_str+'D'+oct_str+'G'+oct_str,
+            'Dsus2': 'C'+oct_str+'E'+oct_str+'A'+oct_str, 'Fsus2': 'F'+oct_str+'G'+oct_str+'C'+oct_str2, 'Gsus2': 'G'+oct_str+'A'+oct_str+'D'+oct_str2, 'Asus2': 'A'+oct_str+'B'+oct_str+'E'+oct_str2,
+            'Csus'+oct_str: 'C'+oct_str+'F'+oct_str+'G'+oct_str, 'Dsus'+oct_str: 'D'+oct_str+'G'+oct_str+'A'+oct_str, 'Esus'+oct_str: 'E'+oct_str+'A'+oct_str+'B'+oct_str, 'Gsus'+oct_str: 'G'+oct_str+'C'+oct_str2+'D'+oct_str2,
+            'Asus'+oct_str: 'A'+oct_str+'D'+oct_str2+'E'+oct_str2, 'D7sus'+oct_str: 'D'+oct_str+'G'+oct_str+'A'+oct_str+'C'+oct_str2, 'E7sus'+oct_str: 'E'+oct_str+'A'+oct_str+'B'+oct_str+'D'+oct_str2, 'G7sus'+oct_str: 'G'+oct_str+'C'+oct_str2+'D'+oct_str2+'F'+oct_str2,
+            'A7sus'+oct_str: 'A'+oct_str+'D'+oct_str2+'E'+oct_str2+'G'+oct_str2, 'C6': 'C'+oct_str+'E'+oct_str+'G'+oct_str+'A'+oct_str, 'F6': 'F'+oct_str+'A'+oct_str+'C'+oct_str2+'D'+oct_str2, 'G6': 'G'+oct_str+'B'+oct_str+'D'+oct_str2+'E'+oct_str2, 'G7': 'G'+oct_str+'B'+oct_str+'D'+oct_str2+'F'+oct_str2,
+            'G9': 'G'+oct_str+'B'+oct_str+'D'+oct_str2+'F'+oct_str2+'A'+oct_str2, 'Cmaj7': 'C'+oct_str+'E'+oct_str+'G'+oct_str+'B'+oct_str, 'Fmaj7': 'F'+oct_str+'A'+oct_str+'C'+oct_str2+'E'+oct_str2, 'Cmaj9': 'C'+oct_str+'E'+oct_str+'G'+oct_str+'D'+oct_str2,
+            'Fmaj9': 'F'+oct_str+'A'+oct_str+'C'+oct_str2+'E'+oct_str2+'G'+oct_str2, 'Cmaj11': 'C'+oct_str+'E'+oct_str+'G'+oct_str+'D'+oct_str2+'F'+oct_str2, 'Dm6': 'D'+oct_str+'F'+oct_str+'A'+oct_str+'B'+oct_str, 'Dm7': 'D'+oct_str+'F'+oct_str+'A'+oct_str+'C'+oct_str2,
+            'Em7': 'E'+oct_str+'G'+oct_str+'B'+oct_str+'D'+oct_str2, 'Am7': 'A'+oct_str+'C'+oct_str2+'E'+oct_str2+'G'+oct_str2, 'Dm9': 'D'+oct_str+'F'+oct_str+'A'+oct_str+'C'+oct_str2+'E'+oct_str2, 'Am9': 'A'+oct_str+'C'+oct_str2+'E'+oct_str2+'G'+oct_str2+'B'+oct_str2,
+            'Dm11': 'D'+oct_str+'F'+oct_str+'A'+oct_str+'C'+oct_str2+'E'+oct_str2+'G'+oct_str2, 'Am11': 'D'+oct_str+'A'+oct_str+'C'+oct_str2+'E'+oct_str2+'G'+oct_str2+'B'+oct_str2, 'Cmaj': 'C'+oct_str+'E'+oct_str+'G'+oct_str, 'Dmaj': 'D'+oct_str+'A'+oct_str, 'Fmaj': 'F'+oct_str+'A'+oct_str+'C'+oct_str2,
+            'Gmaj': 'G'+oct_str+'B'+oct_str+'D'+oct_str2, 'Aaug': 'A'+oct_str+'C'+oct_str2+'F'+oct_str2, 'Csus': 'C'+oct_str+'F'+oct_str+'G'+oct_str, 'Dsus': 'D'+oct_str+'G'+oct_str+'A'+oct_str, 'Esus': 'E'+oct_str+'A'+oct_str+'B'+oct_str, 'Gsus': 'G'+oct_str+'C'+oct_str2+'D'+oct_str2,
+            'Asus': 'A'+oct_str+'D'+oct_str2+'E'+oct_str2, 'D7sus': 'D'+oct_str+'G'+oct_str+'A'+oct_str+'C'+oct_str2, 'E7sus': 'E'+oct_str+'A'+oct_str+'B'+oct_str+'D'+oct_str2, 'G7sus': 'G'+oct_str+'C'+oct_str2+'D'+oct_str2+'F'+oct_str2, 'A7sus': 'A'+oct_str+'D'+oct_str2+'E'+oct_str2+'G'+oct_str2
+        }
         # use EnglishNoteParser as a helper parser for the individual notes
         self.helper_parser = EnglishNoteParser()
 
@@ -874,10 +884,15 @@ class DoremiNoteParser(NoteParser):
                                      'fa#': 6, 'solb': 6, 'sob': 6, 'sol': 7, 'so': 7, 'sol#': 8, 'so#': 8, 'lab': 8,
                                      'la': 9, 'la#': 10, 'sib': 10, 'tib': 10, 'si': 11, 'ti': 11}
 
+        oct_str = ''
+        oct_int = self.get_default_starting_octave()
+        if oct_int > 1:
+            oct_str = str(oct_int)
+
         self.inverse_position_map = {
-            (0, 0): 'do4', (0, 1): 're4', (0, 2): 'mi4', (0, 3): 'fa4', (0, 4): 'sol4',
-            (1, 0): 'la4', (1, 1): 'si4', (1, 2): 'do5', (1, 3): 're5', (1, 4): 'mi5',
-            (2, 0): 'fa5', (2, 1): 'sol5', (2, 2): 'la6', (2, 3): 'si6', (2, 4): 'do6'
+            (0, 0): 'do'+oct_str, (0, 1): 're'+oct_str, (0, 2): 'mi'+oct_str, (0, 3): 'fa'+oct_str, (0, 4): 'sol'+oct_str,
+            (1, 0): 'la'+oct_str, (1, 1): 'si'+oct_str, (1, 2): 'do'+str(oct_int+1), (1, 3): 're'+str(oct_int+1), (1, 4): 'mi'+str(oct_int+1),
+            (2, 0): 'fa'+str(oct_int+1), (2, 1): 'sol'+str(oct_int+1), (2, 2): 'la'+str(oct_int+2), (2, 3): 'si'+str(oct_int+2), (2, 4): 'do'+str(oct_int+2)
         }
 
         # Compile regexes for notes to save before using

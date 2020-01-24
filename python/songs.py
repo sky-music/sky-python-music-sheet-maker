@@ -579,7 +579,7 @@ class Song():
             ncols = len(line)
             nsublines = int(1.0 * ncols / self.maxIconsPerLine)  # to be changed
 
-            if linetype == 'voice':
+            if linetype.lower() == 'voice':
                 ypredict = yline_in_song + (self.png_lyric_size[1] + self.png_harp_spacings[1] / 2.0) * (
                             nsublines + 1) + self.png_harp_spacings[1] / 2.0
             else:
@@ -615,7 +615,7 @@ class Song():
                     x = 0
                     song_render = trans_paste(song_render, line_render, (int(xline_in_song), int(yline_in_song)))
                     yline_in_song += line_render.size[1] + self.png_harp_spacings[1] / 2.0
-                    if linetype != 'voice':
+                    if linetype.lower() != 'voice':
                         yline_in_song += self.png_harp_spacings[1] / 2.0
 
                     sub_line += 1
@@ -631,7 +631,8 @@ class Song():
                 # INSTRUMENT RENDER
                 instrument_render = instrument.render_in_png(harp_rescale)
                 line_render = trans_paste(line_render, instrument_render, (int(x), int(y)))
-                x += self.png_harp_size[0]
+                    
+                x += max(self.png_harp_size[0],instrument_render.size[0])
 
                 # REPEAT
                 if instrument.get_repeat() > 1:
@@ -647,7 +648,7 @@ class Song():
             song_render = trans_paste(song_render, line_render,
                                       (int(xline_in_song), int(yline_in_song)))  # Paste line in song
             yline_in_song += line_render.size[1] + self.png_harp_spacings[1] / 2.0
-            if linetype != 'voice':
+            if linetype.lower() != 'voice':
                 yline_in_song += self.png_harp_spacings[1] / 2.0
 
         song_render.save(file_path, dpi=self.png_dpi, compress_level=self.png_compress)
@@ -663,7 +664,7 @@ class Song():
 
         if no_mido_module == True:
             print('\n**** WARNING: MIDI was not created because mido module was not found. ****\n')
-            return 0, ''
+            return ''
 
         mid = mido.MidiFile(type=0)
         track = mido.MidiTrack()

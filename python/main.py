@@ -6,7 +6,9 @@ import os
 import re
 
 
-def ask_for_mode(modes):
+def ask_for_mode(modes, myparser=None):
+    if myparser == None:
+        myparser = SongParser()
     mydict = {}
     i = 0
     print('Please choose your note format:\n')
@@ -17,8 +19,8 @@ def ask_for_mode(modes):
             print('   ' + myparser.get_keyboard_layout().replace(' ', '\n   ') + ':')
         mydict[i] = mode
     try:
-        song_notation = int(input('Mode (1-' + str(i) + "): ").strip())
-        mode = mydict[song_notation]
+        notation = int(input('Mode (1-' + str(i) + "): ").strip())
+        mode = mydict[notation]
     except (ValueError, KeyError):
         mode = InputModes.SKY
     return mode
@@ -28,50 +30,50 @@ def load_file(directory, filename):
     """
     if string is a file name, loads the file, else return None
     """
-    fp = os.path.join(directory, os.path.normpath(filename))
-    isfile = os.path.isfile(fp)
+    filepath = os.path.join(directory, os.path.normpath(filename))
+    isfile = os.path.isfile(filepath)
 
     # Assumes that user has forgotten extension
     if not isfile:
-        fp = os.path.join(filename, os.path.normpath(filename + '.txt'))
-        isfile = os.path.isfile(fp)
+        filepath = os.path.join(filename, os.path.normpath(filename + '.txt'))
+        isfile = os.path.isfile(filepath)
 
     if not isfile:
-        fp = None
+        filepath = None
         splitted = os.path.splitext(filename)
         if len(splitted[0]) > 0 and 2 < len(splitted[1]) <= 5 and re.search('\\.', splitted[0]) is None:
             # then probably a file name
-            while fp is None:
+            while filepath is None:
                 print('\nFile not found.')
-                fp = load_file(directory, input('File name (in ' + os.path.normpath(directory) + '/): ').strip())
-                isfile = os.path.isfile(fp)
+                filepath = load_file(directory, input('File name (in ' + os.path.normpath(directory) + '/): ').strip())
+                isfile = os.path.isfile(filepath)
     if isfile:
-        return fp
+        return filepath
     else:
         return None
 
 
-def read_lines(fp=None):
+def read_lines(filepath=None, first_line=None):
     """
      Read song lines in fp, or asks the user to type each line in the console
     """
-    song_lines = []
-    if fp is not None:
+    lines = []
+    if filepath is not None:
         try:
-            for song_line in open(fp, mode='r', encoding='utf-8', errors='ignore'):
-                song_lines.append(song_line)
+            for line in open(filepath, mode='r', encoding='utf-8', errors='ignore'):
+                lines.append(line)
         except (OSError, IOError) as err:
             print('Error opening file.')
             raise err
-        print('(Song imported from ' + os.path.abspath(fp) + ')')
+        print('(Song imported from ' + os.path.abspath(filepath) + ')')
     else:
-        song_line = first_line
-        while song_line:
-            song_line = song_line.split(os.linesep)
-            for line in song_line:
-                song_lines.append(line)
-            song_line = input('Type next line: ')
-    return song_lines
+        line = first_line
+        while line:
+            line = line.split(os.linesep)
+            for line in line:
+                lines.append(line)
+            line = input('Type next line: ')
+    return lines
 
 
 if __name__ == "__main__":
@@ -94,13 +96,13 @@ if __name__ == "__main__":
 
     myparser = SongParser()  # Create a parser object
 
-    ### Change directory
+    # ## Change directory
     mycwd = os.getcwd()
     os.chdir("..")
     if not os.path.isdir(SONG_DIR_OUT):
         os.mkdir(SONG_DIR_OUT)
 
-    ### MAIN SCRIPT
+    # ## MAIN SCRIPT
     print('===== VISUAL MUSIC SHEETS FOR SKY:CHILDREN OF THE LIGHT =====')
     print('\nAccepted music notes formats:')
     for mode in InputModes:
@@ -121,17 +123,17 @@ if __name__ == "__main__":
 
     fp = load_file(SONG_DIR_IN, first_line)  # loads file or asks for next line
 
-    song_lines = read_lines(fp)
+    song_lines = read_lines(fp, first_line)
 
     myparser.set_delimiters(ICON_DELIMITER, PAUSE, QUAVER_DELIMITER, COMMENT_DELIMITER, REPEAT_INDICATOR)
     possible_modes = myparser.get_possible_modes(song_lines)
 
     if len(possible_modes) > 1:
         print('\nSeveral possible notations detected.')
-        song_notation = ask_for_mode(possible_modes)
+        song_notation = ask_for_mode(possible_modes, myparser)
     elif len(possible_modes) == 0:
         print('\nCould not detect your note format. Maybe your song contains typo errors?')
-        song_notation = ask_for_mode(possible_modes)
+        song_notation = ask_for_mode(possible_modes, myparser)
     else:
         print('\nWe detected that you use the following notation: ' + possible_modes[0].value[1] + '.')
         song_notation = possible_modes[0]
@@ -166,7 +168,7 @@ if __name__ == "__main__":
     if song_notation in [InputModes.ENGLISH, InputModes.DOREMI, InputModes.JIANPU, InputModes.ENGLISHCHORDS]:
         try:
             note_shift = int(7 * eval(input('Shift song by how many octaves? (-n ; +n): ').strip()))
-        except:
+        except (NameError, SyntaxError):
             note_shift = 0
     else:
         note_shift = 0
@@ -237,10 +239,10 @@ if __name__ == "__main__":
 
     if RenderModes.MIDI in ENABLED_MODES:
         midi_path = os.path.join(SONG_DIR_OUT, song_title + '.mid')
-        midi_ascii_path = mysong.write_midi(midi_path)
-        if midi_ascii_path != '':
+        midi_path = mysong.write_midi(midi_path)
+        if midi_path != '':
             print('--------------------------------------------------')
-            print('Your song in MIDI is located at:', midi_ascii_path)
+            print('Your song in MIDI is located at:', midi_path)
 
     if RenderModes.SKYASCII in ENABLED_MODES and song_notation not in [InputModes.SKY, InputModes.SKYKEYBOARD]:
         sky_ascii_path = os.path.join(SONG_DIR_OUT, song_title + '_sky.txt')
