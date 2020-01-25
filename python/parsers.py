@@ -234,7 +234,7 @@ class SongParser:
                 lyrics = line.split(self.comment_delimiter)
                 for lyric in lyrics:
                     if len(lyric) > 0:
-                        voice = instruments.Voice()
+                        voice = instruments.Voice(self.get_responder())
                         voice.set_lyric(lyric.strip())
                         instrument_line.append(voice)
             else:
