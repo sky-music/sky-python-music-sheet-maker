@@ -3,6 +3,7 @@ import instruments
 import os
 import parsers
 import re
+from io import StringIO, BytesIO
 
 try:
     from PIL import Image, ImageDraw, ImageFont
@@ -31,6 +32,7 @@ class Song():
 
         self.responder = responder
         self.directory_base = self.responder.get_directory_base()
+        self.directory_fonts = 'fonts'
         self.lines = []
         self.title = 'Untitled'
         self.headers = [['Original Artist(s):', 'Transcript:', 'Musical key:'], ['', '', '']]
@@ -77,7 +79,7 @@ class Song():
             # self.png_color = (54, 57, 63)    #Discord colors
             self.png_font_size = 36
             self.png_title_font_size = 48
-            self.png_font = 'fonts/NotoSansCJKjp-Regular.otf'
+            self.png_font = os.path.normpath(os.path.join(self.directory_fonts, 'NotoSansCJKjp-Regular.otf'))
 
         if not no_mido_module:
             # WARNING: instrument codes correspond to General Midi codes (see Wikipedia) minus 1
@@ -202,17 +204,13 @@ class Song():
         """Calculates the text height in PNG for a standard text depending on the input font size"""
         return fnt.getsize('HQfgjyp')[1]
 
-    def write_html(self, file_path, css_mode=CSSMode.EMBED, css_path='css/main.css'):
+    def write_html(self, css_mode=CSSMode.EMBED, css_path='css/main.css'):
 
-        try:
-            html_file = open(file_path, 'w+', encoding='utf-8', errors='ignore')
-        except:
-            print('Could not create text file.')
-            return ''
+        html_buffer = StringIO()
 
-        html_file.write('<!DOCTYPE html>'
+        html_buffer.write('<!DOCTYPE html>'
                         '\n<html xmlns:svg=\"http://www.w3.org/2000/svg\">')
-        html_file.write('\n<head>\n<title>' + self.title + '</title>')
+        html_buffer.write('\n<head>\n<title>' + self.title + '</title>')
 
         if css_mode == CSSMode.EMBED:
             try:
@@ -221,24 +219,24 @@ class Song():
             except:
                 print('Could not open CSS file to embed it in HTML.')
                 css_file = ''
-            html_file.write('\n<style type=\"text/css\">\n')
-            html_file.write(css_file)
-            html_file.write('\n</style>')
+            html_buffer.write('\n<style type=\"text/css\">\n')
+            html_buffer.write(css_file)
+            html_buffer.write('\n</style>')
         elif css_mode == CSSMode.IMPORT:
-            html_file.write('\n<style type=\"text/css\">')
-            html_file.write("@import url(\'" + os.path.relpath(css_path, start=os.path.dirname(file_path)).replace('\\',
+            html_buffer.write('\n<style type=\"text/css\">')
+            html_buffer.write("@import url(\'" + os.path.relpath(css_path, start=os.path.dirname(file_path)).replace('\\',
                                                                                                                    '/') + "\');</style>")
         elif css_mode == CSSMode.XML:
-            html_file.write('\n<link href=\"' + os.path.relpath(css_path, start=os.path.dirname(
+            html_buffer.write('\n<link href=\"' + os.path.relpath(css_path, start=os.path.dirname(
                 file_path)) + '\" rel=\"stylesheet\" />')
 
-        html_file.write('\n<meta charset="utf-8"/></head>\n<body>')
-        html_file.write('\n<h1> ' + self.title + ' </h1>')
+        html_buffer.write('\n<meta charset="utf-8"/></head>\n<body>')
+        html_buffer.write('\n<h1> ' + self.title + ' </h1>')
 
         for i in range(len(self.headers[0])):
-            html_file.write('\n<p> <b>' + self.headers[0][i] + '</b> ' + self.headers[1][i] + ' </p>')
+            html_buffer.write('\n<p> <b>' + self.headers[0][i] + '</b> ' + self.headers[1][i] + ' </p>')
 
-        html_file.write('\n<div id="transcript">\n')
+        html_buffer.write('\n<div id="transcript">\n')
 
         song_render = ''
         instrument_index = 0
@@ -259,21 +257,17 @@ class Song():
 
                 song_render += line_render
 
-        html_file.write(song_render)
+        html_buffer.write(song_render)
 
-        html_file.write('\n</div>'
+        html_buffer.write('\n</div>'
                         '\n</body>'
                         '\n</html>')
+        
+        return html_buffer
 
-        return file_path
+    def write_ascii(self, render_mode=RenderMode.SKYASCII):
 
-    def write_ascii(self, file_path, render_mode=RenderMode.SKYASCII):
-
-        try:
-            ascii_file = open(file_path, 'w+', encoding='utf-8', errors='ignore')
-        except:
-            print('Could not create text file.')
-            return ''
+        ascii_buffer = StringIO()
 
         if render_mode == RenderMode.SKYASCII:
             note_parser = parsers.SkyNoteParser()
@@ -286,10 +280,10 @@ class Song():
         else:
             note_parser = parsers.SkyNoteParser()
 
-        ascii_file.write('#' + self.title + '\n')
+        ascii_buffer.write('#' + self.title + '\n')
 
         for i in range(len(self.headers[0])):
-            ascii_file.write('#' + self.headers[0][i] + ' ' + self.headers[1][i] + '\n')
+            ascii_buffer.write('#' + self.headers[0][i] + ' ' + self.headers[1][i] + '\n')
 
         song_render = '\n'
         instrument_index = 0
@@ -302,36 +296,28 @@ class Song():
                 line_render += instrument_render + ' '
             song_render += '\n' + line_render
 
-        ascii_file.write(song_render)
+        ascii_buffer.write(song_render)
 
-        return file_path
+        return ascii_buffer
 
-    def write_svg(self, file_path0, css_mode=CSSMode.EMBED, css_path='css/main.css', start_row=0, filenum=0):
+    def write_svg(self, css_mode=CSSMode.EMBED, css_path='css/main.css', start_row=0, buffer_list=[]):
 
-        if filenum > self.maxFiles:
+
+        if len(buffer_list) > self.maxFiles:
             print('\nYour song is too long. Stopping at ' + str(self.maxFiles) + ' files.')
-            return filenum, file_path0
+            return buffer_list
 
-        if filenum > 0:
-            (file_base, file_ext) = os.path.splitext(file_path0)
-            file_path = file_base + str(filenum) + file_ext
-        else:
-            file_path = file_path0
-
-        try:
-            svg_file = open(file_path, 'w+', encoding='utf-8', errors='ignore')
-        except:
-            print('Could not create SVG file.')
-            return filenum, ''
+        svg_buffer = StringIO()
+        filenum=len(buffer_list)
 
         # SVG/XML headers
-        svg_file.write('<?xml version=\"1.0\" encoding=\"utf-8\" ?>')
+        svg_buffer.write('<?xml version=\"1.0\" encoding=\"utf-8\" ?>')
 
         if css_mode == CSSMode.HREF:
-            svg_file.write('\n<?xml-stylesheet href=\"' + os.path.relpath(css_path, start=os.path.dirname(
+            svg_buffer.write('\n<?xml-stylesheet href=\"' + os.path.relpath(css_path, start=os.path.dirname(
                 file_path)) + '\" type=\"text/css\" alternate=\"no\" media=\"all\"?>')
 
-        svg_file.write(
+        svg_buffer.write(
             '\n<svg baseProfile=\"full\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:ev=\"http://www.w3.org/2001/xml-events\" xmlns:xlink=\"http://www.w3.org/1999/xlink\"'
             ' width=\"100%\" height=\"100%\"'
             ' viewBox=\"' + ' '.join((str(self.SVG_viewPort[0]), str(self.SVG_viewPort[1]), str(self.SVG_viewPort[2]),
@@ -345,17 +331,17 @@ class Song():
                 print('Could not open CSS file to embed it in SVG.')
                 css_file = ''
                 pass
-            svg_file.write('\n<defs><style type=\"text/css\"><![CDATA[\n')
-            svg_file.write(css_file)
-            svg_file.write('\n]]></style></defs>')
+            svg_buffer.write('\n<defs><style type=\"text/css\"><![CDATA[\n')
+            svg_buffer.write(css_file)
+            svg_buffer.write('\n]]></style></defs>')
         elif css_mode == CSSMode.IMPORT:
-            svg_file.write('\n<defs><style type=\"text/css\">')
-            svg_file.write("@import url(\'" + os.path.relpath(css_path, start=os.path.dirname(file_path)).replace('\\',
+            svg_buffer.write('\n<defs><style type=\"text/css\">')
+            svg_buffer.write("@import url(\'" + os.path.relpath(css_path, start=os.path.dirname(file_path)).replace('\\',
                                                                                                                   '/') + "\');</style></defs>")
         else:
-            svg_file.write('\n<defs></defs>')
+            svg_buffer.write('\n<defs></defs>')
 
-        svg_file.write('\n<title>' + self.title + '-' + str(filenum) + '</title>')
+        svg_buffer.write('\n<title>' + self.title + '-' + str(filenum) + '</title>')
 
         # Header SVG container
         song_header = ('\n<svg x=\"' + '%.2f' % self.SVG_viewPortMargins[0] + '\" y=\"' + '%.2f' %
@@ -388,7 +374,7 @@ class Song():
 
         song_header += '\n</svg>'
 
-        svg_file.write(song_header)
+        svg_buffer.write(song_header)
 
         # Song SVG container
         ysong = y
@@ -487,22 +473,24 @@ class Song():
             song_render += '\n</svg>'  # Close line SVG
 
         song_render += '\n</svg>'  # Close song SVG
-        svg_file.write(song_render)
+        svg_buffer.write(song_render)
 
-        svg_file.write('\n</svg>')  # Close file SVG
+        svg_buffer.write('\n</svg>')  # Close file SVG
+        
+        buffer_list.append(svg_buffer)
 
         # Open new file
         if end_row < len(self.lines):
-            filenum, file_path = self.write_svg(file_path0, css_mode, css_path, end_row, filenum + 1)
+            buffer_list = self.write_svg(css_mode, css_path, end_row, buffer_list)
 
-        return filenum, file_path
+        return buffer_list
 
-    def write_png(self, file_path0, start_row=0, filenum=0):
+    def write_png(self, start_row=0, buffer_list=[]):
         global no_PIL_module
 
         if no_PIL_module:
             print('\n**** WARNING: PNG was not rendered because PIL module was not found. ****\n')
-            return 0, ''
+            return None
 
         def trans_paste(bg, fg, box=(0, 0)):
             if fg.mode == 'RGBA':
@@ -517,15 +505,11 @@ class Song():
                 bg.paste(fg, box)
                 return bg
 
-        if filenum > self.maxFiles:
+        filenum = len(buffer_list)
+        if len(buffer_list) > self.maxFiles:
             print('\nYour song is too long. Stopping at ' + str(self.maxFiles) + ' files.')
-            return filenum, file_path0
+            return buffer_list
 
-        if filenum > 0:
-            (file_base, file_ext) = os.path.splitext(file_path0)
-            file_path = file_base + str(filenum) + file_ext
-        else:
-            file_path = file_path0
 
         # Determines png size as a function of the numer of chords per line
         self.set_png_harp_size()
@@ -665,15 +649,18 @@ class Song():
             if linetype.lower() != 'voice':
                 yline_in_song += self.png_harp_spacings[1] / 2.0
 
-        song_render.save(file_path, dpi=self.png_dpi, compress_level=self.png_compress)
-
+        song_buffer = BytesIO()
+        song_render.save(song_buffer, format='PNG', dpi=self.png_dpi, compress_level=self.png_compress)
+        
+        buffer_list.append(song_buffer)
+        
         # Open new file
         if end_row < len(self.lines):
-            filenum, file_path = self.write_png(file_path0, end_row, filenum + 1)
+            buffer_list =  self.write_png(end_row, buffer_list)
 
-        return filenum, file_path
+        return buffer_list
 
-    def write_midi(self, file_path):
+    def write_midi_file(self, file_path):
         global no_mido_module
 
         if no_mido_module:
