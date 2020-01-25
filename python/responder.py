@@ -4,6 +4,7 @@ from parsers import SongParser
 from songs import Song
 import os
 import re
+from io import StringIO, BytesIO
 
 
 class Responder:
@@ -158,31 +159,32 @@ class Responder:
 
         # Output
         if self.get_response_mode() == ResponseMode.COMMAND_LINE:
-            self.write_songs_to_files()
+            self.write_song_to_files()
         elif ResponseMode.BOT:
-            self.send_song_to_channel()
+            #TODO: choose RenderMode according to player request
+            self.send_song_to_channel(RenderMode.PNG)
         else:
             return
 
     def output_instructions(self):
 
-        print('===== VISUAL MUSIC SHEETS FOR SKY:CHILDREN OF THE LIGHT =====')
-        print('\nAccepted music notes formats:')
+        self.output('===== VISUAL MUSIC SHEETS FOR SKY:CHILDREN OF THE LIGHT =====')
+        self.output('\nAccepted music notes formats:')
         for mode in InputMode:
-            print('\n* ' + mode.value[2])
+            self.output('\n* ' + mode.value[2])
             if mode == InputMode.SKYKEYBOARD:
-                print('   ' + self.get_parser().get_keyboard_layout().replace(' ', '\n   ') + ':')
-        print('\nNotes composing a chord must be glued together (e.g. A1B1C1).')
-        print('Separate chords with \"' + self.get_parser().get_icon_delimiter() + '\".')
-        print('Use \"' + self.get_parser().get_pause() + '\" for a silence (rest).')
-        print(
+                self.output('   ' + self.get_parser().get_keyboard_layout().replace(' ', '\n   ') + ':')
+        self.output('\nNotes composing a chord must be glued together (e.g. A1B1C1).')
+        self.output('Separate chords with \"' + self.get_parser().get_icon_delimiter() + '\".')
+        self.output('Use \"' + self.get_parser().get_pause() + '\" for a silence (rest).')
+        self.output(
             'Use \"' + self.get_parser().get_quaver_delimiter() + '\" to link notes within an icon, for triplets, '
                                                                   'quavers... (e.g. A1' + self.get_parser(
 
             ).get_quaver_delimiter() + 'B1' + self.get_parser().get_quaver_delimiter() + 'C1).')
-        print('Add ' + self.get_parser().get_repeat_indicator() + '2 after a chord to indicate repetition.')
-        print('Sharps # and flats b (semitones) are supported for Western and Jianpu notations.')
-        print('==================================================')
+        self.output('Add ' + self.get_parser().get_repeat_indicator() + '2 after a chord to indicate repetition.')
+        self.output('Sharps # and flats b (semitones) are supported for Western and Jianpu notations.')
+        self.output('===========================================')
 
     def ask_first_line(self):
 
@@ -209,7 +211,7 @@ class Responder:
             if len(splitted[0]) > 0 and 2 < len(splitted[1]) <= 5 and re.search('\\.', splitted[0]) is None:
                 # then probably a file name
                 while file_path is None:
-                    print('\nFile not found.')
+                    self.output('\nFile not found.')
                     file_path = self.load_file(directory,
                                                input('File name (in ' + os.path.normpath(directory) + '/): ').strip())
                     isfile = os.path.isfile(file_path)
@@ -230,9 +232,9 @@ class Responder:
                     for line in open(filepath, mode='r', encoding='utf-8', errors='ignore'):
                         lines.append(line)
                 except (OSError, IOError) as err:
-                    print('Error opening file.')
+                    self.output('Error opening file.')
                     raise err
-                print('(Song imported from ' + os.path.abspath(filepath) + ')')
+                self.output('(Song imported from ' + os.path.abspath(filepath) + ')')
             else:
                 line = first_line
                 while line:
@@ -249,7 +251,7 @@ class Responder:
             self.get_song().set_title('untitled')
 
     def ask_song_headers(self, song_key):
-        print('\nPlease fill song info or press ENTER to skip:')
+        self.output('\nPlease fill song info or press ENTER to skip:')
         original_artists = self.ask('Original artist(s): ')
         transcript_writer = self.ask('Transcribed by: ')
         self.get_song().set_headers(original_artists, transcript_writer, song_key)
@@ -259,13 +261,13 @@ class Responder:
         possible_modes = self.get_parser().get_possible_modes(song_lines)
 
         if len(possible_modes) > 1:
-            print('\nSeveral possible notations detected.')
+            self.output('\nSeveral possible notations detected.')
             input_mode = self.ask_to_select_mode(possible_modes)
         elif len(possible_modes) == 0:
-            print('\nCould not detect your note format. Maybe your song contains typo errors?')
+            self.output('\nCould not detect your note format. Maybe your song contains typo errors?')
             input_mode = self.ask_to_select_mode(possible_modes)
         else:
-            print('\nWe detected that you use the following notation: ' + possible_modes[0].value[1] + '.')
+            self.output('\nWe detected that you use the following notation: ' + possible_modes[0].value[1] + '.')
             input_mode = possible_modes[0]
 
         self.get_parser().set_input_mode(input_mode)
@@ -276,15 +278,15 @@ class Responder:
         if input_mode in [InputMode.ENGLISH, InputMode.DOREMI, InputMode.JIANPU]:
             possible_keys = self.get_parser().find_key(song_lines)
             if len(possible_keys) == 0:
-                print("\nYour song cannot be transposed exactly in Sky.")
+                self.output("\nYour song cannot be transposed exactly in Sky.")
                 # trans = input('Enter a key or a number to transpose your song within the chromatic scale:')
-                print("\nDefault key will be set to C.")
+                self.output("\nDefault key will be set to C.")
                 song_key = 'C'
             elif len(possible_keys) == 1:
                 song_key = str(possible_keys[0])
-                print("\nYour song can be transposed in Sky with the following key: " + song_key)
+                self.output("\nYour song can be transposed in Sky with the following key: " + song_key)
             else:
-                print("\nYour song can be transposed in Sky with the following keys: " + ', '.join(possible_keys))
+                self.output("\nYour song can be transposed in Sky with the following keys: " + ', '.join(possible_keys))
                 song_key = ''
                 while song_key not in possible_keys:
                     song_key = str(input('Choose your key: '))
@@ -320,150 +322,113 @@ class Responder:
         return song
 
     def calculate_error_ratio(self):
-        print('==================================================')
+        self.output('===========================================')
         error_ratio = self.get_song().get_num_broken() / max(1, self.get_song().get_num_instruments())
         if error_ratio == 0:
-            print('Song successfully read with no errors!')
+            self.output('Song successfully read with no errors!')
         elif error_ratio < 0.05:
-            print('Song successfully read with few errors!')
+            self.output('Song successfully read with few errors!')
         else:
-            print('**WARNING**: Your song contains many errors. Please check the following:'
+            self.output('**WARNING**: Your song contains many errors. Please check the following:'
                   '\n- All your notes are within octaves 4 and 6. If not, try again with an octave shift.'
                   '\n- Your song is free of typos. Please check this website for full instructions: '
                   'https://sky.bloomexperiment.com/t/summary-of-input-modes/403')
 
-    def write_songs_to_files(self):
-
-        """Renders the song"""
-        print('==================================================')
-        if self.is_render_mode_enabled(RenderMode.HTML):
-            html_path = os.path.join(self.get_song_dir_out(), self.get_song().get_title() + '.html')
-            html_buffer = self.get_song().write_html(self.get_css_mode(), self.get_css_path())
+    def write_buffer_to_file(self, buffer_list, file_path0):
+        '''Writes the content of an IOString or IOBytes buffer list to one or several files
+        '''
+        try:
+            numfiles = len(buffer_list)
+        except:
+            buffer_list = [buffer_list]
+            numfiles = 1
+        
+        (file_base, file_ext) = os.path.splitext(file_path0)
+        
+        for filenum, buffer in enumerate(buffer_list):
+            if numfiles > 1:
+                file_path = file_base + str(filenum) + file_ext
+            else:
+                 file_path = file_path0
             
-            try:
-                html_file = open(html_path, 'w+', encoding='utf-8', errors='ignore')
-                html_file.write(html_buffer.getvalue())
-                self.output('Your song in HTML is located at:'+html_path)
-            except (OSError, IOError):
-                self.output('Could not write to text file.')
-
-        if self.is_render_mode_enabled(RenderMode.SVG):
-            svg_path0 = os.path.join(self.get_song_dir_out(), self.get_song().get_title() + '.svg')
-            svg_buffers = self.get_song().write_svg(self.get_css_mode(), self.get_css_path())
-            self.output('-------------------------------------------')
-            if len(svg_buffers) == 0:
-                self.output('No SVG was generated.')
+            if isinstance(buffer, StringIO):
+                output_file = open(file_path, 'w+', encoding='utf-8', errors='ignore')
+            elif isinstance(buffer, BytesIO):
+                output_file = open(file_path, 'bw+')
             else:
-                (file_base, file_ext) = os.path.splitext(svg_path0)
-                for filenum, svg_buffer in enumerate(svg_buffers):
-                    try:
-                        if filenum>0:
-                            svg_path = file_base + str(filenum) + file_ext
-                        else:
-                            svg_path=svg_path0
-                        
-                        svg_file = open(svg_path, 'w+', encoding='utf-8', errors='ignore')
-                        svg_file.write(svg_buffer.getvalue())
-                    except (OSError, IOError):
-                        self.output('Could not write to SVG file.')
-                
-                self.output('Your song in SVG is located in:'+self.get_song_dir_out())
-                self.output('Your song has been split into ' + str(len(svg_buffers)) + ' files '
-                                                                            'between ' + os.path.split(svg_path0)[
-                          1] + ' and ' + os.path.split(svg_path)[1])
-                          
-
-        if self.is_render_mode_enabled(RenderMode.PNG):
-            png_path0 = os.path.join(self.get_song_dir_out(), self.get_song().get_title() + '.png')
-            png_buffers = self.get_song().write_png()
-            self.output('-------------------------------------------')
-            if len(png_buffers) == 0:
-                self.output('No PNG was generated.')
-            else:
-                (file_base, file_ext) = os.path.splitext(png_path0)
-                for filenum,png_buffer in enumerate(png_buffers):
-                    try:
-                        if filenum>0:
-                            png_path = file_base + str(filenum) + file_ext
-                        else:
-                            png_path=png_path0
-                        
-                        png_file = open(png_path, 'bw+')
-                        
-                        png_file.write(png_buffer.getvalue())
-                        
-                    except (OSError, IOError):
-                        self.output('Could not write to PNG file.')
-                
-                self.output('Your song in PNG is located in:'+self.get_song_dir_out())
-                self.output('Your song has been split into ' + str(len(png_buffers)) + ' files '
-                                                                            'between ' + os.path.split(png_path0)[
-                          1] + ' and ' + os.path.split(png_path)[1])
-     
-     
-        if self.is_render_mode_enabled(RenderMode.MIDI):
-            midi_path = os.path.join(self.get_song_dir_out(), self.get_song().get_title() + '.mid')
-            midi_path = self.get_song().write_midi_file(midi_path)
-            self.output('-------------------------------------------')
-            if midi_path != '':
-                self.output('Your song in MIDI is located at:'+midi_path)
-            else:
-                self.output('No Midi was generated.')
-
-        if self.is_render_mode_enabled(RenderMode.SKYASCII) and self.get_parser().get_input_mode() not in [
-                InputMode.SKY, InputMode.SKYKEYBOARD]:
-                	
-            sky_ascii_path = os.path.join(self.get_song_dir_out(), self.get_song().get_title() + '_sky.txt')
-            ascii_buffer = self.get_song().write_ascii(RenderMode.SKYASCII)
-            self.output('-------------------------------------------')
-            try:
-                ascii_file = open(sky_ascii_path, 'w+', encoding='utf-8', errors='ignore')
-                ascii_file.write(ascii_buffer.getvalue())
-                
-                self.output('Your song in TXT converted to Sky notation is located at:'+sky_ascii_path)
-            except (OSError, IOError):
-                self.output('Could not write to text file.')
+                raise Exception('Unknown buffer type in '+str(self))
+            output_file.write(buffer.getvalue())
+        return file_path
+    
+    def write_song_to_files(self):
+        '''
+        Writes the song to files with different formats as defined in RenderMode
+        '''
+        self.output('==========================================')
+        for render_mode in self.get_render_modes_enabled():
             
-        if self.is_render_mode_enabled(RenderMode.ENGLISHASCII) and self.get_parser().get_input_mode() not in [
-                InputMode.ENGLISH,
-                InputMode.ENGLISHCHORDS]:
-            english_ascii_path = os.path.join(self.get_song_dir_out(), self.get_song().get_title() + '_english.txt')
-            ascii_buffer = self.get_song().write_ascii(RenderMode.ENGLISHASCII)
-            self.output('-------------------------------------------')
+            if render_mode == RenderMode.HTML:
+                buffer_list = [self.get_song().write_html(self.get_css_mode(), self.get_css_path())]
+            elif render_mode == RenderMode.SVG:
+                buffer_list = self.get_song().write_svg(self.get_css_mode(), self.get_css_path())
+            elif render_mode == RenderMode.PNG:
+                buffer_list = self.get_song().write_png()
+            elif render_mode == RenderMode.MIDI:
+                buffer_list = [self.get_song().write_midi()]
+            else: #Ascii
+                buffer_list = [self.get_song().write_ascii(render_mode)]
+            
+            numfiles = len(buffer_list)
+            file_ext = render_mode.value[2]
+            file_path0 = os.path.join(self.get_song_dir_out(), self.get_song().get_title() + file_ext)
+    
             try:
-               ascii_file = open(english_ascii_path, 'w+', encoding='utf-8', errors='ignore')
-               ascii_file.write(ascii_buffer.getvalue())
-               
-               self.output('Your song in TXT converted to English notation with C key is located at:'+ english_ascii_path)
-            except (OSError, IOError):
-                self.output('Could not write to text file.')
-
-        if self.is_render_mode_enabled(
-                RenderMode.JIANPUASCII) and self.get_parser().get_input_mode() != InputMode.JIANPU:
-            jianpu_ascii_path = os.path.join(self.get_song_dir_out(), self.get_song().get_title() + '_jianpu.txt')
-            ascii_buffer = self.get_song().write_ascii(RenderMode.JIANPUASCII)
-            self.output('-------------------------------------------')
-            try:
-               ascii_file = open(jianpu_ascii_path, 'w+', encoding='utf-8', errors='ignore')
-               ascii_file.write(ascii_buffer.getvalue())
-               
-               self.output('Your song in TXT converted to Jianpu notation with 1 key is located at:'+jianpu_ascii_path)
-            except (OSError, IOError):
-                self.output('Could not write to text file.')
+                file_path = self.write_buffer_to_file(buffer_list, file_path0)
                 
-        if self.is_render_mode_enabled(
-                RenderMode.DOREMIASCII) and self.get_parser().get_input_mode() != InputMode.DOREMI:
-                	
-            doremi_ascii_path = os.path.join(self.get_song_dir_out(), self.get_song().get_title() + '_doremi.txt')
-            ascii_buffer = self.get_song().write_ascii(RenderMode.DOREMIASCII)
-            self.output('-------------------------------------------')
-            try:
-               ascii_file = open(doremi_ascii_path, 'w+', encoding='utf-8', errors='ignore')
-               ascii_file.write(ascii_buffer.getvalue())
-               
-               self.output('Your song in TXT converted to Doremi notation with do key is located at:'+ doremi_ascii_path)
+                if numfiles > 1:
+                    self.output('Your song in '+render_mode.value[1]+' is located in: '+self.get_song_dir_out())
+                    self.output('Your song has been split into '+str(numfiles)+' between '+os.path.split(file_path0)[1]+' and '+os.path.split(file_path)[1])
+                else:
+                    self.output('Your song in '+render_mode.value[1]+' is located at:'+file_path)
             except (OSError, IOError):
-                self.output('Could not write to text file.')
-                     
-    def send_song_to_channel(self):
-        self.output('song output not implemented yet.')
+                self.output('Could not write to '+render_mode.value[1]+' file.')
+            self.output('------------------------------------------')
+    
+    def send_song_to_channel(self, render_mode):
+        '''Sends the song as a file to a Discord channel, with format according to render_mode'''
+        if not self.is_render_mode_enabled(render_mode):
+            self.output('Sorry, this song format is disabled.')
+        else:
+            if render_mode == RenderMode.HTML:
+                buffer_list = [self.get_song().write_html(self.get_css_mode(), self.get_css_path())]
+            elif render_mode == RenderMode.SVG:
+                buffer_list = self.get_song().write_svg(self.get_css_mode(), self.get_css_path())
+            elif render_mode == RenderMode.PNG:
+                buffer_list = self.get_song().write_png()
+            elif render_mode == RenderMode.MIDI:
+                buffer_list = [self.get_song().write_midi()]
+            else: #Ascii
+                buffer_list = [self.get_song().write_ascii(render_mode)]
+        	
+            numfiles = len(buffer_list)
+            
+            if numfiles == 0:
+                self.output('No '+render_mode.value[1]+' was generated.')
+                return
+                
+            file_ext = render_mode.value[2]
+            file_name0 = self.get_song().get_title() + file_ext
+                
+            (file_base, file_ext) = os.path.splitext(file_name0)
+             
+            for filenum, buffer in enumerate(buffers_list):
+                if filenum>0:
+                    file_name = file_base + str(filenum) + file_ext
+                else:
+                    file_name = file_name0
+                 
+                buffer.seek(0) #reset the reader to the beginning
+                self.output('Sending file to discord not implemented yet')
+                #TODO: finish
+                #await channel.send(file=discord.File(buffer, file_name))
+                 
