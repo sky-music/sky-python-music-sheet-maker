@@ -157,7 +157,12 @@ class Responder:
         self.ask_song_headers(song_key)
 
         # Output
-        self.write_songs()
+        if self.get_response_mode() == ResponseMode.COMMAND_LINE:
+            self.write_songs_to_files()
+        elif ResponseMode.BOT:
+            self.send_song_to_channel()
+        else:
+            return
 
     def output_instructions(self):
 
@@ -177,7 +182,7 @@ class Responder:
             ).get_quaver_delimiter() + 'B1' + self.get_parser().get_quaver_delimiter() + 'C1).')
         print('Add ' + self.get_parser().get_repeat_indicator() + '2 after a chord to indicate repetition.')
         print('Sharps # and flats b (semitones) are supported for Western and Jianpu notations.')
-        print('============================================================')
+        print('==================================================')
 
     def ask_first_line(self):
 
@@ -315,7 +320,7 @@ class Responder:
         return song
 
     def calculate_error_ratio(self):
-        print('============================================================')
+        print('==================================================')
         error_ratio = self.get_song().get_num_broken() / max(1, self.get_song().get_num_instruments())
         if error_ratio == 0:
             print('Song successfully read with no errors!')
@@ -327,76 +332,138 @@ class Responder:
                   '\n- Your song is free of typos. Please check this website for full instructions: '
                   'https://sky.bloomexperiment.com/t/summary-of-input-modes/403')
 
-    def write_songs(self):
+    def write_songs_to_files(self):
 
         """Renders the song"""
-
+        print('==================================================')
         if self.is_render_mode_enabled(RenderMode.HTML):
             html_path = os.path.join(self.get_song_dir_out(), self.get_song().get_title() + '.html')
-            html_path = self.get_song().write_html(html_path, self.get_css_mode(), self.get_css_path())
-
-            if html_path != '':
-                print('============================================================')
-                print('Your song in HTML is located at:', html_path)
+            html_buffer = self.get_song().write_html(self.get_css_mode(), self.get_css_path())
+            
+            try:
+                html_file = open(html_path, 'w+', encoding='utf-8', errors='ignore')
+                html_file.write(html_buffer.getvalue())
+                self.output('Your song in HTML is located at:'+html_path)
+            except (OSError, IOError):
+                self.output('Could not write to text file.')
 
         if self.is_render_mode_enabled(RenderMode.SVG):
             svg_path0 = os.path.join(self.get_song_dir_out(), self.get_song().get_title() + '.svg')
-            filenum, svg_path = self.get_song().write_svg(svg_path0, self.get_css_mode(), self.get_css_path())
-
-            if svg_path != '':
-                print('--------------------------------------------------')
-                print('Your song in SVG is located in:', self.get_song_dir_out())
-                print('Your song has been split into ' + str(filenum + 1) + ' files '
+            svg_buffers = self.get_song().write_svg(self.get_css_mode(), self.get_css_path())
+            self.output('-------------------------------------------')
+            if len(svg_buffers) == 0:
+                self.output('No SVG was generated.')
+            else:
+                (file_base, file_ext) = os.path.splitext(svg_path0)
+                for filenum, svg_buffer in enumerate(svg_buffers):
+                    try:
+                        if filenum>0:
+                            svg_path = file_base + str(filenum) + file_ext
+                        else:
+                            svg_path=svg_path0
+                        
+                        svg_file = open(svg_path, 'w+', encoding='utf-8', errors='ignore')
+                        svg_file.write(svg_buffer.getvalue())
+                    except (OSError, IOError):
+                        self.output('Could not write to SVG file.')
+                
+                self.output('Your song in SVG is located in:'+self.get_song_dir_out())
+                self.output('Your song has been split into ' + str(len(svg_buffers)) + ' files '
                                                                             'between ' + os.path.split(svg_path0)[
                           1] + ' and ' + os.path.split(svg_path)[1])
+                          
 
         if self.is_render_mode_enabled(RenderMode.PNG):
             png_path0 = os.path.join(self.get_song_dir_out(), self.get_song().get_title() + '.png')
-            filenum, png_path = self.get_song().write_png(png_path0)
-
-            if png_path != '':
-                print('--------------------------------------------------')
-                print('Your song in PNG is located in:', self.get_song_dir_out())
-                print('Your song has been split into ' + str(filenum + 1) + ' files '
+            png_buffers = self.get_song().write_png()
+            self.output('-------------------------------------------')
+            if len(png_buffers) == 0:
+                self.output('No PNG was generated.')
+            else:
+                (file_base, file_ext) = os.path.splitext(png_path0)
+                for filenum,png_buffer in enumerate(png_buffers):
+                    try:
+                        if filenum>0:
+                            png_path = file_base + str(filenum) + file_ext
+                        else:
+                            png_path=png_path0
+                        
+                        png_file = open(png_path, 'bw+')
+                        
+                        png_file.write(png_buffer.getvalue())
+                        
+                    except (OSError, IOError):
+                        self.output('Could not write to PNG file.')
+                
+                self.output('Your song in PNG is located in:'+self.get_song_dir_out())
+                self.output('Your song has been split into ' + str(len(png_buffers)) + ' files '
                                                                             'between ' + os.path.split(png_path0)[
                           1] + ' and ' + os.path.split(png_path)[1])
-
+     
+     
         if self.is_render_mode_enabled(RenderMode.MIDI):
             midi_path = os.path.join(self.get_song_dir_out(), self.get_song().get_title() + '.mid')
-            midi_path = self.get_song().write_midi(midi_path)
+            midi_path = self.get_song().write_midi_file(midi_path)
+            self.output('-------------------------------------------')
             if midi_path != '':
-                print('--------------------------------------------------')
-                print('Your song in MIDI is located at:', midi_path)
+                self.output('Your song in MIDI is located at:'+midi_path)
+            else:
+                self.output('No Midi was generated.')
 
         if self.is_render_mode_enabled(RenderMode.SKYASCII) and self.get_parser().get_input_mode() not in [
                 InputMode.SKY, InputMode.SKYKEYBOARD]:
+                	
             sky_ascii_path = os.path.join(self.get_song_dir_out(), self.get_song().get_title() + '_sky.txt')
-            res = self.get_song().write_ascii(sky_ascii_path, RenderMode.SKYASCII)
-            if sky_ascii_path != '':
-                print('--------------------------------------------------')
-                print('Your song in TXT converted to Sky notation is located at:', sky_ascii_path)
-
+            ascii_buffer = self.get_song().write_ascii(RenderMode.SKYASCII)
+            self.output('-------------------------------------------')
+            try:
+                ascii_file = open(sky_ascii_path, 'w+', encoding='utf-8', errors='ignore')
+                ascii_file.write(ascii_buffer.getvalue())
+                
+                self.output('Your song in TXT converted to Sky notation is located at:'+sky_ascii_path)
+            except (OSError, IOError):
+                self.output('Could not write to text file.')
+            
         if self.is_render_mode_enabled(RenderMode.ENGLISHASCII) and self.get_parser().get_input_mode() not in [
                 InputMode.ENGLISH,
                 InputMode.ENGLISHCHORDS]:
             english_ascii_path = os.path.join(self.get_song_dir_out(), self.get_song().get_title() + '_english.txt')
-            english_ascii_path = self.get_song().write_ascii(english_ascii_path, RenderMode.ENGLISHASCII)
-            if english_ascii_path != '':
-                print('--------------------------------------------------')
-                print('Your song in TXT converted to English notation with C key is located at:', english_ascii_path)
+            ascii_buffer = self.get_song().write_ascii(RenderMode.ENGLISHASCII)
+            self.output('-------------------------------------------')
+            try:
+               ascii_file = open(english_ascii_path, 'w+', encoding='utf-8', errors='ignore')
+               ascii_file.write(ascii_buffer.getvalue())
+               
+               self.output('Your song in TXT converted to English notation with C key is located at:'+ english_ascii_path)
+            except (OSError, IOError):
+                self.output('Could not write to text file.')
 
         if self.is_render_mode_enabled(
                 RenderMode.JIANPUASCII) and self.get_parser().get_input_mode() != InputMode.JIANPU:
             jianpu_ascii_path = os.path.join(self.get_song_dir_out(), self.get_song().get_title() + '_jianpu.txt')
-            jianpu_ascii_path = self.get_song().write_ascii(jianpu_ascii_path, RenderMode.JIANPUASCII)
-            if jianpu_ascii_path != '':
-                print('--------------------------------------------------')
-                print('Your song in TXT converted to Jianpu notation with 1 key is located at:', jianpu_ascii_path)
-
+            ascii_buffer = self.get_song().write_ascii(RenderMode.JIANPUASCII)
+            self.output('-------------------------------------------')
+            try:
+               ascii_file = open(jianpu_ascii_path, 'w+', encoding='utf-8', errors='ignore')
+               ascii_file.write(ascii_buffer.getvalue())
+               
+               self.output('Your song in TXT converted to Jianpu notation with 1 key is located at:'+jianpu_ascii_path)
+            except (OSError, IOError):
+                self.output('Could not write to text file.')
+                
         if self.is_render_mode_enabled(
                 RenderMode.DOREMIASCII) and self.get_parser().get_input_mode() != InputMode.DOREMI:
+                	
             doremi_ascii_path = os.path.join(self.get_song_dir_out(), self.get_song().get_title() + '_doremi.txt')
-            doremi_ascii_path = self.get_song().write_ascii(doremi_ascii_path, RenderMode.DOREMIASCII)
-            if doremi_ascii_path != '':
-                print('--------------------------------------------------')
-                print('Your song in TXT converted to doremi notation with do key is located at:', doremi_ascii_path)
+            ascii_buffer = self.get_song().write_ascii(RenderMode.DOREMIASCII)
+            self.output('-------------------------------------------')
+            try:
+               ascii_file = open(doremi_ascii_path, 'w+', encoding='utf-8', errors='ignore')
+               ascii_file.write(ascii_buffer.getvalue())
+               
+               self.output('Your song in TXT converted to Doremi notation with do key is located at:'+ doremi_ascii_path)
+            except (OSError, IOError):
+                self.output('Could not write to text file.')
+                     
+    def send_song_to_channel(self):
+        self.output('song output not implemented yet.')
