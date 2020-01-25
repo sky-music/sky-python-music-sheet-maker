@@ -15,14 +15,14 @@ class InputMode(Enum):
 
 
 class RenderMode(Enum):
-    HTML = 1
-    SVG = 2
-    PNG = 3
-    SKYASCII = 4
-    ENGLISHASCII = 5
-    JIANPUASCII = 6
-    DOREMIASCII = 7
-    MIDI = 8
+    HTML = [1, 'HTML', '.html']
+    SVG = [2, 'SVG', '.svg']
+    PNG = [3, 'PNG', '.png']
+    MIDI = [4, 'MIDI', '.mid']
+    SKYASCII = [5, 'Sky ASCII', '_sky.txt']
+    ENGLISHASCII = [6, 'English ASCII', '_english.txt']
+    JIANPUASCII = [7, 'Jianpu ASCII', '_jianpu.txt']
+    DOREMIASCII = [8, 'Doremi ASCII', '_doremi.txt']
 
 
 class CSSMode(Enum):
