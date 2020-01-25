@@ -660,12 +660,12 @@ class Song():
 
         return buffer_list
 
-    def write_midi_file(self, file_path):
+    def write_midi(self):
         global no_mido_module
 
         if no_mido_module:
             print('\n**** WARNING: MIDI was not created because mido module was not found. ****\n')
-            return ''
+            return None
 
         mid = mido.MidiFile(type=0)
         track = mido.MidiTrack()
@@ -705,7 +705,7 @@ class Song():
                             for note_render in instrument_render:
                                 track.append(note_render)
                             instrument_index += 1
+        midi_buffer = BytesIO()
+        mid.save(file=midi_buffer)
 
-        mid.save(file_path)
-
-        return file_path
+        return midi_buffer
