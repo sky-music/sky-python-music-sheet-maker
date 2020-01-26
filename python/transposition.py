@@ -14,10 +14,10 @@ from parsers import SongParser
 from modes import InputMode
 
 def set_dodecas(mode):
-    if mode==InputModes.DOREMI:
+    if mode==InputMode.DOREMI:
         dodeca_sharps = ['do', 'do#', 're', 're#', 'mi', 'fa', 'fa#', 'sol', 'sol#', 'la', 'la#', 'si']
         dodeca_flats = ['do', 'reb', 're', 'mib', 'mi', 'fa', 'solb', 'sol', 'lab', 'la', 'sib', 'si']
-    elif mode==InputModes.JIANPU:
+    elif mode==InputMode.JIANPU:
         dodeca_sharps = ['1', '1#', '2', '2#', '3', '4', '4#', '5', '5#', '6', '6#', '7']
         dodeca_flats = ['1', '2b', '2', '3b', '3', '4', '5b', '5', '6b', '6', '7b', '7']
     else:

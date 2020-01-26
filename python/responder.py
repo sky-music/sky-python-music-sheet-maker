@@ -132,7 +132,7 @@ class Responder:
             print(output)
         # TODO: refactor print and input to use ResponseMode.COMMAND_LINE and BOT
 
-    def create_song(self):
+    def create_song_command_line(self):
 
         self.set_parser(SongParser(self))
 
@@ -161,7 +161,7 @@ class Responder:
         if self.get_response_mode() == ResponseMode.COMMAND_LINE:
             self.write_song_to_files()
         elif ResponseMode.BOT:
-            #TODO: choose RenderMode according to player request
+            # TODO: choose RenderMode according to player request
             self.send_song_to_channel(RenderMode.PNG)
         else:
             return
@@ -189,7 +189,8 @@ class Responder:
     def ask_first_line(self):
 
         first_line = input(
-            'Type or copy-paste notes, or enter file name (in ' + os.path.normpath(self.get_song_dir_in()) + '/): ').strip()
+            'Type or copy-paste notes, or enter file name (in ' + os.path.normpath(
+                self.get_song_dir_in()) + '/): ').strip()
 
         return first_line
 
@@ -330,43 +331,43 @@ class Responder:
             self.output('Song successfully read with few errors!')
         else:
             self.output('**WARNING**: Your song contains many errors. Please check the following:'
-                  '\n- All your notes are within octaves 4 and 6. If not, try again with an octave shift.'
-                  '\n- Your song is free of typos. Please check this website for full instructions: '
-                  'https://sky.bloomexperiment.com/t/summary-of-input-modes/403')
+                        '\n- All your notes are within octaves 4 and 6. If not, try again with an octave shift.'
+                        '\n- Your song is free of typos. Please check this website for full instructions: '
+                        'https://sky.bloomexperiment.com/t/summary-of-input-modes/403')
 
     def write_buffer_to_file(self, buffer_list, file_path0):
-        '''Writes the content of an IOString or IOBytes buffer list to one or several files
-        '''
+        """Writes the content of an IOString or IOBytes buffer list to one or several files
+        """
         try:
             numfiles = len(buffer_list)
         except:
             buffer_list = [buffer_list]
             numfiles = 1
-        
+
         (file_base, file_ext) = os.path.splitext(file_path0)
-        
+
         for filenum, buffer in enumerate(buffer_list):
             if numfiles > 1:
                 file_path = file_base + str(filenum) + file_ext
             else:
-                 file_path = file_path0
-            
+                file_path = file_path0
+
             if isinstance(buffer, StringIO):
                 output_file = open(file_path, 'w+', encoding='utf-8', errors='ignore')
             elif isinstance(buffer, BytesIO):
                 output_file = open(file_path, 'bw+')
             else:
-                raise Exception('Unknown buffer type in '+str(self))
+                raise Exception('Unknown buffer type in ' + str(self))
             output_file.write(buffer.getvalue())
         return file_path
-    
+
     def write_song_to_files(self):
-        '''
+        """
         Writes the song to files with different formats as defined in RenderMode
-        '''
+        """
         self.output('==========================================')
         for render_mode in self.get_render_modes_enabled():
-            
+
             if render_mode == RenderMode.HTML:
                 buffer_list = [self.get_song().write_html(self.get_css_mode(), self.get_css_path())]
             elif render_mode == RenderMode.SVG:
@@ -375,27 +376,29 @@ class Responder:
                 buffer_list = self.get_song().write_png()
             elif render_mode == RenderMode.MIDI:
                 buffer_list = [self.get_song().write_midi()]
-            else: #Ascii
+            else:  # Ascii
                 buffer_list = [self.get_song().write_ascii(render_mode)]
-            
+
             numfiles = len(buffer_list)
             file_ext = render_mode.value[2]
             file_path0 = os.path.join(self.get_song_dir_out(), self.get_song().get_title() + file_ext)
-    
+
             try:
                 file_path = self.write_buffer_to_file(buffer_list, file_path0)
-                
+
                 if numfiles > 1:
-                    self.output('Your song in '+render_mode.value[1]+' is located in: '+self.get_song_dir_out())
-                    self.output('Your song has been split into '+str(numfiles)+' between '+os.path.split(file_path0)[1]+' and '+os.path.split(file_path)[1])
+                    self.output('Your song in ' + render_mode.value[1] + ' is located in: ' + self.get_song_dir_out())
+                    self.output(
+                        'Your song has been split into ' + str(numfiles) + ' between ' + os.path.split(file_path0)[
+                            1] + ' and ' + os.path.split(file_path)[1])
                 else:
-                    self.output('Your song in '+render_mode.value[1]+' is located at:'+file_path)
+                    self.output('Your song in ' + render_mode.value[1] + ' is located at:' + file_path)
             except (OSError, IOError):
-                self.output('Could not write to '+render_mode.value[1]+' file.')
+                self.output('Could not write to ' + render_mode.value[1] + ' file.')
             self.output('------------------------------------------')
-    
+
     def send_song_to_channel(self, render_mode):
-        '''Sends the song as a file to a Discord channel, with format according to render_mode'''
+        """Sends the song as a file to a Discord channel, with format according to render_mode"""
         if not self.is_render_mode_enabled(render_mode):
             self.output('Sorry, this song format is disabled.')
         else:
@@ -407,28 +410,27 @@ class Responder:
                 buffer_list = self.get_song().write_png()
             elif render_mode == RenderMode.MIDI:
                 buffer_list = [self.get_song().write_midi()]
-            else: #Ascii
+            else:  # Ascii
                 buffer_list = [self.get_song().write_ascii(render_mode)]
-        	
+
             numfiles = len(buffer_list)
-            
+
             if numfiles == 0:
-                self.output('No '+render_mode.value[1]+' was generated.')
+                self.output('No ' + render_mode.value[1] + ' was generated.')
                 return
-                
+
             file_ext = render_mode.value[2]
             file_name0 = self.get_song().get_title() + file_ext
-                
+
             (file_base, file_ext) = os.path.splitext(file_name0)
-             
-            for filenum, buffer in enumerate(buffers_list):
-                if filenum>0:
+
+            for filenum, buffer in enumerate(buffer_list):
+                if filenum > 0:
                     file_name = file_base + str(filenum) + file_ext
                 else:
                     file_name = file_name0
-                 
-                buffer.seek(0) #reset the reader to the beginning
+
+                buffer.seek(0)  # reset the reader to the beginning
                 self.output('Sending file to discord not implemented yet')
-                #TODO: finish
-                #await channel.send(file=discord.File(buffer, file_name))
-                 
+                # TODO: finish
+                # await channel.send(file=discord.File(buffer, file_name))

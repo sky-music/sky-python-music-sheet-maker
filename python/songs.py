@@ -209,7 +209,7 @@ class Song():
         html_buffer = StringIO()
 
         html_buffer.write('<!DOCTYPE html>'
-                        '\n<html xmlns:svg=\"http://www.w3.org/2000/svg\">')
+                          '\n<html xmlns:svg=\"http://www.w3.org/2000/svg\">')
         html_buffer.write('\n<head>\n<title>' + self.title + '</title>')
 
         if css_mode == CSSMode.EMBED:
@@ -224,8 +224,9 @@ class Song():
             html_buffer.write('\n</style>')
         elif css_mode == CSSMode.IMPORT:
             html_buffer.write('\n<style type=\"text/css\">')
-            html_buffer.write("@import url(\'" + os.path.relpath(css_path, start=os.path.dirname(file_path)).replace('\\',
-                                                                                                                   '/') + "\');</style>")
+            html_buffer.write(
+                "@import url(\'" + os.path.relpath(css_path, start=os.path.dirname(file_path)).replace('\\',
+                                                                                                       '/') + "\');</style>")
         elif css_mode == CSSMode.XML:
             html_buffer.write('\n<link href=\"' + os.path.relpath(css_path, start=os.path.dirname(
                 file_path)) + '\" rel=\"stylesheet\" />')
@@ -260,9 +261,9 @@ class Song():
         html_buffer.write(song_render)
 
         html_buffer.write('\n</div>'
-                        '\n</body>'
-                        '\n</html>')
-        
+                          '\n</body>'
+                          '\n</html>')
+
         return html_buffer
 
     def write_ascii(self, render_mode=RenderMode.SKYASCII):
@@ -300,15 +301,16 @@ class Song():
 
         return ascii_buffer
 
-    def write_svg(self, css_mode=CSSMode.EMBED, css_path='css/main.css', start_row=0, buffer_list=[]):
+    def write_svg(self, css_mode=CSSMode.EMBED, css_path='css/main.css', start_row=0, buffer_list=None):
 
-
+        if buffer_list is None:
+            buffer_list = []
         if len(buffer_list) > self.maxFiles:
             print('\nYour song is too long. Stopping at ' + str(self.maxFiles) + ' files.')
             return buffer_list
 
         svg_buffer = StringIO()
-        filenum=len(buffer_list)
+        filenum = len(buffer_list)
 
         # SVG/XML headers
         svg_buffer.write('<?xml version=\"1.0\" encoding=\"utf-8\" ?>')
@@ -336,8 +338,9 @@ class Song():
             svg_buffer.write('\n]]></style></defs>')
         elif css_mode == CSSMode.IMPORT:
             svg_buffer.write('\n<defs><style type=\"text/css\">')
-            svg_buffer.write("@import url(\'" + os.path.relpath(css_path, start=os.path.dirname(file_path)).replace('\\',
-                                                                                                                  '/') + "\');</style></defs>")
+            svg_buffer.write(
+                "@import url(\'" + os.path.relpath(css_path, start=os.path.dirname(file_path)).replace('\\',
+                                                                                                       '/') + "\');</style></defs>")
         else:
             svg_buffer.write('\n<defs></defs>')
 
@@ -345,7 +348,7 @@ class Song():
 
         # Header SVG container
         song_header = ('\n<svg x=\"' + '%.2f' % self.SVG_viewPortMargins[0] + '\" y=\"' + '%.2f' %
-                       self.SVG_viewPortMargins[1] + \
+                       self.SVG_viewPortMargins[1] +
                        '\" width=\"' + '%.2f' % self.SVG_line_width + '\" height=\"' + '%.2f' % (
                                self.SVG_viewPort[3] - self.SVG_viewPortMargins[1]) + '\">')
 
@@ -476,7 +479,7 @@ class Song():
         svg_buffer.write(song_render)
 
         svg_buffer.write('\n</svg>')  # Close file SVG
-        
+
         buffer_list.append(svg_buffer)
 
         # Open new file
@@ -485,7 +488,9 @@ class Song():
 
         return buffer_list
 
-    def write_png(self, start_row=0, buffer_list=[]):
+    def write_png(self, start_row=0, buffer_list=None):
+        if buffer_list is None:
+            buffer_list = []
         global no_PIL_module
 
         if no_PIL_module:
@@ -509,7 +514,6 @@ class Song():
         if len(buffer_list) > self.maxFiles:
             print('\nYour song is too long. Stopping at ' + str(self.maxFiles) + ' files.')
             return buffer_list
-
 
         # Determines png size as a function of the numer of chords per line
         self.set_png_harp_size()
@@ -629,8 +633,8 @@ class Song():
                 # INSTRUMENT RENDER
                 instrument_render = instrument.render_in_png(harp_rescale)
                 line_render = trans_paste(line_render, instrument_render, (int(x), int(y)))
-                    
-                x += max(self.png_harp_size[0],instrument_render.size[0])
+
+                x += max(self.png_harp_size[0], instrument_render.size[0])
 
                 # REPEAT
                 if instrument.get_repeat() > 1:
@@ -651,12 +655,12 @@ class Song():
 
         song_buffer = BytesIO()
         song_render.save(song_buffer, format='PNG', dpi=self.png_dpi, compress_level=self.png_compress)
-        
+
         buffer_list.append(song_buffer)
-        
+
         # Open new file
         if end_row < len(self.lines):
-            buffer_list =  self.write_png(end_row, buffer_list)
+            buffer_list = self.write_png(end_row, buffer_list)
 
         return buffer_list
 

@@ -5,7 +5,7 @@ from modes import ResponseMode
 
 song_responder = Responder()
 song_responder.set_response_mode(ResponseMode.COMMAND_LINE)
-song_responder.create_song()
+song_responder.create_song_command_line()
 
 
 
