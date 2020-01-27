@@ -120,11 +120,15 @@ mycwd = os.getcwd()
 os.chdir("..")
 
 print('===== TRANSPOSITION TOOL IN THE CHROMATIC SCALE =====')
-first_line = input('Type or copy-paste notes, or enter file name (in ' + os.path.normpath(SONG_DIR_IN) + '/): ').strip()
 
-fp = load_file(SONG_DIR_IN, first_line)  # loads file or asks for next line
+song_responder = Responder()
+song_responder.set_response_mode(ResponseMode.COMMAND_LINE)
 
-song_lines = read_lines(fp, first_line)
+first_line = song_responder.ask_first_line()
+
+fp = song_responder.load_file(SONG_DIR_IN, first_line)  # loads file or asks for next line
+
+song_lines = song_responder.read_lines(first_line, fp)
 
 try:
     note_shift = int(input('Transposition ? (-12 ; +12): ').strip())
