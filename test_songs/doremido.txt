@@ -1,15 +1,15 @@
 #All Notes:
-do4 re4 mi4 fa4 sol4 la4 si4 do5 re5 mi5 fa5 sol5 la5 si5 do6
+do1 re1 mi1 fa1 sol1 la1 si1 do2 re2 mi2 fa2 sol2 la2 si2 do3
 # English
 Do re mi fa so la ti do
 #si versus ti:
-si5 ti5
+si2 ti2
 #Chords:
-do4re4 mi4fa4sol4
+do1re1 mi1fa1sol1
 #Some quavers #and chords:
-do4-re4-mi4-fa4 sol4-la4si4do4
+do1-re1-mi1-fa1 sol1-la1si1do1
 #Pauses:
-do4 . re4 . . mi4
+do1 . re1 . . mi1
 #Notes #without #octave:
 do re mi fa sol la si
 #Chords #without #octaves:
@@ -19,8 +19,11 @@ do-re mifasol-lasidore
 #Errors:
 X + : 0 HIK
 #Out of range #notes:
-do1 do2 do7 do8
+do0 do6 do7 do8
 #uppercase and #multiple #spaces:
-   DO4-RE4    Do4RE4mI4-lA4-re4-SoL5-RE5   
+   DO1-RE1    Do1RE1mI1-lA1-re1-SoL2-RE2   
 #uppercase #without #octaves:
 DO RE MI FA SOL LA SI
+
+
+
