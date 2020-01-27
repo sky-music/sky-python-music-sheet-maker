@@ -30,9 +30,6 @@ ICON_DELIMITER = ' '  # Chords separation
 PAUSE = '.'
 COMMENT_DELIMITER = '#'  # Lyrics delimiter, can be used for comments
 REPEAT_INDICATOR = '*'
-SONG_DIR_IN = 'test_songs'
-SONG_DIR_OUT = 'songs_out'
-
 
 def parse_chords(chords, note_shift=0, song_jet='C'):
     splitted_chords = []
@@ -116,8 +113,7 @@ def render_transposed_song(song_lines):
 
 
 # ========== MAIN SCRIPT================
-mycwd = os.getcwd()
-os.chdir("..")
+os.chdir(os.getcwd())
 
 print('===== TRANSPOSITION TOOL IN THE CHROMATIC SCALE =====')
 
@@ -126,7 +122,7 @@ song_responder.set_response_mode(ResponseMode.COMMAND_LINE)
 
 first_line = song_responder.ask_first_line()
 
-fp = song_responder.load_file(SONG_DIR_IN, first_line)  # loads file or asks for next line
+fp = song_responder.load_file(song_responder.get_song_dir_in(), first_line)  # loads file or asks for next line
 
 song_lines = song_responder.read_lines(first_line, fp)
 
