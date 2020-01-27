@@ -9,9 +9,9 @@ KNOWN BUGS: repeat is imported but not exported
 import os
 import re
 import math
-from responder import load_file, read_lines, ask_for_mode # TODO: import Responder methods
+from responder import Responder
 from parsers import SongParser
-from modes import InputMode
+from modes import InputMode, ResponseMode
 
 def set_dodecas(mode):
     if mode==InputMode.DOREMI:
@@ -135,7 +135,7 @@ try:
 except ValueError:
     note_shift = 0
 
-skyparser = SongParser()
+skyparser = SongParser(song_responder)
 skyparser.set_delimiters(ICON_DELIMITER, PAUSE, QUAVER_DELIMITER, COMMENT_DELIMITER, REPEAT_INDICATOR)
 possible_modes = skyparser.get_possible_modes(song_lines)
 
