@@ -9,10 +9,10 @@ from io import StringIO, BytesIO
 
 class Responder:
 
-    def __init__(self):
+    def __init__(self, dir_in='test_songs', dir_out='songs_out' ):
 
-        self.song_dir_in = "test_songs"
-        self.song_dir_out = "songs_out"
+        self.song_dir_in = dir_in
+        self.song_dir_out = dir_out
         self.css_path = "css/main.css"
         self.css_mode = CSSMode.EMBED
         self.render_modes_enabled = [mode for mode in RenderMode]
