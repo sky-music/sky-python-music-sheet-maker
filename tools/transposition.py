@@ -6,6 +6,8 @@ A dev file to transpose in the chromatic scale
 @author: jmmelko
 KNOWN BUGS: repeat is imported but not exported
 """
+import sys
+sys.path.append('..')
 import os
 import re
 import math
