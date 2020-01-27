@@ -96,21 +96,25 @@ def parse_line(line, note_shift=0, song_key='C'):
 def render_transposed_song(song_lines):
     song = ''
     for song_line in song_lines:
-        song += '\n'
+        if song_line[0] != '':
+            song += '\n'
         for instr_idx, instrument in enumerate(song_line):
-            if song_line[0][0][0] == '#':
-                song += str(instrument)
-            else:
-                for icon_idx, icon in enumerate(instrument):
-                    for chord_idx, chord in enumerate(icon):
-                        for note in chord:
-                            song += note
-                        if chord_idx + 1 < len(icon):
-                            song += '-'
-                if icon_idx + 1 < len(instrument):
+            try:
+                if song_line[0][0][0] == '#':
+                    song += str(instrument)
+                else:
+                    for icon_idx, icon in enumerate(instrument):
+                        for chord_idx, chord in enumerate(icon):
+                            for note in chord:
+                                song += note
+                            if chord_idx + 1 < len(icon):
+                                song += '-'
+                    if icon_idx + 1 < len(instrument):
+                        song += ' '
+                if instr_idx + 1 < len(song_line):
                     song += ' '
-            if instr_idx + 1 < len(song_line):
-                song += ' '
+            except IndexError:
+                pass
     return song
 
 
