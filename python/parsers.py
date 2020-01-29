@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 import re
-import os
-from modes import InputMode
-import instruments
 from operator import truediv, itemgetter
-import math
-from noteparsers.skykeyboard import SkyKeyboard
-from noteparsers.sky import Sky
-from noteparsers.english import English
-from noteparsers.jianpu import Jianpu
+
+import instruments
+from modes import InputMode
 from noteparsers.doremi import Doremi
+from noteparsers.english import English
 from noteparsers.englishchords import EnglishChords
+from noteparsers.jianpu import Jianpu
+from noteparsers.sky import Sky
+from noteparsers.skykeyboard import SkyKeyboard
+
 
 class SongParser:
 
@@ -407,6 +407,3 @@ class SongParser:
             return items
         else:
             return sorted_items
-
-
-

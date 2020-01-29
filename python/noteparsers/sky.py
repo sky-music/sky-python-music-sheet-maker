@@ -1,6 +1,10 @@
-import os, sys, re
+import os
+import re
+import sys
+
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 import noteparser
+
 
 class Sky(noteparser.NoteParser):
 
@@ -63,6 +67,3 @@ class Sky(noteparser.NoteParser):
         # make sure the first letter of the note is uppercase, for sky note's dictionary keys
         note_name = note_name.capitalize()
         return note_name
-
-
-
