@@ -1,8 +1,12 @@
 from modes import RenderMode, CSSMode
 import instruments
-import os
-import parsers
-import re
+import os, re
+from noteparsers.skykeyboard import SkyKeyboard
+from noteparsers.sky import Sky
+from noteparsers.english import English
+from noteparsers.jianpu import Jianpu
+from noteparsers.doremi import Doremi
+from noteparsers.englishchords import EnglishChords
 from io import StringIO, BytesIO
 
 try:
@@ -271,15 +275,15 @@ class Song():
         ascii_buffer = StringIO()
 
         if render_mode == RenderMode.SKYASCII:
-            note_parser = parsers.SkyNoteParser()
+            note_parser = Sky()
         elif render_mode == RenderMode.ENGLISHASCII:
-            note_parser = parsers.EnglishNoteParser()
+            note_parser = English()
         elif render_mode == RenderMode.JIANPUASCII:
-            note_parser = parsers.JianpuNoteParser()
+            note_parser = Jianpu()
         elif render_mode == RenderMode.DOREMIASCII:
-            note_parser = parsers.DoremiNoteParser()
+            note_parser = Doremi()
         else:
-            note_parser = parsers.SkyNoteParser()
+            note_parser = Sky()
 
         ascii_buffer.write('#' + self.title + '\n')
 
