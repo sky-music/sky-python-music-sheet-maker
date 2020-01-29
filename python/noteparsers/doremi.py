@@ -1,7 +1,11 @@
-import os, sys, re
+import os
+import re
+import sys
+
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 import noteparser
+
 
 class Doremi(noteparser.NoteParser):
 
@@ -19,9 +23,12 @@ class Doremi(noteparser.NoteParser):
             oct_str = str(oct_int)
 
         self.inverse_position_map = {
-            (0, 0): 'do'+oct_str, (0, 1): 're'+oct_str, (0, 2): 'mi'+oct_str, (0, 3): 'fa'+oct_str, (0, 4): 'sol'+oct_str,
-            (1, 0): 'la'+oct_str, (1, 1): 'si'+oct_str, (1, 2): 'do'+str(oct_int+1), (1, 3): 're'+str(oct_int+1), (1, 4): 'mi'+str(oct_int+1),
-            (2, 0): 'fa'+str(oct_int+1), (2, 1): 'sol'+str(oct_int+1), (2, 2): 'la'+str(oct_int+2), (2, 3): 'si'+str(oct_int+2), (2, 4): 'do'+str(oct_int+2)
+            (0, 0): 'do' + oct_str, (0, 1): 're' + oct_str, (0, 2): 'mi' + oct_str, (0, 3): 'fa' + oct_str,
+            (0, 4): 'sol' + oct_str,
+            (1, 0): 'la' + oct_str, (1, 1): 'si' + oct_str, (1, 2): 'do' + str(oct_int + 1),
+            (1, 3): 're' + str(oct_int + 1), (1, 4): 'mi' + str(oct_int + 1),
+            (2, 0): 'fa' + str(oct_int + 1), (2, 1): 'sol' + str(oct_int + 1), (2, 2): 'la' + str(oct_int + 2),
+            (2, 3): 'si' + str(oct_int + 2), (2, 4): 'do' + str(oct_int + 2)
         }
 
         # Compile regexes for notes to save before using
