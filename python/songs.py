@@ -1,13 +1,9 @@
+import os, re
+from io import StringIO, BytesIO
 from modes import RenderMode, CSSMode
 import instruments
-import os, re
-from noteparsers.skykeyboard import SkyKeyboard
-from noteparsers.sky import Sky
-from noteparsers.english import English
-from noteparsers.jianpu import Jianpu
-from noteparsers.doremi import Doremi
-from noteparsers.englishchords import EnglishChords
-from io import StringIO, BytesIO
+from noteparsers import *
+
 
 try:
     from PIL import Image, ImageDraw, ImageFont
@@ -275,15 +271,15 @@ class Song():
         ascii_buffer = StringIO()
 
         if render_mode == RenderMode.SKYASCII:
-            note_parser = Sky()
+            note_parser = sky.Sky()
         elif render_mode == RenderMode.ENGLISHASCII:
-            note_parser = English()
+            note_parser = english.English()
         elif render_mode == RenderMode.JIANPUASCII:
-            note_parser = Jianpu()
+            note_parser = jianpu.Jianpu()
         elif render_mode == RenderMode.DOREMIASCII:
-            note_parser = Doremi()
+            note_parser = doremi.Doremi()
         else:
-            note_parser = Sky()
+            note_parser = sky.Sky()
 
         ascii_buffer.write('#' + self.title + '\n')
 

@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-from modes import InputMode, RenderMode, CSSMode, ResponseMode
-from parsers import SongParser
-from noteparsers.skykeyboard import SkyKeyboard
-from songs import Song
 import os, re
 from io import StringIO, BytesIO
+from modes import InputMode, RenderMode, CSSMode, ResponseMode
+from parsers import SongParser
+from noteparsers import *
+from songs import Song
+
 
 
 class Responder:

@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 from responder import Responder
-
 from modes import ResponseMode
 
 song_responder = Responder()

@@ -1,4 +1,5 @@
 import os
+from notes import Note, NoteRoot, NoteCircle, NoteDiamond
 
 try:
     from PIL import Image, ImageDraw, ImageFont
@@ -13,8 +14,6 @@ try:
     no_mido_module = False
 except (ImportError, ModuleNotFoundError):
     no_mido_module = True
-
-from notes import Note, NoteRoot, NoteCircle, NoteDiamond
 
 
 # ## Instrument classes
