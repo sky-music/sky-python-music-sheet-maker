@@ -1,10 +1,7 @@
-import os
-import re
-import sys
-
+import os, sys, re
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-import noteparser
 
+import noteparser
 
 class Jianpu(noteparser.NoteParser):
 
