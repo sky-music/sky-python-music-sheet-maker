@@ -306,6 +306,7 @@ class SongParser:
         good_notes = [0] * len(possible_modes)
         num_notes = [0] * len(possible_modes)
         defg_notes = 0
+        qwrt_notes = 0
         octave_span = 0
 
         for line in song_lines:
@@ -334,7 +335,8 @@ class SongParser:
                                 num_notes[idx] += sum([1 for note in notes if note != self.pause])
 
                                 if possible_mode == InputMode.ENGLISH:
-                                    defg_notes += sum([int(re.search('[D-G]', note) is not None) for note in notes])
+                                    defg_notes += sum([int(re.search('[D-Gd-g]', note) is not None) for note in notes])
+                                    qwrt_notes += sum([int(re.search('[QWRTSZXVqwrtszxv]', note) is not None) for note in notes])
                                     octaves = [re.search('\d', note) for note in notes]
 
                                     octaves = sorted([int(octave.group(0)) for octave in octaves if octave is not None])
@@ -345,10 +347,15 @@ class SongParser:
 
         scores = list(map(truediv, good_notes, num_notes))
         defg_notes /= num_notes[possible_modes.index(InputMode.ENGLISH)]
+        qwrt_notes /= num_notes[possible_modes.index(InputMode.SKYKEYBOARD)]
 
         if ((defg_notes == 0) or (defg_notes < 0.01 and octave_span > 2)) and (
                 num_notes[possible_modes.index(InputMode.ENGLISH)] > 10):
             scores[possible_modes.index(InputMode.ENGLISH)] *= 0.5
+            
+        if ((qwrt_notes == 0) or (qwrt_notes < 0.01 and octave_span <= 1)) and (
+                num_notes[possible_modes.index(InputMode.SKYKEYBOARD)] > 5):
+            scores[possible_modes.index(InputMode.SKYKEYBOARD)] *= 0.5
         # print(scores)
 
         return self.most_likely(scores, possible_modes, 0.9)
