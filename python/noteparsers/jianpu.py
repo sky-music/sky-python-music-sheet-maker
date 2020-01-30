@@ -42,7 +42,7 @@ class Jianpu(noteparser.NoteParser):
     def parse_note(self, note, song_key, is_finding_key=False):
 
         """
-        Returns a tuple containing note_name, octave_number for a note in the format self.note_name_with_octave_regex
+        Returns a tuple containing note_name, note_name for a note in the format self.note_name_with_octave_regex
         """
 
         note_name = self.note_name_regex.search(note)

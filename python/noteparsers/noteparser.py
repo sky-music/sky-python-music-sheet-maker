@@ -138,7 +138,9 @@ class NoteParser:
     def parse_note(self, note, song_key, is_finding_key=False):
 
         """
-        Returns a tuple containing note_name, octave_number for a note in the format self.note_name_with_octave_regex
+        Returns a tuple containing note_name, note_name for a note in the format self.note_name_with_octave_regex
+
+        When is_finding_key is True, the handle_note_name_without_octave method should be used
         """
 
         if self.is_valid_note_name_with_octave(note):
