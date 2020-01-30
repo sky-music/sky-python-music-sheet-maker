@@ -97,7 +97,7 @@ class Responder:
             i += 1
             instructions += str(i) + ') ' + mode.value[2] + "\n"
             if mode == InputMode.SKYKEYBOARD:
-                instructions += "   " + self.get_parser().get_keyboard_layout().replace(" ", "\n   ") + ":"
+                instructions += "   " + self.get_parser().get_keyboard_layout().replace(" ", "\n   ") + ":\n"
             modes_list[i] = mode
         self.output(instructions)
         try:
