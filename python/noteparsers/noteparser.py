@@ -1,4 +1,6 @@
-import re, math
+import re
+import math
+
 
 class NoteParser:
     """
@@ -33,7 +35,7 @@ class NoteParser:
         # these regexes are used for validating whether an individual note is formatted correctly.
         self.note_name_with_octave_regex = None
         self.note_name_regex = None
-        self.octave_number_regex = None
+        self.note_octave_regex = None
 
     def get_chromatic_scale_dict(self):
 
@@ -71,9 +73,21 @@ class NoteParser:
 
         return self.note_name_regex
 
-    def get_octave_number_regex(self):
+    def get_note_octave_regex(self):
 
-        return self.octave_number_regex
+        return self.note_octave_regex
+
+    def get_note_name(self, note):
+
+        note_name = self.get_note_name_regex().search(note).group(0)
+
+        return note_name
+
+    def get_note_octave(self, note):
+
+        note_octave = int(self.get_note_octave_regex().search(note).group(0))
+
+        return note_octave
 
     def is_valid_note_name_with_octave(self, note):
 
@@ -132,15 +146,15 @@ class NoteParser:
     def parse_note(self, note, song_key, is_finding_key=False):
 
         """
-        Returns a tuple containing note_name, octave_number for a note in the format self.note_name_with_octave_regex
+        Returns a tuple containing note_name, note_name for a note in the format self.note_name_with_octave_regex
+
+        When is_finding_key is True, the handle_note_name_without_octave method should be used
         """
 
         if self.is_valid_note_name_with_octave(note):
-            note_name = self.get_note_name_regex().search(note).group(0)
-            # TODO: will probably want to isolate the int() and make this more generic, in the case of Jianpu,
-            #  octave is denoted by ++ or -- etc.
-            octave_number = int(self.get_octave_number_regex().search(note).group(0))
-            return note_name, octave_number
+            note_name = self.get_note_name(note)
+            note_octave = self.get_note_octave(note)
+            return note_name, note_octave
         else:
             if self.is_valid_note_name(note):
 
@@ -149,8 +163,8 @@ class NoteParser:
 
                 if not is_finding_key:
 
-                    octave_number = self.get_default_starting_octave()
-                    return note_name, octave_number
+                    note_octave = self.get_default_starting_octave()
+                    return note_name, note_octave
                 else:
                     return self.handle_note_name_without_octave(note_name, song_key)
 
@@ -164,15 +178,15 @@ class NoteParser:
         Handle notes specified without octaves (e.g. the note G in the key of Ab)
         """
 
-        octave_number = self.get_default_starting_octave()
+        note_octave = self.get_default_starting_octave()
 
         chromatic_interval = self.convert_note_name_into_chromatic_position(
             note_name) - self.convert_note_name_into_chromatic_position(song_key)
 
         if chromatic_interval < 0:
-            octave_number += 1
+            note_octave += 1
 
-        return note_name, octave_number
+        return note_name, note_octave
 
     def convert_note_name_into_chromatic_position(self, note_name):
 
@@ -224,7 +238,7 @@ class NoteParser:
         """
 
         # Convert note to base 7
-        note_name, octave_number = self.parse_note(note, song_key, is_finding_key)
+        note_name, note_octave = self.parse_note(note, song_key, is_finding_key)
 
         # Find the major scale interval from the song_key to the note_name
         # Find the semitone interval from the song_key to the note_name first
@@ -247,9 +261,9 @@ class NoteParser:
         if interval_in_semitones < 0:
             # Circular shift the interval back to a positive number
             interval_in_semitones += self.get_chromatic_scale_count()
-            octave_number -= 1
+            note_octave -= 1
 
-        octave_number_str = self.convert_base_10_to_base_7(octave_number)
+        note_octave_str = self.convert_base_10_to_base_7(note_octave)
 
         try:
             major_scale_interval = self.convert_semitone_interval_to_major_scale_interval(interval_in_semitones)
@@ -258,7 +272,7 @@ class NoteParser:
             raise KeyError('Note ' + str(note) + ' is not in the song key.')
 
         # Convert note to base 10 for arithmetic
-        note_in_base_10 = self.convert_base_7_to_base_10(octave_number_str + str(major_scale_interval))
+        note_in_base_10 = self.convert_base_7_to_base_10(note_octave_str + str(major_scale_interval))
         note_in_base_10 -= self.get_base_of_western_major_scale() * self.get_default_starting_octave()
 
         if self.is_valid_note_name_with_octave(note):
@@ -325,5 +339,3 @@ class NoteParser:
             return True
         else:
             return False
-
-

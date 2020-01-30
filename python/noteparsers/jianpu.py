@@ -1,5 +1,7 @@
 import re
+
 import noteparser
+
 
 class Jianpu(noteparser.NoteParser):
 
@@ -14,7 +16,7 @@ class Jianpu(noteparser.NoteParser):
         self.note_name_with_octave_regex = re.compile(r'([1234567][b#]?[\\+\\-]+)')
         self.note_name_regex = re.compile(r'([1234567][b#]?)')
         self.single_note_name_regex = re.compile(r'\b[1234567][b#]?[\\+\\-]?\b')
-        self.octave_number_regex = re.compile(r'[\\+\\-]?')
+        self.note_octave_regex = re.compile(r'[\\+\\-]+')
         self.not_note_name_regex = re.compile(r'[^1234567b#]+')
         self.not_octave_regex = re.compile(r'[^\\+\\-]+')
 
@@ -24,6 +26,22 @@ class Jianpu(noteparser.NoteParser):
             (2, 0): '4+', (2, 1): '5+', (2, 2): '6+', (2, 3): '7+', (2, 4): '1++'
         }
 
+    def get_note_octave(self, note):
+
+        note_octave = re.search('(\\+)+', note)
+        if note_octave is not None:
+            note_octave = self.get_default_starting_octave() + len(note_octave.group(0))
+            return note_octave
+        else:
+            note_octave = re.search('(-)+', note)
+            if note_octave is not None:
+                note_octave = self.get_default_starting_octave() - len(note_octave.group(0))
+                return note_octave
+            else:
+                # no octave (+ or -) found
+                note_octave = self.get_default_starting_octave()
+                return note_octave
+
     def get_note_from_coordinate(self, coord):
 
         try:
@@ -32,27 +50,3 @@ class Jianpu(noteparser.NoteParser):
             note = 'X'
 
         return note
-
-    def parse_note(self, note, song_key, is_finding_key=False):
-
-        """
-        Returns a tuple containing note_name, octave_number for a note in the format self.note_name_with_octave_regex
-        """
-
-        note_name = self.note_name_regex.search(note)
-        if note_name is not None:
-            note_name = note_name.group(0)
-        else:
-            raise KeyError('Note ' + str(note) + ' was not recognized as Jianpu.')
-
-        note_octave = re.search('(\\+)+', note)
-        if note_octave is not None:
-            note_octave = self.get_default_starting_octave() + len(note_octave.group(0))
-        else:
-            note_octave = re.search('(-)+', note)
-            if note_octave is not None:
-                note_octave = self.get_default_starting_octave() - len(note_octave.group(0))
-            else:
-                note_octave = self.get_default_starting_octave()
-        # print(note_base+note_alt+str(note_octave))
-        return note_name, note_octave

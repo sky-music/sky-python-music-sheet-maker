@@ -1,5 +1,8 @@
-import re, os
+import re
+import os
+
 import sky
+
 
 class SkyKeyboard(sky.Sky):
 
@@ -25,4 +28,3 @@ class SkyKeyboard(sky.Sky):
         self.single_note_name_regex = re.compile(r'(\b[' + regex + r']\b)')
         self.not_note_name_regex = re.compile(r'[^' + regex + r']+')
         self.not_octave_regex = re.compile(r'.')
-
