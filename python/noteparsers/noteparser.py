@@ -1,7 +1,4 @@
-import os, sys, re
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-
-import math
+import re, math
 
 class NoteParser:
     """
