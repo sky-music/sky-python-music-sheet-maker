@@ -2,7 +2,7 @@ import os, re
 from io import StringIO, BytesIO
 from modes import RenderMode, CSSMode
 import instruments
-from noteparsers import *
+import noteparsers
 
 
 try:
@@ -271,15 +271,15 @@ class Song():
         ascii_buffer = StringIO()
 
         if render_mode == RenderMode.SKYASCII:
-            note_parser = sky.Sky()
+            note_parser = noteparsers.sky.Sky()
         elif render_mode == RenderMode.ENGLISHASCII:
-            note_parser = english.English()
+            note_parser = noteparsers.english.English()
         elif render_mode == RenderMode.JIANPUASCII:
-            note_parser = jianpu.Jianpu()
+            note_parser = noteparsers.jianpu.Jianpu()
         elif render_mode == RenderMode.DOREMIASCII:
-            note_parser = doremi.Doremi()
+            note_parser = noteparsers.doremi.Doremi()
         else:
-            note_parser = sky.Sky()
+            note_parser = noteparsers.sky.Sky()
 
         ascii_buffer.write('#' + self.title + '\n')
 

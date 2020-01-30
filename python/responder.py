@@ -2,8 +2,8 @@
 import os, re
 from io import StringIO, BytesIO
 from modes import InputMode, RenderMode, CSSMode, ResponseMode
+import noteparsers
 from parsers import SongParser
-from noteparsers import *
 from songs import Song
 
 

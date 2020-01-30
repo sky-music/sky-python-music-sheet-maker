@@ -1,5 +1,5 @@
 import os
-from notes import Note, NoteRoot, NoteCircle, NoteDiamond
+import notes
 
 try:
     from PIL import Image, ImageDraw, ImageFont
@@ -251,14 +251,14 @@ class Harp(Instrument):
 
         if note_index % 7 == 0:  # the 7 comes from the heptatonic scale of Sky's music (no semitones)
             # Note is a root note
-            return NoteRoot(self, pos)  # very important: the chord creating the note is passed as a parameter
+            return notes.NoteRoot(self, pos)  # very important: the chord creating the note is passed as a parameter
         elif (
                 note_index % self.get_column_count() == 0 or note_index % self.get_column_count() == 2) or note_index % self.get_column_count() == 4:
             # Note is in an odd column, so it is a circle
-            return NoteCircle(self, pos)
+            return notes.NoteCircle(self, pos)
         else:
             # Note is in an even column, so it is a diamond
-            return NoteDiamond(self, pos)
+            return notes.NoteDiamond(self, pos)
 
     def render_in_ascii(self, note_parser):
 
@@ -380,7 +380,7 @@ class Harp(Instrument):
         harp_render = Image.new('RGB', harp_file.size, self.song_bkg)  # Empty image
 
         # Get a typical note to check that the size of the note png is consistent with the harp png                  
-        note_size = Note(self).get_png_size()
+        note_size = notes.Note(self).get_png_size()
         note_rel_width = note_size[0] / harp_size[0]  # percentage of harp
         if note_rel_width > 1.0 / self.get_column_count() or note_rel_width < 0.05:
             note_rescale = 0.153 / note_rel_width

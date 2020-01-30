@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 import re, os, math
+from operator import truediv, itemgetter
 from modes import InputMode
 import instruments
-from operator import truediv, itemgetter
-from noteparsers import *
+import noteparsers
 
 class SongParser:
 
@@ -54,7 +54,7 @@ class SongParser:
 
     def check_delimiters(self):
 
-        if self.input_mode == InputMode.JIANPU or isinstance(self.note_parser, jianpu.Jianpu):
+        if self.input_mode == InputMode.JIANPU or isinstance(self.note_parser, noteparsers.jianpu.Jianpu):
             if self.pause != '0':
                 print('Jianpu notation is used: setting 0 as the pause character instead of ' + self.pause)
                 self.pause = '0'
@@ -102,17 +102,17 @@ class SongParser:
         note_parser = None
 
         if input_mode == InputMode.SKYKEYBOARD:
-            note_parser = skykeyboard.SkyKeyboard()
+            note_parser = noteparsers.skykeyboard.SkyKeyboard()
         elif input_mode == InputMode.SKY:
-            note_parser = sky.Sky()
+            note_parser = noteparsers.sky.Sky()
         elif input_mode == InputMode.ENGLISH:
-            note_parser = english.English()
+            note_parser = noteparsers.english.English()
         elif input_mode == InputMode.DOREMI:
-            note_parser = doremi.Doremi()
+            note_parser = noteparsers.doremi.Doremi()
         elif input_mode == InputMode.JIANPU:
-            note_parser = jianpu.Jianpu()
+            note_parser = noteparsers.jianpu.Jianpu()
         elif input_mode == InputMode.ENGLISHCHORDS:
-            note_parser = englishchords.EnglishChords()
+            note_parser = noteparsers.englishchords.EnglishChords()
 
         return note_parser
 
@@ -131,7 +131,7 @@ class SongParser:
 
     def get_keyboard_layout(self):
 
-        return skykeyboard.SkyKeyboard().keyboard_layout
+        return noteparsers.skykeyboard.SkyKeyboard().keyboard_layout
 
     def split_icon(self, icon, delimiter=None):
 
@@ -189,7 +189,7 @@ class SongParser:
             # TODO: this line is useless since we don't use position maps anymore.
             # chord = re.sub(re.escape(self.pause), '.', chord) #Replaces the pause character by the default
 
-            if isinstance(self.note_parser, english.English):
+            if isinstance(self.note_parser, noteparsers.english.English):
                 chord = self.note_parser.decode_chord(chord)
 
             repeat, chord = self.split_chord(chord)
