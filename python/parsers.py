@@ -189,7 +189,7 @@ class SongParser:
             # TODO: this line is useless since we don't use position maps anymore.
             # chord = re.sub(re.escape(self.pause), '.', chord) #Replaces the pause character by the default
 
-            if isinstance(self.note_parser, noteparsers.english.English):
+            if isinstance(self.note_parser, noteparsers.englishchords.EnglishChords):
                 chord = self.note_parser.decode_chord(chord)
 
             repeat, chord = self.split_chord(chord)
