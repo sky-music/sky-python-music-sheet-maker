@@ -33,7 +33,7 @@ class English(noteparser.NoteParser):
         self.note_name_with_octave_regex = re.compile(r'([ABCDEFGabcdefg][b#]?\d)')
         self.note_name_regex = re.compile(r'([ABCDEFGabcdefg][b#]?)')
         self.single_note_name_regex = re.compile(r'(\b[ABCDEFGabcdefg][b#]?\d?\b)')
-        self.octave_number_regex = re.compile(r'\d')
+        self.note_octave_regex = re.compile(r'\d')
         self.not_note_name_regex = re.compile(r'[^ABCDEFGabcdefgb#]+')
         self.not_octave_regex = re.compile(r'[^\d]+')
 

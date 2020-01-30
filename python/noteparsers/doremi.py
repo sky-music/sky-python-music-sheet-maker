@@ -35,7 +35,7 @@ class Doremi(noteparser.NoteParser):
         self.note_name_with_octave_regex = re.compile(r'([DRMFSLTdrmfslt][OEIAoeia][Ll]?[b#]?\d)')
         self.note_name_regex = re.compile(r'([DRMFSLTdrmfslt][OEIAoeia][Ll]?[b#]?)')
         self.single_note_name_regex = re.compile(r'\b[DRMFSLTdrmfslt][OEIAoeia][Ll]?[b#]?\d?\b')
-        self.octave_number_regex = re.compile(r'\d')
+        self.note_octave_regex = re.compile(r'\d')
         self.not_note_name_regex = re.compile(r'[^DRMFSLTOEIAdrmfsltoeiab#]+')
         self.not_octave_regex = re.compile(r'[^\d]+')
 
