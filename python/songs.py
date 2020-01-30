@@ -1,9 +1,8 @@
+import os, re, io
 from modes import RenderMode, CSSMode
 import instruments
-import os
-import parsers
-import re
-from io import StringIO, BytesIO
+import noteparsers
+
 
 try:
     from PIL import Image, ImageDraw, ImageFont
@@ -206,7 +205,7 @@ class Song():
 
     def write_html(self, css_mode=CSSMode.EMBED, css_path='css/main.css'):
 
-        html_buffer = StringIO()
+        html_buffer = io.StringIO()
 
         html_buffer.write('<!DOCTYPE html>'
                           '\n<html xmlns:svg=\"http://www.w3.org/2000/svg\">')
@@ -268,18 +267,18 @@ class Song():
 
     def write_ascii(self, render_mode=RenderMode.SKYASCII):
 
-        ascii_buffer = StringIO()
+        ascii_buffer = io.StringIO()
 
         if render_mode == RenderMode.SKYASCII:
-            note_parser = parsers.SkyNoteParser()
+            note_parser = noteparsers.sky.Sky()
         elif render_mode == RenderMode.ENGLISHASCII:
-            note_parser = parsers.EnglishNoteParser()
+            note_parser = noteparsers.english.English()
         elif render_mode == RenderMode.JIANPUASCII:
-            note_parser = parsers.JianpuNoteParser()
+            note_parser = noteparsers.jianpu.Jianpu()
         elif render_mode == RenderMode.DOREMIASCII:
-            note_parser = parsers.DoremiNoteParser()
+            note_parser = noteparsers.doremi.Doremi()
         else:
-            note_parser = parsers.SkyNoteParser()
+            note_parser = noteparsers.sky.Sky()
 
         ascii_buffer.write('#' + self.title + '\n')
 
@@ -309,7 +308,7 @@ class Song():
             print('\nYour song is too long. Stopping at ' + str(self.maxFiles) + ' files.')
             return buffer_list
 
-        svg_buffer = StringIO()
+        svg_buffer = io.StringIO()
         filenum = len(buffer_list)
 
         # SVG/XML headers
@@ -653,7 +652,7 @@ class Song():
             if linetype.lower() != 'voice':
                 yline_in_song += self.png_harp_spacings[1] / 2.0
 
-        song_buffer = BytesIO()
+        song_buffer = io.BytesIO()
         song_render.save(song_buffer, format='PNG', dpi=self.png_dpi, compress_level=self.png_compress)
 
         buffer_list.append(song_buffer)
@@ -709,7 +708,7 @@ class Song():
                             for note_render in instrument_render:
                                 track.append(note_render)
                             instrument_index += 1
-        midi_buffer = BytesIO()
+        midi_buffer = io.BytesIO()
         mid.save(file=midi_buffer)
 
         return midi_buffer

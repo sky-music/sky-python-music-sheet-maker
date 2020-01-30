@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
+import os, re, io
 from modes import InputMode, RenderMode, CSSMode, ResponseMode
+import noteparsers
 from parsers import SongParser
 from songs import Song
-import os
-import re
-from io import StringIO, BytesIO
+
 
 
 class Responder:
@@ -352,9 +352,9 @@ class Responder:
             else:
                 file_path = file_path0
 
-            if isinstance(buffer, StringIO):
+            if isinstance(buffer, io.StringIO):
                 output_file = open(file_path, 'w+', encoding='utf-8', errors='ignore')
-            elif isinstance(buffer, BytesIO):
+            elif isinstance(buffer, io.BytesIO):
                 output_file = open(file_path, 'bw+')
             else:
                 raise Exception('Unknown buffer type in ' + str(self))
