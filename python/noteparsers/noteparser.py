@@ -145,8 +145,8 @@ class NoteParser:
             note_name = self.get_note_name_regex().search(note).group(0)
             # TODO: will probably want to isolate the int() and make this more generic, in the case of Jianpu,
             #  octave is denoted by ++ or -- etc.
-            octave_number = int(self.get_octave_number_regex().search(note).group(0))
-            return note_name, octave_number
+            note_octave = int(self.get_octave_number_regex().search(note).group(0))
+            return note_name, note_octave
         else:
             if self.is_valid_note_name(note):
 
@@ -155,8 +155,8 @@ class NoteParser:
 
                 if not is_finding_key:
 
-                    octave_number = self.get_default_starting_octave()
-                    return note_name, octave_number
+                    note_octave = self.get_default_starting_octave()
+                    return note_name, note_octave
                 else:
                     return self.handle_note_name_without_octave(note_name, song_key)
 

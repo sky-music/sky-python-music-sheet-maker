@@ -49,7 +49,7 @@ class Jianpu(noteparser.NoteParser):
         if note_name is not None:
             note_name = note_name.group(0)
         else:
-            raise KeyError('Note ' + str(note) + ' was not recognized as Jianpu.')
+            raise SyntaxError('Note ' + str(note) + ' was not recognized as Jianpu.')
 
         note_octave = re.search('(\\+)+', note)
         if note_octave is not None:
@@ -59,6 +59,14 @@ class Jianpu(noteparser.NoteParser):
             if note_octave is not None:
                 note_octave = self.get_default_starting_octave() - len(note_octave.group(0))
             else:
-                note_octave = self.get_default_starting_octave()
+                # Player has given note name without specifying an octave
+                note_name = note
+
+                if not is_finding_key:
+
+                    note_octave = self.get_default_starting_octave()
+                    return note_name, note_octave
+                else:
+                    return self.handle_note_name_without_octave(note_name, song_key)
         # print(note_base+note_alt+str(note_octave))
         return note_name, note_octave
