@@ -1,11 +1,7 @@
-import os
-import re
-import sys
-
+import os, sys, re
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 import noteparser
-
 
 class English(noteparser.NoteParser):
 
@@ -22,18 +18,16 @@ class English(noteparser.NoteParser):
             oct_str = str(oct_int)
 
         self.inverse_position_map = {
-            (0, 0): 'C' + oct_str, (0, 1): 'D', (0, 2): 'E' + oct_str, (0, 3): 'F' + oct_str, (0, 4): 'G' + oct_str,
-            (1, 0): 'A' + oct_str, (1, 1): 'B' + oct_str, (1, 2): 'C' + str(oct_int + 1),
-            (1, 3): 'D' + str(oct_int + 1), (1, 4): 'E' + str(oct_int + 1),
-            (2, 0): 'F' + str(oct_int + 1), (2, 1): 'G' + str(oct_int + 1), (2, 2): 'A' + str(oct_int + 2),
-            (2, 3): 'B' + str(oct_int + 2), (2, 4): 'C' + str(oct_int + 2)
+            (0, 0): 'C'+oct_str, (0, 1): 'D', (0, 2): 'E'+oct_str, (0, 3): 'F'+oct_str, (0, 4): 'G'+oct_str,
+            (1, 0): 'A'+oct_str, (1, 1): 'B'+oct_str, (1, 2): 'C'+str(oct_int+1), (1, 3): 'D'+str(oct_int+1), (1, 4): 'E'+str(oct_int+1),
+            (2, 0): 'F'+str(oct_int+1), (2, 1): 'G'+str(oct_int+1), (2, 2): 'A'+str(oct_int+2), (2, 3): 'B'+str(oct_int+2), (2, 4): 'C'+str(oct_int+2)
         }
 
         # Compile regexes for notes to save before using
         self.note_name_with_octave_regex = re.compile(r'([ABCDEFGabcdefg][b#]?\d)')
         self.note_name_regex = re.compile(r'([ABCDEFGabcdefg][b#]?)')
         self.single_note_name_regex = re.compile(r'(\b[ABCDEFGabcdefg][b#]?\d?\b)')
-        self.note_octave_regex = re.compile(r'\d')
+        self.octave_number_regex = re.compile(r'\d')
         self.not_note_name_regex = re.compile(r'[^ABCDEFGabcdefgb#]+')
         self.not_octave_regex = re.compile(r'[^\d]+')
 
@@ -50,3 +44,5 @@ class English(noteparser.NoteParser):
             note = 'X'
 
         return note
+
+

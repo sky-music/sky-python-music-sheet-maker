@@ -1,11 +1,7 @@
-import os
-import re
-import sys
-
+import os, sys, re
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 import sky
-
 
 class SkyKeyboard(sky.Sky):
 
@@ -31,3 +27,4 @@ class SkyKeyboard(sky.Sky):
         self.single_note_name_regex = re.compile(r'(\b[' + regex + r']\b)')
         self.not_note_name_regex = re.compile(r'[^' + regex + r']+')
         self.not_octave_regex = re.compile(r'.')
+
