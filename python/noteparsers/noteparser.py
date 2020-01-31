@@ -103,7 +103,7 @@ class NoteParser:
             return False
 
     def english_note_name(self, note_name, reverse=False):
-        import english
+        from noteparsers import english
         if reverse:
             native_parser = english.English()
             foreign_parser = self
