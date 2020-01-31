@@ -103,13 +103,13 @@ class NoteParser:
             return False
 
     def english_note_name(self, note_name, reverse=False):
-        from english import English
+        import english
         if reverse:
-            native_parser = English()
+            native_parser = english.English()
             foreign_parser = self
         else:
             native_parser = self
-            foreign_parser = English()
+            foreign_parser = english.English()
 
         note_name = native_parser.note_name_regex.match(str(note_name))
         if note_name is not None:
