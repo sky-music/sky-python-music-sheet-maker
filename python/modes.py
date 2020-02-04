@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class InputModes(Enum):
+class InputMode(Enum):
     SKYKEYBOARD = [1, 'Sky keyboard', 'Type on keyboard as you would in Sky']
     SKY = [2, 'Sky ABC1-5', 'Sky column/row notation:\n   A1 A2 A3 A4 A5\n   B1 B2 B3 B4 B5\n   C1 C2 C3 C4 C5']
     ENGLISH = [3, 'English CDEFGAB',
@@ -14,21 +14,26 @@ class InputModes(Enum):
                      'Abbreviated English chord name (e.g. C, F, Dm, Bdim, A+, Csus2, Dsus4, C6, Cmaj7, Dm11)']
 
 
-class RenderModes(Enum):
-    HTML = 1
-    SVG = 2
-    PNG = 3
-    SKYASCII = 4
-    ENGLISHASCII = 5
-    JIANPUASCII = 6
-    DOREMIASCII = 7
-    MIDI = 8
+class RenderMode(Enum):
+    HTML = [1, 'HTML', '.html']
+    SVG = [2, 'SVG', '.svg']
+    PNG = [3, 'PNG', '.png']
+    MIDI = [4, 'MIDI', '.mid']
+    SKYASCII = [5, 'Sky ASCII', '_sky.txt']
+    ENGLISHASCII = [6, 'English ASCII', '_english.txt']
+    JIANPUASCII = [7, 'Jianpu ASCII', '_jianpu.txt']
+    DOREMIASCII = [8, 'Doremi ASCII', '_doremi.txt']
 
 
-class CSSModes(Enum):
+class CSSMode(Enum):
     XML = 1
     HREF = XML
     LINK = XML
     IMPORT = 2
     EMBED = 3
     HARD = EMBED
+
+
+class ResponseMode(Enum):
+    COMMAND_LINE = 1
+    BOT = 2

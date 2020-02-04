@@ -1,4 +1,5 @@
 import os
+import notes
 
 try:
     from PIL import Image, ImageDraw, ImageFont
@@ -14,36 +15,42 @@ try:
 except (ImportError, ModuleNotFoundError):
     no_mido_module = True
 
-from notes import Note, NoteRoot, NoteCircle, NoteDiamond
-
 
 # ## Instrument classes
 
 class Instrument:
 
-    def __init__(self):
+    def __init__(self, responder):
         self.type = 'undefined'
         self.chord_skygrid = {}
         self.repeat = 1
         self.index = 0
         self.is_silent = True
         self.is_broken = False
-        self.empty_chord_png = os.path.normpath('elements/empty-chord.png')  # blank harp
-        self.unhighlighted_chord_png = os.path.normpath(
-            'elements/unhighlighted-chord.png')  # harp with unhighlighted notes
-        self.broken_png = os.path.normpath('elements/broken-symbol.png')
-        self.silent_png = os.path.normpath('elements/silent-symbol.png')
+        self.responder = responder
+        self.directory_base = self.responder.get_directory_base()
+        self.directory_elements = 'elements'
+        self.directory_fonts = 'fonts'
+        self.empty_chord_png = os.path.normpath(os.path.join(self.directory_elements, 'empty-chord.png'))  # blank harp
+        self.unhighlighted_chord_png = os.path.normpath(os.path.join(self.directory_elements,
+                                                                     'unhighlighted-chord.png'))  # harp with unhighlighted notes
+        self.broken_png = os.path.normpath(os.path.join(self.directory_elements, 'broken-symbol.png'))
+        self.silent_png = os.path.normpath(os.path.join(self.directory_elements, 'silent-symbol.png'))
         self.png_chord_size = None
         self.text_bkg = (255, 255, 255, 0)  # Transparent white
         self.song_bkg = (255, 255, 255)  # White paper sheet
         self.font_color = (0, 0, 0)
-        self.font = 'fonts/NotoSansCJKjp-Regular.otf'
+        self.font = os.path.normpath(os.path.join(self.directory_fonts, 'NotoSansCJKjp-Regular.otf'))
         self.font_size = 38
         self.repeat_height = None
 
         self.midi_relspacing = 0.1  # Spacing between midi notes, as a ratio of note duration
         self.midi_pause_relduration = 1  # Spacing between midi notes, as a ratio of note duration
         self.midi_quaver_relspacing = 0.5
+
+    def get_responder(self):
+
+        return self.responder
 
     def set_chord_skygrid(self, chord_skygrid):
         self.chord_skygrid = chord_skygrid
@@ -80,7 +87,7 @@ class Instrument:
         return self.is_silent
 
     def get_is_broken(self):
-        """Returns whether the Harp is broken (notes were not recongized by the Parser)"""
+        """Returns whether the Harp is broken (notes were not recognized by the Parser)"""
         return self.is_broken
 
     def set_is_broken(self, is_broken=True):
@@ -117,16 +124,28 @@ class Instrument:
 
         return repeat_im
 
+    def get_directory_base(self):
+
+        return self.directory_base
+
+    def get_directory_fonts(self):
+
+        return os.path.join(self.get_directory_base(), self.directory_fonts)
+
+    def get_directory_elements(self):
+
+        return os.path.join(self.get_directory_base(), self.directory_elements)
+
 
 class Voice(Instrument):  # Lyrics or comments
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, responder):
+        super().__init__(responder)
         self.type = 'voice'
         self.lyric = ''
         # self.text_bkg = (255, 255, 255, 0)#Uncomment to make it different from the inherited class
         # self.font_color = (255,255,255)#Uncomment to make it different from the inherited class
-        self.font = 'fonts/NotoSansCJKjp-Regular.otf'
+        # self.font = 'fonts/NotoSansCJKjp-Regular.otf'
         self.font_size = 32
         self.lyric_height = None
         self.lyric_width = None
@@ -198,12 +217,11 @@ class Voice(Instrument):  # Lyrics or comments
 
 class Harp(Instrument):
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, responder):
+        super().__init__(responder)
         self.type = 'harp'
         self.column_count = 5
         self.row_count = 3
-        # self.highlighted_states_skygrid = []
 
     def get_row_count(self):
         return self.row_count
@@ -233,14 +251,14 @@ class Harp(Instrument):
 
         if note_index % 7 == 0:  # the 7 comes from the heptatonic scale of Sky's music (no semitones)
             # Note is a root note
-            return NoteRoot(self, pos)  # very important: the chord creating the note is passed as a parameter
+            return notes.NoteRoot(self, pos)  # very important: the chord creating the note is passed as a parameter
         elif (
                 note_index % self.get_column_count() == 0 or note_index % self.get_column_count() == 2) or note_index % self.get_column_count() == 4:
             # Note is in an odd column, so it is a circle
-            return NoteCircle(self, pos)
+            return notes.NoteCircle(self, pos)
         else:
             # Note is in an even column, so it is a diamond
-            return NoteDiamond(self, pos)
+            return notes.NoteDiamond(self, pos)
 
     def render_in_ascii(self, note_parser):
 
@@ -362,7 +380,7 @@ class Harp(Instrument):
         harp_render = Image.new('RGB', harp_file.size, self.song_bkg)  # Empty image
 
         # Get a typical note to check that the size of the note png is consistent with the harp png                  
-        note_size = Note(self).get_png_size()
+        note_size = notes.Note(self).get_png_size()
         note_rel_width = note_size[0] / harp_size[0]  # percentage of harp
         if note_rel_width > 1.0 / self.get_column_count() or note_rel_width < 0.05:
             note_rescale = 0.153 / note_rel_width

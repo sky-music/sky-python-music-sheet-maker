@@ -1,27 +1,30 @@
 #All Notes with flats:
-reb4 mib4 fa4 solb4 lab4 sib4 do5 reb5 mib5 fa5 solb5 lab5 sib5 do6 reb6
+reb1 mib1 fa1 solb1 lab1 sib1 do2 reb2 mib2 fa2 solb2 lab2 sib2 do3 reb3
 #All Notes with sharps:
-do#4 re#4 fa4 fa#4 sol#4 la# do5 do#5 re#5 fa5 fa#5 sol#5 la#5 do6 do#6
+do#1 re#1 fa1 fa#1 sol#1 la# do2 do#2 re#2 fa2 fa#2 sol#2 la#2 do3 do#3
 #si versus ti:
-sib5 tib5
+sib2 tib2
 #Some chords:
-reb4mib4 fa4solb4lab4
+reb1mib1 fa1solb1lab1
 #Some quavers #and chords:
-reb4-mib4-fa4-solb4 lab4-sib4do5reb5
+reb1-mib1-fa1-solb1 lab1-sib1do2reb2
 #Pauses:
-reb4 . mib4 . . fa4
+reb1 . mib1 . . fa1
 #Notes #without #octave:
 reb mib fa solb lab sib
 do# re# fa fa# sol# la#
 #Chords #without #octaves:
 rebmib fasolblab
 #quavers #without #octaves:
-reb-mib-fa-solb lab-sibdo5reb
+reb-mib-fa-solb lab-sibdo2reb
 #Errors:
 X + : 0
 #Out of range #notes:
-reb3 fa6 mib6
+reb0 fa7 mib8
 #Mixed case and #multiple #spaces:
-   REb4-MIb4    Fa4-SoLb4-lAb4-Sib4    
+   REb1-MIb1    Fa1-SoLb1-lAb1-Sib1    
 #Mixed case #without #octaves:
 reb MIb f SoLb lAb SIb DO#
+
+
+
