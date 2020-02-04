@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
-import os, re, io
+import io
+import os
+import re
+
 from modes import InputMode, RenderMode, CSSMode, ResponseMode
-import noteparsers
 from parsers import SongParser
 from songs import Song
 
 
-
 class Responder:
 
-    def __init__(self, dir_in='test_songs', dir_out='songs_out' ):
+    def __init__(self, dir_in='test_songs', dir_out='songs_out'):
 
         self.song_dir_in = dir_in
         self.song_dir_out = dir_out

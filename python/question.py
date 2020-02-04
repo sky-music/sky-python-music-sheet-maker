@@ -1,4 +1,6 @@
 class Question:
 
     def __init__(self):
-        pass
+
+        self.text = ''
+        self.answer = None
