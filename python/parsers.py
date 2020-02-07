@@ -129,10 +129,6 @@ class SongParser:
         else:
             return self.note_parser.english_note_name(note_name, reverse)
 
-    def get_keyboard_layout(self):
-
-        return noteparsers.skykeyboard.SkyKeyboard().keyboard_layout
-
     def split_icon(self, icon, delimiter=None):
 
         """
