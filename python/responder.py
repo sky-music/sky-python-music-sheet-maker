@@ -1,15 +1,19 @@
 #!/usr/bin/env python3
-import os, re, io
+import io
+import os
+import re
+
 from modes import InputMode, RenderMode, CSSMode, ResponseMode
-import noteparsers
 from parsers import SongParser
 from songs import Song
 
 
-
 class Responder:
+    """
+    For managing text input and output from external sources to the Parser
+    """
 
-    def __init__(self, dir_in='test_songs', dir_out='songs_out' ):
+    def __init__(self, dir_in='test_songs', dir_out='songs_out', questions=None):
 
         self.song_dir_in = dir_in
         self.song_dir_out = dir_out
@@ -30,6 +34,8 @@ class Responder:
         self.init_working_directory()
         self.directory_base = os.getcwd()
 
+        self.questions = questions
+
     def init_working_directory(self):
 
         os.chdir('../')
@@ -42,11 +48,11 @@ class Responder:
 
     def get_song_dir_out(self):
 
-        return self.song_dir_out
+        return os.path.join(self.get_directory_base(), self.song_dir_out)
 
     def get_song_dir_in(self):
 
-        return self.song_dir_in
+        return os.path.join(self.get_directory_base(), self.song_dir_in)
 
     def get_css_mode(self):
 
@@ -87,23 +93,26 @@ class Responder:
 
         self.response_mode = response_mode
 
+    def create_questions(self):
+
+        pass
+
     def ask_to_select_mode(self, modes):
 
         modes_list = {}
         instructions = ""
         i = 0
-        instructions += "Please choose your note format:\n'"
+        instructions += "Please choose your note format:\n"
         for mode in modes:
             i += 1
             instructions += str(i) + ') ' + mode.value[2] + "\n"
-            if mode == InputMode.SKYKEYBOARD:
-                instructions += "   " + self.get_parser().get_keyboard_layout().replace(" ", "\n   ") + ":\n"
             modes_list[i] = mode
         self.output(instructions)
         try:
             notation = int(self.ask('Mode (1-' + str(i) + "): ").strip())
             mode = modes_list[notation]
         except (ValueError, KeyError):
+            self.output('No valid notation selected. Using SKY by default.')
             mode = InputMode.SKY
         return mode
 
@@ -111,7 +120,7 @@ class Responder:
 
         return self.response_mode
 
-    def ask(self, question):
+    def ask(self, prompt):
 
         user_response = None
 
@@ -122,7 +131,7 @@ class Responder:
 
         elif self.get_response_mode() == ResponseMode.COMMAND_LINE:
 
-            user_response = input(question)
+            user_response = input(prompt)
 
         return user_response
 
@@ -172,8 +181,6 @@ class Responder:
         self.output('\nAccepted music notes formats:')
         for mode in InputMode:
             self.output('\n* ' + mode.value[2])
-            if mode == InputMode.SKYKEYBOARD:
-                self.output('   ' + self.get_parser().get_keyboard_layout().replace(' ', '\n   ') + ':')
         self.output('\nNotes composing a chord must be glued together (e.g. A1B1C1).')
         self.output('Separate chords with \"' + self.get_parser().get_icon_delimiter() + '\".')
         self.output('Use \"' + self.get_parser().get_pause() + '\" for a silence (rest).')

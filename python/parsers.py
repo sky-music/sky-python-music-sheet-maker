@@ -5,7 +5,11 @@ from modes import InputMode
 import instruments
 import noteparsers
 
+
 class SongParser:
+    """
+    For parsing a text format into a Song object
+    """
 
     def __init__(self, responder):
 
@@ -128,10 +132,6 @@ class SongParser:
             return ''
         else:
             return self.note_parser.english_note_name(note_name, reverse)
-
-    def get_keyboard_layout(self):
-
-        return noteparsers.skykeyboard.SkyKeyboard().keyboard_layout
 
     def split_icon(self, icon, delimiter=None):
 
@@ -336,7 +336,8 @@ class SongParser:
 
                                 if possible_mode == InputMode.ENGLISH:
                                     defg_notes += sum([int(re.search('[D-Gd-g]', note) is not None) for note in notes])
-                                    qwrt_notes += sum([int(re.search('[QWRTSZXVqwrtszxv]', note) is not None) for note in notes])
+                                    qwrt_notes += sum(
+                                        [int(re.search('[QWRTSZXVqwrtszxv]', note) is not None) for note in notes])
                                     octaves = [re.search('\d', note) for note in notes]
 
                                     octaves = sorted([int(octave.group(0)) for octave in octaves if octave is not None])
@@ -352,7 +353,7 @@ class SongParser:
         if ((defg_notes == 0) or (defg_notes < 0.01 and octave_span > 2)) and (
                 num_notes[possible_modes.index(InputMode.ENGLISH)] > 10):
             scores[possible_modes.index(InputMode.ENGLISH)] *= 0.5
-            
+
         if ((qwrt_notes == 0) or (qwrt_notes < 0.01 and octave_span <= 1)) and (
                 num_notes[possible_modes.index(InputMode.SKYKEYBOARD)] > 5):
             scores[possible_modes.index(InputMode.SKYKEYBOARD)] *= 0.5
@@ -407,6 +408,3 @@ class SongParser:
             return items
         else:
             return sorted_items
-
-
-
