@@ -10,7 +10,11 @@ from songs import Song
 
 class Responder:
 
-    def __init__(self, dir_in='test_songs', dir_out='songs_out'):
+    """
+    For managing text input and output from external sources to the Parser
+    """
+
+    def __init__(self, dir_in='test_songs', dir_out='songs_out', questions = None):
 
         self.song_dir_in = dir_in
         self.song_dir_out = dir_out
@@ -30,6 +34,8 @@ class Responder:
 
         self.init_working_directory()
         self.directory_base = os.getcwd()
+
+        self.questions = questions
 
     def init_working_directory(self):
 
@@ -87,6 +93,10 @@ class Responder:
     def set_response_mode(self, response_mode):
 
         self.response_mode = response_mode
+
+    def create_questions(self):
+
+        pass
 
     def ask_to_select_mode(self, modes):
 
