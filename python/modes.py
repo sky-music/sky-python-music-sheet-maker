@@ -41,3 +41,9 @@ class CSSMode(Enum):
 class ResponseMode(Enum):
     COMMAND_LINE = 1
     BOT = 2
+
+
+class QuestionType(Enum):
+    BOOLEAN = 1
+    LIST = 2
+    STRING = 3

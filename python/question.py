@@ -13,7 +13,7 @@ class Question:
         self.answer = None
         self.is_answered = False
 
-        self.type = None  # Boolean, options, open-ended
+        self.type = None  # Boolean, options, open-ended — from QuestionType
 
         self.options = options
 
