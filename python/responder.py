@@ -49,11 +49,11 @@ class Responder:
 
     def get_song_dir_out(self):
 
-        return self.song_dir_out
+        return os.path.join(self.get_directory_base(), self.song_dir_out)
 
     def get_song_dir_in(self):
 
-        return self.song_dir_in
+        return os.path.join(self.get_directory_base(), self.song_dir_in)
 
     def get_css_mode(self):
 
