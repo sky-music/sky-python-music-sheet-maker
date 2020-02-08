@@ -103,18 +103,17 @@ class Responder:
         modes_list = {}
         instructions = ""
         i = 0
-        instructions += "Please choose your note format:\n'"
+        instructions += "Please choose your note format:\n"
         for mode in modes:
             i += 1
             instructions += str(i) + ') ' + mode.value[2] + "\n"
-            if mode == InputMode.SKYKEYBOARD:
-                instructions += "   " + self.get_parser().get_keyboard_layout().replace(" ", "\n   ") + ":\n"
             modes_list[i] = mode
         self.output(instructions)
         try:
             notation = int(self.ask('Mode (1-' + str(i) + "): ").strip())
             mode = modes_list[notation]
         except (ValueError, KeyError):
+            self.output('No valid notation selected. Using SKY by default.')
             mode = InputMode.SKY
         return mode
 
@@ -183,8 +182,6 @@ class Responder:
         self.output('\nAccepted music notes formats:')
         for mode in InputMode:
             self.output('\n* ' + mode.value[2])
-            if mode == InputMode.SKYKEYBOARD:
-                self.output('   ' + self.get_parser().get_keyboard_layout().replace(' ', '\n   ') + ':')
         self.output('\nNotes composing a chord must be glued together (e.g. A1B1C1).')
         self.output('Separate chords with \"' + self.get_parser().get_icon_delimiter() + '\".')
         self.output('Use \"' + self.get_parser().get_pause() + '\" for a silence (rest).')

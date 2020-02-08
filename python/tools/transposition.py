@@ -143,10 +143,10 @@ possible_modes = skyparser.get_possible_modes(song_lines)
 
 if len(possible_modes) > 1:
     print('\nSeveral possible notations detected.')
-    song_notation = ask_for_mode(possible_modes)
+    song_notation = song_responder.ask_to_select_mode(possible_modes)
 elif len(possible_modes) == 0:
     print('\nCould not detect your note format. Maybe your song contains typo errors?')
-    song_notation = ask_for_mode(possible_modes)
+    song_notation = song_responder.ask_to_select_mode(possible_modes)
 else:
     print('\nWe detected that you use the following notation: ' + possible_modes[0].value[1] + '.')
     song_notation = possible_modes[0]

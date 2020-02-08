@@ -1,8 +1,12 @@
 from enum import Enum
+import os
 
 
 class InputMode(Enum):
-    SKYKEYBOARD = [1, 'Sky keyboard', 'Type on keyboard as you would in Sky']
+    if (os.getenv('LANG') == 'fr') or (os.getenv('LANG') == 'be'):
+        SKYKEYBOARD = [1, 'Sky keyboard', 'Type on keyboard as you would in Sky:\n   AZERT\n   QSDFG\n   WXCVB']
+    else:
+        SKYKEYBOARD = [1, 'Sky keyboard', 'Type on keyboard as you would in Sky:\n   QWERT\n   ASDFG\n   ZXCVB']
     SKY = [2, 'Sky ABC1-5', 'Sky column/row notation:\n   A1 A2 A3 A4 A5\n   B1 B2 B3 B4 B5\n   C1 C2 C3 C4 C5']
     ENGLISH = [3, 'English CDEFGAB',
                'English (note name in C D E F G A B + alteration b/# + octave number, e.g. Cb4 D#4 E5 ...)']
