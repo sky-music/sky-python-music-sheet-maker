@@ -8,10 +8,16 @@ class Question:
         """
 
         self.information_before = information_before
-        self.information_after = information_after
         self.question = question
+        self.information_after = information_after
         self.answer = None
+        self.is_answered = False
+
+        self.type = None  # Boolean, options, open-ended
+
         self.options = options
+
+        self.depends_on = []  # A list of other Questions that this depends on
 
     def get_information_before(self):
         return self.information_before

@@ -9,12 +9,11 @@ from songs import Song
 
 
 class Responder:
-
     """
     For managing text input and output from external sources to the Parser
     """
 
-    def __init__(self, dir_in='test_songs', dir_out='songs_out', questions = None):
+    def __init__(self, dir_in='test_songs', dir_out='songs_out', questions=None):
 
         self.song_dir_in = dir_in
         self.song_dir_out = dir_out
@@ -121,7 +120,7 @@ class Responder:
 
         return self.response_mode
 
-    def ask(self, question):
+    def ask(self, prompt):
 
         user_response = None
 
@@ -132,7 +131,7 @@ class Responder:
 
         elif self.get_response_mode() == ResponseMode.COMMAND_LINE:
 
-            user_response = input(question)
+            user_response = input(prompt)
 
         return user_response
 
