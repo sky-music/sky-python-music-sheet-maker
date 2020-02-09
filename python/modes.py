@@ -45,5 +45,5 @@ class ResponseMode(Enum):
 
 class QuestionType(Enum):
     BOOLEAN = 1
-    LIST = 2
-    STRING = 3
+    OPTION = 2
+    OPEN = 3
