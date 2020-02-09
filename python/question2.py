@@ -54,6 +54,8 @@ class Question:
         '''
         self.valid_locutors = ['bot', 'music-cog']
 
+        self.answer = None
+
         self.sender_type = None
         self.recipient_type = None
         self.type = None  # Yes/no, list of choices, open-ended — from QuestionType # Overiddent by the derived classes
