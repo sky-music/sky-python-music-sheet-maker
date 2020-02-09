@@ -1,5 +1,24 @@
-from modes import QuestionType
+'''
+Classes to ask and answer questions between the bot and the music cog.
+TODO: list of mandatory questions to implement
+a) asked by the cog:
+- notes, OPEN
+- musical notation (if several are found), CHOICE
+- music key (if several are found), CHOICE
+- song title, OPEN
+- song headers, OPEN
+- note shift, OPEN with type and range restrictions
 
+b) asked by the bot:
+- what are the PNGs?, OPEN with type restriction
+- how many PNGs?, OPEN with type and range restrictions
+
+c) asked by the command line:
+- what are the files and where are they saved, OPEN
+
+'''
+
+from modes import QuestionType
 
 class QuestionError(Exception):
     def __init__(self, explanation):
@@ -13,7 +32,40 @@ class QuestionError(Exception):
 
 class InvalidQuestionError(QuestionError):
     pass
+    
+class InvalidAnswerError(QuestionError):
+    pass
 
+class Answer():
+	
+	def __init__(self, question):
+		
+		self.question = question # the Question object this Answer responds to
+		self.answer = None
+		self.isvalid = None
+		if not isinstance(question, Question):
+			raise InvalidAnswerError('this answer has no question.')
+		
+	def get_answer(self):
+		if self.isvalid:
+			return self.answer
+		else:
+			return None
+		
+	def set_answer(self, answer):
+		self.answer = answer
+		
+	def get_validity(self):
+		if self.isvalid == None:
+			self.isvalid = self.check_answer()
+		return self.isvalid
+		
+	def check_answer(self):
+		"""
+		Only the Question can tell if the answer is valid.
+		"""
+		self.isvalid = self.question.check_answer()
+		return self.isvalid
 
 class Question:
 
@@ -58,7 +110,7 @@ class Question:
 
         self.sender_type = None
         self.recipient_type = None
-        self.type = None  # Yes/no, list of choices, open-ended — from QuestionType # Overiddent by the derived classes
+        self.type = None  # Yes/no, list of choices, open-ended — from QuestionType # Overidden by the derived classes
         self.depends_on = []  # A list of other Questions objects (or class types?) that this depends on
         # TODO: decide how depends_on will be set
         self.is_asked = False
@@ -87,8 +139,7 @@ class Question:
         return self.choices
 
     def get_is_answered(self):
-        if self.answer is not None:
-            return True
+        return self.is_answered
 
     def check_sender(self):
         if self.sender is not None:
@@ -124,13 +175,19 @@ class Question:
             raise InvalidQuestionError('question is undefined.')
 
     def check_answer(self):
-        if self.answer is not None:
+        if isinstance(self.answer, Answer):
             # TODO: add checks for testing the validity of the answer
             # for instance, if a music key is expected, check that it belongs to a dictionary
             # check for length, type, length
             # Typically this method is overridden by derived classes
-            self.is_answer_valid = True
-
+            self.is_answered = True
+            
+            if self.answer.get_answer() is not None:
+                self.is_answer_valid = True
+            else:
+                self.is_answer_valid = False
+        else:
+             self.is_answered = False
         return self.is_answer_valid
 
     def build_question(self):
@@ -148,16 +205,17 @@ class Question:
         self.check_question()
 
         self.is_asked = True
-        self.is_answered = False  # TODO: decide whether asking again supposes the question remains unanswered
+        self.is_answered = False  # TODO: decide whether asking again resets the question to unanswered (as here)
 
         self.build_question()
 
         return self.get_question()
 
-    def set_answer(self, answer):
+    def give_answer(self, answer):
         self.answer = answer
-        self.check_answer()
-        self.is_answered = True
+        is_answer_valid = self.check_answer()
+        if is_answer_valid is not None:
+            self.is_answered = True
         # TODO: decide if is_answered must be set to False of the answer is invalid.
         return self.get_information_after()
 
