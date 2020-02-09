@@ -1,4 +1,4 @@
-'''
+"""
 Classes to ask and answer questions between the bot and the music cog.
 TODO: list of mandatory questions to implement
 a) asked by the cog:
@@ -16,9 +16,11 @@ b) asked by the bot:
 c) asked by the command line:
 - what are the files and where are they saved, OPEN
 
-'''
+"""
 
 from modes import QuestionType
+from answer import Answer
+
 
 class QuestionError(Exception):
     def __init__(self, explanation):
@@ -32,40 +34,7 @@ class QuestionError(Exception):
 
 class InvalidQuestionError(QuestionError):
     pass
-    
-class InvalidAnswerError(QuestionError):
-    pass
 
-class Answer():
-	
-	def __init__(self, question):
-		
-		self.question = question # the Question object this Answer responds to
-		self.answer = None
-		self.isvalid = None
-		if not isinstance(question, Question):
-			raise InvalidAnswerError('this answer has no question.')
-		
-	def get_answer(self):
-		if self.isvalid:
-			return self.answer
-		else:
-			return None
-		
-	def set_answer(self, answer):
-		self.answer = answer
-		
-	def get_validity(self):
-		if self.isvalid == None:
-			self.isvalid = self.check_answer()
-		return self.isvalid
-		
-	def check_answer(self):
-		"""
-		Only the Question can tell if the answer is valid.
-		"""
-		self.isvalid = self.question.check_answer()
-		return self.isvalid
 
 class Question:
 
@@ -181,13 +150,13 @@ class Question:
             # check for length, type, length
             # Typically this method is overridden by derived classes
             self.is_answered = True
-            
+
             if self.answer.get_answer() is not None:
                 self.is_answer_valid = True
             else:
                 self.is_answer_valid = False
         else:
-             self.is_answered = False
+            self.is_answered = False
         return self.is_answer_valid
 
     def build_question(self):
@@ -220,7 +189,7 @@ class Question:
         return self.get_information_after()
 
 
-class QuestionText(Question):
+class QuestionText(Question):  # TODO: is this inherited from QuestionOpen but the answer needs to be a string?
     """
         A class in which both the question and the answer are strings (including numbers parsed as text)
     """
@@ -247,18 +216,10 @@ class QuestionText(Question):
 
         self.question = self.get_information_before()
 
-        if self.get_choices() is not None:
-            self.question += '\n'
-
-        for i, choice in enumerate(self.get_choices()):
-            self.question += str(i) + ') '
-            self.question += choice + '\n'
-
         return self.question  # Generic return, will be overridden in derived classes
 
 
 class QuestionChoice(Question):
-    
     """
     Question with multiple choices
     """
@@ -294,7 +255,7 @@ class QuestionSongMetadata(QuestionText):
         self.choices = None  # choices are ignored
 
 
-class QuestionSongNotation(QuestionText):
+class QuestionSongNotation(QuestionText):  # TODO: inherit from QuestionChoice rather than QuestionText
     """
         Song notation used by the player, defined by its name among a given list
     """
