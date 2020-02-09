@@ -18,11 +18,11 @@ class InvalidQuestionError(QuestionError):
 class Question:
 
     def __init__(self, sender=None, recipient=None, question=None, information_before=None, information_after=None,
-                 options=None):
+                 choices=None):
         """
         A question object
 
-        Options are for questions where the user chooses from multiple options
+        Choices are for questions where the user chooses from multiple choices
         """
         '''
         TO-DOs:
@@ -42,7 +42,7 @@ class Question:
         self.question = question
         self.information_before = information_before
         self.information_after = information_after
-        self.options = options
+        self.choices = choices
 
         '''
         TODO: decide how to check for sender and recipient types:
@@ -83,8 +83,8 @@ class Question:
     def get_information_after(self):
         return self.information_after
 
-    def get_options(self):
-        return self.options
+    def get_choices(self):
+        return self.choices
 
     def get_is_answered(self):
         if self.answer is not None:
@@ -128,7 +128,7 @@ class Question:
             # TODO: add checks for testing the validty of the answer
             # for instance, if a music key is expected, check that it belongs to a dictionary
             # check for length, type, length
-            # Typically this method is overriden by derivied classes
+            # Typically this method is overriden by derived classes
             self.is_answer_valid = True
 
         return self.is_answer_valid
@@ -189,12 +189,32 @@ class QuestionText(Question):
 
         self.question = self.get_information_before()
 
-        if self.get_options() is not None:
+        if self.get_choices() is not None:
             self.question += '\n'
 
-        for i, option in enumerate(self.get_options()):
+        for i, choice in enumerate(self.get_choices()):
             self.question += str(i) + ') '
-            self.question += option + '\n'
+            self.question += choice + '\n'
+
+        return self.question  # Generic return, will be overridden in derived classes
+
+
+class QuestionChoice(Question):
+    
+    """
+    Question with multiple choices
+    """
+
+    def build_question(self):
+
+        self.question = self.get_information_before()
+
+        if self.get_choices() is not None:
+            self.question += '\n'
+
+        for i, choice in enumerate(self.get_choices()):
+            self.question += str(i) + ') '
+            self.question += choice + '\n'
 
         return self.question  # Generic return, will be overridden in derived classes
 
@@ -213,7 +233,7 @@ class QuestionSongMetadata(QuestionText):
         super().__init__()
 
         self.type = QuestionType.OPEN
-        self.options = None  # options are ignored
+        self.choices = None  # choices are ignored
 
 
 class QuestionSongNotation(QuestionText):
@@ -225,12 +245,12 @@ class QuestionSongNotation(QuestionText):
 
         super().__init__()
 
-        self.type = QuestionType.OPTION
+        self.type = QuestionType.CHOICE
 
         try:
-            self.options[0]
+            self.choices[0]
         except (TypeError, IndexError):
-            raise InvalidQuestionError('open question with no options.')
+            raise InvalidQuestionError('open question with no choices.')
 
     def check_answer(self):
         if self.answer is not None:
@@ -238,5 +258,5 @@ class QuestionSongNotation(QuestionText):
                 raise InvalidQuestionError(
                     'Invalid answer type. ' + type(self.answer) + ' was given, str was expected.')
             else:
-                if self.answer.lower() in [option.lower() for option in self.options]:
+                if self.answer.lower() in [choice.lower() for choice in self.choices]:
                     return True
