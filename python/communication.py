@@ -27,10 +27,13 @@ class QueryError(Exception):
 
     def __str__(self):
         return str(self.explanation)
+
     pass
+
 
 class InvalidReplyError(QueryError):
     pass
+
 
 class InvalidQueryError(QueryError):
     pass
@@ -40,7 +43,7 @@ class Reply:
 
     def __init__(self, query):
 
-        self.query = query # the question that was asked in the first place
+        self.query = query  # the question that was asked in the first place
         self.result = None
         self.isvalid = None
         if not isinstance(query, Query):
@@ -109,6 +112,7 @@ class Query:
 
         self.reply = None
 
+        self.is_sent = False
         self.sender_type = None
         self.recipient_type = None
         self.type = None  # Yes/no, list of choices, open-ended — from QueryType # Overidden by the derived classes
@@ -220,6 +224,7 @@ class Query:
         # TODO: decide if is_answered must be set to False of the answer is invalid.
         return self.get_information_after()
 
+
 '''
 class QueryText(Query):  # TODO: is this inherited from QueryOpen but the answer needs to be a string?
     """
@@ -251,25 +256,28 @@ class QueryText(Query):  # TODO: is this inherited from QueryOpen but the answer
         return self.question  # Generic return, will be overridden in derived classes
 '''
 
+
 class QueryBoolean(Query):
     """
     a yes/no, true/false question type
     """
+
     def __init__(self, **kwargs):
         super().__init__()
         self.type = QueryType.BOOLEAN
-    
-    def build_question(self):
 
-        #TODO: is result initialized with question or information_before()?
+    def build_question(self):
+        # TODO: is result initialized with question or information_before()?
         self.result = self.get_information_before()
 
-        self.result += '(y/n)'#TODO: to be changed
+        self.result += '(y/n)'  # TODO: to be changed
+
 
 class QueryChoice(Query):
     """
     Query with multiple choices
     """
+
     def __init__(self, **kwargs):
         super().__init__()
         self.type = QueryType.CHOICE
@@ -280,7 +288,7 @@ class QueryChoice(Query):
 
     def build_question(self):
 
-        #TODO: is result initialized with question or information_before()?
+        # TODO: is result initialized with question or information_before()?
         self.result = self.get_information_before()
 
         if self.get_choices() is not None:
@@ -292,15 +300,17 @@ class QueryChoice(Query):
 
         return self.result  # Generic return, will be overridden in derived classes
 
+
 class QueryOpen(Query):
     """
     Query  open-ended
     """
+
     def __init__(self, **kwargs):
         super().__init__()
         self.type = QueryType.OPEN
         self.choices = None  # choices are ignored
-    
+
 
 class QuerySongMetadata(QueryOpen):
     """
@@ -318,7 +328,7 @@ class QuerySongNotation(QueryChoice):
     """
     Song notation used by the player, defined by its name among a given list
     """
-    
+
     def check_answer(self):
         if self.answer is not None:
             if not isinstance(self.answer, str):
@@ -327,6 +337,3 @@ class QuerySongNotation(QueryChoice):
             else:
                 if self.answer.lower() in [choice.lower() for choice in self.choices]:
                     return True
-
-
-
