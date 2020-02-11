@@ -43,7 +43,7 @@ class ResponseMode(Enum):
     BOT = 2
 
 
-class QuestionType(Enum):
+class QueryType(Enum):
     BOOLEAN = 1
     CHOICE = 2
     OPEN = 3
