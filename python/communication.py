@@ -1,5 +1,5 @@
 """
-Classes to ask and answer questions between the bot and the music cog.
+Classes to ask and answer questions called Query and Reply between the bot and the music cog.
 TODO: list of mandatory questions to implement
 a) asked by the cog:
 - notes, OPEN
@@ -47,7 +47,7 @@ class Reply:
         self.result = None
         self.isvalid = None
         if not isinstance(query, Query):
-            raise InvalidReplyError('this answer has no question.')
+            raise InvalidReplyError('this reply does not follow any query.')
 
     def get_result(self):
         if self.isvalid:
@@ -73,7 +73,7 @@ class Reply:
 
 class Query:
 
-    def __init__(self, sender=None, recipient=None, question=None, information_before=None, information_after=None,
+    def __init__(self, sender=None, recipient=None, question=None, foreword=None, afterword=None,
                  choices=None):
         """
         A question object
@@ -84,20 +84,20 @@ class Query:
         TO-DOs:
         a question is a request for information
         it has one or several formulations
-        it has one or several possible answers
-        it is repeated (or not) after a given time if no answer is given
-        it is repeated (or not) if a blank answer is given
-        for some questions there is a default answer (yes/no questions, and choice within a set, eg song key), for other not (open questions, such as “composer name”)
-        a question has an “answered”/“not answered” status
-        “answer” could be a property of question or a separate object
-        the internal answer can be different from the answer you give out (for instance, the answer to ‘what is the song key?’ can be C, but you give the answer 'do' instead).
+        it has one or several possible replies
+        it is repeated (or not) after a given time if no reply is given
+        it is repeated (or not) if a blank reply is given
+        for some questions there is a default reply (yes/no questions, and choice within a set, eg song key), for other not (open questions, such as “composer name”)
+        a question has a “replied”/“not replied” status
+        “reply” could be a property of question or a separate object
+        the internal reply can be different from the reply you give out (for instance, the reply to ‘what is the song key?’ can be C, but you give the reply 'do' instead).
         etc
         '''
         self.sender = sender
         self.recipient = recipient
         self.result = question
-        self.information_before = information_before
-        self.information_after = information_after
+        self.foreword = foreword
+        self.afterword = afterword
         self.choices = choices
 
         '''
@@ -111,8 +111,7 @@ class Query:
         self.valid_locutors = ['bot', 'music-cog']
 
         self.reply = None
-        self.answer = None
-        self.is_answered = False
+        self.is_replied = False
 
         self.is_sent = False
         self.sender_type = None
@@ -136,11 +135,11 @@ class Query:
     def get_reply(self):
         return self.reply
 
-    def get_information_before(self):
-        return self.information_before
+    def get_foreword(self):
+        return self.foreword
 
-    def get_information_after(self):
-        return self.information_after
+    def get_afterword(self):
+        return self.afterword
 
     def get_choices(self):
         return self.choices
@@ -183,7 +182,7 @@ class Query:
 
     def check_reply(self):
         if isinstance(self.reply, Reply):
-            # TODO: add checks for testing the validity of the answer
+            # TODO: add checks for testing the validity of the reply
             # for instance, if a music key is expected, check that it belongs to a dictionary
             # check for length, type, length
             # Typically this method is overridden by derived classes
@@ -212,25 +211,25 @@ class Query:
         self.check_question()
 
         self.is_sent = True
-        self.is_replied = False  # TODO: decide whether asking again resets the question to unanswered (as here)
+        self.is_replied = False  # TODO: decide whether asking again resets the question to unreplied to (as here)
 
         self.build_query()
 
         return self.get_query()
 
-    def give_answer(self, answer):
-        self.answer = answer
-        is_answer_valid = self.check_answer()
-        if is_answer_valid is not None:
-            self.is_answered = True
-        # TODO: decide if is_answered must be set to False of the answer is invalid.
-        return self.get_information_after()
+    def set_reply(self, reply):
+        self.reply = reply
+        is_reply_valid = self.check_reply()
+        if is_reply_valid is not None:
+            self.is_replied = True
+        # TODO: decide if is_replied must be set to False of the reply is invalid.
+        return self.get_afterword()
 
 
 '''
-class QueryText(Query):  # TODO: is this inherited from QueryOpen but the answer needs to be a string?
+class QueryText(Query):  # TODO: is this inherited from QueryOpen but the Reply needs to be a string?
     """
-        A class in which both the question and the answer are strings (including numbers parsed as text)
+        A class in which both the question and the reply are strings (including numbers parsed as text)
     """
 
     def check_question(self):
@@ -243,17 +242,17 @@ class QueryText(Query):  # TODO: is this inherited from QueryOpen but the answer
         else:
             raise InvalidQueryError('Undefined question.')
 
-    def check_answer(self):
-        if self.answer is not None:
-            if isinstance(self.answer, str):
+    def check_reply(self):
+        if self.reply is not None:
+            if isinstance(self.reply, str):
                 return True
             else:
                 raise InvalidQueryError(
-                    'Invalid answer type. ' + type(self.answer) + ' was given, str was expected.')
+                    'Invalid reply type. ' + type(self.reply) + ' was given, str was expected.')
 
     def build_question(self):
 
-        self.question = self.get_information_before()
+        self.question = self.get_foreword()
 
         return self.question  # Generic return, will be overridden in derived classes
 '''
@@ -269,8 +268,8 @@ class QueryBoolean(Query):
         self.type = QueryType.BOOLEAN
 
     def build_question(self):
-        # TODO: is result initialized with question or information_before()?
-        self.result = self.get_information_before()
+        # TODO: is result initialized with question or foreword()?
+        self.result = self.get_foreword()
 
         self.result += '(y/n)'  # TODO: to be changed
 
@@ -290,8 +289,8 @@ class QueryChoice(Query):
 
     def build_question(self):
 
-        # TODO: is result initialized with question or information_before()?
-        self.result = self.get_information_before()
+        # TODO: is result initialized with question or foreword()?
+        self.result = self.get_foreword()
 
         if self.get_choices() is not None:
             self.result += '\n'
@@ -321,7 +320,7 @@ class QuerySongMetadata(QueryOpen):
             - original artist
             - transcript writer
 
-        This is an open question: the answer can be anything, provided it is a string.
+        This is an open question: the reply can be anything, provided it is a string.
     """
     pass
 
@@ -331,11 +330,13 @@ class QuerySongNotation(QueryChoice):
     Song notation used by the player, defined by its name among a given list
     """
 
-    def check_answer(self):
-        if self.answer is not None:
-            if not isinstance(self.answer, str):
+    def check_reply(self):
+        if self.reply is not None:
+            if not isinstance(self.reply, str):
                 raise InvalidQueryError(
-                    'Invalid answer type. ' + type(self.answer) + ' was given, str was expected.')
+                    'Invalid reply type. ' + type(self.reply) + ' was given, str was expected.')
             else:
-                if self.answer.lower() in [choice.lower() for choice in self.choices]:
+                if self.reply.lower() in [choice.lower() for choice in self.choices]:
                     return True
+
+
