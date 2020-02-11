@@ -42,8 +42,8 @@ class ResponseMode(Enum):
     COMMAND_LINE = 1
     BOT = 2
 
-
-class QueryType(Enum):
-    BOOLEAN = 1
-    CHOICE = 2
-    OPEN = 3
+class ReplyType(Enum):
+    TEXT = 1
+    INTEGER = 2
+    NOTE = 3
+    IMAGE = 4
