@@ -301,6 +301,15 @@ class QueryChoice(Query):
 
         return self.result  # Generic return, will be overridden in derived classes
 
+    def check_reply(self):
+        if self.reply is not None:
+            if not isinstance(self.reply, str):
+                raise InvalidQueryError(
+                    'Invalid reply type. ' + type(self.reply) + ' was given, str was expected.')
+            else:
+                if self.reply.lower() in [choice.lower() for choice in self.choices]:
+                    return True
+
 
 class QueryOpen(Query):
     """
@@ -313,30 +322,5 @@ class QueryOpen(Query):
         self.choices = None  # choices are ignored
 
 
-class QuerySongMetadata(QueryOpen):
-    """
-        Metadata currently includes:
-            - title
-            - original artist
-            - transcript writer
-
-        This is an open question: the reply can be anything, provided it is a string.
-    """
-    pass
-
-
-class QuerySongNotation(QueryChoice):
-    """
-    Song notation used by the player, defined by its name among a given list
-    """
-
-    def check_reply(self):
-        if self.reply is not None:
-            if not isinstance(self.reply, str):
-                raise InvalidQueryError(
-                    'Invalid reply type. ' + type(self.reply) + ' was given, str was expected.')
-            else:
-                if self.reply.lower() in [choice.lower() for choice in self.choices]:
-                    return True
 
 
