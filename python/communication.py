@@ -111,6 +111,8 @@ class Query:
         self.valid_locutors = ['bot', 'music-cog']
 
         self.reply = None
+        self.answer = None
+        self.is_answered = False
 
         self.is_sent = False
         self.sender_type = None
