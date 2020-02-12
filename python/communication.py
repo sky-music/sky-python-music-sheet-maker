@@ -53,10 +53,11 @@ class QueryRepliedError(QueryError):
 
 class Reply:
 
-    def __init__(self, query, reply=None):
+    def __init__(self, query, answer=None):
 
         self.query = query  # the question that was asked in the first place
         self.result = None
+        self.answer = answer
         self.isvalid = None
         if not isinstance(query, Query):
             raise InvalidReplyError('this reply does not follow any query')
@@ -74,6 +75,9 @@ class Reply:
         if self.isvalid is None:
             self.isvalid = self.check_result()
         return self.isvalid
+        
+    def build_result():
+        self.result = self.answer
 
     def check_result(self):
         """
@@ -134,7 +138,12 @@ class Query:
         self.is_replied = False
 
     def __str__(self):
-        return '<' + self.__class__.__name__ + ' from ' + str(self.sender) + ' to ' + str(self.recipient) + ': ' + self.question + ' ' + str(self.reply_type) + ' expected, within ' + str(self.limits) + '>'
+        string = '<' + self.__class__.__name__ + ' from ' + str(self.sender) + ' to ' + str(self.recipient) + ': ' + self.question + ' ' + str(self.reply_type) + ' expected'
+        if self.limits is not None:
+           string += ', within ' + str(self.limits)
+        string += '>'
+        
+        return string
 
     def get_sender(self):
         return self.sender
@@ -144,6 +153,9 @@ class Query:
 
     def get_question(self):
         return self.question
+        
+    def get_result(self):
+        return self.result
 
     def get_reply(self):
         return self.reply
@@ -238,6 +250,9 @@ class Query:
                         self.reply_type = ReplyType.INTEGER
                     except:
                          self.reply_type = ReplyType.TEXT
+            else:
+            	#TODO: decide if its better to leave it to none
+                self.reply_type = ReplyType.OTHER
                          
 
     def check_reply(self):
@@ -279,8 +294,9 @@ class Query:
 
         return self.is_sent
 
-    def receive_reply(self, reply):
-        self.reply = reply
+    def receive_reply(self, reply_result):
+        #TODO: maybe it is iseless to pass seld as argument to reply since rely is already a property of self
+        self.reply = Reply(self, reply_result)
         is_reply_valid = self.check_reply()
         if is_reply_valid is not None:
             self.is_replied = True
@@ -327,11 +343,12 @@ class QueryBoolean(Query):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        if self.limits == None:
+        try:
+            self.limits[0]
+            self.limits[1]
+        except:
             self.limits = ['y','n']
-        else:
-            if len(self.limits) != 2:
-                raise InvalidQueryError('incorrect limits argument passed to QueryBoolean')
+
 
     def build_result(self):
     	
