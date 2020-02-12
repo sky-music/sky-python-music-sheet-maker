@@ -13,7 +13,7 @@ q = QueryChoice(sender='music-cog', recipient='bot', question="Mode (1-" + str(l
 
 q.send()
 brain.store(q)
-
+print('\n')
 print(q)
 
 choices = ('dad', 'mom')
@@ -21,7 +21,14 @@ q = QueryBoolean(sender='music-cog', recipient='bot', question='Which one do you
 
 q.send()
 brain.store(q)
+print('\n')
+print(q)
 
+q = QueryOpen(sender='music-cog', recipient='bot', question='What is your name?', foreword='', afterword=None, reply_type=ReplyType.TEXT, limits=[])
+
+q.send()
+brain.store(q)
+print('\n')
 print(q)
 
 q.receive_reply('myself')
