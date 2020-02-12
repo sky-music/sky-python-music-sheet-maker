@@ -1,5 +1,5 @@
 import os
-from modes import InputMode
+from modes import InputMode, ReplyType
 from communication import QueryOpen, QueryChoice, Query
     
 class test_responder():
@@ -13,7 +13,7 @@ class test_responder():
     def create_query_mode(self, modes_list):
 
         query_mode = QueryChoice(sender=self.name, recipient='bot', question="Mode (1-" + str(len(modes_list)) + "): ",
-                                 foreword="Please choose your note format:\n", afterword="None", choices=modes_list)
+                                 foreword="Please choose your note format:\n", afterword=None, reply_type=ReplyType.INPUTMODE, limits=modes_list)
 
         return query_mode            
             

@@ -18,7 +18,7 @@ c) asked by the command line:
 
 """
 
-from modes import ReplyType
+from modes import ReplyType, InputMode
 from PIL import Image
 
 
@@ -38,6 +38,15 @@ class InvalidReplyError(QueryError):
 
 class InvalidQueryError(QueryError):
     pass
+    
+class InvalidQueryTypeError(InvalidQueryError):
+    def __init__(self, explanation, obj_in, obj_expect):
+        self.explanation = explanation + ': ' + str(type(obj_expect).__name__) + ' expected, ' + str(type(obj_in).__name__)+ ' given.'
+        super().__init__(self.explanation)
+    pass
+    
+class QueryRepliedError(QueryError):
+    pass
 
 
 class Reply:
@@ -48,7 +57,7 @@ class Reply:
         self.result = None
         self.isvalid = None
         if not isinstance(query, Query):
-            raise InvalidReplyError('this reply does not follow any query.')
+            raise InvalidReplyError('this reply does not follow any query')
 
     def get_result(self):
         if self.isvalid:
@@ -66,7 +75,7 @@ class Reply:
 
     def check_result(self):
         """
-        Only the Query can tell if the result is valid.
+        Only the Query can tell if the result is valid
         """
         self.isvalid = self.question.check_result()
         return self.isvalid
@@ -74,7 +83,7 @@ class Reply:
 
 class Query:
 
-    def __init__(self, sender=None, recipient=None, question=None, foreword=None, afterword=None, reply_type=ReplyType.TEXT,limits=None):
+    def __init__(self, sender=None, recipient=None, question=None, foreword=None, afterword=None, reply_type=ReplyType.OTHER,limits=None):
         """
         A question object
 
@@ -122,7 +131,6 @@ class Query:
         self.depends_on = []  # A list of other Querys objects (or class types?) that this depends on
         # TODO: decide how depends_on will be set
         self.is_asked = False
-        self.is_reply_valid = None
         self.is_replied = False
 
     def get_sender(self):
@@ -169,38 +177,51 @@ class Query:
         if self.recipient is not None:
             # TODO: more elaborate checking
             if self.recipient == self.sender:
-                raise InvalidQueryError('sender cannot ask a question to itself.')
+                raise InvalidQueryError('sender cannot ask a question to itself')
             return True
         else:
-            raise InvalidQueryError('invalid recipient. Recipient is ' + str(self.recipient))
+            raise InvalidQueryError('invalid recipient ' + str(self.recipient))
         
         return False
 
     def check_question(self):
         if self.question is not None:
             # TODO: add checking among more types, if needed
-            if isinstance(self.result, str):
+            if isinstance(self.question, str):
                 return True
             else:
-                raise InvalidQueryError('only string (str) questions are allowed at the moment.')
+                raise InvalidQueryError('only string (str) questions are allowed at the moment')
         else:
-            raise InvalidQueryError('question is undefined.')
+            raise InvalidQueryError('question is None')
             
         return False
 
     def check_limits(self):
-        if self.limits is not None:
-            if isistance(self.limits, list) or isinstance(self.limits, tuple):
+    	
+        if self.limits is None:
+            return True
+        else:
+            if isinstance(self.limits, list) or isinstance(self.limits, tuple):
                 item = self.limits[0]
             else:
                 item = self.limits
+                
             if (self.reply_type == ReplyType.TEXT or self.reply_type == ReplyType.NOTE) and not isinstance(item, str):
-                raise QueryError('incorrect limits type. str expected, ' + str(type(item).__name__)+ 'given.')
-            if self.reply_type == ReplyType.INTEGER:
+                raise InvalidQueryTypeError('incorrect limits type',item,str)
+                
+            if self.reply_type ==  ReplyType.INTEGER:
                try:
                    int(item)
                except:
-                   raise QueryError('incorrect limit passed to Query')
+                   raise InvalidQueryTypeError('incorrect limits type',item,int)
+                   
+            if self.reply_type == ReplyType.INPUTMODE and not isinstance(item, InputMode):
+                raise InvalidQueryTypeError('incorrect limits type',item,InputMode)
+            
+            if any([type(limit) != type(item) for limit in self.limits]):
+                raise InvalidQueryError('limits are not all of the same type')
+                
+            #TODO: smarter type guessing
             if self.reply_type == None:
                 if isinstance(item,str):
                     try:
@@ -208,6 +229,7 @@ class Query:
                         self.reply_type = ReplyType.INTEGER
                     except:
                          self.reply_type = ReplyType.TEXT
+                         
 
     def check_reply(self):
         if isinstance(self.reply, Reply):
@@ -235,14 +257,18 @@ class Query:
             there is someone to listen, that your question is meaningful (or allowed)
             and then you can send your query
         """
+        if self.is_replied:
+            if self.reply.check_reply():
+                raise QueryRepliedError('this question has already been answered')
         self.check_sender()
         self.check_recipient()
         self.check_question()
+        self.check_limits()
         self.build_result()
         self.is_sent = True
         self.is_replied = False  # TODO: decide whether asking again resets the question to unreplied to (as here)
 
-        return is_sent
+        return self.is_sent
 
     def receive_reply(self, reply):
         self.reply = reply
@@ -295,14 +321,14 @@ class QueryBoolean(Query):
         if self.limits == None:
             self.limits = ['y','n']
         else:
-            if len(self.limits) is not 2:
-                raise QueryError('incorrect limits argument passed to QueryBoolean')
+            if len(self.limits) != 2:
+                raise InvalidQueryError('incorrect limits argument passed to QueryBoolean')
 
     def build_result(self):
         self.result = self.get_foreword()
         self.result += self.get_question()
         self.result += self.limits[0] + '/' + self.limits[1]
-        self.results +=self.afterwords
+        self.results += self.get_afterwords()
         return self.result
         
 
@@ -317,18 +343,37 @@ class QueryChoice(Query):
         try:
             self.limits[0]
         except (TypeError, IndexError):
-            raise InvalidQueryError('QueryChoice called with no choices.')
+            raise InvalidQueryError('QueryChoice called with no choices')
 
     def build_result(self):
+    	
         self.result = self.get_foreword()
 
         if self.get_limits() is not None:
             self.result += '\n'
 
+        #TODO: handles types other than string
         for i, choice in enumerate(self.get_limits()):
-            self.result += str(i) + ') '
-            self.result += choice + '\n'
+        	
+                
+            if self.reply_type == ReplyType.NOTE:
+                if i>0:
+                    choice_str = ', '
+                else:
+                    choice_str = ''
+                choice_str += str(choice)
+            
+            elif self.reply_type == ReplyType.INPUTMODE:
+                choice_str = str(i) + ') ' + choice.value[2] + '\n'
+                #modes_list[i] = mode
+            
+            else:
+                choice_str = str(i) + ') ' + str(choice) + '\n'
+                
+            self.result += choice_str
 
+        self.results += self.get_afterwords()
+        
         return self.result
 
 
