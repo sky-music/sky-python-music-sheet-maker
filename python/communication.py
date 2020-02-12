@@ -35,10 +35,12 @@ class QueryError(Exception):
 class InvalidReplyError(QueryError):
     pass
 
-
 class InvalidQueryError(QueryError):
     pass
-    
+
+class QueryMemoryError(QueryError):
+    pass
+
 class InvalidQueryTypeError(InvalidQueryError):
     def __init__(self, explanation, obj_in, obj_expect):
         self.explanation = explanation + ': ' + str(type(obj_expect).__name__) + ' expected, ' + str(type(obj_in).__name__)+ ' given.'
@@ -51,7 +53,7 @@ class QueryRepliedError(QueryError):
 
 class Reply:
 
-    def __init__(self, query):
+    def __init__(self, query, reply=None):
 
         self.query = query  # the question that was asked in the first place
         self.result = None
@@ -125,13 +127,14 @@ class Query:
         self.is_replied = False
 
         self.is_sent = False
-        self.sender_type = None
-        self.recipient_type = None
         self.type = None  # Yes/no, list of limits, open-ended — from QueryType # Overidden by the derived classes
         self.depends_on = []  # A list of other Querys objects (or class types?) that this depends on
         # TODO: decide how depends_on will be set
         self.is_asked = False
         self.is_replied = False
+
+    def __str__(self):
+        return '<' + self.__class__.__name__ + ' from ' + str(self.sender) + ' to ' + str(self.recipient) + ': ' + self.question + ' ' + str(self.reply_type) + ' expected, within ' + str(self.limits) + '>'
 
     def get_sender(self):
         return self.sender
@@ -146,10 +149,16 @@ class Query:
         return self.reply
 
     def get_foreword(self):
-        return self.foreword
+        if self.foreword == None:
+            return ''
+        else:
+            return self.foreword
 
     def get_afterword(self):
-        return self.afterword
+        if self.afterword == None:
+            return ''
+        else:
+            return self.afterword
 
     def get_limits(self):
         return self.limits
@@ -240,12 +249,12 @@ class Query:
             self.is_replied = True
 
             if self.reply.get_result() is not None:
-                self.is_reply_valid = True
+                self.reply.is_valid = True
             else:
-                self.is_reply_valid = False
+                self.reply.is_valid = False
         else:
             self.is_replied = False
-        return self.is_reply_valid
+        return self.reply.is_valid
 
     def build_result(self):
 
@@ -325,10 +334,11 @@ class QueryBoolean(Query):
                 raise InvalidQueryError('incorrect limits argument passed to QueryBoolean')
 
     def build_result(self):
+    	
         self.result = self.get_foreword()
         self.result += self.get_question()
         self.result += self.limits[0] + '/' + self.limits[1]
-        self.results += self.get_afterwords()
+        self.result += self.get_afterword()
         return self.result
         
 
@@ -346,7 +356,7 @@ class QueryChoice(Query):
             raise InvalidQueryError('QueryChoice called with no choices')
 
     def build_result(self):
-    	
+        
         self.result = self.get_foreword()
 
         if self.get_limits() is not None:
@@ -372,7 +382,7 @@ class QueryChoice(Query):
                 
             self.result += choice_str
 
-        self.results += self.get_afterwords()
+        self.result += self.get_afterword()
         
         return self.result
 
@@ -403,3 +413,68 @@ def check_reply(self):
                     return True
                     
 '''
+
+
+class QueryMemory():
+    
+    def __init__(self):
+    	
+        self.queries = []
+    
+    def __str__(self):
+        
+        return '<' + self.__class__.__name__ + ' with ' + str(len(self.queries)) + ' stored queries>'
+    
+    def recall_last(self):
+        
+        if len(self.queries) > 0:
+            return self.queries[-1]
+        else:
+            return None
+    
+    def recall(self, criterion):
+
+        try:
+            self.queries[0]
+        except (IndexError, TypeError):
+            QueryMemoryError('no stored query')
+
+        if criterion is None or criterion == '':
+            return self.queries
+
+        if isinstance(criterion, int):
+            try:
+                q = self.queries[criterion]
+                return q
+            except IndexError:
+                print('no query #'+str(criterion))
+        else:
+            q_found = []
+            for q in self.queries:
+                attr_vals =  list(q.__dict__.values())
+                if criterion in attr_vals:
+                    q_found.append(q)
+            return q_found
+            
+            
+    def get_pending(self):
+        
+        qlist = [q for q in self.queries if q.get_is_replied() == False]
+        
+        return qlist
+    
+    def store(self, query):
+        
+        if not isinstance(query, Query):
+           raise QueryMemoryError('invalid query type')
+        else:
+            self.queries.append(query)
+            
+    def erase(self, criterion):
+        
+        if criterion in self.queries:
+            self.queries.remove(criterion)
+        else:
+            if criterion is not None and criterion != '':
+                [self.queries.remove(q) for q in self.recall(criterion)]
+            
