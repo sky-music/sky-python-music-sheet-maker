@@ -42,8 +42,8 @@ class QueryMemoryError(QueryError):
     pass
 
 class InvalidQueryTypeError(InvalidQueryError):
-    def __init__(self, explanation, obj_in, obj_expect):
-        self.explanation = explanation + ': ' + str(type(obj_expect).__name__) + ' expected, ' + str(type(obj_in).__name__)+ ' given.'
+    def __init__(self, explanation, obj_in, type_expect):
+        self.explanation = explanation + ': ' + str(type_expect.__name__) + ' expected, ' + str(type(obj_in).__name__)+ ' given.'
         super().__init__(self.explanation)
     pass
     
@@ -58,33 +58,40 @@ class Reply:
         self.query = query  # the question that was asked in the first place
         self.result = None
         self.answer = answer
-        self.isvalid = None
+        self.is_valid = None
         if not isinstance(query, Query):
             raise InvalidReplyError('this reply does not follow any query')
 
-    def get_result(self):
-        if self.isvalid:
-            return self.result
+    def __str__(self):
+        string = '<' + self.__class__.__name__ + ' from ' + str(self.query.get_recipient()) + ' to ' + str(self.query.get_sender()) + ': '
+        if isinstance(self.get_result(),str):
+            string += repr(self.get_result())
         else:
-            return None
+            string += str(self.get_result())
+        string += '>'
+        
+        return string
+
+    def get_result(self):
+        return self.result
 
     def set_result(self, result):
         self.result = result
 
     def get_validity(self):
-        if self.isvalid is None:
-            self.isvalid = self.check_result()
-        return self.isvalid
+        if self.is_valid is None:
+            self.is_valid = self.check_result()
+        return self.is_valid
         
-    def build_result():
+    def build_result(self):
         self.result = self.answer
-
+        
     def check_result(self):
         """
         Only the Query can tell if the result is valid
         """
-        self.isvalid = self.question.check_result()
-        return self.isvalid
+        self.is_valid = self.query.check_reply()
+        return self.is_valid
 
 
 class Query:
@@ -128,7 +135,6 @@ class Query:
         self.valid_locutors = ['bot', 'music-cog']
 
         self.reply = None
-        self.is_replied = False
 
         self.is_sent = False
         self.type = None  # Yes/no, list of limits, open-ended — from QueryType # Overidden by the derived classes
@@ -138,9 +144,12 @@ class Query:
         self.is_replied = False
 
     def __str__(self):
-        string = '<' + self.__class__.__name__ + ' from ' + str(self.sender) + ' to ' + str(self.recipient) + ': ' + self.question + ' ' + str(self.reply_type) + ' expected'
-        if self.limits is not None:
+        string = '<' + self.__class__.__name__ + ' from ' + str(self.sender) + ' to ' + str(self.recipient) + ': ' + repr(self.question) + ', ' + str(self.reply_type) + ' expected'
+        try:
+           self.get_limits()[0]
            string += ', within ' + str(self.limits)
+        except (TypeError, IndexError):
+           pass
         string += '>'
         
         return string
@@ -156,6 +165,9 @@ class Query:
         
     def get_result(self):
         return self.result
+    
+    def set_result(self, result):
+        self.result = result
 
     def get_reply(self):
         return self.reply
@@ -218,14 +230,16 @@ class Query:
         return False
 
     def check_limits(self):
-    	
-        if self.limits is None:
+        
+        limits = self.get_limits()
+        
+        if limits is None:
             return True
         else:
-            if isinstance(self.limits, list) or isinstance(self.limits, tuple):
-                item = self.limits[0]
-            else:
-                item = self.limits
+            try:
+                item = limits[0]
+            except (IndexError, TypeError):
+                item = limits
                 
             if (self.reply_type == ReplyType.TEXT or self.reply_type == ReplyType.NOTE) and not isinstance(item, str):
                 raise InvalidQueryTypeError('incorrect limits type',item,str)
@@ -239,7 +253,7 @@ class Query:
             if self.reply_type == ReplyType.INPUTMODE and not isinstance(item, InputMode):
                 raise InvalidQueryTypeError('incorrect limits type',item,InputMode)
             
-            if any([type(limit) != type(item) for limit in self.limits]):
+            if any([type(limit) != type(item) for limit in limits]):
                 raise InvalidQueryError('limits are not all of the same type')
                 
             #TODO: smarter type guessing
@@ -250,30 +264,38 @@ class Query:
                         self.reply_type = ReplyType.INTEGER
                     except:
                          self.reply_type = ReplyType.TEXT
-            else:
-            	#TODO: decide if its better to leave it to none
-                self.reply_type = ReplyType.OTHER
+                else:
+                #TODO: decide if its better to leave it to none
+                    self.reply_type = ReplyType.OTHER
                          
 
     def check_reply(self):
-        if isinstance(self.reply, Reply):
+        
+        if not isinstance(self.reply, Reply):
+            self.is_replied = False
+            return None
+        else:
             # TODO: add checks for testing the validity of the reply
             # for instance, if a music key is expected, check that it belongs to a dictionary
             # check for length, type, length
             # Typically this method is overridden by derived classes
             self.is_replied = True
-
+            
             if self.reply.get_result() is not None:
                 self.reply.is_valid = True
             else:
                 self.reply.is_valid = False
-        else:
-            self.is_replied = False
-        return self.reply.is_valid
+            
+            return self.reply.is_valid
 
     def build_result(self):
 
-        return self.get_result()  # Generic return, will be overridden in derived classes
+        result = [self.get_foreword()]
+        result += [self.get_question()]
+        result += [self.get_afterword()]
+        result = '\n'.join(filter(None, result))
+        self.set_result(result)
+        return result  # Generic return, will be overridden in derived classes
 
     def send(self):
         """
@@ -297,7 +319,8 @@ class Query:
     def receive_reply(self, reply_result):
         #TODO: maybe it is iseless to pass seld as argument to reply since rely is already a property of self
         self.reply = Reply(self, reply_result)
-        is_reply_valid = self.check_reply()
+        self.reply.build_result()
+        is_reply_valid = self.reply.check_result()
         if is_reply_valid is not None:
             self.is_replied = True
         # TODO: decide if is_replied must be set to False of the reply is invalid.
@@ -336,29 +359,6 @@ class QueryText(Query):  # TODO: is this inherited from QueryOpen but the Reply 
 '''
 
 
-class QueryBoolean(Query):
-    """
-    a yes/no, true/false question type
-    """
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        try:
-            self.limits[0]
-            self.limits[1]
-        except:
-            self.limits = ['y','n']
-
-
-    def build_result(self):
-    	
-        self.result = self.get_foreword()
-        self.result += self.get_question()
-        self.result += self.limits[0] + '/' + self.limits[1]
-        self.result += self.get_afterword()
-        return self.result
-        
-
 
 class QueryChoice(Query):
     """
@@ -370,18 +370,18 @@ class QueryChoice(Query):
         try:
             self.limits[0]
         except (TypeError, IndexError):
-            raise InvalidQueryError('QueryChoice called with no choices')
+            raise InvalidQueryError('QueryChoice called with no choices') 
+        
 
     def build_result(self):
         
-        self.result = self.get_foreword()
+        result = self.get_foreword()
 
         if self.get_limits() is not None:
-            self.result += '\n'
+            result += '\n'
 
         #TODO: handles types other than string
         for i, choice in enumerate(self.get_limits()):
-        	
                 
             if self.reply_type == ReplyType.NOTE:
                 if i>0:
@@ -397,13 +397,71 @@ class QueryChoice(Query):
             else:
                 choice_str = str(i) + ') ' + str(choice) + '\n'
                 
-            self.result += choice_str
+            result += choice_str
 
-        self.result += self.get_afterword()
+        result += self.get_afterword()
         
-        return self.result
+        self.set_result(result)
+        
+        return result
+        
+
+    def check_reply(self):
+    
+        if not isinstance(self.reply, Reply):
+            self.is_replied = False
+            return None
+        else:
+            # TODO: add specific checking for this class
+            self.is_replied = True
+            
+            answer = self.reply.get_result()
+            choices = self.get_limits()
+            
+            if isinstance(answer,str):
+                answer = answer.lower().strip()
+            if isinstance(choices[0],str):
+                choices = [c.lower().strip() for c in choices]
+            
+            if answer is None:
+                self.reply.is_valid = False
+            elif answer in choices:
+                self.reply.is_valid = True
+            else:
+                try:
+                    choice = choices[int(answer)]
+                    self.reply.is_valid = True
+                except:
+                    self.reply.is_valid = False
+            return self.reply.is_valid
 
 
+class QueryBoolean(QueryChoice):
+    """
+    a yes/no, true/false question type
+    """
+
+    def __init__(self, **kwargs):
+       #repairing missing choices
+       try:
+            kwargs['limits'][0]
+            kwargs['limits'][1]
+       except:
+            kwargs['limits'] = ('y','n')
+       super().__init__(**kwargs)
+#TODO: decide whether we want to repair limits if len()>2, or only if len() is odd (treat each 2 limits as a possible yes/no couple), raise an error, or do nothing (as currently)
+
+    def build_result(self):
+        
+        result = []
+        
+        result += [self.get_foreword()]
+        result += [self.get_question() + ' (' + (self.limits[0] + '/' + self.limits[1]) + ')']
+        result += [self.get_afterword()]
+        result = '\n'.join(filter(None,result))
+        self.set_result(result)
+        return result
+        
 
 class QueryOpen(Query):
     """
@@ -412,24 +470,9 @@ class QueryOpen(Query):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.limits = None  # limits are ignored
 
+    #TODO: add specific check_reply for this class with handling of regular expressions for self.limits
 
-
-
-'''
-
-
-def check_reply(self):
-        if self.reply is not None:
-            if not isinstance(self.reply, str):
-                raise InvalidQueryError(
-                    'Invalid reply type. ' + type(self.reply) + ' was given, str was expected.')
-            else:
-                if self.reply.lower() in [choice.lower() for choice in self.limits]:
-                    return True
-                    
-'''
 
 
 class QueryMemory():
@@ -449,12 +492,7 @@ class QueryMemory():
         else:
             return None
     
-    def recall(self, criterion):
-
-        try:
-            self.queries[0]
-        except (IndexError, TypeError):
-            QueryMemoryError('no stored query')
+    def recall(self, criterion=None):
 
         if criterion is None or criterion == '':
             return self.queries
@@ -462,7 +500,7 @@ class QueryMemory():
         if isinstance(criterion, int):
             try:
                 q = self.queries[criterion]
-                return q
+                return [q]
             except IndexError:
                 print('no query #'+str(criterion))
         else:
@@ -486,12 +524,37 @@ class QueryMemory():
            raise QueryMemoryError('invalid query type')
         else:
             self.queries.append(query)
-            
+    
+    def recall_replied(self):
+    
+        return [q for q in self.queries if q.get_is_replied()]
+    
+    def recall_unreplied(self):
+    
+        return [q for q in self.queries if not q.get_is_replied()]
+    
+    def recall_by_invalid_reply(self):
+    
+        #q_replied = return [q for q in self.queries if q.get_is_replied()]
+        
+        q_replied = self.recall_replied()
+        
+        return [q for q in q_replied if not q.reply.get_validity()]
+        
+    
     def erase(self, criterion):
         
+        try:
+            clean = (criterion.lower() == 'all')
+            if clean:
+                self.queries.clear()
+        except:
+            pass
+                
         if criterion in self.queries:
             self.queries.remove(criterion)
         else:
             if criterion is not None and criterion != '':
                 [self.queries.remove(q) for q in self.recall(criterion)]
-            
+         
+
