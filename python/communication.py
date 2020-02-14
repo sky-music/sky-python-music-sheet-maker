@@ -184,6 +184,9 @@ class Query:
         else:
             return self.afterword
 
+    def get_reply_type(self):
+        return self.reply_type
+
     def get_limits(self):
         return self.limits
 
@@ -256,7 +259,7 @@ class Query:
             if any([type(limit) != type(item) for limit in limits]):
                 raise InvalidQueryError('limits are not all of the same type')
                 
-            #TODO: smarter type guessing
+            #smart guess of some types
             if self.reply_type == None:
                 if isinstance(item,str):
                     try:
@@ -264,28 +267,40 @@ class Query:
                         self.reply_type = ReplyType.INTEGER
                     except:
                          self.reply_type = ReplyType.TEXT
+                elif isinstance(item,InputMode):
+                    self.reply_type = ReplyType.INPUTMODE
                 else:
-                #TODO: decide if its better to leave it to none
+                #TODO: decide if its better to leave it to none instead
                     self.reply_type = ReplyType.OTHER
                          
 
     def check_reply(self):
         
         if not isinstance(self.reply, Reply):
+        	
             self.is_replied = False
             return None
+            
         else:
             # TODO: add checks for testing the validity of the reply
-            # for instance, if a music key is expected, check that it belongs to a dictionary
             # check for length, type, length
             # Typically this method is overridden by derived classes
             self.is_replied = True
+            self.reply.is_valid = False
             
-            if self.reply.get_result() is not None:
-                self.reply.is_valid = True
-            else:
-                self.reply.is_valid = False
+            answer = self.reply.get_result()
             
+            if answer is not None:
+                if self.get_reply_type() in [ReplyType.TEXT, ReplyType.NOTE, ReplyType.INTEGER]:
+                    if isinstance(answer, str):
+                        self.reply.is_valid = True
+                elif self.get_reply_type() == ReplyType.INPUTMODE:
+                    if isinstance(answer, InputMode) or isinstance(answer, str):
+                        self.reply.is_valid = True
+                else:
+                    self.reply.is_valid = True
+            
+            #print('%%%DEBUG:'+str(self.reply.is_valid))
             return self.reply.is_valid
 
     def build_result(self):
@@ -408,32 +423,32 @@ class QueryChoice(Query):
 
     def check_reply(self):
     
-        if not isinstance(self.reply, Reply):
-            self.is_replied = False
-            return None
-        else:
-            # TODO: add specific checking for this class
-            self.is_replied = True
-            
-            answer = self.reply.get_result()
-            choices = self.get_limits()
-            
-            if isinstance(answer,str):
-                answer = answer.lower().strip()
-            if isinstance(choices[0],str):
-                choices = [c.lower().strip() for c in choices]
-            
-            if answer is None:
-                self.reply.is_valid = False
-            elif answer in choices:
-                self.reply.is_valid = True
-            else:
-                try:
-                    choice = choices[int(answer)]
-                    self.reply.is_valid = True
-                except:
-                    self.reply.is_valid = False
+        #Performs basic checking against ReplyType
+        self.reply.is_valid = super().check_reply()
+        
+        if self.reply.is_valid is not True:
             return self.reply.is_valid
+        
+        answer = self.reply.get_result()
+        choices = self.get_limits()
+            
+        if isinstance(answer,str):
+            answer = answer.lower().strip()
+        if isinstance(choices[0],str):
+            choices = [c.lower().strip() for c in choices]
+            
+        if answer is None:
+            self.reply.is_valid = False
+        elif answer in choices:
+            self.reply.is_valid = True
+        else:
+            try:
+                choice = choices[int(answer)]
+                self.reply.is_valid = True
+            except:
+                self.reply.is_valid = False
+            
+        return self.reply.is_valid
 
 
 class QueryBoolean(QueryChoice):
@@ -443,13 +458,17 @@ class QueryBoolean(QueryChoice):
 
     def __init__(self, **kwargs):
        #repairing missing choices
+       self.default_limits = ('y','n')
        try:
             kwargs['limits'][0]
             kwargs['limits'][1]
+            if len(kwargs['limits']) != 2:
+                kwargs['limits'] = self.default_limits
+       #TODO: decide whether we want to repair limits only if len()!=2, or also if len() is odd (then treat each 2 limits as a possible yes/no couple), or raise an error
        except:
-            kwargs['limits'] = ('y','n')
+            kwargs['limits'] = self.default_limits
        super().__init__(**kwargs)
-#TODO: decide whether we want to repair limits if len()>2, or only if len() is odd (treat each 2 limits as a possible yes/no couple), raise an error, or do nothing (as currently)
+
 
     def build_result(self):
         
@@ -471,9 +490,20 @@ class QueryOpen(Query):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    #TODO: add specific check_reply for this class with handling of regular expressions for self.limits
 
-
+    def check_reply(self):
+    	
+        self.reply.is_valid = super().check_reply()
+        
+        if self.reply.is_valid is not True:
+            return self.reply.is_valid
+            
+        return self.reply.is_valid
+        
+         #TODO: add specific check_reply for this class with handling of regular expressions for self.limits
+    
+        
+        
 
 class QueryMemory():
     
