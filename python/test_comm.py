@@ -13,13 +13,26 @@ q_open = QueryOpen(sender='music-cog', recipient='bot', question='What is your n
 brain.store(q_open)
 
 q_open.send()
-q_open.receive_reply('Tracey')
+q_open.receive('Tracey')
 
 print(q_open)
 print(q_open.get_reply())
 print('\n')
 print(q_open.get_result())
 print(q_open.get_reply().get_result())
+
+regex = r'([ABCDEFGabcdefg][b#]?\d)'
+q_open2 = QueryOpen(sender='music-cog', recipient='bot', question='What is the song key?', foreword='', afterword=None, reply_type=ReplyType.NOTE, limits=regex)
+brain.store(q_open2)
+
+q_open2.send()
+q_open2.receive('Ab6')
+
+print(q_open2)
+print(q_open2.get_reply())
+print('\n')
+print(q_open2.get_result())
+print(q_open2.get_reply().get_result())
 
 print('\n\n####Testing QueryBoolean####\n')
 
@@ -28,19 +41,19 @@ q_boolean = QueryBoolean(sender='music-cog', recipient='bot', question='Which on
 brain.store(q_boolean)
 
 q_boolean.send()
-q_boolean.receive_reply('myself') #testing out of range reply
-q_boolean.receive_reply('dad') #testing answering twice
+q_boolean.receive('myself') #testing out of range reply
+q_boolean.receive('dad') #testing answering twice
 
 print(q_boolean)
 print(q_boolean.get_reply())
 print(q_boolean.get_result())
 print(q_boolean.get_reply().get_result())
 
-q_boolean2 = QueryBoolean(sender='music-cog', recipient='bot', question='Are you happy?', foreword='', afterword=None, reply_type=ReplyType.TEXT, limits=None)
+q_boolean2 = QueryBoolean(sender='music-cog', recipient='bot', question='Are you happy?', foreword='', afterword=None, reply_type=ReplyType.TEXT, limits='yn')
 brain.store(q_boolean2)
 
 q_boolean2.send()
-q_boolean2.receive_reply('y') #testing out of initial limits reply
+q_boolean2.receive('y') #testing out of initial limits reply
 
 print(q_boolean2)
 print(q_boolean2.get_reply())
@@ -55,7 +68,7 @@ q_choice = QueryChoice(sender='music-cog', recipient='bot', question="Mode (1-" 
 brain.store(q_choice)
 
 q_choice.send()
-q_choice.receive_reply('1')
+q_choice.receive('1')
 
 print(q_choice)
 print(q_choice.get_reply())
@@ -69,8 +82,12 @@ print('\nAll queries:\n')
 for q in brain.recall():
 	print(q)
 
-print('\nPending (unreplied) queries:\n')
-for q in brain.get_pending():
+print('\nUnsent queries:\n')
+for q in brain.recall_unsent():
+	print(q)
+
+print('\nUnreplied queries:\n')
+for q in brain.recall_unreplied():
 	print(q)
 	
 print('\n\nQueries with invalid replies:\n')
@@ -90,3 +107,4 @@ print('\n\nBrain inventory:\n')
 brain.erase('all')
 print(brain)
 '''
+

@@ -17,7 +17,7 @@ c) asked by the command line:
 - what are the files and where are they saved, OPEN
 
 """
-
+import re
 from modes import ReplyType, InputMode
 from PIL import Image
 
@@ -100,28 +100,17 @@ class Query:
         """
         A question object
 
-        Choices are for questions where the user chooses from multiple limits
+        Choices are for questions where the user chooses 1 item from multiple choices
+        Boolean means choosing between 2 choices
         """
-        '''
-        TO-DOs:
-        a question is a request for information
-        it has one or several formulations
-        it has one or several possible replies
-        it is repeated (or not) after a given time if no reply is given
-        it is repeated (or not) if a blank reply is given
-        for some questions there is a default reply (yes/no questions, and choice within a set, eg song key), for other not (open questions, such as “composer name”)
-        a question has a “replied”/“not replied” status
-        “reply” could be a property of question or a separate object
-        the internal reply can be different from the reply you give out (for instance, the reply to ‘what is the song key?’ can be C, but you give the reply 'do' instead).
-        etc
-        '''
+        
         self.sender = sender
         self.recipient = recipient
         self.question = question
         self.foreword = foreword
         self.afterword = afterword
         self.reply_type = reply_type
-        self.limits = limits
+        self.limits = limits #Choices, regexp...
         self.result = None
 
         '''
@@ -134,13 +123,11 @@ class Query:
         '''
         self.valid_locutors = ['bot', 'music-cog']
 
-        self.reply = None
+        self.reply = None #Reply object
 
-        self.is_sent = False
-        self.type = None  # Yes/no, list of limits, open-ended — from QueryType # Overidden by the derived classes
         self.depends_on = []  # A list of other Querys objects (or class types?) that this depends on
         # TODO: decide how depends_on will be set
-        self.is_asked = False
+        self.is_sent = False
         self.is_replied = False
 
     def __str__(self):
@@ -192,6 +179,9 @@ class Query:
 
     def get_is_replied(self):
         return self.is_replied
+        
+    def get_is_sent(self):
+        return self.is_sent
 
     def check_sender(self):
         if self.sender is not None:
@@ -300,7 +290,6 @@ class Query:
                 else:
                     self.reply.is_valid = True
             
-            #print('%%%DEBUG:'+str(self.reply.is_valid))
             return self.reply.is_valid
 
     def build_result(self):
@@ -331,7 +320,7 @@ class Query:
 
         return self.is_sent
 
-    def receive_reply(self, reply_result):
+    def receive(self, reply_result):
         #TODO: maybe it is iseless to pass seld as argument to reply since rely is already a property of self
         self.reply = Reply(self, reply_result)
         self.reply.build_result()
@@ -340,39 +329,6 @@ class Query:
             self.is_replied = True
         # TODO: decide if is_replied must be set to False of the reply is invalid.
         return self.is_replied
-
-
-'''
-class QueryText(Query):  # TODO: is this inherited from QueryOpen but the Reply needs to be a string?
-    """
-        A class in which both the question and the reply are strings (including numbers parsed as text)
-    """
-
-    def check_question(self):
-        if self.question_string is not None:
-            if isinstance(self.question_string, str):
-                return True
-            else:
-                raise InvalidQueryError(
-                    'Invalid question type. ' + type(self.question_string) + ' was given, str was expected.')
-        else:
-            raise InvalidQueryError('Undefined question.')
-
-    def check_reply(self):
-        if self.reply is not None:
-            if isinstance(self.reply, str):
-                return True
-            else:
-                raise InvalidQueryError(
-                    'Invalid reply type. ' + type(self.reply) + ' was given, str was expected.')
-
-    def build_question(self):
-
-        self.question = self.get_foreword()
-
-        return self.question  # Generic return, will be overridden in derived classes
-'''
-
 
 
 class QueryChoice(Query):
@@ -498,10 +454,14 @@ class QueryOpen(Query):
         if self.reply.is_valid is not True:
             return self.reply.is_valid
             
-        return self.reply.is_valid
-        
-         #TODO: add specific check_reply for this class with handling of regular expressions for self.limits
+        try:
+           match = re.search(self.get_limits(), self.reply.get_result())
+           if match is None:
+               self.reply.is_valid = False
+        except TypeError:
+           pass
     
+        return self.reply.is_valid
         
         
 
@@ -541,19 +501,12 @@ class QueryMemory():
                     q_found.append(q)
             return q_found
             
-            
-    def get_pending(self):
+    def recall_unsent(self):
         
-        qlist = [q for q in self.queries if q.get_is_replied() == False]
+        qlist = [q for q in self.queries if q.get_is_sent() == False]
         
         return qlist
-    
-    def store(self, query):
         
-        if not isinstance(query, Query):
-           raise QueryMemoryError('invalid query type')
-        else:
-            self.queries.append(query)
     
     def recall_replied(self):
     
@@ -571,6 +524,13 @@ class QueryMemory():
         
         return [q for q in q_replied if not q.reply.get_validity()]
         
+        
+    def store(self, query):
+        
+        if not isinstance(query, Query):
+           raise QueryMemoryError('invalid query type')
+        else:
+            self.queries.append(query)
     
     def erase(self, criterion):
         
@@ -587,4 +547,3 @@ class QueryMemory():
             if criterion is not None and criterion != '':
                 [self.queries.remove(q) for q in self.recall(criterion)]
          
-
