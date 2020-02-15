@@ -42,6 +42,7 @@ class ResponseMode(Enum):
     COMMAND_LINE = 1
     BOT = 2
 
+
 class ReplyType(Enum):
     TEXT = 1
     INTEGER = 2
