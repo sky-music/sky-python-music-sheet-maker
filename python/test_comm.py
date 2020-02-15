@@ -1,4 +1,4 @@
-import os
+#import os
 from modes import InputMode, ReplyType
 from communication import QueryOpen, QueryChoice, QueryBoolean, QueryMemory
 
@@ -65,6 +65,13 @@ print('\n')
 print(q_boolean2.get_result())
 print(q_boolean2.get_reply().get_result())
 
+
+q_boolean3 = QueryBoolean(sender='music-cog', recipient='bot', question='Are you happy?', foreword='', afterword=None,
+                          reply_type=ReplyType.TEXT, limits='yn')
+brain.store(q_boolean3)
+q_boolean3.send()
+
+
 print('\n\n####Testing QueryChoice####\n')
 
 modes_list = [InputMode.JIANPU, InputMode.SKY]
@@ -100,6 +107,15 @@ print('\n\nQueries with invalid replies:\n')
 for q in brain.recall_by_invalid_reply():
     print(q)
     print(q.get_reply())
+
+print('\nRepeated queries:\n')
+for q in brain.recall_repeated():
+    print(q)
+    
+brain.erase_repeated()
+print('\nRepeated queries after cleaning:\n')
+for q in brain.recall_repeated():
+    print(q)
 
 print('\n\nStored TEXT queries:\n')
 qs = brain.recall(ReplyType.TEXT)
