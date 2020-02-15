@@ -201,7 +201,14 @@ class Query:
         return self.sent_time
 
     def get_prerequisites(self):
-        return self.prerequisites
+        if self.prerequisites is None:
+            return []
+        if len(self.prerequisites) == 0:
+            return []
+        if not isinstance(self.prerequisites, (list, tuple)):
+            return [self.prerequisites]
+        else:
+            return self.prerequisites
 
     def check_sender(self):
         if self.sender is  None:
@@ -556,7 +563,7 @@ class QueryMemory:
         if isinstance(criterion, int):
             try:
                 q = self.queries[criterion]
-                return [q]
+                return q
             except IndexError:
                 print('no query #' + str(criterion))
         else:
@@ -629,12 +636,16 @@ class QueryMemory:
         
 
     def store(self, query):
-
-        if not isinstance(query, Query):
-            raise QueryMemoryError('invalid query type')
-        else:
+        
+        if isinstance(query, Query):
             self.queries.append(query)
-            return True
+        elif isinstance(query, (list,tuple)):
+            for q in query:
+                self.queries.append(q)
+        else:
+            raise InvalidQueryError('cannot store other objects than '+str(Query.__name__))
+
+        return True
 
     def erase_all(self):
 
@@ -656,3 +667,44 @@ class QueryMemory:
                 return True
             else:
                 return False
+
+
+    def topological_sort(self):
+                
+        queries = self.queries.copy()
+        
+        if len(queries) <= 1:
+            return queries
+        
+        edgeless_nodes = set()
+        
+        for i,q in enumerate(queries):
+            if len(q.get_prerequisites()) == 0:
+                edgeless_nodes.add((i,q))
+            
+        if len(edgeless_nodes) == 0:
+            raise QueryMemoryError('Queries have a circular dependency')
+        
+        sorted_nodes = list() #L
+
+        i = 0
+        while len(edgeless_nodes) > 0 and i < len(queries)**2:
+            i += 1
+            
+            node = edgeless_nodes.pop()
+            sorted_nodes.append(node)
+                        
+            for m, query in enumerate(queries):
+                edges = query.get_prerequisites() 
+                if node[1] in edges:
+                    edges.remove(node[1])
+                    if len(edges) == 0:
+                        edgeless_nodes.add((m,query))
+         
+        if len(sorted_nodes) == len(self.queries):
+            self.queries = [self.queries[node[0]] for node in sorted_nodes]
+            return self.queries
+        else:
+            raise QueryMemoryError('Topological sort has failed at i='+str(i))
+            return None
+        

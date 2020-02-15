@@ -124,8 +124,23 @@ qs = brain.recall(ReplyType.TEXT)
 print('\n\nBrain inventory:\n')
 print(brain)
 
-'''
-print('\n\nBrain inventory:\n')
-brain.erase('all')
-print(brain)
-'''
+graph = QueryMemory()
+q5 = QueryOpen(question='5', prerequisites=[])
+q7 = QueryOpen(question='7', prerequisites=[])
+q3 = QueryOpen(question='3', prerequisites=[])
+q11 = QueryOpen(question='11', prerequisites=[q5, q7])
+q8 = QueryOpen(question='8', prerequisites=[q7, q3])
+q2 = QueryOpen(question='2', prerequisites=[q11])
+q9 = QueryOpen(question='9', prerequisites=[q11, q8])
+q10 = QueryOpen(question='10', prerequisites=[q11, q3])
+graph.store([q5, q7, q3, q11, q8, q2, q9, q10])
+
+print('\n\nGraph of dependencies:\n')
+for i in range(len(graph)):
+    print(graph.recall(i))
+
+graph.topological_sort()
+
+print('\n\nSorted Graph:\n')
+for i in range(len(graph)):
+    print(graph.recall(i))
