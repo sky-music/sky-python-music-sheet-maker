@@ -1,6 +1,7 @@
 import re
 from modes import ReplyType, InputMode
-from PIL import Image
+from datetime import datetime
+# from PIL import Image
 
 
 class QueryError(Exception):
@@ -46,6 +47,7 @@ class Reply:
         self.result = None
         self.answer = answer
         self.is_valid = None
+        
         if not isinstance(query, Query):
             raise InvalidReplyError('this reply does not follow any query')
 
@@ -85,7 +87,7 @@ class Reply:
 class Query:
 
     def __init__(self, sender=None, recipient=None, question=None, foreword=None, afterword=None,
-                 reply_type=ReplyType.OTHER, limits=None):
+                 reply_type=ReplyType.OTHER, limits=None, prerequisites=None):
         """
         A question object
 
@@ -98,29 +100,29 @@ class Query:
         self.question = question
         self.foreword = foreword
         self.afterword = afterword
-        self.reply_type = reply_type
+        self.reply_type = reply_type #Expected type of the reply, among ReplyType
         self.limits = limits  # Choices, regexp...
-        self.result = None
+        self.prerequisites = prerequisites #Other Queries required to reply to this Query
+        self.UID = None #A unique ID based on the Query content, excluding the timestamp
+        self.sent_time = None # The timestamp at which the Query was sent()
 
         '''
         TODO: decide how to check for sender and recipient types:
             - by checking the class of the sender object
-            - by comparing sender to a list of strings, so the sender must send an identification string 
+            - by comparing sender to a list of strings, so the sender must send an identification string
             - by asking the send back who is his (eg sender.get_type(), if such a property exist)
             => the choice will depend on the bot structure (since we can do whatever we want with music cog)
             => a possibility is to check first if the sender is music cog, and if not (AttributeError), then it is the bot
         '''
-        self.valid_locutors = ['bot', 'music-cog']
+        self.valid_locutors = ['bot', 'music-cog'] # A list of valid locutors
 
         self.reply = None  # Reply object
-
-        self.depends_on = []  # A list of other Querys objects (or class types?) that this depends on
-        # TODO: decide how depends_on will be set
-        self.is_sent = False
-        self.is_replied = False
+        self.result = None #The full question with foreword and afterword
+        self.is_sent = False #The send() command has been called
+        self.is_replied = False #Has been assigned a Reply object
 
     def __str__(self):
-        string = '<' + self.__class__.__name__ + ' from ' + str(self.sender) + ' to ' + str(
+        string = '<' + self.__class__.__name__ + ' ' + str(self.get_UID()) + ' from ' + str(self.sender) + ' to ' + str(
             self.recipient) + ': ' + repr(self.question) + ', ' + str(self.reply_type) + ' expected'
         try:
             self.get_limits()[0]
@@ -172,32 +174,59 @@ class Query:
 
     def get_is_sent(self):
         return self.is_sent
+        
+    def get_UID(self):
+        return self.UID
+    
+    def get_sent_time(self):
+        return self.sent_time
+
+    def get_prerequisites(self):
+        if self.prerequisites is None:
+            return []
+        if len(self.prerequisites) == 0:
+            return []
+        if not isinstance(self.prerequisites, (list, tuple)):
+            return [self.prerequisites]
+        else:
+            return self.prerequisites
 
     def check_sender(self):
-        if self.sender is not None:
+        if self.sender is  None:
+            raise InvalidQueryError('invalid sender. Sender is ' + str(self.sender))
+        else:
+            if len(self.valid_locutors) == 0:
+                return True
+            else:
             # TODO: more elaborate checking
             # if isinstance(self.sender, bot) or ...
-            if not type(self.sender) == type(self.valid_locutors[0]):
-                raise InvalidQueryError(
-                    'invalid sender. It must be of ' + repr(
-                        type(self.valid_locutors[0]).__name__) + ' type and among ' + str(
-                        self.valid_locutors))
-            else:
-                if self.sender in self.valid_locutors:
-                    return True
-        else:
-            raise InvalidQueryError('invalid sender. Sender is ' + str(self.sender))
+                if type(self.sender) != type(self.valid_locutors[0]):
+                    raise InvalidQueryError('invalid sender. It must be of ' \
+                                            + repr(type(self.valid_locutors[0]).__name__) \
+                                            + ' type and among ' + str(self.valid_locutors))
+                else:
+                    if self.sender in self.valid_locutors:
+                        return True
 
         return False
 
     def check_recipient(self):
-        if self.recipient is not None:
-            # TODO: more elaborate checking
-            if self.recipient == self.sender:
-                raise InvalidQueryError('sender cannot ask a question to itself')
-            return True
-        else:
+        if self.recipient is None:
             raise InvalidQueryError('invalid recipient ' + str(self.recipient))
+        else:
+            if len(self.valid_locutors) == 0:
+                return True
+            else:
+                # TODO: more elaborate checking
+                if self.recipient == self.sender:
+                    raise InvalidQueryError('sender cannot ask a question to itself')
+                    
+                if type(self.recipient) != type(self.valid_locutors[0]):
+                    raise InvalidQueryError('invalid recipient. It must be of ' \
+                                            + repr(type(self.valid_locutors[0]).__name__) \
+                                            + ' type and among ' + str(self.valid_locutors))
+        
+                return True            
 
         return False
 
@@ -291,6 +320,18 @@ class Query:
         self.set_result(result)
         return result  # Generic return, will be overridden in derived classes
 
+    def stamp(self):
+        """
+        Assigns an UID and a timestamp to the Query
+        
+        """
+        self.UID = hash(','.join([str(self.get_sender()), str(self.get_recipient()), str(self.get_result()), 
+                                  str(self.get_limits()), str(self.get_prerequisites())])) 
+        
+        self.sent_time = datetime.timestamp(datetime.now())
+    
+        return (self.UID, self.sent_time)       
+
     def send(self):
         """
             Querying is a protocol during which you first check that you are allowed to speak, that
@@ -305,12 +346,14 @@ class Query:
         self.check_question()
         self.check_limits()
         self.build_result()
+        self.stamp()
         self.is_sent = True
-        self.is_replied = False  # TODO: decide whether asking again resets the question to unreplied to (as here)
+        # TODO: decide whether asking again resets the question to unreplied to (as here)
+        self.is_replied = False
 
         return self.is_sent
 
-    def receive(self, reply_result):
+    def receive(self, reply_result, prerequisite=None):
         # TODO: maybe it is iseless to pass seld as argument to reply since rely is already a property of self
         self.reply = Reply(self, reply_result)
         self.reply.build_result()
@@ -387,7 +430,7 @@ class QueryChoice(Query):
             self.reply.is_valid = True
         else:
             try:
-                choice = choices[int(answer)]
+                choices[int(answer)]
                 self.reply.is_valid = True
             except:
                 self.reply.is_valid = False
@@ -397,7 +440,7 @@ class QueryChoice(Query):
 
 class QueryBoolean(QueryChoice):
     """
-    a yes/no, true/false question type
+    A yes/no, true/false question type
     """
 
     def __init__(self, **kwargs):
@@ -419,7 +462,8 @@ class QueryBoolean(QueryChoice):
         result = []
 
         result += [self.get_foreword()]
-        result += [self.get_question() + ' (' + (self.limits[0] + '/' + self.limits[1]) + ')']
+        result += [self.get_question() + ' (' + (self.limits[0] +
+                                     '/' + self.limits[1]) + ')']
         result += [self.get_afterword()]
         result = '\n'.join(filter(None, result))
         self.set_result(result)
@@ -428,7 +472,8 @@ class QueryBoolean(QueryChoice):
 
 class QueryOpen(Query):
     """
-    Query open-ended
+    An open-ended Query,
+    excepted that a string answer can be checked against a regular expression in limits
     """
 
     def __init__(self, **kwargs):
@@ -452,7 +497,12 @@ class QueryOpen(Query):
 
 
 class QueryMemory:
-
+    """
+    Storage for Queries.
+    With function to recall and erase Queries by type, property...
+    Note that erasing a Query here does *not* delete the object in Python
+    
+    """
     def __init__(self):
 
         self.queries = []
@@ -461,22 +511,40 @@ class QueryMemory:
 
         return '<' + self.__class__.__name__ + ' with ' + str(len(self.queries)) + ' stored queries>'
 
-    def recall_last(self):
+    def __len__(self):
+        
+        return len(self.queries)
 
+    def recall_last(self):
+        """
+        Recalls the last Query stored
+        """
         if len(self.queries) > 0:
             return self.queries[-1]
         else:
             return None
 
-    def recall(self, criterion=None):
+    def recall_last_sent(self):
+        """
+        Recalls the most recent Query (the last one sent)
+        """
+        if len(self.queries) > 0:
+            chronos = sorted(self.queries, key=Query.get_sent_time)
+            return chronos[-1]
+        else:
+            return None
 
+    def recall(self, criterion=None):
+        """
+        Recalls Queries matching criterion
+        """
         if criterion is None or criterion == '':
             return self.queries
 
         if isinstance(criterion, int):
             try:
                 q = self.queries[criterion]
-                return [q]
+                return q
             except IndexError:
                 print('no query #' + str(criterion))
         else:
@@ -490,7 +558,6 @@ class QueryMemory:
     def recall_unsent(self):
 
         qlist = [q for q in self.queries if q.get_is_sent() == False]
-
         return qlist
 
     def recall_replied(self):
@@ -503,30 +570,122 @@ class QueryMemory:
 
     def recall_by_invalid_reply(self):
 
-        # q_replied = return [q for q in self.queries if q.get_is_replied()]
-
         q_replied = self.recall_replied()
-
         return [q for q in q_replied if not q.reply.get_validity()]
 
+    def recall_repeated(self):
+        """
+        Recall queries that have been stored twice or more
+        TODO: decide if we check for is_sent
+        """
+        queries = self.queries
+        
+        if len(queries) < 2:
+            return None
+        else: 
+            UIDs = [q.get_UID() for q in queries]
+            
+            seen = set()
+            repeated = set()
+            
+            for UID in UIDs:
+                if UID in seen:
+                    repeated.add(UID)
+                else:
+                    seen.add(UID)
+            
+            repeated = [q for q in queries if q.get_UID() in repeated]
+                       
+        return repeated
+
+    def erase_repeated(self):
+        """
+        Erase repeated Queries, keeping the most recent in time
+        
+        """
+        repeated = self.recall_repeated()
+
+        #Probably the most recent query is the last one of the list but one never knows
+        #Also, we can change the criterion from 'latest asked' to 'better answered'
+        if len(repeated) >=2 :
+            repeated = sorted(repeated, key=Query.get_sent_time)
+            for q in repeated[0:-1]:
+                self.queries.remove(q)
+            return True
+        else:
+            return False
+        
+
     def store(self, query):
-
-        if not isinstance(query, Query):
-            raise QueryMemoryError('invalid query type')
-        else:
+        
+        if isinstance(query, Query):
             self.queries.append(query)
-
-    def erase(self, criterion):
-
-        try:
-            clean = (criterion.lower() == 'all')
-            if clean:
-                self.queries.clear()
-        except:
-            pass
-
-        if criterion in self.queries:
-            self.queries.remove(criterion)
+        elif isinstance(query, (list,tuple)):
+            for q in query:
+                self.queries.append(q)
         else:
+            raise InvalidQueryError('cannot store other objects than '+str(Query.__name__))
+
+        return True
+
+    def erase_all(self):
+
+        self.queries.clear()
+        return True
+
+    def erase(self, criterion=None):
+        """
+        Erases Queries matching criterion
+        """
+        if criterion in self.queries:
+            # removes the query directly
+            self.queries.remove(criterion)
+            return True
+        else:
+            # searches for a query matching criterion and removes it
             if criterion is not None and criterion != '':
                 [self.queries.remove(q) for q in self.recall(criterion)]
+                return True
+            else:
+                return False
+
+
+    def topological_sort(self):
+                
+        queries = self.queries.copy()
+        
+        if len(queries) <= 1:
+            return queries
+        
+        edgeless_nodes = set()
+        
+        for i,q in enumerate(queries):
+            if len(q.get_prerequisites()) == 0:
+                edgeless_nodes.add((i,q))
+            
+        if len(edgeless_nodes) == 0:
+            raise QueryMemoryError('Queries have a circular dependency')
+        
+        sorted_nodes = list() #L
+
+        i = 0
+        while len(edgeless_nodes) > 0 and i < len(queries)**2:
+            i += 1
+            
+            node = edgeless_nodes.pop()
+            sorted_nodes.append(node)
+                        
+            for m, query in enumerate(queries):
+                edges = query.get_prerequisites() 
+                if node[1] in edges:
+                    edges.remove(node[1])
+                    if len(edges) == 0:
+                        edgeless_nodes.add((m,query))
+         
+        if len(sorted_nodes) == len(self.queries):
+            self.queries = [self.queries[node[0]] for node in sorted_nodes]
+            return self.queries
+        else:
+            raise QueryMemoryError('Topological sort has failed at i='+str(i))
+            return None
+        

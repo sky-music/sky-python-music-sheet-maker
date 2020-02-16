@@ -1,4 +1,4 @@
-import os
+#import os
 from modes import InputMode, ReplyType
 from communication import QueryOpen, QueryChoice, QueryBoolean, QueryMemory
 
@@ -65,6 +65,13 @@ print('\n')
 print(q_boolean2.get_result())
 print(q_boolean2.get_reply().get_result())
 
+
+q_boolean3 = QueryBoolean(sender='music-cog', recipient='bot', question='Are you happy?', foreword='', afterword=None,
+                          reply_type=ReplyType.TEXT, limits='yn')
+brain.store(q_boolean3)
+q_boolean3.send()
+
+
 print('\n\n####Testing QueryChoice####\n')
 
 modes_list = [InputMode.JIANPU, InputMode.SKY]
@@ -101,6 +108,15 @@ for q in brain.recall_by_invalid_reply():
     print(q)
     print(q.get_reply())
 
+print('\nRepeated queries:\n')
+for q in brain.recall_repeated():
+    print(q)
+    
+brain.erase_repeated()
+print('\nRepeated queries after cleaning:\n')
+for q in brain.recall_repeated():
+    print(q)
+
 print('\n\nStored TEXT queries:\n')
 qs = brain.recall(ReplyType.TEXT)
 [print(q) for q in qs]
@@ -108,8 +124,23 @@ qs = brain.recall(ReplyType.TEXT)
 print('\n\nBrain inventory:\n')
 print(brain)
 
-'''
-print('\n\nBrain inventory:\n')
-brain.erase('all')
-print(brain)
-'''
+graph = QueryMemory()
+q5 = QueryOpen(question='5', prerequisites=[])
+q7 = QueryOpen(question='7', prerequisites=[])
+q3 = QueryOpen(question='3', prerequisites=[])
+q11 = QueryOpen(question='11', prerequisites=[q5, q7])
+q8 = QueryOpen(question='8', prerequisites=[q7, q3])
+q2 = QueryOpen(question='2', prerequisites=[q11])
+q9 = QueryOpen(question='9', prerequisites=[q11, q8])
+q10 = QueryOpen(question='10', prerequisites=[q11, q3])
+graph.store([q5, q7, q3, q11, q8, q2, q9, q10])
+
+print('\n\nGraph of dependencies:\n')
+for i in range(len(graph)):
+    print(graph.recall(i))
+
+graph.topological_sort()
+
+print('\n\nSorted Graph:\n')
+for i in range(len(graph)):
+    print(graph.recall(i))
