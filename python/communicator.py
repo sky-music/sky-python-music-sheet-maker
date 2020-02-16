@@ -29,46 +29,36 @@ c) asked by the command line:
 class Communicator:
 
     def __init__(self):
-        self.brain = QueryMemory()
-        pass
+        self.query_memory = QueryMemory()
+        self.create_queries()
 
     def create_queries(self):
-        # Notes
+
         q_song_title = QueryOpen(sender='music-cog', recipient='bot', question='What is the song title? (also used '
                                                                                'for the file name)', foreword='',
                                  afterword=None,
                                  reply_type=ReplyType.TEXT, limits=None)
-        self.brain.store(q_song_title)
-
-        print(q_song_title)
-
+        self.query_memory.store(q_song_title)
 
         modes_list = [InputMode.JIANPU, InputMode.SKY]
-        q_choice = QueryChoice(sender='music-cog', recipient='bot', question="Mode (1-" + str(len(modes_list)) + "): ",
-                               foreword="Please choose your note format:\n", afterword=None,
-                               reply_type=ReplyType.INPUTMODE,
-                               limits=modes_list)
-        self.brain.store(q_choice)
+        q_mode = QueryChoice(sender='music-cog', recipient='bot', question="Mode (1-" + str(len(modes_list)) + "): ",
+                             foreword="Please choose your note format:\n", afterword=None,
+                             reply_type=ReplyType.INPUTMODE,
+                             limits=modes_list)
+        self.query_memory.store(q_mode)
 
-        q_choice.send()
-        q_choice.receive('1')
-
-        print(q_choice)
-        print(q_choice.get_reply())
-        print('\n')
-        print(q_choice.get_result())
-        print(q_choice.get_reply().get_result())
+    def recall_queries(self):
 
         print('\nAll queries:\n')
-        for q in self.brain.recall():
+        for q in self.query_memory.recall():
             print(q)
 
         print('\n\nStored TEXT queries:\n')
-        qs = self.brain.recall(ReplyType.TEXT)
+        qs = self.query_memory.recall(ReplyType.TEXT)
         [print(q) for q in qs]
 
         print('\n\nBrain inventory:\n')
-        print(self.brain)
+        print(self.query_memory)
 
-    def get_brain(self):
-        return self.brain
+    def get_query_memory(self):
+        return self.query_memory

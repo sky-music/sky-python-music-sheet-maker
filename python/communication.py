@@ -1,6 +1,8 @@
 import re
 from modes import ReplyType, InputMode
 from datetime import datetime
+
+
 # from PIL import Image
 
 
@@ -47,7 +49,7 @@ class Reply:
         self.result = None
         self.answer = answer
         self.is_valid = None
-        
+
         if not isinstance(query, Query):
             raise InvalidReplyError('this reply does not follow any query')
 
@@ -100,11 +102,11 @@ class Query:
         self.question = question
         self.foreword = foreword
         self.afterword = afterword
-        self.reply_type = reply_type #Expected type of the reply, among ReplyType
+        self.reply_type = reply_type  # Expected type of the reply, among ReplyType
         self.limits = limits  # Choices, regexp...
-        self.prerequisites = prerequisites #Other Queries required to reply to this Query
-        self.UID = None #A unique ID based on the Query content, excluding the timestamp
-        self.sent_time = None # The timestamp at which the Query was sent()
+        self.prerequisites = prerequisites  # Other Queries required to reply to this Query
+        self.UID = None  # A unique ID based on the Query content, excluding the timestamp
+        self.sent_time = None  # The timestamp at which the Query was sent()
 
         '''
         TODO: decide how to check for sender and recipient types:
@@ -114,12 +116,12 @@ class Query:
             => the choice will depend on the bot structure (since we can do whatever we want with music cog)
             => a possibility is to check first if the sender is music cog, and if not (AttributeError), then it is the bot
         '''
-        self.valid_locutors = ['bot', 'music-cog'] # A list of valid locutors
+        self.valid_locutors = ['bot', 'music-cog']  # A list of valid locutors
 
         self.reply = None  # Reply object
-        self.result = None #The full question with foreword and afterword
-        self.is_sent = False #The send() command has been called
-        self.is_replied = False #Has been assigned a Reply object
+        self.result = None  # The full question with foreword and afterword
+        self.is_sent = False  # The send() command has been called
+        self.is_replied = False  # Has been assigned a Reply object
 
     def __str__(self):
         string = '<' + self.__class__.__name__ + ' ' + str(self.get_UID()) + ' from ' + str(self.sender) + ' to ' + str(
@@ -174,10 +176,10 @@ class Query:
 
     def get_is_sent(self):
         return self.is_sent
-        
+
     def get_UID(self):
         return self.UID
-    
+
     def get_sent_time(self):
         return self.sent_time
 
@@ -192,14 +194,14 @@ class Query:
             return self.prerequisites
 
     def check_sender(self):
-        if self.sender is  None:
+        if self.sender is None:
             raise InvalidQueryError('invalid sender. Sender is ' + str(self.sender))
         else:
             if len(self.valid_locutors) == 0:
                 return True
             else:
-            # TODO: more elaborate checking
-            # if isinstance(self.sender, bot) or ...
+                # TODO: more elaborate checking
+                # if isinstance(self.sender, bot) or ...
                 if type(self.sender) != type(self.valid_locutors[0]):
                     raise InvalidQueryError('invalid sender. It must be of ' \
                                             + repr(type(self.valid_locutors[0]).__name__) \
@@ -220,13 +222,13 @@ class Query:
                 # TODO: more elaborate checking
                 if self.recipient == self.sender:
                     raise InvalidQueryError('sender cannot ask a question to itself')
-                    
+
                 if type(self.recipient) != type(self.valid_locutors[0]):
                     raise InvalidQueryError('invalid recipient. It must be of ' \
                                             + repr(type(self.valid_locutors[0]).__name__) \
                                             + ' type and among ' + str(self.valid_locutors))
-        
-                return True            
+
+                return True
 
         return False
 
@@ -325,12 +327,12 @@ class Query:
         Assigns an UID and a timestamp to the Query
         
         """
-        self.UID = hash(','.join([str(self.get_sender()), str(self.get_recipient()), str(self.get_result()), 
-                                  str(self.get_limits()), str(self.get_prerequisites())])) 
-        
+        self.UID = hash(','.join([str(self.get_sender()), str(self.get_recipient()), str(self.get_result()),
+                                  str(self.get_limits()), str(self.get_prerequisites())]))
+
         self.sent_time = datetime.timestamp(datetime.now())
-    
-        return (self.UID, self.sent_time)       
+
+        return self.UID, self.sent_time
 
     def send(self):
         """
@@ -463,7 +465,7 @@ class QueryBoolean(QueryChoice):
 
         result += [self.get_foreword()]
         result += [self.get_question() + ' (' + (self.limits[0] +
-                                     '/' + self.limits[1]) + ')']
+                                                 '/' + self.limits[1]) + ')']
         result += [self.get_afterword()]
         result = '\n'.join(filter(None, result))
         self.set_result(result)
@@ -503,6 +505,7 @@ class QueryMemory:
     Note that erasing a Query here does *not* delete the object in Python
     
     """
+
     def __init__(self):
 
         self.queries = []
@@ -512,7 +515,7 @@ class QueryMemory:
         return '<' + self.__class__.__name__ + ' with ' + str(len(self.queries)) + ' stored queries>'
 
     def __len__(self):
-        
+
         return len(self.queries)
 
     def recall_last(self):
@@ -579,23 +582,23 @@ class QueryMemory:
         TODO: decide if we check for is_sent
         """
         queries = self.queries
-        
+
         if len(queries) < 2:
             return None
-        else: 
+        else:
             UIDs = [q.get_UID() for q in queries]
-            
+
             seen = set()
             repeated = set()
-            
+
             for UID in UIDs:
                 if UID in seen:
                     repeated.add(UID)
                 else:
                     seen.add(UID)
-            
+
             repeated = [q for q in queries if q.get_UID() in repeated]
-                       
+
         return repeated
 
     def erase_repeated(self):
@@ -605,26 +608,25 @@ class QueryMemory:
         """
         repeated = self.recall_repeated()
 
-        #Probably the most recent query is the last one of the list but one never knows
-        #Also, we can change the criterion from 'latest asked' to 'better answered'
-        if len(repeated) >=2 :
+        # Probably the most recent query is the last one of the list but one never knows
+        # Also, we can change the criterion from 'latest asked' to 'better answered'
+        if len(repeated) >= 2:
             repeated = sorted(repeated, key=Query.get_sent_time)
             for q in repeated[0:-1]:
                 self.queries.remove(q)
             return True
         else:
             return False
-        
 
     def store(self, query):
-        
+
         if isinstance(query, Query):
             self.queries.append(query)
-        elif isinstance(query, (list,tuple)):
+        elif isinstance(query, (list, tuple)):
             for q in query:
                 self.queries.append(q)
         else:
-            raise InvalidQueryError('cannot store other objects than '+str(Query.__name__))
+            raise InvalidQueryError('cannot store other objects than ' + str(Query.__name__))
 
         return True
 
@@ -649,43 +651,41 @@ class QueryMemory:
             else:
                 return False
 
-
     def topological_sort(self):
-                
+
         queries = self.queries.copy()
-        
+
         if len(queries) <= 1:
             return queries
-        
+
         edgeless_nodes = set()
-        
-        for i,q in enumerate(queries):
+
+        for i, q in enumerate(queries):
             if len(q.get_prerequisites()) == 0:
-                edgeless_nodes.add((i,q))
-            
+                edgeless_nodes.add((i, q))
+
         if len(edgeless_nodes) == 0:
             raise QueryMemoryError('Queries have a circular dependency')
-        
-        sorted_nodes = list() #L
+
+        sorted_nodes = list()  # L
 
         i = 0
-        while len(edgeless_nodes) > 0 and i < len(queries)**2:
+        while len(edgeless_nodes) > 0 and i < len(queries) ** 2:
             i += 1
-            
+
             node = edgeless_nodes.pop()
             sorted_nodes.append(node)
-                        
+
             for m, query in enumerate(queries):
-                edges = query.get_prerequisites() 
+                edges = query.get_prerequisites()
                 if node[1] in edges:
                     edges.remove(node[1])
                     if len(edges) == 0:
-                        edgeless_nodes.add((m,query))
-         
+                        edgeless_nodes.add((m, query))
+
         if len(sorted_nodes) == len(self.queries):
             self.queries = [self.queries[node[0]] for node in sorted_nodes]
             return self.queries
         else:
-            raise QueryMemoryError('Topological sort has failed at i='+str(i))
+            raise QueryMemoryError('Topological sort has failed at i=' + str(i))
             return None
-        
