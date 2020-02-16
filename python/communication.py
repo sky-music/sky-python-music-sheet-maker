@@ -1,22 +1,3 @@
-"""
-Classes to ask and answer questions called Query and Reply between the bot and the music cog.
-TODO: list of mandatory questions to implement
-a) asked by the cog:
-- notes, OPEN
-- musical notation (if several are found), CHOICE
-- music key (if several are found), CHOICE
-- song title, OPEN
-- song headers, OPEN
-- note shift, OPEN with type and range restrictions
-
-b) asked by the bot:
-- what are the PNGs?, OPEN with type restriction
-- how many PNGs?, OPEN with type and range restrictions
-
-c) asked by the command line:
-- what are the files and where are they saved, OPEN
-
-"""
 import re
 from modes import ReplyType, InputMode
 from PIL import Image
