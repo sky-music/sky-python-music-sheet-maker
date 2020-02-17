@@ -51,14 +51,18 @@ class Communicator:
         self.brain.store(q_mode)
 
         # query song key
+        possible_keys = []
+        q_song_key = QueryChoice(sender='music-sheet-maker', recipient='bot', question='What is the song key?',
+                                 foreword=None, afterword=None, reply_type=ReplyType.TEXT, limits=possible_keys)
+        self.brain.store(q_song_key)
 
         # query note shift
 
         # info error ratio
 
         # query song title
-        q_song_title = QueryOpen(sender='music-sheet-maker', recipient='bot', question='What is the song title? (also used '
-                                                                               'for the file name)', foreword='',
+        q_song_title = QueryOpen(sender='music-sheet-maker', recipient='bot', question='What is the song title?',
+                                 foreword='',
                                  afterword=None,
                                  reply_type=ReplyType.TEXT, limits=None)
         self.brain.store(q_song_title)
@@ -69,7 +73,8 @@ class Communicator:
                                        reply_type=ReplyType.TEXT, limits=None)
         self.brain.store(q_original_artists)
         # query transcript_writer
-        q_transcript_writer = QueryOpen(sender='music-sheet-maker', recipient='bot', question='Transcribed by: ', foreword=None,
+        q_transcript_writer = QueryOpen(sender='music-sheet-maker', recipient='bot', question='Transcribed by: ',
+                                        foreword=None,
                                         afterword=None, reply_type=ReplyType.TEXT, limits=None)
         self.brain.store(q_transcript_writer)
 
