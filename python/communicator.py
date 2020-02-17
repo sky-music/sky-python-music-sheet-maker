@@ -3,7 +3,7 @@ from modes import InputMode, ReplyType
 from communication import QueryOpen, QueryChoice, QueryBoolean, QueryMemory, Information
 
 """
-Classes to ask and answer questions called Query and Reply between the bot and the music cog.
+Classes to ask and answer questions called Query and Reply between the bot and the music sheet maker
 TODO: list of mandatory questions to implement
 a) asked by the cog:
 - notes, OPEN
@@ -40,8 +40,11 @@ class Communicator:
 
         # query notes
         # query song notation / input mode
+
+        # TODO: this is meant to be set after calculated by Song
         modes_list = [InputMode.JIANPU, InputMode.SKY]
-        q_mode = QueryChoice(sender='music-cog', recipient='bot', question="Mode (1-" + str(len(modes_list)) + "): ",
+
+        q_mode = QueryChoice(sender='music-sheet-maker', recipient='bot', question="Mode (1-" + str(len(modes_list)) + "): ",
                              foreword="Please choose your note format:\n", afterword=None,
                              reply_type=ReplyType.INPUTMODE,
                              limits=modes_list)
@@ -54,23 +57,21 @@ class Communicator:
         # info error ratio
 
         # query song title
-        q_song_title = QueryOpen(sender='music-cog', recipient='bot', question='What is the song title? (also used '
+        q_song_title = QueryOpen(sender='music-sheet-maker', recipient='bot', question='What is the song title? (also used '
                                                                                'for the file name)', foreword='',
                                  afterword=None,
                                  reply_type=ReplyType.TEXT, limits=None)
         self.brain.store(q_song_title)
 
         # query original_artists
-        q_original_artists = QueryOpen(sender='music-cog', recipient='bot', question='Original artist(s): ',
+        q_original_artists = QueryOpen(sender='music-sheet-maker', recipient='bot', question='Original artist(s): ',
                                        foreword='Please fill song info or press ENTER to skip:', afterword=None,
                                        reply_type=ReplyType.TEXT, limits=None)
         self.brain.store(q_original_artists)
         # query transcript_writer
-
-        # send song
-
-        # query.send()
-        # query.receive('example answer')
+        q_transcript_writer = QueryOpen(sender='music-sheet-maker', recipient='bot', question='Transcribed by: ', foreword=None,
+                                        afterword=None, reply_type=ReplyType.TEXT, limits=None)
+        self.brain.store(q_transcript_writer)
 
     def recall_queries(self):
 

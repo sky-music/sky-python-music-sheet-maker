@@ -116,7 +116,7 @@ class Query:
             => the choice will depend on the bot structure (since we can do whatever we want with music cog)
             => a possibility is to check first if the sender is music cog, and if not (AttributeError), then it is the bot
         '''
-        self.valid_locutors = ['bot', 'music-cog']  # A list of valid locutors
+        self.valid_locutors = ['bot', 'music-sheet-maker']  # A list of valid locutors
 
         self.reply = None  # Reply object
         self.result = None  # The full question with foreword and afterword
@@ -500,9 +500,11 @@ class QueryOpen(Query):
 
 class Information:
 
-    def __init__(self, text):
+    def __init__(self, text, sender=None, recipient=None):
 
         self.text = text
+        self.sender = sender
+        self.recipient = recipient
 
 
 class QueryMemory:
