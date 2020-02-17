@@ -627,6 +627,8 @@ class QueryMemory:
 
     def store(self, query):
 
+        # TODO: add support for storing Information
+
         if isinstance(query, Query):
             self.queries.append(query)
         elif isinstance(query, (list, tuple)):

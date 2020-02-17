@@ -36,6 +36,17 @@ class Communicator:
 
         i_instructions = Information('Instructions')
 
+        # TODO:
+
+        # query notes
+        # query song notation / input modes
+        # query song key
+        # query note shift
+        # info error ratio
+        # query song title
+        # query song headers
+        # send song
+
         q_song_title = QueryOpen(sender='music-cog', recipient='bot', question='What is the song title? (also used '
                                                                                'for the file name)', foreword='',
                                  afterword=None,
