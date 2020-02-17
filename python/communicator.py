@@ -36,7 +36,7 @@ class Communicator:
 
         i_instructions = Information('Instructions')
 
-        # TODO:
+        # TODO: outline queries
 
         # query notes
         # query song notation / input mode

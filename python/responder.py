@@ -14,7 +14,7 @@ class Responder:
     For managing text input and output from external sources to the Parser
     """
 
-    def __init__(self, dir_in='test_songs', dir_out='songs_out', questions=None):
+    def __init__(self, dir_in='test_songs', dir_out='songs_out'):
 
         self.song_dir_in = dir_in
         self.song_dir_out = dir_out
@@ -34,8 +34,6 @@ class Responder:
 
         self.init_working_directory()
         self.directory_base = os.getcwd()
-
-        self.questions = questions
 
     def init_working_directory(self):
 
