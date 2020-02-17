@@ -498,6 +498,13 @@ class QueryOpen(Query):
         return self.reply.is_valid
 
 
+class Information:
+
+    def __init__(self, text):
+
+        self.text = text
+
+
 class QueryMemory:
     """
     Storage for Queries.
