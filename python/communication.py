@@ -322,16 +322,25 @@ class Query:
         self.set_result(result)
         return result  # Generic return, will be overridden in derived classes
 
+    def hash_UID(self):
+        """
+        Builds an UID of the Query
+        
+        """
+        hashables = [self.get_sender(), self.get_recipient(), self.get_result(), self.get_limits(), self.get_prerequisites()]
+        hashables = [str(hashable).lower().strip() for hashable in hashables]
+        self.UID = hash(','.join(hashables))
+                                  
+        return self.UID
+
     def stamp(self):
         """
         Assigns an UID and a timestamp to the Query
         
         """
-        self.UID = hash(','.join([str(self.get_sender()), str(self.get_recipient()), str(self.get_result()),
-                                  str(self.get_limits()), str(self.get_prerequisites())]))
-
+        self.hash_UID()
         self.sent_time = datetime.timestamp(datetime.now())
-
+        
         return self.UID, self.sent_time
 
     def send(self):
@@ -515,13 +524,14 @@ class QueryMemory:
     
     """
 
-    def __init__(self):
+    def __init__(self, queries=[], topic=None):
 
-        self.queries = []
+        self.queries = queries
+        self.topic = topic
 
     def __str__(self):
 
-        return '<' + self.__class__.__name__ + ' with ' + str(len(self.queries)) + ' stored queries>'
+        return '<' + self.__class__.__name__ + ' for ' + repr(self.topic) + ' with ' + str(len(self.queries)) + ' stored queries>'
 
     def __len__(self):
 
@@ -546,6 +556,14 @@ class QueryMemory:
         else:
             return None
 
+    def recall_by_UID(self, UID):
+        
+        q_found = []
+        for query in self.queries:
+            if query.get_UID() == UID:
+                q_found += [query]
+        return q_found
+
     def recall(self, criterion=None):
         """
         Recalls Queries matching criterion
@@ -553,19 +571,21 @@ class QueryMemory:
         if criterion is None or criterion == '':
             return self.queries
 
+        q_found = []
         if isinstance(criterion, int):
             try:
-                q = self.queries[criterion]
-                return q
+                q_found = self.queries[criterion]
             except IndexError:
-                print('no query #' + str(criterion))
+                q_found = self.recall_by_UID(criterion)
+                if len(q_found) == 0:
+                    print('no query #' + str(criterion))
         else:
-            q_found = []
             for q in self.queries:
                 attr_vals = list(q.__dict__.values())
                 if criterion in attr_vals:
                     q_found.append(q)
-            return q_found
+                    
+        return q_found
 
     def recall_unsent(self):
 
@@ -661,6 +681,11 @@ class QueryMemory:
                 return True
             else:
                 return False
+
+    def chronological_sort(self):
+    	
+    	self.queries = sorted(self.queries, key=Query.get_sent_time)
+    	return self.queries
 
     def topological_sort(self):
 
