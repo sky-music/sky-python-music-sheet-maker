@@ -3,9 +3,6 @@ from modes import ReplyType, InputMode
 from datetime import datetime
 
 
-# from PIL import Image
-
-
 class QueryError(Exception):
     def __init__(self, explanation):
         self.explanation = explanation
@@ -42,7 +39,9 @@ class QueryRepliedError(QueryError):
 
 
 class Reply:
-
+    '''
+    A Reply to be attached to a Query
+    '''
     def __init__(self, query, answer=None):
 
         self.query = query  # the question that was asked in the first place
@@ -88,10 +87,11 @@ class Query:
     def __init__(self, sender=None, recipient=None, question=None, foreword=None, afterword=None,
                  reply_type=ReplyType.OTHER, limits=None, prerequisites=None):
         """
-        A question object
+        A generic Query object
 
-        Choices are for questions where the user chooses 1 item from multiple choices
-        Boolean means choosing between 2 choices
+        QueryChoice is for questions where the user chooses 1 item from multiple choices
+        QueryBoolean means choosing between 2 choices
+        QueryOpen is for an open-ended query
         """
 
         self.sender = sender
@@ -102,7 +102,7 @@ class Query:
         self.reply_type = reply_type  # Expected type of the reply, among ReplyType
         self.limits = limits  # Choices, regexp...
         self.prerequisites = prerequisites  # Other Queries required to reply to this Query
-        self.UID = None  # A unique ID based on the Query content, excluding the timestamp
+        self.identifier = None  # A unique ID based on the Query content, excluding the timestamp
         self.sent_time = None  # The timestamp at which the Query was sent()
 
         '''
@@ -120,11 +120,12 @@ class Query:
         self.is_sent = False  # The send() command has been called
         self.is_replied = False  # Has been assigned a Reply object
         
+        self.check_and_pack()
         self.build_result()
-        self.hash_UID()
+        self.hash_identifier()
 
     def __str__(self):
-        string = '<' + self.__class__.__name__ + ' ' + str(self.get_UID()) + ' from ' + str(self.sender) + ' to ' + str(
+        string = '<' + self.__class__.__name__ + ' ' + str(self.get_identifier()) + ' from ' + str(self.sender) + ' to ' + str(
             self.recipient) + ': ' + repr(self.question) + ', ' + str(self.reply_type) + ' expected'
         try:
             self.get_limits()[0]
@@ -174,8 +175,8 @@ class Query:
     def get_is_sent(self):
         return self.is_sent
 
-    def get_UID(self):
-        return self.UID
+    def get_identifier(self):
+        return self.identifier
 
     def get_sent_time(self):
         return self.sent_time
@@ -190,9 +191,21 @@ class Query:
         else:
             return self.prerequisites
 
+
+    def check_and_pack(self):
+        '''
+        Checks the fundamental properties normally passed as inputs, builds the complete question (.result) and creates an ID
+        '''
+        self.check_sender()
+        self.check_recipient()
+        self.check_question()
+        self.check_limits()
+        self.build_result()
+        self.hash_identifier()
+
     def check_sender(self):
         if self.sender is None:
-            raise InvalidQueryError('invalid sender. Sender is ' + str(self.sender))
+            raise InvalidQueryError('invalid sender for ID=' + str(self.get_identifier()) +': ' + str(self.sender))
         else:
             if len(self.valid_locutors) == 0:
                 return True
@@ -200,7 +213,7 @@ class Query:
                 # TODO: more elaborate checking
                 # if isinstance(self.sender, bot) or ...
                 if type(self.sender) != type(self.valid_locutors[0]):
-                    raise InvalidQueryError('invalid sender. It must be of ' \
+                    raise InvalidQueryError('invalid sender for ID=' + str(self.get_identifier()) +'. It must be of ' \
                                             + repr(type(self.valid_locutors[0]).__name__) \
                                             + ' type and among ' + str(self.valid_locutors))
                 else:
@@ -211,7 +224,7 @@ class Query:
 
     def check_recipient(self):
         if self.recipient is None:
-            raise InvalidQueryError('invalid recipient ' + str(self.recipient))
+            raise InvalidQueryError('invalid recipient for ID=' + str(self.get_identifier()) +': ' + str(self.recipient))
         else:
             if len(self.valid_locutors) == 0:
                 return True
@@ -221,7 +234,7 @@ class Query:
                     raise InvalidQueryError('sender cannot ask a question to itself')
 
                 if type(self.recipient) != type(self.valid_locutors[0]):
-                    raise InvalidQueryError('invalid recipient. It must be of ' \
+                    raise InvalidQueryError('invalid recipient for ID=' + str(self.get_identifier()) +'. It must be of ' \
                                             + repr(type(self.valid_locutors[0]).__name__) \
                                             + ' type and among ' + str(self.valid_locutors))
 
@@ -311,7 +324,9 @@ class Query:
             return self.reply.is_valid
 
     def build_result(self):
-
+        '''
+        The result is the complete query, with foreword, afterword, et caetera
+        '''
         result = [self.get_foreword()]
         result += [self.get_question()]
         result += [self.get_afterword()]
@@ -319,21 +334,19 @@ class Query:
         self.result = result
         return result  # Generic return, will be overridden in derived classes
 
-    def hash_UID(self):
+    def hash_identifier(self):
         """
-        Builds an UID of the Query
-        
+        Builds an ID of the Query. Two queries with the same ID are considered as duplicates. 
         """
         hashables = [self.get_sender(), self.get_recipient(), self.get_result(), self.get_limits(), self.get_prerequisites()]
         hashables = [str(hashable).lower().strip() for hashable in hashables]
-        self.UID = hash(','.join(hashables))
+        self.identifier = hash(','.join(hashables))
                                   
-        return self.UID
+        return self.identifier
 
     def stamp(self):
         """
-        Assigns an UID and a timestamp to the Query
-        
+        Assigns a sent timestamp to the Query
         """
         self.sent_time = datetime.timestamp(datetime.now())
         
@@ -341,19 +354,13 @@ class Query:
 
     def send(self):
         """
-            Querying is a protocol during which you first check that you are allowed to speak, that
-            there is someone to listen, that your question is meaningful (or allowed)
-            and then you can send your query
+        Querying is a protocol during which you first check that you are allowed to speak, that
+        there is someone to listen, that your question is meaningful (or allowed) and then you can send your query
         """
         if self.is_replied:
             if self.reply.check_reply():
                 raise QueryRepliedError('this question has already been answered')
-        self.check_sender()
-        self.check_recipient()
-        self.check_question()
-        self.check_limits()
-        self.build_result()
-        self.hash_UID()
+        self.check_and_pack()
         self.stamp()
         self.is_sent = True
         # TODO: decide whether asking again resets the question to unreplied to (as here)
@@ -362,6 +369,9 @@ class Query:
         return self.is_sent
 
     def receive(self, reply_result, prerequisite=None):
+        '''
+        Assigns a Reply to the Query
+        '''
         # TODO: maybe it is iseless to pass seld as argument to reply since rely is already a property of self
         self.reply = Reply(self, reply_result)
         self.reply.build_result()
@@ -374,7 +384,7 @@ class Query:
 
 class QueryChoice(Query):
     """
-    Query with multiple choices
+    Query with multiple choices, defined in self.limits
     """
 
     def __init__(self, **kwargs):
@@ -481,7 +491,7 @@ class QueryBoolean(QueryChoice):
 class QueryOpen(Query):
     """
     An open-ended Query,
-    excepted that a string answer can be checked against a regular expression in limits
+    excepted that a string answer can be checked against a regular expression in self.limits
     """
 
     def __init__(self, **kwargs):
@@ -505,7 +515,11 @@ class QueryOpen(Query):
 
 
 class Information:
-
+    '''
+    An object passed to the recipient without Query
+    WARNING: should not be used
+    =>Please created a "I am listening to you" Query by default instead and send a Reply
+    '''
     def __init__(self, text, sender=None, recipient=None):
 
         self.text = text
@@ -518,17 +532,16 @@ class QueryMemory:
     Storage for Queries.
     With function to recall and erase Queries by type, property...
     Note that erasing a Query here does *not* delete the object in Python
-    
     """
 
     def __init__(self, queries=[], topic=None):
 
         self.queries = queries
-        self.topic = topic
+        self.topic = topic #A topic for this specific memory object
 
     def __str__(self):
 
-        return '<' + self.__class__.__name__ + ' for ' + repr(self.topic) + ' with ' + str(len(self.queries)) + ' stored queries>'
+        return '<' + self.__class__.__name__ + ' about ' + repr(self.topic) + ' with ' + str(len(self.queries)) + ' stored queries>'
 
     def __len__(self):
 
@@ -536,7 +549,7 @@ class QueryMemory:
 
     def recall_last(self):
         """
-        Recalls the last Query stored
+        Recalls the last stored Query
         """
         if len(self.queries) > 0:
             return self.queries[-1]
@@ -545,7 +558,7 @@ class QueryMemory:
 
     def recall_last_sent(self):
         """
-        Recalls the most recent Query (the last one sent)
+        Recalls the most recent Query (the last one sent, unsent queries have no daye)
         """
         if len(self.queries) > 0:
             chronos = sorted(self.queries, key=Query.get_sent_time)
@@ -553,17 +566,19 @@ class QueryMemory:
         else:
             return None
 
-    def recall_by_UID(self, UID):
-        
+    def recall_by_identifier(self, identifier):
+        '''
+        Recalls Queries with the given identifier
+        '''
         q_found = []
         for query in self.queries:
-            if query.get_UID() == UID:
+            if query.get_identifier() == identifier:
                 q_found += [query]
         return q_found
 
     def recall(self, criterion=None):
         """
-        Recalls Queries matching criterion
+        Recalls Queries matching criterion, which can be a list index, a string to be searched, or a Query identifier
         """
         if criterion is None or criterion == '':
             return self.queries
@@ -573,7 +588,7 @@ class QueryMemory:
             try:
                 q_found = self.queries[criterion]
             except IndexError:
-                q_found = self.recall_by_UID(criterion)
+                q_found = self.recall_by_identifier(criterion)
                 if len(q_found) == 0:
                     print('no query #' + str(criterion))
         else:
@@ -612,25 +627,24 @@ class QueryMemory:
         if len(queries) < 2:
             return None
         else:
-            UIDs = [q.get_UID() for q in queries]
+            identifiers = [q.get_identifier() for q in queries]
 
             seen = set()
             repeated = set()
 
-            for UID in UIDs:
-                if UID in seen:
-                    repeated.add(UID)
+            for identifier in identifiers:
+                if identifier in seen:
+                    repeated.add(identifier)
                 else:
-                    seen.add(UID)
+                    seen.add(identifier)
 
-            repeated = [q for q in queries if q.get_UID() in repeated]
+            repeated = [q for q in queries if q.get_identifier() in repeated]
 
         return repeated
 
     def erase_repeated(self):
         """
         Erase repeated Queries, keeping the most recent in time
-        
         """
         repeated = self.recall_repeated()
 
@@ -680,12 +694,16 @@ class QueryMemory:
                 return False
 
     def chronological_sort(self):
-    	
-    	self.queries = sorted(self.queries, key=Query.get_sent_time)
-    	return self.queries
+        '''
+        Sort queries by sent date
+        '''
+        self.queries = sorted(self.queries, key=Query.get_sent_time)
+        return self.queries
 
     def topological_sort(self):
-
+        """
+        Sort Queries by solving dependencies
+        """
         queries = self.queries.copy()
 
         if len(queries) <= 1:
@@ -722,3 +740,4 @@ class QueryMemory:
         else:
             raise QueryMemoryError('Topological sort has failed at i=' + str(i))
             return None
+
