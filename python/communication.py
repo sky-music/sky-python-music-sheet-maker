@@ -67,9 +67,6 @@ class Reply:
     def get_result(self):
         return self.result
 
-    def set_result(self, result):
-        self.result = result
-
     def get_validity(self):
         if self.is_valid is None:
             self.is_valid = self.check_result()
@@ -122,6 +119,9 @@ class Query:
         self.result = None  # The full question with foreword and afterword
         self.is_sent = False  # The send() command has been called
         self.is_replied = False  # Has been assigned a Reply object
+        
+        self.build_result()
+        self.hash_UID()
 
     def __str__(self):
         string = '<' + self.__class__.__name__ + ' ' + str(self.get_UID()) + ' from ' + str(self.sender) + ' to ' + str(
@@ -146,9 +146,6 @@ class Query:
 
     def get_result(self):
         return self.result
-
-    def set_result(self, result):
-        self.result = result
 
     def get_reply(self):
         return self.reply
@@ -319,7 +316,7 @@ class Query:
         result += [self.get_question()]
         result += [self.get_afterword()]
         result = '\n'.join(filter(None, result))
-        self.set_result(result)
+        self.result = result
         return result  # Generic return, will be overridden in derived classes
 
     def hash_UID(self):
@@ -338,10 +335,9 @@ class Query:
         Assigns an UID and a timestamp to the Query
         
         """
-        self.hash_UID()
         self.sent_time = datetime.timestamp(datetime.now())
         
-        return self.UID, self.sent_time
+        self.sent_time
 
     def send(self):
         """
@@ -357,6 +353,7 @@ class Query:
         self.check_question()
         self.check_limits()
         self.build_result()
+        self.hash_UID()
         self.stamp()
         self.is_sent = True
         # TODO: decide whether asking again resets the question to unreplied to (as here)
@@ -415,7 +412,7 @@ class QueryChoice(Query):
 
         result += self.get_afterword()
 
-        self.set_result(result)
+        self.result = result
 
         return result
 
@@ -477,7 +474,7 @@ class QueryBoolean(QueryChoice):
                                                  '/' + self.limits[1]) + ')']
         result += [self.get_afterword()]
         result = '\n'.join(filter(None, result))
-        self.set_result(result)
+        self.result = result
         return result
 
 
