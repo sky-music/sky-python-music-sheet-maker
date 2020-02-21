@@ -1,6 +1,7 @@
-import os
+#import os
 from modes import InputMode, ReplyType
-from communication import QueryOpen, QueryChoice, QueryBoolean, QueryMemory, Information
+#from communication import QueryOpen, QueryChoice, QueryBoolean, QueryMemory, Information
+import communication
 
 """
 Classes to ask and answer questions called Query and Reply between the bot and the music sheet maker
@@ -22,19 +23,69 @@ c) asked by the command line:
 
 """
 
+class CommunicatorError(Exception):
+    def __init__(self, explanation):
+        self.explanation = explanation
 
-# song_dir_in = 'test_songs'
-# song_dir_out = 'songs_out'
+    def __str__(self):
+        return str(self.explanation)
+
+    pass
+
+
+
 
 class Communicator:
 
-    def __init__(self):
-        self.brain = QueryMemory()
-        self.create_messages()
+    def __init__(self, owner=None):
+        self.brain = communication.QueryMemory()
+        self.listening = True
+        self.owner = owner
 
-    def create_messages(self):
+        #A dictionary of standard queries arguments
+        self.standard_queries = {}
+        self.standard_queries['song_creation'] = {'class': communication.QueryOpen.__name__, 'sender': 'bot', 'recipient': 'music-sheet-maker', 'question': 'Please create a Visual Sheet'}
 
-        i_instructions = Information('Instructions')
+    def __getattr__(self, name):
+        '''
+        Default function to call in case no one else is found. 
+        '''
+        def default_handler_function(*args, **kwargs):
+            try:
+                thefunc = getattr(self.brain, name) #If it's not for me, it's for my brain
+                return thefunc
+            except AttributeError:
+                try:
+                    if isinstance(args[0], communication.Query):
+                        self.receive(*args, **kwargs)
+                except:
+                   return AttributeError
+
+        return default_handler_function
+
+    def formulate(self, standard_query_name):
+        
+        try:
+            standard_query_name = standard_query_name.lower().replace(' ','_')
+            method_name = self.standard_queries[standard_query_name]['class']
+            method_args = self.standard_queries[standard_query_name].copy()
+            method_args.pop('class')
+            query_method = getattr(communication, method_name)
+            q = query_method(**method_args)
+            return q
+        except (KeyError, AttributeError):
+            raise CommunicatorError(str(standard_query_name) + ' is not a standard query')
+    
+    
+    def receive(self, query):
+        
+        query.check_recipient(forbidden=self.owner)
+        self.brain.store(query)
+        
+
+    def create_song_messages(self, recipient=None):
+
+        i_instructions = communication.Information('Instructions')
 
         # TODO: outline queries
 
@@ -43,8 +94,7 @@ class Communicator:
 
         # TODO: this is meant to be set after calculated by Song
         modes_list = [InputMode.JIANPU, InputMode.SKY]
-
-        q_mode = QueryChoice(sender='music-sheet-maker', recipient='bot', question="Mode (1-" + str(len(modes_list)) + "): ",
+        q_mode = communication.QueryChoice(sender=self.owner, recipient=recipient, question="Mode (1-" + str(len(modes_list)) + "): ",
                              foreword="Please choose your note format:\n", afterword=None,
                              reply_type=ReplyType.INPUTMODE,
                              limits=modes_list)
@@ -52,7 +102,7 @@ class Communicator:
 
         # query song key
         possible_keys = []
-        q_song_key = QueryChoice(sender='music-sheet-maker', recipient='bot', question='What is the song key?',
+        q_song_key = communication.QueryChoice(sender=self.owner, recipient=recipient, question='What is the song key?',
                                  foreword=None, afterword=None, reply_type=ReplyType.TEXT, limits=possible_keys)
         self.brain.store(q_song_key)
 
@@ -61,19 +111,19 @@ class Communicator:
         # info error ratio
 
         # query song title
-        q_song_title = QueryOpen(sender='music-sheet-maker', recipient='bot', question='What is the song title?',
+        q_song_title = communication.QueryOpen(sender=self.owner, recipient=recipient, question='What is the song title?',
                                  foreword='',
                                  afterword=None,
                                  reply_type=ReplyType.TEXT, limits=None)
         self.brain.store(q_song_title)
 
         # query original_artists
-        q_original_artists = QueryOpen(sender='music-sheet-maker', recipient='bot', question='Original artist(s): ',
+        q_original_artists = communication.QueryOpen(sender=self.owner, recipient=recipient, question='Original artist(s): ',
                                        foreword='Please fill song info or press ENTER to skip:', afterword=None,
                                        reply_type=ReplyType.TEXT, limits=None)
         self.brain.store(q_original_artists)
         # query transcript_writer
-        q_transcript_writer = QueryOpen(sender='music-sheet-maker', recipient='bot', question='Transcribed by: ',
+        q_transcript_writer = communication.QueryOpen(sender=self.owner, recipient=recipient, question='Transcribed by: ',
                                         foreword=None,
                                         afterword=None, reply_type=ReplyType.TEXT, limits=None)
         self.brain.store(q_transcript_writer)

@@ -203,44 +203,51 @@ class Query:
         self.build_result()
         self.hash_identifier()
 
-    def check_sender(self):
-        if self.sender is None:
-            raise InvalidQueryError('invalid sender for ID=' + str(self.get_identifier()) +': ' + str(self.sender))
-        else:
-            if len(self.valid_locutors) == 0:
-                return True
-            else:
+    def check_locutor(self, locutor, allowed='all', forbidden=None):
+        
+        locutor_ok = True
+        
+        if locutor is None:
+            locutor_ok = False
+            raise InvalidQueryError('invalid locutor for ID=' + str(self.get_identifier()) +': ' + str(self.locutor))
+        
+        if len(self.valid_locutors) != 0:
                 # TODO: more elaborate checking
                 # if isinstance(self.sender, bot) or ...
-                if type(self.sender) != type(self.valid_locutors[0]):
-                    raise InvalidQueryError('invalid sender for ID=' + str(self.get_identifier()) +'. It must be of ' \
-                                            + repr(type(self.valid_locutors[0]).__name__) \
-                                            + ' type and among ' + str(self.valid_locutors))
-                else:
-                    if self.sender in self.valid_locutors:
-                        return True
+            if type(locutor) != type(self.valid_locutors[0]):
+                locutor_ok = False
+                raise InvalidQueryError('invalid locutor for ID=' + str(self.get_identifier()) +'. It must be of ' \
+                                        + repr(type(self.valid_locutors[0]).__name__) \
+                                        + ' type and among ' + str(self.valid_locutors))
+            
+            if locutor not in self.valid_locutors:
+                locutor_ok = False
+        
+        if allowed != 'all':
+            if locutor != allowed and locutor not in allowed:
+                locutor_ok = False
+ 
+        if forbidden != None:
+            if locutor == forbidden or locutor in forbidden:
+                locutor_ok = False               
+        
+        return locutor_ok
+             
 
-        return False
+    def check_sender(self, allowed='all', forbidden=None):
+        
+        sender_ok = self.check_locutor(self.sender, allowed, forbidden)
+        
+        return sender_ok
 
-    def check_recipient(self):
-        if self.recipient is None:
-            raise InvalidQueryError('invalid recipient for ID=' + str(self.get_identifier()) +': ' + str(self.recipient))
-        else:
-            if len(self.valid_locutors) == 0:
-                return True
-            else:
-                # TODO: more elaborate checking
-                if self.recipient == self.sender:
-                    raise InvalidQueryError('sender cannot ask a question to itself')
+    def check_recipient(self, allowed='all', forbidden=None):
+        
+        recipient_ok = self.check_locutor(self.recipient, allowed, forbidden)
+        
+        if self.recipient == self.sender:
+            raise InvalidQueryError('sender cannot ask a question to itself')
 
-                if type(self.recipient) != type(self.valid_locutors[0]):
-                    raise InvalidQueryError('invalid recipient for ID=' + str(self.get_identifier()) +'. It must be of ' \
-                                            + repr(type(self.valid_locutors[0]).__name__) \
-                                            + ' type and among ' + str(self.valid_locutors))
-
-                return True
-
-        return False
+        return recipient_ok
 
     def check_question(self):
         if self.question is not None:
@@ -352,7 +359,7 @@ class Query:
         
         self.sent_time
 
-    def send(self):
+    def send(self, recipient=None):
         """
         Querying is a protocol during which you first check that you are allowed to speak, that
         there is someone to listen, that your question is meaningful (or allowed) and then you can send your query
@@ -365,10 +372,11 @@ class Query:
         self.is_sent = True
         # TODO: decide whether asking again resets the question to unreplied to (as here)
         self.is_replied = False
+        recipient.receive(self) #Assumes that all recipients contain a method to handle queries
 
         return self.is_sent
 
-    def receive(self, reply_result, prerequisite=None):
+    def reply_to(self, reply_result, prerequisite=None):
         '''
         Assigns a Reply to the Query
         '''
