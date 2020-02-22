@@ -104,6 +104,7 @@ class Query:
         self.prerequisites = prerequisites  # Other Queries required to reply to this Query
         self.identifier = None  # A unique ID based on the Query content, excluding the timestamp
         self.sent_time = None  # The timestamp at which the Query was sent()
+        self.expect_reply = True
 
         '''
         TODO: decide how to check for sender and recipient types:
@@ -113,7 +114,7 @@ class Query:
             => the choice will depend on the bot structure (since we can do whatever we want with music cog)
             => a possibility is to check first if the sender is music cog, and if not (AttributeError), then it is the bot
         '''
-        self.valid_locutors = ['bot', 'music-sheet-maker']  # A list of valid locutors
+        self.valid_locutors_names = ['music-cog', 'music-sheet-maker']  # A list of valid locutors
 
         self.reply = None  # Reply object
         self.result = None  # The full question with foreword and afterword
@@ -121,8 +122,7 @@ class Query:
         self.is_replied = False  # Has been assigned a Reply object
         
         self.check_and_pack()
-        self.build_result()
-        self.hash_identifier()
+        
 
     def __str__(self):
         string = '<' + self.__class__.__name__ + ' ' + str(self.get_identifier()) + ' from ' + str(self.sender) + ' to ' + str(
@@ -192,44 +192,57 @@ class Query:
             return self.prerequisites
 
 
-    def check_and_pack(self):
-        '''
-        Checks the fundamental properties normally passed as inputs, builds the complete question (.result) and creates an ID
-        '''
-        self.check_sender()
-        self.check_recipient()
-        self.check_question()
-        self.check_limits()
-        self.build_result()
-        self.hash_identifier()
-
     def check_locutor(self, locutor, allowed='all', forbidden=None):
         
+        def get_name_and_sanitize(obj):
+            if isinstance(obj, str):
+                obj_name = obj
+            else:
+                try:
+                    obj_name = obj.get_name().lower().strip()
+                except AttributeError:
+                    try:
+                        obj_name = obj.__name__.lower().strip()
+                    except AttributeError:
+                        obj_name = type(obj).__name__.lower().strip()
+            return obj_name.lower().strip()
+        
+        def get_list_and_sanitize(obj):
+            if not isinstance(obj, (list, tuple)):
+                objects = [obj]
+            if isinstance(objects[0], str):
+                objects = [obj.lower().strip() for obj in objects]
+            return objects
+       
         locutor_ok = True
         
         if locutor is None:
             locutor_ok = False
-            raise InvalidQueryError('invalid locutor for ID=' + str(self.get_identifier()) +': ' + str(self.locutor))
+            raise InvalidQueryError('invalid locutor for ID=' + str(self.get_identifier()) +': ' + str(locutor))
         
-        if len(self.valid_locutors) != 0:
-                # TODO: more elaborate checking
-                # if isinstance(self.sender, bot) or ...
-            if type(locutor) != type(self.valid_locutors[0]):
-                locutor_ok = False
-                raise InvalidQueryError('invalid locutor for ID=' + str(self.get_identifier()) +'. It must be of ' \
-                                        + repr(type(self.valid_locutors[0]).__name__) \
-                                        + ' type and among ' + str(self.valid_locutors))
+        if len(self.valid_locutors_names) != 0:            
+            # Try to retrieve the locutor name
+
+            locutor_name = get_name_and_sanitize(locutor)
             
-            if locutor not in self.valid_locutors:
+            if locutor_name not in self.valid_locutors_names:
                 locutor_ok = False
+                print('locutor is not in list')
         
-        if allowed != 'all':
-            if locutor != allowed and locutor not in allowed:
+        if allowed != 'all': 
+            allowed = get_list_and_sanitize(allowed)
+            if (locutor not in allowed) and (locutor_name not in allowed):
                 locutor_ok = False
+                raise InvalidQueryError('locutor not allowed for Query ID=' + str(self.get_identifier()) + \
+                                   ': ' + repr(str(locutor)) + '. It must be among ' + str(allowed))
+
  
         if forbidden != None:
-            if locutor == forbidden or locutor in forbidden:
-                locutor_ok = False               
+            forbidden = get_list_and_sanitize(forbidden)
+            if (locutor in forbidden) or locutor_name in forbidden:
+                locutor_ok = False   
+                raise InvalidQueryError('locutor forbidden for Query ID=' + str(self.get_identifier()) + \
+                                   ': ' + repr(str(locutor)) + '. It must not be among ' + str(forbidden))
         
         return locutor_ok
              
@@ -238,12 +251,21 @@ class Query:
         
         sender_ok = self.check_locutor(self.sender, allowed, forbidden)
         
+        if not sender_ok:     
+            raise InvalidQueryError('invalid sender for Query ID=' + str(self.get_identifier()) + \
+                                   ': ' + repr(str(self.sender)) + '. It must be among ' + str(self.valid_locutors_names))
+                 
         return sender_ok
 
     def check_recipient(self, allowed='all', forbidden=None):
         
         recipient_ok = self.check_locutor(self.recipient, allowed, forbidden)
-        
+ 
+        if not recipient_ok:     
+            raise InvalidQueryError('invalid recipient for Query ID=' + str(self.get_identifier()) + \
+                                   ': ' + repr(str(self.sender)) + '. It must be among ' + str(self.valid_locutors_names))
+
+       
         if self.recipient == self.sender:
             raise InvalidQueryError('sender cannot ask a question to itself')
 
@@ -304,6 +326,9 @@ class Query:
 
     def check_reply(self):
 
+        if self.expect_reply is False:
+            return True
+        
         if not isinstance(self.reply, Reply):
 
             self.is_replied = False
@@ -351,13 +376,25 @@ class Query:
                                   
         return self.identifier
 
+    def check_and_pack(self):
+        '''
+        Checks the fundamental properties normally passed as inputs, builds the complete question (.result) and creates an ID
+        '''
+        self.check_sender()
+        self.check_recipient()
+        self.check_question()
+        self.check_limits()
+        self.build_result()
+        self.hash_identifier()
+
+
     def stamp(self):
         """
         Assigns a sent timestamp to the Query
         """
         self.sent_time = datetime.timestamp(datetime.now())
         
-        self.sent_time
+        return self.sent_time
 
     def send(self, recipient=None):
         """
@@ -371,16 +408,22 @@ class Query:
         self.stamp()
         self.is_sent = True
         # TODO: decide whether asking again resets the question to unreplied to (as here)
-        self.is_replied = False
-        recipient.receive(self) #Assumes that all recipients contain a method to handle queries
+        if self.expect_reply:
+            self.is_replied = False
+        if recipient is None:
+            recipient = self.get_recipient()
+            
+        recipient.receive(self) #Assumes that all recipients contain a method to handle queries            
 
         return self.is_sent
 
-    def reply_to(self, reply_result, prerequisite=None):
+    def reply_to(self, reply_result):
         '''
         Assigns a Reply to the Query
         '''
-        # TODO: maybe it is iseless to pass seld as argument to reply since rely is already a property of self
+        if self.expect_reply is False:
+            raise InvalidReplyError('This Query doesnt expect aa Reply')
+        
         self.reply = Reply(self, reply_result)
         self.reply.build_result()
         is_reply_valid = self.reply.check_result()
@@ -395,12 +438,15 @@ class QueryChoice(Query):
     Query with multiple choices, defined in self.limits
     """
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, *args, **kwargs):
+        
         try:
-            self.limits[0]
+            kwargs['limits'][0]
         except (TypeError, IndexError):
             raise InvalidQueryError('QueryChoice called with no choices')
+                
+        super().__init__(*args, **kwargs)
+       
 
     def build_result(self):
 
@@ -469,7 +515,7 @@ class QueryBoolean(QueryChoice):
     A yes/no, true/false question type
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, *args, **kwargs):
         # repairing missing choices
         self.default_limits = ('y', 'n')
         try:
@@ -481,7 +527,7 @@ class QueryBoolean(QueryChoice):
         #  limits as a possible yes/no couple), or raise an error
         except:
             kwargs['limits'] = self.default_limits
-        super().__init__(**kwargs)
+        super().__init__(*args, **kwargs)
 
     def build_result(self):
 
@@ -502,8 +548,8 @@ class QueryOpen(Query):
     excepted that a string answer can be checked against a regular expression in self.limits
     """
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     def check_reply(self):
 
@@ -522,17 +568,17 @@ class QueryOpen(Query):
         return self.reply.is_valid
 
 
-class Information:
+class Information(Query):
     '''
-    An object passed to the recipient without Query
-    WARNING: should not be used
-    =>Please created a "I am listening to you" Query by default instead and send a Reply
+    An object passed to the recipient without expecting an answer
     '''
-    def __init__(self, text, sender=None, recipient=None):
-
-        self.text = text
-        self.sender = sender
-        self.recipient = recipient
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.reply_type = None
+        self.limits = None
+        self.reply = None
+        self.is_replied = None
+        self.expect_reply = False
 
 
 class QueryMemory:
@@ -542,9 +588,9 @@ class QueryMemory:
     Note that erasing a Query here does *not* delete the object in Python
     """
 
-    def __init__(self, queries=[], topic=None):
+    def __init__(self, topic=None):
 
-        self.queries = queries
+        self.queries = []
         self.topic = topic #A topic for this specific memory object
 
     def __str__(self):
@@ -584,6 +630,16 @@ class QueryMemory:
                 q_found += [query]
         return q_found
 
+
+    def has_query(self, criterion=None):
+        
+        q_found = self.recall(criterion)
+        if len(q_found) > 0:
+            return True
+        else:
+            return False
+        
+
     def recall(self, criterion=None):
         """
         Recalls Queries matching criterion, which can be a list index, a string to be searched, or a Query identifier
@@ -594,13 +650,14 @@ class QueryMemory:
         q_found = []
         if isinstance(criterion, int):
             try:
-                q_found = self.queries[criterion]
+                q_found = self.queries[criterion] #Maybe criterion is an index
             except IndexError:
-                q_found = self.recall_by_identifier(criterion)
-                if len(q_found) == 0:
-                    print('no query #' + str(criterion))
+                q_found = self.recall_by_identifier(criterion) #Maybe criterion is an identifier
+        elif isinstance(criterion, Query): #Maybe criterion is a Query
+            if criterion in self.queries:
+                q_found.append(criterion)
         else:
-            for q in self.queries:
+            for q in self.queries: #Maybe criterion is an attribute, some text for instance
                 attr_vals = list(q.__dict__.values())
                 if criterion in attr_vals:
                     q_found.append(q)
@@ -669,7 +726,7 @@ class QueryMemory:
     def store(self, query):
 
         # TODO: add support for storing Information
-
+        print(self)
         if isinstance(query, Query):
             self.queries.append(query)
         elif isinstance(query, (list, tuple)):

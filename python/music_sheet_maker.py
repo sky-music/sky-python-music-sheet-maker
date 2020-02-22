@@ -1,4 +1,4 @@
-from communicator import Communicator, CommunicatorError
+from communicator import Communicator
 #from parsers import SongParser
 
 
@@ -7,23 +7,30 @@ class MusicSheetMaker:
     def __init__(self):
         self.song = None #Song object
         self.name = 'music-sheet-maker'
-        self.communicator = Communicator(owner=self.name)
+        self.communicator = Communicator(owner_name=self.name)
         #self.parser = SongParser()
-        #self.receive =  self.communicator.receive
-    
-    def __getattr__(self, name):
+        
+    def __getattr__(self, attr_name):
         '''
         Default function to call in case no one else is found. 
         '''
-        return getattr(self.communicator, name)
+        return getattr(self.communicator, attr_name)
     
-    def create_song(self, client_listening=True, recipient=None):
-        
-        if not self.listening:
-            raise CommunicatorError(self.name+' is not listening')
-               
-        self.communicator.create_song_messages(recipient=recipient)
+    def get_name(self):
+        return self.name
 
+    def receive(self, *args, **kwargs):
+        
+        self.communicator.receive(*args, **kwargs)
+            
+        #self.communicator.print_memory()
+    
+    def create_song(self, recipient=None):
+                      
+        self.communicator.create_song_messages(recipient=recipient)
+        
+        
+        
         #self.set_parser(SongParser(self))
 
         #os.chdir(self.get_directory_base())
