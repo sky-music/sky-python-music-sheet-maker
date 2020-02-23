@@ -42,10 +42,10 @@ class Communicator:
         self.owner_name = owner_name
 
         # A dictionary of standard queries arguments
-        self.standard_queries = {'song_creation': {'class': communication.QueryOpen.__name__, 'sender': owner_name,
+        self_known_queries = {'create_song': {'class': communication.QueryOpen.__name__, 'handler': 'create_song', 'sender': owner_name,
                                                    'recipient': 'music-sheet-maker',
-                                                   'question': 'Please create a Visual Sheet'}}
-
+                                                   'question': 'create_song'}}
+                                                   
     def get_name(self):
         return self.owner_name
 
@@ -77,20 +77,22 @@ class Communicator:
     #        print('RETURNING 4')
     #        return default_handler_function
 
-    def formulate_standard(self, standard_query_name, recipient=None):
+    def formulate_known(self, known_query_name, recipient=None):
 
         try:
-            standard_query_name = standard_query_name.lower().replace(' ', '_')
-            method_name = self.standard_queries[standard_query_name]['class']
-            method_args = self.standard_queries[standard_query_name].copy()
-            method_args.pop('class')
-            if recipient is not None:
-                method_args['recipient'] = recipient
-            query_method = getattr(communication, method_name)
-            q = query_method(**method_args)
-            return q
-        except (KeyError, AttributeError):
-            raise CommunicatorError(str(standard_query_name) + ' is not a standard query')
+            known_query_name = known_query_name.lower().replace(' ', '_')
+            known_query = self.known_queries[known_query_name]
+        except KeyError:
+            raise CommunicatorError(str(known_query_name) + ' is not a standard query')
+                
+        method_name = known_query['class']
+        method_args = known_query.copy().pop('class').pop('handler')
+        if recipient is not None:
+            method_args['recipient'] = recipient
+        query_method = getattr(communication, method_name)
+        q = query_method(**method_args)
+        return q
+            
 
     def send(self, communication_objects, recipient=None):
 
@@ -124,6 +126,23 @@ class Communicator:
             # print('I am ' + self.get_name() + ', storing a query upon receipt.')
             self.memory.store(query)
             # TODO: check for duplicates
+
+    def query_to_discord(self, obj):
+    	
+    	question = obj.get_result()
+    	return question
+
+    def discord_to_query(self, obj):
+    	
+        return
+
+    def translate(self, obj):
+    
+        if isinstance(obj, (Query, Reply)):	
+            self.query_to_discord(obj)
+        else:
+            self.discord_to_query(obj)
+        return
 
     def formulate_song_messages(self, recipient=None):
 

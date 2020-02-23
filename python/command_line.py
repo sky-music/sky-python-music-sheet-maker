@@ -29,28 +29,45 @@ class CommandLinePlayer:
 
     def receive(self, *args, **kwargs):
         self.communicator.receive(*args, **kwargs)
-
-        # self.communicator.print_memory()
+        
+    def prompt_queries(self, queries):
+    
+        try:
+            len(queries)
+        except AttributeError:
+            queries = [queries]
+    		
+        for q in queries:
+    		
+            question = self.communicator.query_to_discord()
+            answer = input(question)		
+            q.reply_to(answer)
+        
 
 
 player = CommandLinePlayer()
 
 maker = MusicSheetMaker()
 
-q = player.communicator.formulate_standard('song_creation', recipient=maker)
-
-player.communicator.memory.store(q)
-print(player.communicator.memory)
-print(maker.communicator.memory)
+q = player.communicator.formulate_known('create_song', recipient=maker)
 player.communicator.send(q, recipient=maker)
+
+maker.execute_queries()
+
+#player.communicator.process_queries()
+
+
+
+#player.communicator.memory.store(q)
 
 print('\n\n')
 player.communicator.print_memory()
 print('\n')
 maker.communicator.print_memory()
 
-# MusicSheetMaker().create_song(recipient=player)
 
+
+# MusicSheetMaker().create_song(recipient=player)
 
 # MusicSheetMaker().get_communicator().send_unsent_queries(recipient=me)
 

@@ -25,8 +25,23 @@ class MusicSheetMaker:
         self.communicator.receive(*args, **kwargs)
 
         # self.communicator.print_memory()
+    	
 
-    def create_song(self, recipient=None):
+    def execute_queries(self):
+        self.communicator.memory.topological_sort()
+        
+        queries = self.communicator.recall_unreplied()
+        
+        for q in queries:	
+            try:
+                query_name = q.get_result()
+                known_query = self.communicator.known_queries[query_name]
+                result = eval(known_query['handler'])
+                q.reply_to(result)
+            except:
+                pass
+
+    def create_song(self):
         self.communicator.create_song_messages(recipient=recipient)
 
         # self.set_parser(SongParser(self))
