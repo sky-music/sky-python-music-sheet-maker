@@ -172,6 +172,12 @@ class Query:
 
     def get_is_replied(self):
         return self.is_replied
+        
+    def get_reply_validity(self):
+        try:
+            return self.get_reply().get_validity()
+        except AttributeError:
+            return None
 
     def get_is_sent(self):
         return self.is_sent
@@ -591,6 +597,12 @@ class QueryMemory:
 
         self.queries = []
         self.topic = topic  # A topic for this specific memory object
+        self.query_filters = {
+        	'replied': lambda q: q.get_is_replied(),
+        	'sent': lambda q: q.get_is_sent(),
+        	'unreplied': lambda q: not q.get_is_replied(),
+        	'unsent': lambda q: not q.get_is_sent(),
+        	'valid_reply': lambda q:  q.get_reply_validity(), 'invalid_reply': lambda q: not q.get_reply_validity()}
 
     def __str__(self):
 
@@ -601,21 +613,48 @@ class QueryMemory:
 
         return len(self.queries)
 
-    def recall_last(self):
+    def recall_filtered(self, filters=None):
+        
+        if filters is None:
+            return self.queries
+        else:
+            queries = self.queries
+            if not isinstance(filters, (list, tuple, set)):
+                filters = [filters]
+            for k in filters:
+                queries=filter(self.query_filters[k],queries)
+        return list(queries)
+
+    def recall_last(self, filters=None):
         """
-        Recalls the last stored Query
+        Recalls the last stored Query. If a topological sort has been made, it is the last one to be answered
         """
-        if len(self.queries) > 0:
-            return self.queries[-1]
+        queries = self.recall_filtered(filters)
+            
+        if len(queries) > 0:
+            return queries[-1]
         else:
             return None
 
-    def recall_last_sent(self):
+    def recall_first(self, filters=None):
+        '''
+        Recalls the first query. If a topological sort has been made, it is the first one to be answered
+        '''
+        queries = self.recall_filtered(filters)
+        
+        if len(queries) > 0:
+            return queries[0]
+        else:
+            return None
+
+    def recall_last_sent(self, filters=None):
         """
         Recalls the most recent Query (the last one sent, unsent queries have no daye)
         """
-        if len(self.queries) > 0:
-            chronos = sorted(self.queries, key=Query.get_sent_time)
+        queries = self.recall_filtered(filters)
+        
+        if len(queries) > 0:
+            chronos = sorted(queries, key=Query.get_sent_time)
             return chronos[-1]
         else:
             return None
@@ -638,24 +677,26 @@ class QueryMemory:
         else:
             return False
 
-    def recall(self, criterion=None):
+    def recall(self, criterion=None, filters=None):
         """
         Recalls Queries matching criterion, which can be a list index, a string to be searched, or a Query identifier
         """
+        queries = self.recall_filtered(filters)
+        
         if criterion is None or criterion == '':
-            return self.queries
+            return queries
 
         q_found = []
         if isinstance(criterion, int):
             try:
-                q_found = self.queries[criterion]  # Maybe criterion is an index
+                q_found = queries[criterion]  # Maybe criterion is an index
             except IndexError:
                 q_found = self.recall_by_identifier(criterion)  # Maybe criterion is an identifier
         elif isinstance(criterion, Query):  # Maybe criterion is a Query
-            if criterion in self.queries:
+            if criterion in queries:
                 q_found.append(criterion)
         else:
-            for q in self.queries:  # Maybe criterion is an attribute, some text for instance
+            for q in queries:  # Maybe criterion is an attribute, some text for instance
                 attr_vals = list(q.__dict__.values())
                 if criterion in attr_vals:
                     q_found.append(q)
@@ -680,12 +721,12 @@ class QueryMemory:
         q_replied = self.recall_replied()
         return [q for q in q_replied if not q.reply.get_validity()]
 
-    def recall_repeated(self):
+    def recall_repeated(self, filters_keys=None):
         """
         Recall queries that have been stored twice or more
         TODO: decide if we check for is_sent
         """
-        queries = self.queries
+        queries = self.recall_filtered(filters_keys)
 
         if len(queries) < 2:
             return None
@@ -704,6 +745,7 @@ class QueryMemory:
             repeated = [q for q in queries if q.get_identifier() in repeated]
 
         return repeated
+        
 
     def erase_repeated(self):
         """
@@ -713,12 +755,13 @@ class QueryMemory:
 
         # Probably the most recent query is the last one of the list but one never knows
         # Also, we can change the criterion from 'latest asked' to 'better answered'
-        if len(repeated) >= 2:
+        try:
+            repeated[1]
             repeated = sorted(repeated, key=Query.get_sent_time)
             for q in repeated[0:-1]:
                 self.queries.remove(q)
             return True
-        else:
+        except (KeyError, TypeError):
             return False
 
     def store(self, query):
@@ -755,6 +798,13 @@ class QueryMemory:
                 return True
             else:
                 return False
+
+    def clean(self):
+        
+        self.erase_repeated()
+        for q in self.recall_by_invalid_reply():
+            self.queries.remove(q)
+        self.topological_sort()
 
     def chronological_sort(self):
         """

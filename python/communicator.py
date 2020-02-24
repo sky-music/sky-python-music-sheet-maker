@@ -42,9 +42,11 @@ class Communicator:
         self.owner_name = owner_name
 
         # A dictionary of standard queries arguments
-        self_known_queries = {'create_song': {'class': communication.QueryOpen.__name__, 'handler': 'create_song', 'sender': owner_name,
-                                                   'recipient': 'music-sheet-maker',
-                                                   'question': 'create_song'}}
+        self.known_queries = {
+            'create_song': {'class': communication.QueryOpen.__name__, 'handler': 'create_song', 'sender': owner_name,
+            'recipient': 'music-sheet-maker',
+            'question': 'create_song'}
+                             }
                                                    
     def get_name(self):
         return self.owner_name
@@ -86,7 +88,10 @@ class Communicator:
             raise CommunicatorError(str(known_query_name) + ' is not a standard query')
                 
         method_name = known_query['class']
-        method_args = known_query.copy().pop('class').pop('handler')
+        method_args = known_query.copy()
+        method_args.pop('class')
+        method_args.pop('handler')
+        
         if recipient is not None:
             method_args['recipient'] = recipient
         query_method = getattr(communication, method_name)

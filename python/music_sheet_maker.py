@@ -35,14 +35,16 @@ class MusicSheetMaker:
         for q in queries:	
             try:
                 query_name = q.get_result()
+                #print('This one is unreplied to :+query_name')
                 known_query = self.communicator.known_queries[query_name]
-                result = eval(known_query['handler'])
+                result = eval('self.'+known_query['handler']+'()')
                 q.reply_to(result)
-            except:
+            except KeyError:
+                print('unknown query!!!')
                 pass
 
     def create_song(self):
-        self.communicator.create_song_messages(recipient=recipient)
+        self.communicator.create_song_queries()
 
         # self.set_parser(SongParser(self))
 

@@ -13,7 +13,7 @@ q_open = QueryOpen(sender='music-cog', recipient='music-sheet-maker', question='
                    reply_type=ReplyType.TEXT, limits='')
 brain.store(q_open)
 
-q_open.send()
+#q_open.send()
 q_open.reply_to('Tracey')
 
 print(q_open)
@@ -27,7 +27,7 @@ q_open2 = QueryOpen(sender='music-cog', recipient='music-sheet-maker', question=
                     reply_type=ReplyType.NOTE, limits=regex)
 brain.store(q_open2)
 
-q_open2.send()
+#q_open2.send()
 q_open2.reply_to('Ab6')
 
 print(q_open2)
@@ -43,7 +43,7 @@ q_boolean = QueryBoolean(sender='music-cog', recipient='music-sheet-maker', ques
                          afterword=None, reply_type=ReplyType.TEXT, limits=choices)
 brain.store(q_boolean)
 
-q_boolean.send()
+#q_boolean.send()
 q_boolean.reply_to('myself')  # testing out of range reply
 q_boolean.reply_to('dad')  # testing answering twice
 
@@ -56,7 +56,7 @@ q_boolean2 = QueryBoolean(sender='music-cog', recipient='music-sheet-maker', que
                           reply_type=ReplyType.TEXT, limits='yn')
 brain.store(q_boolean2)
 
-q_boolean2.send()
+#q_boolean2.send()
 q_boolean2.reply_to('y')  # testing out of initial limits reply
 
 print(q_boolean2)
@@ -69,7 +69,7 @@ print(q_boolean2.get_reply().get_result())
 q_boolean3 = QueryBoolean(sender='music-cog', recipient='music-sheet-maker', question='Are you happy?', foreword='', afterword=None,
                           reply_type=ReplyType.TEXT, limits='yn')
 brain.store(q_boolean3)
-q_boolean3.send()
+#q_boolean3.send()
 
 
 print('\n\n####Testing QueryChoice####\n')
@@ -80,7 +80,7 @@ q_choice = QueryChoice(sender='music-cog', recipient='music-sheet-maker', questi
                        limits=modes_list)
 brain.store(q_choice)
 
-q_choice.send()
+#q_choice.send()
 q_choice.reply_to('1')
 
 print(q_choice)
