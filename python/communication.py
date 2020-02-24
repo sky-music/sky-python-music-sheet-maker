@@ -224,7 +224,8 @@ class Query:
 
         if locutor is None:
             locutor_ok = False
-            raise InvalidQueryError('invalid locutor for ID=' + str(self.get_identifier()) + ': ' + str(locutor))
+            return locutor_ok
+            #raise InvalidQueryError('invalid locutor for ID=' + str(self.get_identifier()) + ': ' + str(locutor))
 
         if len(self.valid_locutors_names) != 0:
             # Try to retrieve the locutor name
@@ -233,7 +234,9 @@ class Query:
 
             if locutor_name not in self.valid_locutors_names:
                 locutor_ok = False
-                print('locutor is not in list')
+                print(locutor_name)
+                print(self.valid_locutors_names)
+                print('locutor is not in internal validation list')
 
         if allowed != 'all':
             allowed = get_list_and_sanitize(allowed)
@@ -721,12 +724,12 @@ class QueryMemory:
         q_replied = self.recall_replied()
         return [q for q in q_replied if not q.reply.get_validity()]
 
-    def recall_repeated(self, filters_keys=None):
+    def recall_repeated(self, filters=None):
         """
         Recall queries that have been stored twice or more
         TODO: decide if we check for is_sent
         """
-        queries = self.recall_filtered(filters_keys)
+        queries = self.recall_filtered(filters)
 
         if len(queries) < 2:
             return None
@@ -747,11 +750,11 @@ class QueryMemory:
         return repeated
         
 
-    def erase_repeated(self):
+    def erase_repeated(self, filters):
         """
         Erase repeated Queries, keeping the most recent in time
         """
-        repeated = self.recall_repeated()
+        repeated = self.recall_repeated(filters)
 
         # Probably the most recent query is the last one of the list but one never knows
         # Also, we can change the criterion from 'latest asked' to 'better answered'
@@ -801,9 +804,9 @@ class QueryMemory:
 
     def clean(self):
         
-        self.erase_repeated()
-        for q in self.recall_by_invalid_reply():
-            self.queries.remove(q)
+        self.erase_repeated('unreplied')
+        #for q in self.recall_by_invalid_reply():
+        #    self.queries.remove(q)
         self.topological_sort()
 
     def chronological_sort(self):

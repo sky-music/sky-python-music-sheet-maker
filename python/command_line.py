@@ -14,7 +14,7 @@ class CommandLinePlayer:
     def __init__(self):
         self.song = None  # Song object
         self.name = 'music-cog'
-        self.communicator = Communicator(owner_name=self.name)
+        self.communicator = Communicator(owner=self)
         # self.parser = SongParser()
         # self.receive =  self.communicator.receive
 
@@ -22,7 +22,10 @@ class CommandLinePlayer:
         """
         Default function to call in case no one else is found.
         """
-        return getattr(self.communicator, attr_name)
+        if 'communicator' in self.__dict__.keys():
+            return getattr(self.communicator, attr_name)
+        else:
+            raise AttributeError("type object " + repr(type(self).__name__) + " has no attribute 'communicator")
 
     def get_name(self):
         return self.name
@@ -30,11 +33,16 @@ class CommandLinePlayer:
     def receive(self, *args, **kwargs):
         self.communicator.receive(*args, **kwargs)
         
-    def prompt_queries(self, queries):
-    
+        self.prompt_queries()
+        
+        
+    def prompt_queries(self, queries=None):
+        
+        if queries == None:
+            queries = self.communicator.recall(('unreplied', 'invalid_reply'))
         try:
-            len(queries)
-        except AttributeError:
+            queries[0]
+        except TypeError:
             queries = [queries]
     		
         for q in queries:

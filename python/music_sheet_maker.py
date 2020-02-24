@@ -1,25 +1,44 @@
+import os
 from communicator import Communicator
+from parsers import SongParser
 
+class MusicMakerError(Exception):
+    def __init__(self, explanation):
+        self.explanation = explanation
 
-# from parsers import SongParser
-
+    def __str__(self):
+        return str(self.explanation)
+    pass
 
 class MusicSheetMaker:
 
     def __init__(self):
-        self.song = None  # Song object
         self.name = 'music-sheet-maker'
-        self.communicator = Communicator(owner_name=self.name)
+        self.communicator = Communicator(owner=self)
+        self.song = 0  # Song object
+        self.parser = None
+        self.init_working_directory()
+        self.directory_base = os.getcwd()
+        
         # self.parser = SongParser()
 
     def __getattr__(self, attr_name):
         """
         Default function to call in case no one else is found.
         """
-        return getattr(self.communicator, attr_name)
+        if 'communicator' in self.__dict__.keys():
+            return getattr(self.communicator, attr_name)
+        else:
+            raise AttributeError("type object " + repr(type(self).__name__) + " has no attribute 'communicator")
 
     def get_name(self):
         return self.name
+
+    def init_working_directory(self):
+
+        os.chdir('../')
+        #if not os.path.isdir(self.song_dir_out):
+            #os.mkdir(self.song_dir_out)
 
     def receive(self, *args, **kwargs):
         self.communicator.receive(*args, **kwargs)
@@ -28,27 +47,36 @@ class MusicSheetMaker:
     	
 
     def execute_queries(self):
-        self.communicator.memory.topological_sort()
+    	
+        self.communicator.memory.clean()
         
         queries = self.communicator.recall_unreplied()
         
-        for q in queries:	
+        for q in queries:
             try:
                 query_name = q.get_result()
                 #print('This one is unreplied to :+query_name')
                 known_query = self.communicator.known_queries[query_name]
-                result = eval('self.'+known_query['handler']+'()')
+                print('self.'+known_query['handler']+'(sender='+q.get_sender().get_name()+')')
+                result = eval('self.'+known_query['handler']+'(sender=q.get_sender())')
                 q.reply_to(result)
             except KeyError:
                 print('unknown query!!!')
                 pass
 
-    def create_song(self):
-        self.communicator.create_song_queries()
-
-        # self.set_parser(SongParser(self))
-
-        # os.chdir(self.get_directory_base())
+    def create_song(self, **kwargs):
+        
+        try:
+            recipient = kwargs['sender']
+        except KeyError:
+            raise MusicMakerError('No recipient specified for the Song')
+            
+        if self.song is not None:
+            overwrite = self.communicator.ask_song_overwrite(recipient=recipient)
+            
+            
+        #self.set_parser(SongParser(self))
+        #os.chdir(self.directory_base)
 
         # communicator.output_instructions()
 
