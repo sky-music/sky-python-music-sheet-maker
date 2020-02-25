@@ -79,6 +79,14 @@ class MusicSheetMaker:
             #print('%%%%%DEBUG')
             #print(recipient)
             recipient.execute_queries()
+            
+            if q.get_reply().get_result()==False:
+                print('younsaid no')
+                i = self.communicator.tell(string='Aborting.',recipient=recipient)
+                recipient.execute_queries()
+                
+                
+            #if q.get_result() == 
         #self.set_parser(SongParser(self))
         #os.chdir(self.directory_base)
 

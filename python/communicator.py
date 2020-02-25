@@ -144,6 +144,12 @@ class Communicator():
         
         return
 
+    def tell(self, recipient, string):
+        i = Information(sender=self, recipient=recipient, question=string)
+        self.memory.store(i)
+        i.send(recipient=recipient)
+        return i
+
     def translate(self, obj):
     
         if isinstance(obj, (Query, Reply)):	
