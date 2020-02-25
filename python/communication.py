@@ -126,13 +126,14 @@ class Query:
 
     def __str__(self):
         string = '<' + self.__class__.__name__ + ' ' + str(self.get_identifier()) + ' from ' + str(
-            self.sender) + ' to ' + str(
-            self.recipient) + ': ' + repr(self.question) + ', ' + str(self.reply_type) + ' expected'
+            self.sender.get_name()) + ' to ' + str(
+            self.recipient.get_name()) + ': ' + repr(self.question) + ', ' + str(self.reply_type) + ' expected'
         try:
             self.get_limits()[0]
             string += ', within ' + str(self.limits)
         except (TypeError, IndexError):
             pass
+        string += ', answered=' + str(self.get_is_replied())
         string += '>'
 
         return string
@@ -234,8 +235,8 @@ class Query:
 
             if locutor_name not in self.valid_locutors_names:
                 locutor_ok = False
-                print(locutor_name)
-                print(self.valid_locutors_names)
+                #print(locutor_name)
+                #print(self.valid_locutors_names)
                 print('locutor is not in internal validation list')
 
         if allowed != 'all':
@@ -596,8 +597,9 @@ class QueryMemory:
     Note that erasing a Query here does *not* delete the object in Python
     """
 
-    def __init__(self, topic=None):
+    def __init__(self, owner, topic=None):
 
+        self.owner = owner
         self.queries = []
         self.topic = topic  # A topic for this specific memory object
         self.query_filters = {
@@ -605,7 +607,10 @@ class QueryMemory:
         	'sent': lambda q: q.get_is_sent(),
         	'unreplied': lambda q: not q.get_is_replied(),
         	'unsent': lambda q: not q.get_is_sent(),
-        	'valid_reply': lambda q:  q.get_reply_validity(), 'invalid_reply': lambda q: not q.get_reply_validity()}
+        	'valid_reply': lambda q:  q.get_reply_validity(), 'invalid_reply': lambda q: not q.get_reply_validity(),
+        	'from_me': lambda q: q.get_sender()==self.owner,
+        	'to_me': lambda q: q.get_recipient()==self.owner,
+        	}
 
     def __str__(self):
 
@@ -615,6 +620,14 @@ class QueryMemory:
     def __len__(self):
 
         return len(self.queries)
+
+    def print_out(self, filters=None, criterion=None):
+
+        print(self)
+        for i,q in enumerate(self.recall(filters=filters,criterion=criterion)):
+            print('----query#'+str(i)+'----')
+            print(q)
+            print('---------------')
 
     def recall_filtered(self, filters=None):
         
@@ -662,23 +675,23 @@ class QueryMemory:
         else:
             return None
 
-    def recall_by_identifier(self, identifier):
+    def recall_by_identifier(self, identifier, filters=None):
         """
         Recalls Queries with the given identifier
         """
-        q_found = []
-        for query in self.queries:
-            if query.get_identifier() == identifier:
-                q_found += [query]
-        return q_found
+        queries = self.recall_filtered(filters)
+        return [q for q in queries if q.get_identifier() == identifier]
 
-    def has_query(self, criterion=None):
+    def recall_by_sender(self, sender, filters=None):
+        queries = self.recall_filtered(filters)
+        return [q for q in queries if q.get_sender() == sender]
+        
+    def recall_by_recipient(self, recipient, filters=None):
+        queries = self.recall_filtered(filters)
+        return [q for q in queries if q.get_recipient() == sender]
 
-        q_found = self.recall(criterion)
-        if len(q_found) > 0:
-            return True
-        else:
-            return False
+    def has_query(self, criterion=None, filters=None):
+        return len(self.recall(criterion=criterion, filters=filters) > 0)
 
     def recall(self, criterion=None, filters=None):
         """
@@ -702,27 +715,29 @@ class QueryMemory:
             for q in queries:  # Maybe criterion is an attribute, some text for instance
                 attr_vals = list(q.__dict__.values())
                 if criterion in attr_vals:
-                    q_found.append(q)
+                    q_found += [q]
 
         return q_found
 
-    def recall_unsent(self):
+    def recall_unsent(self, filters=None):
+        queries = self.recall_filtered(filters)
+        return [q for q in queries if q.get_is_sent() == False]
 
-        qlist = [q for q in self.queries if q.get_is_sent() == False]
-        return qlist
+    def recall_replied(self, filters=None):
+        queries = self.recall_filtered(filters)
+        return [q for q in queries if q.get_is_replied()]
 
-    def recall_replied(self):
+    def recall_unreplied(self, filters=None):
+        queries = self.recall_filtered(filters)
+        return [q for q in queries if not q.get_is_replied()]
 
-        return [q for q in self.queries if q.get_is_replied()]
-
-    def recall_unreplied(self):
-
-        return [q for q in self.queries if not q.get_is_replied()]
-
-    def recall_by_invalid_reply(self):
-
-        q_replied = self.recall_replied()
+    def recall_by_invalid_reply(self, filters=None):
+        q_replied = self.recall_replied(filters=filters)
         return [q for q in q_replied if not q.reply.get_validity()]
+
+    def recall_unsatisfied(self, filters=None):
+        queries = self.recall_filtered(filters)
+        return [q for q in queries if (not q.get_is_replied() or not q.get_reply_validity())]
 
     def recall_repeated(self, filters=None):
         """
@@ -750,7 +765,7 @@ class QueryMemory:
         return repeated
         
 
-    def erase_repeated(self, filters):
+    def erase_repeated(self, filters=None):
         """
         Erase repeated Queries, keeping the most recent in time
         """
@@ -764,13 +779,13 @@ class QueryMemory:
             for q in repeated[0:-1]:
                 self.queries.remove(q)
             return True
-        except (KeyError, TypeError):
+        except (IndexError, TypeError):
             return False
 
     def store(self, query):
 
         # TODO: add support for storing Information
-        print(self)
+        #print(self)
         if isinstance(query, Query):
             self.queries.append(query)
         elif isinstance(query, (list, tuple)):
@@ -804,7 +819,7 @@ class QueryMemory:
 
     def clean(self):
         
-        self.erase_repeated('unreplied')
+        self.erase_repeated(filters=('unreplied'))
         #for q in self.recall_by_invalid_reply():
         #    self.queries.remove(q)
         self.topological_sort()

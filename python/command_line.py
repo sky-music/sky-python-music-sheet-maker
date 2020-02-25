@@ -33,32 +33,33 @@ class CommandLinePlayer:
     def receive(self, *args, **kwargs):
         self.communicator.receive(*args, **kwargs)
         
-        self.prompt_queries()
         
-        
-    def prompt_queries(self, queries=None):
+    def execute_queries(self, queries=None):
         
         if queries == None:
-            queries = self.communicator.recall(('unreplied', 'invalid_reply'))
-        try:
-            queries[0]
-        except TypeError:
-            queries = [queries]
-    		
+            self.communicator.memory.clean()
+            queries = self.communicator.recall_unsatisfied(filters=('to_me'))
+        else:
+            if not isinstance(queries,(list,tuple)):
+                queries = [queries]
+        print('%%%%I AM MUSIC-COG AND HERE ARE MY UNSATISFIED QUERIES:%%%%')
+        self.communicator.memory.print_out(filters=('to_me'))
+        
         for q in queries:
-    		
-            question = self.communicator.query_to_discord()
+            question = self.communicator.query_to_discord(q)
+            print('%%YOU ARE BEING PROMPTED%%%')
             answer = input(question)		
             q.reply_to(answer)
-        
+            
+        return True
 
 
 player = CommandLinePlayer()
 
 maker = MusicSheetMaker()
 
-q = player.communicator.formulate_known('create_song', recipient=maker)
-player.communicator.send(q, recipient=maker)
+q = player.communicator.send_known_query('create_song', recipient=maker)
+#player.communicator.send(q, recipient=maker)
 
 maker.execute_queries()
 
@@ -68,10 +69,10 @@ maker.execute_queries()
 
 #player.communicator.memory.store(q)
 
-print('\n\n')
-player.communicator.print_memory()
-print('\n')
-maker.communicator.print_memory()
+print('\n\n%%%Player memory:')
+player.communicator.memory.print_out()
+print('\n%%%Maker memory:')
+maker.communicator.memory.print_out()
 
 
 

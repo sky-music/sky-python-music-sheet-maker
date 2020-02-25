@@ -43,21 +43,24 @@ class MusicSheetMaker:
     def receive(self, *args, **kwargs):
         self.communicator.receive(*args, **kwargs)
 
-        # self.communicator.print_memory()
-    	
 
-    def execute_queries(self):
-    	
-        self.communicator.memory.clean()
+    def execute_queries(self, queries=None):
         
-        queries = self.communicator.recall_unreplied()
-        
+        if queries == None:
+            self.communicator.memory.clean()
+            queries = self.communicator.memory.recall_unsatisfied()
+            queries = self.communicator.recall_unsatisfied(filters=('to_me'))
+        else:
+            if not isinstance(queries,(list,tuple)):
+                queries = [queries]
+        print('%%%%I AM MAKER AND HERE ARE MY UNSATISFIED QUERIES:%%%%')
+        self.communicator.memory.print_out(filters=('to_me'))
         for q in queries:
             try:
                 query_name = q.get_result()
                 #print('This one is unreplied to :+query_name')
                 known_query = self.communicator.known_queries[query_name]
-                print('self.'+known_query['handler']+'(sender='+q.get_sender().get_name()+')')
+                #print('self.'+known_query['handler']+'(sender='+q.get_sender().get_name()+')')
                 result = eval('self.'+known_query['handler']+'(sender=q.get_sender())')
                 q.reply_to(result)
             except KeyError:
@@ -72,9 +75,10 @@ class MusicSheetMaker:
             raise MusicMakerError('No recipient specified for the Song')
             
         if self.song is not None:
-            overwrite = self.communicator.ask_song_overwrite(recipient=recipient)
-            
-            
+            q = self.communicator.query_song_overwrite(recipient=recipient)
+            #print('%%%%%DEBUG')
+            #print(recipient)
+            recipient.execute_queries()
         #self.set_parser(SongParser(self))
         #os.chdir(self.directory_base)
 

@@ -39,7 +39,7 @@ class Communicator():
 
     def __init__(self, owner):
         self.owner = owner
-        self.memory = QueryMemory()
+        self.memory = QueryMemory(self.owner)
         self.name = self.owner.get_name()
 
         # A dictionary of standard queries arguments
@@ -82,7 +82,7 @@ class Communicator():
     #        print('RETURNING 4')
     #        return default_handler_function
 
-    def formulate_known(self, known_query_name, recipient):
+    def send_known_query(self, known_query_name, recipient):
 
         try:
             known_query_name = known_query_name.lower().replace(' ', '_')
@@ -98,9 +98,11 @@ class Communicator():
         method_args['recipient'] = recipient
         query_method = getattr(communication, method_name)
         q = query_method(**method_args)
-        return q
+        self.memory.store(q)
+        q.check_sender(allowed=self.owner)
+        q.send(recipient=recipient)
             
-
+    '''
     def send(self, communication_objects, recipient=None):
 
         try:
@@ -120,27 +122,26 @@ class Communicator():
 
         query.check_sender(allowed=self.owner)#TODO: previously self.get_name()
         query.send(recipient=recipient)
+    '''
 
     def receive(self, queries):
 
-        try:
-            queries[0]
-        except TypeError:
+        if not isinstance(queries,(list,tuple)):
             queries = [queries]
 
-        for query in queries:
-            query.check_recipient(allowed=self.owner)
-            # print('I am ' + self.get_name() + ', storing a query upon receipt.')
-            self.memory.store(query)
-            # TODO: check for duplicates
+        for q in queries:
+            if q.check_recipient(allowed=self.owner):
+                # print('I am ' + self.get_name() + ', storing a query upon receipt.')
+                self.memory.store(q)
+                # TODO: check for duplicates
 
     def query_to_discord(self, obj):
-    	
-    	question = obj.get_result()
-    	return question
+        
+        question = obj.get_result()
+        return question
 
     def discord_to_query(self, obj):
-    	
+        
         return
 
     def translate(self, obj):
@@ -202,23 +203,16 @@ class Communicator():
                                                       foreword=None,
                                                       afterword=None, reply_type=ReplyType.TEXT, limits=None)
         self.memory.store(q_transcript_writer)
-
-    def ask_song_overwrite(self, recipient):
+    
+    def query_song_overwrite(self, recipient):
         
         q = QueryBoolean(sender=self, recipient=recipient, foreword='A Song already exist in memory.', question='Do you want to overwrite it?', reply_type=ReplyType.TEXT)
+        self.memory.store(q)
         q.send(recipient=recipient)
+        return q
 
     def send_unsent_queries(self, recipient=None):
 
         for q in self.memory.recall_unsent():
             q.send(recipient)
-
-    def print_memory(self):
-
-        print(self)
-        for q in self.memory.recall():
-            print(q)
-
-    def get_memory(self):
-        return self.memory
 
