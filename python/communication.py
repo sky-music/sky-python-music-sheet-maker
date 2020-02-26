@@ -214,7 +214,7 @@ class Query:
             return []
         if len(self.prerequisites) == 0:
             return []
-        if not isinstance(self.prerequisites, (list, tuple)):
+        if not isinstance(self.prerequisites, (list, tuple, set)):
             return [self.prerequisites]
         else:
             return self.prerequisites
@@ -355,11 +355,10 @@ class Query:
 
     def check_reply(self):
 
-        if self.expect_reply is False:
-            return True
+        #if self.expect_reply is False:
+        #    return True
 
         if not isinstance(self.reply, Reply):
-
             self.is_replied = False
             return None
 
@@ -367,7 +366,6 @@ class Query:
             # TODO: add checks for testing the validity of the reply
             # check for length, type, length
             # Typically this method is overridden by derived classes
-            self.is_replied = True
             self.reply.is_valid = False
 
             answer = self.reply.get_answer()
@@ -382,6 +380,7 @@ class Query:
                 else:
                     self.reply.is_valid = True
 
+            self.is_replied = self.reply.is_valid
             return self.reply.is_valid
 
     def build_result(self):
@@ -437,8 +436,9 @@ class Query:
         self.stamp()
         self.is_sent = True
         # TODO: decide whether asking again resets the question to unreplied to (as here)
-        if self.expect_reply:
-            self.is_replied = False
+        
+        self.is_replied = False
+        
         if recipient is None:
             recipient = self.get_recipient()
 
@@ -446,16 +446,17 @@ class Query:
 
         return self.is_sent
 
-    def reply_to(self, reply_result):
+    def reply_to(self, answer):
         """
         Assigns a Reply to the Query
         """
-        if self.expect_reply is False:
-            raise InvalidReplyError('This Query doesnt expect a Reply')
+        #if self.expect_reply is False:
+        #    raise InvalidReplyError('This Query doesnt expect a Reply')
 
-        self.reply = Reply(self, reply_result)
+        self.reply = Reply(self, answer)
         self.reply.build_result()
-        is_reply_valid = self.reply.check_answer()
+        is_reply_valid =  self.reply.check_answer()
+        
         if is_reply_valid is not None:
             self.is_replied = True
         # TODO: decide if is_replied must be set to False of the reply is invalid.
@@ -468,10 +469,10 @@ class QueryChoice(Query):
     """
 
     def __init__(self, *args, **kwargs):
-
+        
         try:
             kwargs['limits'][0]
-        except (TypeError, IndexError):
+        except (TypeError, IndexError, KeyError):
             raise InvalidQueryError('QueryChoice called with no choices')
 
         super().__init__(*args, **kwargs)
@@ -519,24 +520,14 @@ class QueryChoice(Query):
         answer = self.reply.get_result()
         choices = self.get_limits()
 
-        if isinstance(answer, str):
-            answer = answer.lower().strip()
-        if isinstance(choices[0], str):
-            choices = [c.lower().strip() for c in choices]
-
-        if answer is None:
+        index = self.get_reply_index()
+        
+        if index == None:
             self.reply.is_valid = False
-        elif answer in choices:
-            self.reply.is_valid = True
         else:
-            try:
-                choices[int(answer)]
-                self.reply.is_valid = True
-            except:
-                self.reply.is_valid = False
-
-        return self.reply.is_valid
-
+            self.reply.is_valid = True
+            
+        
     def get_reply_index(self):
     	
         answer = self.reply.get_answer()
@@ -547,19 +538,16 @@ class QueryChoice(Query):
         if isinstance(choices[0], str):
             choices = [c.lower().strip() for c in choices]
 
-        if answer is None:
-            self.reply.is_valid = False
-        elif answer in choices:
-            self.reply.is_valid = True
-        else:
-            try:
+        try:
+            index = choices.index(answer)
+        except ValueError:
+            try:#Maybe answer is the choice number
                 choices[int(answer)]
-                self.reply.is_valid = True
-            except:
-                self.reply.is_valid = False
-
-        return self.reply.is_valid
-    	#put here part of the code from check reply
+                index = int(answer)
+            except (IndexError, TypeError):
+                index = None
+        return index
+        
 
 class QueryBoolean(QueryChoice):
     """
@@ -568,7 +556,7 @@ class QueryBoolean(QueryChoice):
 
     def __init__(self, *args, **kwargs):
         # repairing missing choices
-        self.default_limits = ('y', 'n')
+        self.default_limits = ['y', 'n']
         try:
             kwargs['limits'][0]
             kwargs['limits'][1]
@@ -619,17 +607,13 @@ class QueryOpen(Query):
         return self.reply.is_valid
 
 
-class Information(Query):
+class Information(QueryOpen):
     """
     An object passed to the recipient without expecting an answer
     """
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.reply_type = None
-        self.limits = None
-        self.reply = None
-        self.is_replied = None
         self.expect_reply = False
 
 
@@ -653,13 +637,18 @@ class QueryMemory:
         	'valid_reply': lambda q:  q.get_reply_validity(), 'invalid_reply': lambda q: not q.get_reply_validity(),
         	'from_me': lambda q: q.get_sender()==self.owner,
         	'to_me': lambda q: q.get_recipient()==self.owner,
-        	'information': lambda q: not q.expect_reply()
+        	'information': lambda q: not q.expect_reply(),
+        	'query': lambda q: q.expect_reply(),
         	}
 
     def __str__(self):
 
-        return '<' + self.__class__.__name__ + ' about ' + repr(self.topic) + ' with ' + str(
+        string = '<' + self.__class__.__name__
+        if self.topic is not None:
+            string += ' about ' + repr(self.topic)
+        string += ' with ' + str(
             len(self.queries)) + ' stored queries>'
+        return string
 
     def __len__(self):
 
@@ -742,7 +731,7 @@ class QueryMemory:
     def recall_information(self, filters=None):
         
         queries = self.recall_filtered(filters)
-        return [q for q in queries if q.expect_reply == False]
+        return [q for q in queries if q.get_expect_reply() == False]
 
     def recall(self, criterion=None, filters=None):
         """
@@ -852,27 +841,35 @@ class QueryMemory:
         self.queries.clear()
         return True
 
-    def erase(self, criterion=None):
+    def erase(self, filters=None, criterion=None):
         """
         Erases Queries matching criterion
         """
-        if criterion in self.queries:
+        queries = self.recall_filtered(filters)
+        
+        if criterion in queries:
             # removes the query directly
             self.queries.remove(criterion)
             return True
+        
+        # searches for a query matching criterion and removes it
+        if criterion is not None and criterion != '':
+            [self.queries.remove(q) for q in self.recall(filters=filters, criterion=criterion)]
+            return True
         else:
-            # searches for a query matching criterion and removes it
-            if criterion is not None and criterion != '':
-                [self.queries.remove(q) for q in self.recall(criterion)]
-                return True
-            else:
-                return False
+            return False
 
     def clean(self):
         self.erase_repeated(filters=('unreplied'))
+        #TODO: erase invalid replies?
         #for q in self.recall_by_invalid_reply():
         #    self.queries.remove(q)
         self.topological_sort()
+        
+    def flush(self):
+        self.erase(filters=('replied'))
+        self.topological_sort()
+        #TODO: perform self.clean?
 
     def chronological_sort(self):
         """

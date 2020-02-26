@@ -48,12 +48,11 @@ class MusicSheetMaker:
         
         if queries == None:
             self.communicator.memory.clean()
-            queries = self.communicator.memory.recall_unsatisfied()
-            queries = self.communicator.recall_unsatisfied(filters=('to_me'))
+            queries = self.communicator.memory.recall_unsatisfied(filters=('to_me'))
         else:
             if not isinstance(queries,(list,tuple)):
                 queries = [queries]
-        print('%%%%I AM MAKER AND HERE ARE MY UNSATISFIED QUERIES:%%%%')
+        print('\n%%%%I AM MAKER, MY UNSATISFIED QUERIES ARE:%%%%')
         self.communicator.memory.print_out(filters=('to_me'))
         for q in queries:
             try:
@@ -64,7 +63,7 @@ class MusicSheetMaker:
                 result = eval('self.'+known_query['handler']+'(sender=q.get_sender())')
                 q.reply_to(result)
             except KeyError:
-                print('unknown query!!!')
+                raise MusicMakerError('Unknown query '+repr(query_name))
                 pass
 
     def create_song(self, **kwargs):
@@ -75,15 +74,23 @@ class MusicSheetMaker:
             raise MusicMakerError('No recipient specified for the Song')
             
         if self.song is not None:
-            q = self.communicator.query_song_overwrite(recipient=recipient)
+            #q  = self.communicator.query_song_overwrite(recipient=recipient)
+            q = self.communicator.send_known_query('song_overwrite', recipient=recipient)
             #print('%%%%%DEBUG')
             #print(recipient)
             recipient.execute_queries()
-            
+            #print('%%%%%DEBUG, Reply RESULT')
             if q.get_reply().get_result()==False:
-                print('younsaid no')
+                #print('you said no')
                 i = self.communicator.tell(string='Aborting.',recipient=recipient)
                 recipient.execute_queries()
+                return
+                #TODO: return old song?
+        
+        communicator.output_instructions()
+                #print('you said yes')
+                #TODO: test of the song
+                
                 
                 
             #if q.get_result() == 

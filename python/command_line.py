@@ -42,14 +42,19 @@ class CommandLinePlayer:
         else:
             if not isinstance(queries,(list,tuple)):
                 queries = [queries]
-        print('%%%%I AM MUSIC-COG AND HERE ARE MY UNSATISFIED QUERIES:%%%%')
+        print('\n%%%%I AM PLAYER, MY UNSATISFIED QUERIES ARE:%%%%')
         self.communicator.memory.print_out(filters=('to_me'))
         
         for q in queries:
-            question = self.communicator.query_to_discord(q)
-            print('%%YOU ARE BEING PROMPTED%%%')
-            answer = input(question)		
-            q.reply_to(answer)
+            question = self.communicator.query_to_discord(q) 
+            if q.get_expect_reply():
+                print('%%%PLAYER, YOU ARE BEING PROMPTED%%%')
+                answer = input(question + ': ')		
+                q.reply_to(answer)
+            else:
+                print('%%%PLAYER, YOU ARE BEING TOLD%%%')
+                print(question)
+                q.reply_to('ok')
             
         return True
 
@@ -68,12 +73,12 @@ maker.execute_queries()
 
 
 #player.communicator.memory.store(q)
-
+'''
 print('\n\n%%%Player memory:')
 player.communicator.memory.print_out()
 print('\n%%%Maker memory:')
 maker.communicator.memory.print_out()
-
+'''
 
 
 # MusicSheetMaker().create_song(recipient=player)

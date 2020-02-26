@@ -45,8 +45,14 @@ class Communicator():
         # A dictionary of standard queries arguments
         self.known_queries = {
             'create_song': {'class': QueryOpen.__name__, 'handler': 'create_song',
-            'question': 'create_song'}
+            'question': 'create_song'},
+            
+            'song_overwrite': {'class': QueryBoolean.__name__, 'handler': 'None',
+            'foreword': 'A Song already exists in memory.',
+            'question': 'Do you want to overwrite it?', 'reply_type': ReplyType.TEXT}
+            
                              }
+        
                                                    
 
     def __str__(self):
@@ -101,6 +107,8 @@ class Communicator():
         self.memory.store(q)
         q.check_sender(allowed=self.owner)
         q.send(recipient=recipient)
+        
+        return q
             
     '''
     def send(self, communication_objects, recipient=None):
@@ -145,6 +153,7 @@ class Communicator():
         return
 
     def tell(self, recipient, string):
+        
         i = Information(sender=self, recipient=recipient, question=string)
         self.memory.store(i)
         i.send(recipient=recipient)
@@ -209,16 +218,17 @@ class Communicator():
                                                       foreword=None,
                                                       afterword=None, reply_type=ReplyType.TEXT, limits=None)
         self.memory.store(q_transcript_writer)
-    
+    '''
     def query_song_overwrite(self, recipient):
         
         q = QueryBoolean(sender=self, recipient=recipient, foreword='A Song already exist in memory.', question='Do you want to overwrite it?', reply_type=ReplyType.TEXT)
         self.memory.store(q)
         q.send(recipient=recipient)
         return q
-
+     '''
+    '''
     def send_unsent_queries(self, recipient=None):
 
         for q in self.memory.recall_unsent():
             q.send(recipient)
-
+    '''
