@@ -58,9 +58,9 @@ class MusicSheetMaker:
             try:
                 query_name = q.get_result()
                 #print('This one is unreplied to :+query_name')
-                known_query = self.communicator.known_queries[query_name]
-                #print('self.'+known_query['handler']+'(sender='+q.get_sender().get_name()+')')
-                result = eval('self.'+known_query['handler']+'(sender=q.get_sender())')
+                stock_query = self.communicator.stock_queries[query_name]
+                #print('self.'+stock_query['handler']+'(sender='+q.get_sender().get_name()+')')
+                result = eval('self.'+stock_query['handler']+'(sender=q.get_sender())')
                 q.reply_to(result)
             except KeyError:
                 raise MusicMakerError('Unknown query '+repr(query_name))
@@ -75,7 +75,7 @@ class MusicSheetMaker:
             
         if self.song is not None:
             #q  = self.communicator.query_song_overwrite(recipient=recipient)
-            q = self.communicator.send_known_query('song_overwrite', recipient=recipient)
+            q = self.communicator.send_stock_query('song_overwrite', recipient=recipient)
             #print('%%%%%DEBUG')
             #print(recipient)
             recipient.execute_queries()
@@ -86,13 +86,32 @@ class MusicSheetMaker:
                 recipient.execute_queries()
                 return
                 #TODO: return old song?
-        
-        communicator.output_instructions()
+                
+            i_instructions = self.communicator.send_stock_query('instructions', recipient=recipient)
+
+            recipient.execute_queries(i_instructions)
+            self.send_song_messages(recipient=recipient)
                 #print('you said yes')
                 #TODO: test of the song
                 
                 
-                
+    def send_song_messages(self, recipient=None):
+
+        modes_list = [InputMode.JIANPU, InputMode.SKY]
+        q_mode = self.communicator.send_stock_query('musical_notation', recipient=recipient, limits=modes_list)
+        
+        possible_keys = ['do', 're']
+        q_song_key = self.communicator.send_stock_query('possible_keys', recipient=recipient, foreword="\nYour song can be transposed in Sky with the following keys: " + ','.join(possible_keys),limits=possible_keys, prerequisites=q_mode)
+        
+        recipient.execute_queries()
+
+        
+        q_song_title = self.communicator.send_stock_query('song_title', recipient=recipient)
+        q_original_artist = self.communicator.send_stock_query('original_artist', recipient=recipient)
+        q_transcript_writer = self.communicator.send_stock_query('transcript_writer', recipient=recipient)
+        
+        recipient.execute_queries(q_song_title, q_original_artist, q_transcript_writer)
+        
             #if q.get_result() == 
         #self.set_parser(SongParser(self))
         #os.chdir(self.directory_base)

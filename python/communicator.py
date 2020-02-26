@@ -43,15 +43,34 @@ class Communicator():
         self.name = self.owner.get_name()
 
         # A dictionary of standard queries arguments
-        self.known_queries = {
+        self.query_stock = {
             'create_song': {'class': QueryOpen.__name__, 'handler': 'create_song',
             'question': 'create_song'},
             
             'song_overwrite': {'class': QueryBoolean.__name__, 'handler': 'None',
             'foreword': 'A Song already exists in memory.',
-            'question': 'Do you want to overwrite it?', 'reply_type': ReplyType.TEXT}
+            'question': 'Do you want to overwrite it?', 'reply_type': ReplyType.TEXT},
             
-                             }
+            'instructions': {'class': Information.__name__, 'handler': 'None',
+            'foreword':'===== VISUAL MUSIC SHEETS FOR SKY:CHILDREN OF THE LIGHT =====',
+            'question': ''},
+            
+            'song_title': {'class': QueryOpen.__name__, 'handler': 'None',
+            'question': 'What is the song title?', 'reply_type': ReplyType.TEXT},
+            
+            'original_artist': {'class': QueryOpen.__name__, 'handler': 'None',
+            'question': 'What is the Original artist(s)?', 'reply_type': ReplyType.TEXT},
+            
+            'transcript_writer': {'class': QueryOpen.__name__, 'handler': 'None',
+            'question': 'What is the transcript writer?', 'reply_type': ReplyType.TEXT},
+            
+            'musical_notation': {'class': QueryChoice.__name__, 'handler': 'None',
+            'question': 'Please choose your note format', 'reply_type': ReplyType.INPUTMODE, 'limits': []},
+            
+            'possible_keys': {'class': QueryChoice.__name__, 'handler': 'None',
+            'question': 'Please choose your note format', 'reply_type': ReplyType.NOTES, 'limits': []}
+            
+            }
         
                                                    
 
@@ -88,21 +107,27 @@ class Communicator():
     #        print('RETURNING 4')
     #        return default_handler_function
 
-    def send_known_query(self, known_query_name, recipient):
-
+    def send_stock_query(self, stock_query_name, recipient, **kwargs):
+    '''
+    Create and send a query from a catalog, overriding some parameters with kwargs 
+    '''
         try:
-            known_query_name = known_query_name.lower().replace(' ', '_')
-            known_query = self.known_queries[known_query_name]
+            stock_query_name = known_query_name.lower().replace(' ', '_')
+            stock_query = self.stock_queries[stock_query_name]
         except KeyError:
-            raise CommunicatorError(str(known_query_name) + ' is not a standard query')
+            raise CommunicatorError(str(stock_query_name) + ' is not a standard query')
                 
-        method_name = known_query['class']
-        method_args = known_query.copy()
+        method_name = stock_query['class']
+        method_args = stock_query.copy()
         method_args.pop('class')
         method_args.pop('handler')
         method_args['sender'] = self.owner
         method_args['recipient'] = recipient
+        
+        method_args.update(kwargs)
+        	
         query_method = getattr(communication, method_name)
+        
         q = query_method(**method_args)
         self.memory.store(q)
         q.check_sender(allowed=self.owner)
@@ -167,57 +192,8 @@ class Communicator():
             self.discord_to_query(obj)
         return
 
-    def formulate_song_messages(self, recipient=None):
-
-        i_instructions = Information(sender=self.owner.get_name(), recipient=recipient, question='Instructions')
-        self.memory.store(i_instructions)
-
-        # TODO: outline queries
-
-        # query notes
-        # query song notation / input mode
-
-        # TODO: this is meant to be set after calculated by Song
-        modes_list = [InputMode.JIANPU, InputMode.SKY]
-        q_mode = QueryChoice(sender=self.owner, recipient=recipient,
-                                           question="Mode (1-" + str(len(modes_list)) + "): ",
-                                           foreword="Please choose your note format:\n", afterword=None,
-                                           reply_type=ReplyType.INPUTMODE,
-                                           limits=modes_list)
-        self.memory.store(q_mode)
-
-        # query song key
-        possible_keys = ['do', 're']
-        q_song_key = QueryChoice(sender=self.owner, recipient=recipient, question='What is the song key?',
-                                               foreword=None, afterword=None, reply_type=ReplyType.TEXT,
-                                               limits=possible_keys)
-        self.memory.store(q_song_key)
-
-        # query note shift
-
-        # info error ratio
-
-        # query song title
-        q_song_title = QueryOpen(sender=self.owner, recipient=recipient,
-                                               question='What is the song title?',
-                                               foreword='',
-                                               afterword=None,
-                                               reply_type=ReplyType.TEXT, limits=None)
-        self.memory.store(q_song_title)
-
-        # query original_artists
-        q_original_artists = QueryOpen(sender=self.owner, recipient=recipient,
-                                                     question='Original artist(s): ',
-                                                     foreword='Please fill song info or press ENTER to skip:',
-                                                     afterword=None,
-                                                     reply_type=ReplyType.TEXT, limits=None)
-        self.memory.store(q_original_artists)
-        # query transcript_writer
-        q_transcript_writer = QueryOpen(sender=self.owner, recipient=recipient,
-                                                      question='Transcribed by: ',
-                                                      foreword=None,
-                                                      afterword=None, reply_type=ReplyType.TEXT, limits=None)
-        self.memory.store(q_transcript_writer)
+            
+       
     '''
     def query_song_overwrite(self, recipient):
         

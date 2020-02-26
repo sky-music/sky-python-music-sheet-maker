@@ -51,6 +51,7 @@ class CommandLinePlayer:
                 print('%%%PLAYER, YOU ARE BEING PROMPTED%%%')
                 answer = input(question + ': ')		
                 q.reply_to(answer)
+                
             else:
                 print('%%%PLAYER, YOU ARE BEING TOLD%%%')
                 print(question)
@@ -63,7 +64,7 @@ player = CommandLinePlayer()
 
 maker = MusicSheetMaker()
 
-q = player.communicator.send_known_query('create_song', recipient=maker)
+q = player.communicator.send_stock_query('create_song', recipient=maker)
 #player.communicator.send(q, recipient=maker)
 
 maker.execute_queries()

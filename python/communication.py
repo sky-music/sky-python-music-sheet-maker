@@ -67,16 +67,9 @@ class Reply:
     def get_answer(self):
         return self.answer
 
-    def check_answer(self):
-        """
-        Only the Query can tell if the result is valid
-        """
-        self.is_valid = self.query.check_reply()
-        return self.is_valid
-
     def get_validity(self):
         if self.is_valid is None:
-            self.is_valid = self.check_answer()
+            self.is_valid = self.query.check_reply()
         return self.is_valid
 
     def build_result(self):
@@ -86,9 +79,9 @@ class Reply:
             return self.result
         
         if isinstance(self.query, QueryBoolean):
-            self.result =  (self.query.get_reply_index()%2 == 0)
+            self.result =  (self.query.get_answer_index()%2 == 0)
         elif isinstance(self.query, QueryChoice):
-            self.result = self.query.get_reply_index()
+            self.result = self.query.get_answer_index()
         else:
             self.result = self.answer
         
@@ -366,22 +359,22 @@ class Query:
             # TODO: add checks for testing the validity of the reply
             # check for length, type, length
             # Typically this method is overridden by derived classes
-            self.reply.is_valid = False
-
+            
+            self.is_replied = True
+            is_reply_valid = False
             answer = self.reply.get_answer()
 
             if answer is not None:
                 if self.get_reply_type() in [ReplyType.TEXT, ReplyType.NOTE, ReplyType.INTEGER]:
                     if isinstance(answer, str):
-                        self.reply.is_valid = True
+                        is_reply_valid = True
                 elif self.get_reply_type() == ReplyType.INPUTMODE:
                     if isinstance(answer, InputMode) or isinstance(answer, str):
-                        self.reply.is_valid = True
+                        is_reply_valid = True
                 else:
-                    self.reply.is_valid = True
+                    is_reply_valid = True
 
-            self.is_replied = self.reply.is_valid
-            return self.reply.is_valid
+            return is_reply_valid
 
     def build_result(self):
         """
@@ -455,12 +448,12 @@ class Query:
 
         self.reply = Reply(self, answer)
         self.reply.build_result()
-        is_reply_valid =  self.reply.check_answer()
+        self.reply.get_validity()
+        #is_reply_valid = self.get_reply_validity()
         
-        if is_reply_valid is not None:
-            self.is_replied = True
+        #self.is_replied = True
         # TODO: decide if is_replied must be set to False of the reply is invalid.
-        return self.is_replied
+        return self.reply
 
 
 class QueryChoice(Query):
@@ -512,23 +505,21 @@ class QueryChoice(Query):
     def check_reply(self):
 
         # Performs basic checking against ReplyType
-        self.reply.is_valid = super().check_reply()
+        is_reply_valid = super().check_reply()
 
-        if self.reply.is_valid is not True:
-            return self.reply.is_valid
+        if is_reply_valid is not True:
+            return is_reply_valid
 
-        answer = self.reply.get_result()
-        choices = self.get_limits()
-
-        index = self.get_reply_index()
+        answer_index = self.get_answer_index()
         
-        if index == None:
-            self.reply.is_valid = False
+        if answer_index == None:
+            is_reply_valid = False
         else:
-            self.reply.is_valid = True
-            
+            is_reply_valid = True
+             
+        return is_reply_valid
         
-    def get_reply_index(self):
+    def get_answer_index(self):
     	
         answer = self.reply.get_answer()
         choices = self.get_limits()
@@ -592,19 +583,19 @@ class QueryOpen(Query):
 
     def check_reply(self):
 
-        self.reply.is_valid = super().check_reply()
+        is_reply_valid = super().check_reply()
 
-        if self.reply.is_valid is not True:
-            return self.reply.is_valid
+        if is_reply_valid is not True:
+            return is_reply_valid
 
         try:
-            match = re.search(self.get_limits(), self.reply.get_result())
+            match = re.search(self.get_limits(), self.reply.get_answer())
             if match is None:
-                self.reply.is_valid = False
+                is_reply_valid = False
         except TypeError:
             pass
 
-        return self.reply.is_valid
+        return is_reply_valid
 
 
 class Information(QueryOpen):
