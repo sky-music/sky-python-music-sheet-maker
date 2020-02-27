@@ -68,7 +68,7 @@ class Communicator():
             'question': 'Please choose your note format', 'reply_type': ReplyType.INPUTMODE, 'limits': []},
             
             'possible_keys': {'class': QueryChoice.__name__, 'handler': 'None',
-            'question': 'Please choose your note format', 'reply_type': ReplyType.NOTES, 'limits': []}
+            'question': 'Please choose your note format', 'reply_type': ReplyType.NOTE, 'limits': []}
             
             }
         
@@ -108,12 +108,12 @@ class Communicator():
     #        return default_handler_function
 
     def send_stock_query(self, stock_query_name, recipient, **kwargs):
-    '''
-    Create and send a query from a catalog, overriding some parameters with kwargs 
-    '''
+        '''
+        Create and send a query from a catalog, overriding some parameters with kwargs 
+        '''
         try:
-            stock_query_name = known_query_name.lower().replace(' ', '_')
-            stock_query = self.stock_queries[stock_query_name]
+            stock_query_name = stock_query_name.lower().replace(' ', '_')
+            stock_query = self.query_stock[stock_query_name]
         except KeyError:
             raise CommunicatorError(str(stock_query_name) + ' is not a standard query')
                 

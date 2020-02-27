@@ -205,8 +205,6 @@ class Query:
     def get_prerequisites(self):
         if self.prerequisites is None:
             return []
-        if len(self.prerequisites) == 0:
-            return []
         if not isinstance(self.prerequisites, (list, tuple, set)):
             return [self.prerequisites]
         else:

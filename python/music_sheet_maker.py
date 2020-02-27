@@ -1,4 +1,5 @@
 import os
+from modes import InputMode, ReplyType
 from communicator import Communicator
 from parsers import SongParser
 
@@ -58,7 +59,8 @@ class MusicSheetMaker:
             try:
                 query_name = q.get_result()
                 #print('This one is unreplied to :+query_name')
-                stock_query = self.communicator.stock_queries[query_name]
+                #TODO: should not call query_stock directly
+                stock_query = self.communicator.query_stock[query_name]
                 #print('self.'+stock_query['handler']+'(sender='+q.get_sender().get_name()+')')
                 result = eval('self.'+stock_query['handler']+'(sender=q.get_sender())')
                 q.reply_to(result)
@@ -110,7 +112,7 @@ class MusicSheetMaker:
         q_original_artist = self.communicator.send_stock_query('original_artist', recipient=recipient)
         q_transcript_writer = self.communicator.send_stock_query('transcript_writer', recipient=recipient)
         
-        recipient.execute_queries(q_song_title, q_original_artist, q_transcript_writer)
+        recipient.execute_queries([q_song_title, q_original_artist, q_transcript_writer])
         
             #if q.get_result() == 
         #self.set_parser(SongParser(self))
