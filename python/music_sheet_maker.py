@@ -1,5 +1,5 @@
 import os
-from modes import InputMode, ReplyType
+from modes import InputMode
 from communicator import Communicator
 from parsers import SongParser
 

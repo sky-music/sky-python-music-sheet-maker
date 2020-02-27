@@ -60,6 +60,7 @@ class Reply:
             string += repr(self.get_result())
         else:
             string += str(self.get_result())
+        string += ', valid=' + self.get_validity()
         string += '>'
 
         return string
@@ -68,7 +69,7 @@ class Reply:
         return self.answer
 
     def get_validity(self):
-        if self.is_valid is None:
+        if self.is_valid is not True:
             self.is_valid = self.query.check_reply()
         return self.is_valid
 
@@ -143,7 +144,14 @@ class Query:
             string += ', within ' + str(self.limits)
         except (TypeError, IndexError):
             pass
-        string += ', answered=' + str(self.get_is_replied())
+        string += ', answer='
+        is_valid = self.get_reply_validity()
+        if is_valid is True:
+            string += 'valid'
+        elif is_valid is None:
+            string += 'None'
+        else:
+            string += 'invalid'
         string += '>'
 
         return string
@@ -422,7 +430,7 @@ class Query:
         """
         if self.is_replied:
             if self.reply.check_reply():
-                raise QueryRepliedError('this question has already been answered')
+                raise QueryRepliedError('this question has already been correctly answered')
         self.check_and_pack()
         self.stamp()
         self.is_sent = True
@@ -531,9 +539,9 @@ class QueryChoice(Query):
             index = choices.index(answer)
         except ValueError:
             try:#Maybe answer is the choice number
-                choices[int(answer)]
                 index = int(answer)
-            except (IndexError, TypeError):
+                choices[index]
+            except (ValueError, IndexError, TypeError):
                 index = None
         return index
         
