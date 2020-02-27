@@ -16,7 +16,7 @@ class MusicSheetMaker:
     def __init__(self):
         self.name = 'music-sheet-maker'
         self.communicator = Communicator(owner=self)
-        self.song = 0  # Song object
+        self.song = 0  # TODO reset song to None after debugging tests
         self.parser = None
         self.init_working_directory()
         self.directory_base = os.getcwd()
@@ -55,18 +55,22 @@ class MusicSheetMaker:
                 queries = [queries]
         print('\n%%%%I AM MAKER, MY UNSATISFIED QUERIES ARE:%%%%')
         self.communicator.memory.print_out(filters=('to_me'))
-        for q in queries:
-            try:
-                query_name = q.get_result()
-                #print('This one is unreplied to :+query_name')
-                #TODO: should not call query_stock directly
-                stock_query = self.communicator.query_stock[query_name]
-                #print('self.'+stock_query['handler']+'(sender='+q.get_sender().get_name()+')')
-                result = eval('self.'+stock_query['handler']+'(sender=q.get_sender())')
-                q.reply_to(result)
-            except KeyError:
-                raise MusicMakerError('Unknown query '+repr(query_name))
-                pass
+        
+        reply_valid = False
+        while not reply_valid:
+            for q in queries:
+                try:
+                    query_name = q.get_result()
+                    
+                    stock_query = self.communicator.query_stock[query_name]
+                
+                    result = eval('self.'+stock_query['handler']+'(sender=q.get_sender())')
+                    q.reply_to(result)
+                    reply_valid = q.get_reply_validity()
+                    
+                except KeyError:
+                    raise MusicMakerError('Unknown query '+repr(query_name))
+                    pass
 
     def create_song(self, **kwargs):
         
@@ -77,25 +81,42 @@ class MusicSheetMaker:
             
         if self.song is not None:
             #q  = self.communicator.query_song_overwrite(recipient=recipient)
-            q = self.communicator.send_stock_query('song_overwrite', recipient=recipient)
+            q_overwrite = self.communicator.send_stock_query('song_overwrite', recipient=recipient)
             #print('%%%%%DEBUG')
             #print(recipient)
             recipient.execute_queries()
             #print('%%%%%DEBUG, Reply RESULT')
-            if q.get_reply().get_result()==False:
-                #print('you said no')
+            if q_overwrite.get_reply().get_result()==False:
                 i = self.communicator.tell(string='Aborting.',recipient=recipient)
                 recipient.execute_queries()
                 return
                 #TODO: return old song?
+                #TODO reply None to song_creation query so that it gets satisfied and the loop ends
+                #return something, a Reply or  do Query.reply_to if it has been passed as argument
                 
             i_instructions = self.communicator.send_stock_query('instructions', recipient=recipient)
-
             recipient.execute_queries(i_instructions)
             self.send_song_messages(recipient=recipient)
-                #print('you said yes')
-                #TODO: test of the song
-                
+            self.send_notes_message(recipient=recipient)
+            #TODO: Song rendering
+            #self.set_parser(SongParser(self))
+            #os.chdir(self.directory_base)   
+           
+            
+            # Parse song
+            self.set_song(self.parse_song(song_lines, song_key, note_shift))
+    
+            #err=self.calculate_error_ratio()
+            #i_errors = self.communicator.send_stock_query('text', recipient=recipient, question=str(err))
+    
+            # TODO: Send Output
+            #several options to answer the  query:
+            #1/ have the query passed as the first argument of the current method and use Query.reply_to
+            #2/ return the song as a reply object, and let the encapsulating method use query.reply_to
+            #3/ Find the query in the memory and reply to it
+            
+            # self.send_song(RenderMode.PNG)
+            
                 
     def send_song_messages(self, recipient=None):
 
@@ -106,36 +127,26 @@ class MusicSheetMaker:
         q_song_key = self.communicator.send_stock_query('possible_keys', recipient=recipient, foreword="\nYour song can be transposed in Sky with the following keys: " + ','.join(possible_keys),limits=possible_keys, prerequisites=q_mode)
         
         recipient.execute_queries()
-
         
+        #TODO: Remember metadata so that, if parsing fails the questions are not asked again
         q_song_title = self.communicator.send_stock_query('song_title', recipient=recipient)
         q_original_artist = self.communicator.send_stock_query('original_artist', recipient=recipient)
         q_transcript_writer = self.communicator.send_stock_query('transcript_writer', recipient=recipient)
         
-        recipient.execute_queries([q_song_title, q_original_artist, q_transcript_writer])
+        q_octave_shift = self.communicator.send_stock_query('octave_shift', recipient=recipient)
+        recipient.execute_queries([q_octave_shift])
         
-            #if q.get_result() == 
-        #self.set_parser(SongParser(self))
-        #os.chdir(self.directory_base)
-
-        # communicator.output_instructions()
-
-        # communicator.ask_first_line()
-        # fp = self.load_file(self.get_song_dir_in(), first_line)  # loads file or asks for next line
-        # song_lines = self.read_lines(first_line, fp)
-
-        # Parse song
-        # TODO: refactor song_lines, song_keys, parse_song to be in Song class
-        # communicator.ask_input_mode(song_lines)
-        # song_key = self.ask_song_key(self.get_parser().get_input_mode(), song_lines)
-        # note_shift = communicator.ask_note_shift()
-        # self.set_song(self.parse_song(song_lines, song_key, note_shift))
-
-        # self.calculate_error_ratio()
-
-        # Song information
-        # communicator.ask_song_title()
-        # communicator.ask_song_headers(song_key)
-
-        # Output
-        # communicator.send_song(RenderMode.PNG)
+         # TODO: Send the results back
+        #several options form here:
+        #1/ do nothinf and let the surrounding (calling) method retrieve the answers in Memory
+        #2/ return all the queries as a  tuple
+        
+    def send_notes_message(self, recipient=None):
+        
+    #TODO: ask for notes
+    # communicator.ask_first_line()
+    # fp = self.load_file(self.get_song_dir_in(), first_line)  # loads file or asks for next line
+    # song_lines self.read_lines(first_line, fp)
+        pass
+        
+        

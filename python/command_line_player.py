@@ -40,17 +40,19 @@ class CommandLinePlayer:
         self.communicator.memory.print_out(filters=('to_me'))
         
         for q in queries:
-            question = self.communicator.query_to_discord(q) 
-            if q.get_expect_reply():
-                print('%%%PLAYER, YOU ARE BEING PROMPTED%%%')
-                answer = input(question + ': ')		
-                q.reply_to(answer)
-                
-            else:
-                print('%%%PLAYER, YOU ARE BEING TOLD%%%')
-                print(question)
-                q.reply_to('ok')
-            
+            question = self.communicator.query_to_discord(q)
+            reply_valid = False
+            while not reply_valid:
+                if q.get_expect_reply():
+                    print('%%%PLAYER, YOU ARE BEING PROMPTED%%%')
+                    answer = input(question + ': ')		
+                    q.reply_to(answer)
+                    reply_valid = q.get_reply_validity()
+                else:
+                    print('%%%PLAYER, YOU ARE BEING TOLD%%%')
+                    print(question)
+                    q.reply_to('ok')
+                    reply_valid = q.get_reply_validity()
         return True
 
 

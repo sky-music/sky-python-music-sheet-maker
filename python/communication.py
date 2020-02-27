@@ -382,6 +382,17 @@ class Query:
 
             return is_reply_valid
 
+    def check_prerequisites(self):
+        
+        pre = self.get_prerequisites()
+        if len(pre) == 0:
+            satisfied = True
+        else:
+            satisfied = all([q.get_reply_validity() for q in pre])
+            
+        return satisfied
+            
+
     def build_result(self):
         """
         The result is the complete query, with foreword, afterword, et caetera
@@ -455,6 +466,9 @@ class Query:
         self.reply = Reply(self, answer)
         self.reply.build_result()
         self.reply.get_validity()
+        pre_satisfied = self.check_prerequisites()
+        if not pre_satisfied:
+            raise InvalidReplyError('This Query requires other queries to be satisfied first.')
         #is_reply_valid = self.get_reply_validity()
         
         #self.is_replied = True
