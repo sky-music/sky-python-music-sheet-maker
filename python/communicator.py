@@ -68,11 +68,14 @@ class Communicator():
             'transcript_writer': {'class': QueryOpen.__name__, 'handler': 'None',
             'question': 'What is the transcript writer?', 'reply_type': ReplyType.TEXT},
             
+            'song_notes': {'class': QueryOpen.__name__, 'handler': 'None',
+            'question': 'Please type your notes', 'reply_type': ReplyType.NOTE, 'limits': None},
+            
             'musical_notation': {'class': QueryChoice.__name__, 'handler': 'None',
             'question': 'Please choose your note format', 'reply_type': ReplyType.INPUTMODE, 'limits': []},
             
             'possible_keys': {'class': QueryChoice.__name__, 'handler': 'None',
-            'question': 'Please choose your note format', 'reply_type': ReplyType.NOTE, 'limits': []},
+            'question': 'Please choose your note format', 'reply_type': ReplyType.NOTE, 'limits': None},
             
             'octave_shift': {'class': QueryOpen.__name__, 'handler': 'None',
             'question': 'Do you want to shift by n octaves?', 'reply_type': ReplyType.INTEGER, 'limits': [-6, 6]}
@@ -132,7 +135,7 @@ class Communicator():
         method_args['recipient'] = recipient
         
         method_args.update(kwargs)
-        	
+        
         query_method = getattr(communication, method_name)
         
         q = query_method(**method_args)

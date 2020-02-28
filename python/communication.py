@@ -85,6 +85,9 @@ class Reply:
             self.result = self.query.get_answer_index()
         else:
             self.result = self.answer
+            if self.query.reply_type == ReplyType.INTEGER:
+                self.result = int(self.answer)
+            
         
         return self.result
 
