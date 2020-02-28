@@ -52,6 +52,9 @@ class Communicator():
             'foreword': 'A Song already exists in memory.',
             'question': 'Do you want to overwrite it?', 'reply_type': ReplyType.TEXT},
             
+            'information': {'class': Information.__name__, 'handler': 'None',
+            'question': '', 'reply_type': ReplyType.TEXT},
+            
             'instructions': {'class': Information.__name__, 'handler': 'None',
             'foreword':'===== VISUAL MUSIC SHEETS FOR SKY:CHILDREN OF THE LIGHT =====',
             'question': ''},
@@ -72,7 +75,7 @@ class Communicator():
             'question': 'Please choose your note format', 'reply_type': ReplyType.NOTE, 'limits': []},
             
             'octave_shift': {'class': QueryOpen.__name__, 'handler': 'None',
-            'question': 'Do you want to shift by n octaves?', 'reply_type': ReplyType.INTEGER, 'limits': []}
+            'question': 'Do you want to shift by n octaves?', 'reply_type': ReplyType.INTEGER, 'limits': [-6, 6]}
             
             }
         

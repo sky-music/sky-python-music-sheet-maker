@@ -7,7 +7,7 @@ class CommandLinePlayer:
 
     def __init__(self):
         self.song = None  # Song object
-        self.name = 'music-cog'
+        self.name = 'command-line'
         self.communicator = Communicator(owner=self)
         # self.parser = SongParser()
         # self.receive =  self.communicator.receive

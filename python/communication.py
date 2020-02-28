@@ -126,7 +126,7 @@ class Query:
             => the choice will depend on the bot structure (since we can do whatever we want with music cog)
             => a possibility is to check first if the sender is music cog, and if not (AttributeError), then it is the bot
         '''
-        self.valid_locutors_names = ['music-cog', 'music-sheet-maker']  # A list of valid locutors
+        self.valid_locutors_names = ['music-cog', 'music-sheet-maker', 'command-line']  # A list of valid locutors
 
         self.reply = None  # Reply object
         self.result = None  # The full question with foreword and afterword
@@ -140,8 +140,9 @@ class Query:
             self.sender.get_name()) + ' to ' + str(
             self.recipient.get_name()) + ': ' + repr(self.question) + ', ' + str(self.reply_type) + ' expected'
         try:
-            self.get_limits()[0]
-            string += ', within ' + str(self.limits)
+            limits = self.get_limits()
+            limits[0]
+            string += ', within ' + str(limits)
         except (TypeError, IndexError):
             pass
         string += ', answer='
@@ -187,10 +188,22 @@ class Query:
         return self.reply_type
 
     def get_expect_reply(self):
-    	return self.expect_reply
+        return self.expect_reply
 
     def get_limits(self):
-        return self.limits
+        '''
+        Returns None or a list with len>0
+        '''
+        if self.limits is None:
+            return None
+        else:
+            try:
+                self.limits[0]
+                return self.limits
+            except IndexError:
+                return None
+            except TypeError:
+                return [self.limits]
 
     def get_is_replied(self):
         return self.is_replied
@@ -314,43 +327,39 @@ class Query:
     def check_limits(self):
 
         limits = self.get_limits()
-
         if limits is None:
             return True
-        else:
+        if len(limits) == 0:
+            return True
+
+        if (self.reply_type == ReplyType.TEXT or self.reply_type == ReplyType.NOTE) and not isinstance(limits[0], str):
+            raise InvalidQueryTypeError('incorrect limits type', limits[0], str)
+
+        if self.reply_type == ReplyType.INTEGER:
             try:
-                item = limits[0]
-            except (IndexError, TypeError):
-                item = limits
+                int(limits[0])
+            except:
+                raise InvalidQueryTypeError('incorrect limits type', limits[0], int)
 
-            if (self.reply_type == ReplyType.TEXT or self.reply_type == ReplyType.NOTE) and not isinstance(item, str):
-                raise InvalidQueryTypeError('incorrect limits type', item, str)
+        if self.reply_type == ReplyType.INPUTMODE and not isinstance(limits[0], InputMode):
+            raise InvalidQueryTypeError('incorrect limits type', limits[0], InputMode)
 
-            if self.reply_type == ReplyType.INTEGER:
+        if any([type(limit) != type(limits[0]) for limit in limits]):
+            raise InvalidQueryError('limits are not all of the same type')
+
+        # smart guess of some types
+        if self.reply_type is None:
+            if isinstance(limits[0], str):
                 try:
-                    int(item)
+                    int(limits[0])
+                    self.reply_type = ReplyType.INTEGER
                 except:
-                    raise InvalidQueryTypeError('incorrect limits type', item, int)
-
-            if self.reply_type == ReplyType.INPUTMODE and not isinstance(item, InputMode):
-                raise InvalidQueryTypeError('incorrect limits type', item, InputMode)
-
-            if any([type(limit) != type(item) for limit in limits]):
-                raise InvalidQueryError('limits are not all of the same type')
-
-            # smart guess of some types
-            if self.reply_type is None:
-                if isinstance(item, str):
-                    try:
-                        int(item)
-                        self.reply_type = ReplyType.INTEGER
-                    except:
-                        self.reply_type = ReplyType.TEXT
-                elif isinstance(item, InputMode):
-                    self.reply_type = ReplyType.INPUTMODE
-                else:
-                    # TODO: decide if its better to leave it to none instead
-                    self.reply_type = ReplyType.OTHER
+                    self.reply_type = ReplyType.TEXT
+            elif isinstance(limits[0], InputMode):
+                self.reply_type = ReplyType.INPUTMODE
+            else:
+                # TODO: decide if its better to leave it to none instead
+                self.reply_type = ReplyType.OTHER
 
     def check_reply(self):
 
@@ -368,18 +377,37 @@ class Query:
             
             self.is_replied = True
             is_reply_valid = False
-            answer = self.reply.get_answer()
+            answer = self.get_reply().get_answer()
+            limits = self.get_limits()
 
             if answer is not None:
-                if self.get_reply_type() in [ReplyType.TEXT, ReplyType.NOTE, ReplyType.INTEGER]:
+                if self.get_reply_type() in [ReplyType.TEXT, ReplyType.NOTE]:
                     if isinstance(answer, str):
                         is_reply_valid = True
+                elif self.get_reply_type() == ReplyType.INTEGER:
+                    try:
+                       int(answer)
+                       is_reply_valid = True
+                    except:
+                        is_reply_valid = False
                 elif self.get_reply_type() == ReplyType.INPUTMODE:
                     if isinstance(answer, InputMode) or isinstance(answer, str):
                         is_reply_valid = True
                 else:
                     is_reply_valid = True
 
+                if self.get_reply_type() == ReplyType.INTEGER and limits is not None and is_reply_valid is True:
+                    try:
+                        num = int(answer)
+                        low_lim = min(limits)
+                        high_lim = max(limits)
+                        if num >= low_lim and num <= high_lim:
+                            is_reply_valid = True
+                        else:
+                            is_reply_valid = False
+                    except (ValueError,TypeError):
+                        pass
+                    
             return is_reply_valid
 
     def check_prerequisites(self):
@@ -532,7 +560,7 @@ class QueryChoice(Query):
 
         answer_index = self.get_answer_index()
         
-        if answer_index == None:
+        if answer_index is None:
             is_reply_valid = False
         else:
             is_reply_valid = True
@@ -540,7 +568,7 @@ class QueryChoice(Query):
         return is_reply_valid
         
     def get_answer_index(self):
-    	
+        
         answer = self.reply.get_answer()
         choices = self.get_limits()
 
@@ -552,11 +580,13 @@ class QueryChoice(Query):
         try:
             index = choices.index(answer)
         except ValueError:
-            try:#Maybe answer is the choice number
+            try:#Maybe answer is the choice index (0-n)
                 index = int(answer)
-                choices[index]
+                if index < 0 or index > len(choices):
+                    index = None
             except (ValueError, IndexError, TypeError):
                 index = None
+
         return index
         
 
@@ -584,8 +614,8 @@ class QueryBoolean(QueryChoice):
         result = []
 
         result += [self.get_foreword()]
-        result += [self.get_question() + ' (' + (self.limits[0] +
-                                                 '/' + self.limits[1]) + ')']
+        result += [self.get_question() + ' (' + (self.get_limits()[0] +
+                                                 '/' + self.get_limits()[1]) + ')']
         result += [self.get_afterword()]
         result = '\n'.join(filter(None, result))
         self.result = result
