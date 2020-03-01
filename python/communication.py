@@ -74,13 +74,13 @@ class Reply:
         return self.is_valid
 
     def build_result(self):
-        
+
         if self.get_validity() == False:
             self.result = None
             return self.result
-        
+
         if isinstance(self.query, QueryBoolean):
-            self.result =  (self.query.get_answer_index()%2 == 0)
+            self.result = (self.query.get_answer_index() % 2 == 0)
         elif isinstance(self.query, QueryChoice):
             index =  self.query.get_answer_index()
             self.result = self.query.get_limits()[index]
@@ -89,6 +89,7 @@ class Reply:
             if self.query.reply_type == ReplyType.INTEGER:
                 self.result = int(self.answer)
             
+
         return self.result
 
     def get_result(self):
@@ -210,7 +211,7 @@ class Query:
 
     def get_is_replied(self):
         return self.is_replied
-        
+
     def get_reply_validity(self):
         try:
             return self.get_reply().get_validity()
@@ -261,7 +262,7 @@ class Query:
         if locutor is None:
             locutor_ok = False
             return locutor_ok
-            #raise InvalidQueryError('invalid locutor for ID=' + str(self.get_identifier()) + ': ' + str(locutor))
+            # raise InvalidQueryError('invalid locutor for ID=' + str(self.get_identifier()) + ': ' + str(locutor))
 
         if len(self.valid_locutors_names) != 0:
             # Try to retrieve the locutor name
@@ -270,8 +271,8 @@ class Query:
 
             if locutor_name not in self.valid_locutors_names:
                 locutor_ok = False
-                #print(locutor_name)
-                #print(self.valid_locutors_names)
+                # print(locutor_name)
+                # print(self.valid_locutors_names)
                 print('locutor is not in internal validation list')
 
         if allowed != 'all':
@@ -366,7 +367,7 @@ class Query:
 
     def check_reply(self):
 
-        #if self.expect_reply is False:
+        # if self.expect_reply is False:
         #    return True
 
         if not isinstance(self.reply, Reply):
@@ -377,7 +378,7 @@ class Query:
             # TODO: add checks for testing the validity of the reply
             # check for length, type, length
             # Typically this method is overridden by derived classes
-            
+
             self.is_replied = True
             is_reply_valid = False
             answer = self.get_reply().get_answer()
@@ -389,8 +390,8 @@ class Query:
                         is_reply_valid = True
                 elif self.get_reply_type() == ReplyType.INTEGER:
                     try:
-                       int(answer)
-                       is_reply_valid = True
+                        int(answer)
+                        is_reply_valid = True
                     except:
                         is_reply_valid = False
                 elif self.get_reply_type() == ReplyType.INPUTMODE:
@@ -408,21 +409,20 @@ class Query:
                             is_reply_valid = True
                         else:
                             is_reply_valid = False
-                    except (ValueError,TypeError):
+                    except (ValueError, TypeError):
                         pass
-                    
+
             return is_reply_valid
 
     def check_prerequisites(self):
-        
+
         pre = self.get_prerequisites()
         if len(pre) == 0:
             satisfied = True
         else:
             satisfied = all([q.get_reply_validity() for q in pre])
-            
+
         return satisfied
-            
 
     def build_result(self):
         """
@@ -477,9 +477,9 @@ class Query:
         self.stamp()
         self.is_sent = True
         # TODO: decide whether asking again resets the question to unreplied to (as here)
-        
+
         self.is_replied = False
-        
+
         if recipient is None:
             recipient = self.get_recipient()
 
@@ -491,7 +491,7 @@ class Query:
         """
         Assigns a Reply to the Query
         """
-        #if self.expect_reply is False:
+        # if self.expect_reply is False:
         #    raise InvalidReplyError('This Query doesnt expect a Reply')
 
         self.reply = Reply(self, answer)
@@ -500,9 +500,9 @@ class Query:
         pre_satisfied = self.check_prerequisites()
         if not pre_satisfied:
             raise InvalidReplyError('This Query requires other queries to be satisfied first.')
-        #is_reply_valid = self.get_reply_validity()
-        
-        #self.is_replied = True
+        # is_reply_valid = self.get_reply_validity()
+
+        # self.is_replied = True
         # TODO: decide if is_replied must be set to False of the reply is invalid.
         return self.reply
 
@@ -513,7 +513,7 @@ class QueryChoice(Query):
     """
 
     def __init__(self, *args, **kwargs):
-        
+
         try:
             kwargs['limits'][0]
         except (TypeError, IndexError, KeyError):
@@ -562,16 +562,16 @@ class QueryChoice(Query):
             return is_reply_valid
 
         answer_index = self.get_answer_index()
-        
+
         if answer_index is None:
             is_reply_valid = False
         else:
             is_reply_valid = True
-             
+
         return is_reply_valid
-        
+
     def get_answer_index(self):
-        
+
         answer = self.reply.get_answer()
         choices = self.get_limits()
 
@@ -583,7 +583,7 @@ class QueryChoice(Query):
         try:
             index = choices.index(answer)
         except ValueError:
-            try:#Maybe answer is the choice index (0-n)
+            try:  # Maybe answer is the choice index (0-n)
                 index = int(answer)
                 if index < 0 or index > len(choices):
                     index = None
@@ -591,7 +591,7 @@ class QueryChoice(Query):
                 index = None
 
         return index
-        
+
 
 class QueryBoolean(QueryChoice):
     """
@@ -674,16 +674,16 @@ class QueryMemory:
         self.queries = []
         self.topic = topic  # A topic for this specific memory object
         self.query_filters = {
-        	'replied': lambda q: q.get_is_replied(),
-        	'sent': lambda q: q.get_is_sent(),
-        	'unreplied': lambda q: not q.get_is_replied(),
-        	'unsent': lambda q: not q.get_is_sent(),
-        	'valid_reply': lambda q:  q.get_reply_validity(), 'invalid_reply': lambda q: not q.get_reply_validity(),
-        	'from_me': lambda q: q.get_sender()==self.owner,
-        	'to_me': lambda q: q.get_recipient()==self.owner,
-        	'information': lambda q: not q.expect_reply(),
-        	'query': lambda q: q.expect_reply(),
-        	}
+            'replied': lambda q: q.get_is_replied(),
+            'sent': lambda q: q.get_is_sent(),
+            'unreplied': lambda q: not q.get_is_replied(),
+            'unsent': lambda q: not q.get_is_sent(),
+            'valid_reply': lambda q: q.get_reply_validity(), 'invalid_reply': lambda q: not q.get_reply_validity(),
+            'from_me': lambda q: q.get_sender() == self.owner,
+            'to_me': lambda q: q.get_recipient() == self.owner,
+            'information': lambda q: not q.expect_reply(),
+            'query': lambda q: q.expect_reply(),
+        }
 
     def __str__(self):
 
@@ -701,15 +701,15 @@ class QueryMemory:
     def print_out(self, filters=None, criterion=None):
 
         print(self)
-        for i,q in enumerate(self.recall(filters=filters,criterion=criterion)):
-            print('----query#'+str(i)+'----')
+        for i, q in enumerate(self.recall(filters=filters, criterion=criterion)):
+            print('----query#' + str(i) + '----')
             print(q)
             print('---------------')
 
-   # TODO: add a specific recall for information objects expect_reply = false
+    # TODO: add a specific recall for information objects expect_reply = false
 
     def recall_filtered(self, filters=None):
-        
+
         if filters is None:
             return self.queries
         else:
@@ -717,7 +717,7 @@ class QueryMemory:
             if not isinstance(filters, (list, tuple, set)):
                 filters = [filters]
             for k in filters:
-                queries=filter(self.query_filters[k],queries)
+                queries = filter(self.query_filters[k], queries)
         return list(queries)
 
     def recall_last(self, filters=None):
@@ -725,7 +725,7 @@ class QueryMemory:
         Recalls the last stored Query. If a topological sort has been made, it is the last one to be answered
         """
         queries = self.recall_filtered(filters)
-            
+
         if len(queries) > 0:
             return queries[-1]
         else:
@@ -736,7 +736,7 @@ class QueryMemory:
         Recalls the first query. If a topological sort has been made, it is the first one to be answered
         '''
         queries = self.recall_filtered(filters)
-        
+
         if len(queries) > 0:
             return queries[0]
         else:
@@ -747,7 +747,7 @@ class QueryMemory:
         Recalls the most recent Query (the last one sent, unsent queries have no daye)
         """
         queries = self.recall_filtered(filters)
-        
+
         if len(queries) > 0:
             chronos = sorted(queries, key=Query.get_sent_time)
             return chronos[-1]
@@ -764,7 +764,7 @@ class QueryMemory:
     def recall_by_sender(self, sender, filters=None):
         queries = self.recall_filtered(filters)
         return [q for q in queries if q.get_sender() == sender]
-        
+
     def recall_by_recipient(self, recipient, filters=None):
         queries = self.recall_filtered(filters)
         return [q for q in queries if q.get_recipient() == sender]
@@ -773,7 +773,7 @@ class QueryMemory:
         return len(self.recall(criterion=criterion, filters=filters) > 0)
 
     def recall_information(self, filters=None):
-        
+
         queries = self.recall_filtered(filters)
         return [q for q in queries if q.get_expect_reply() == False]
 
@@ -782,7 +782,7 @@ class QueryMemory:
         Recalls Queries matching criterion, which can be a list index, a string to be searched, or a Query identifier
         """
         queries = self.recall_filtered(filters)
-        
+
         if criterion is None or criterion == '':
             return queries
 
@@ -847,7 +847,6 @@ class QueryMemory:
             repeated = [q for q in queries if q.get_identifier() in repeated]
 
         return repeated
-        
 
     def erase_repeated(self, filters=None):
         """
@@ -868,8 +867,7 @@ class QueryMemory:
 
     def store(self, query):
 
-        
-        #print(self)
+        # print(self)
         if isinstance(query, Query):
             self.queries.append(query)
         elif isinstance(query, (list, tuple)):
@@ -890,12 +888,12 @@ class QueryMemory:
         Erases Queries matching criterion
         """
         queries = self.recall_filtered(filters)
-        
+
         if criterion in queries:
             # removes the query directly
             self.queries.remove(criterion)
             return True
-        
+
         # searches for a query matching criterion and removes it
         if criterion is not None and criterion != '':
             [self.queries.remove(q) for q in self.recall(filters=filters, criterion=criterion)]
@@ -905,15 +903,15 @@ class QueryMemory:
 
     def clean(self):
         self.erase_repeated(filters=('unreplied'))
-        #TODO: erase invalid replies?
-        #for q in self.recall_by_invalid_reply():
+        # TODO: erase invalid replies?
+        # for q in self.recall_by_invalid_reply():
         #    self.queries.remove(q)
         self.topological_sort()
-        
+
     def flush(self):
         self.erase(filters=('replied'))
         self.topological_sort()
-        #TODO: perform self.clean?
+        # TODO: perform self.clean?
 
     def chronological_sort(self):
         """
