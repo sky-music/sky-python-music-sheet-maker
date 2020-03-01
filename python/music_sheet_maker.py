@@ -123,9 +123,12 @@ class MusicSheetMaker:
         #Ask for notes
         notes = self.ask_notes(recipient=recipient)
         
-        mode = self.ask_input_mode(recipient=recipient, notes=notes)
+        input_mode = self.ask_input_mode(recipient=recipient, notes=notes)
         
+        self.get_parser().set_input_mode(input_mode)
         
+        print('%%%%DEBUG')
+        print(input_mode)
         #TODO: Song rendering
         #self.set_parser(SongParser(self))
         #os.chdir(self.directory_base)   
@@ -134,7 +137,7 @@ class MusicSheetMaker:
         #TODO: parse notes
         # self.parse_song(song_lines, song_key, note_shift))
         
-        song_key = self.ask_song_key(recipient=recipient, notes=notes)
+        song_key = self.ask_song_key(recipient=recipient, notes=notes, input_mode=input_mode)
         
         #Asks for octave shift
         q_shift = self.communicator.send_stock_query('octave_shift', recipient=recipient)
@@ -166,13 +169,15 @@ class MusicSheetMaker:
     
         #TODO: Remember metadata so that, if parsing fails the questions are not asked again
         
+        queries = []
+        
         queries += [self.communicator.send_stock_query('song_title', recipient=recipient)]
         queries += [self.communicator.send_stock_query('original_artist', recipient=recipient)]
         queries += [self.communicator.send_stock_query('transcript_writer', recipient=recipient)]
         
         recipient.execute_queries(queries)
         
-        result = [q.get_reply().get_result() for q in queries]
+        result = [q.get_reply().get_result()  for q in queries]
         
         return tuple(result)
         
@@ -192,16 +197,16 @@ class MusicSheetMaker:
         possible_modes = self.get_parser().get_possible_modes(notes)
         
         #Ask for musical notation
-        #modes_list = [InputMode.JIANPU, InputMode.SKY]
         q_mode = self.communicator.send_stock_query('musical_notation', recipient=recipient, limits=possible_modes)
         recipient.execute_queries(q_mode)
         
-        result = q_mode.get_reply().get_answer()
+        result = q_mode.get_reply().get_result()
+        
+        return result
         
         
-    def ask_song_key(self, recipient, notes):
-         #asks for song key
-        #possible_keys = ['do', 're']
+    def ask_song_key(self, recipient, notes, input_mode):
+        #asks for song key
         """
         Attempts to detect key for input written in absolute musical scales (western, Jianpu)
         """
@@ -219,15 +224,17 @@ class MusicSheetMaker:
                 song_key = str(possible_keys[0])
                 self.communicator.tell(string="\nYour song can be transposed in Sky with the following key: " + song_key,recipient=recipient)
             else:
-                self.communicator.tell(string="\nYour song can be transposed in Sky with the following keys: " + ', '.join(possible_keys),recipient=recipient)
                 
                 q_key = self.communicator.send_stock_query('possible_keys', recipient=recipient, foreword="\nYour song can be transposed in Sky with the following keys: " + ','.join(possible_keys),limits=possible_keys)
                 recipient.execute_queries(q_key)
+                
+                song_key = q_key.get_reply().get_answer()
+                
         else:
-            pass
-           # song_key
-           #TODO: create stock query for this one
-           #q_key = self.communicator.send_stock_query('text', recipient=recipient, foreword="\Recommended key to play the visual pattern: ",limits=possible_keys)
-
+            q_key = self.communicator.send_stock_query('recommended_key', recipient=recipient)
+            
+            recipient.execute_queries(q_key)
+                
+            song_key = q_key.get_reply().get_result()
                 
         return song_key

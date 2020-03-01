@@ -55,23 +55,23 @@ class CommandLinePlayer:
                     reply_valid = q.get_reply_validity()
         return True
 
+if __name__ == "__main__":
 
-player = CommandLinePlayer()
-
-maker = MusicSheetMaker()
-
-q = player.communicator.send_stock_query('create_song', recipient=maker)
-#player.communicator.send(q, recipient=maker)
-
-maker.execute_queries()
-
-#player.execute_queries()
-
-
-print('\n%%%MAIN script has ended%%%')
-print('\n\n%%%Player memory:')
-player.communicator.memory.print_out()
-print('\n%%%Maker memory:')
-maker.communicator.memory.print_out()
-
+    player = CommandLinePlayer()
+    maker = MusicSheetMaker()
+    
+    q = player.communicator.send_stock_query('create_song', recipient=maker)
+    #player.communicator.send(q, recipient=maker)
+    
+    maker.execute_queries()
+    
+    #player.execute_queries()
+    
+    
+    print('\n%%%MAIN script has ended%%%')
+    print('\n\n%%%Player memory:')
+    player.communicator.memory.print_out()
+    print('\n%%%Maker memory:')
+    maker.communicator.memory.print_out()
+    
 

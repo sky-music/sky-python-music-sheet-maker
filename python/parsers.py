@@ -11,7 +11,7 @@ class SongParser:
     For parsing a text format into a Song object
     """
 
-    def __init__(self, responder):
+    def __init__(self, maker):
 
         self.input_mode = None
         self.note_parser = None
@@ -20,8 +20,8 @@ class SongParser:
         self.quaver_delimiter = '-'
         self.comment_delimiter = '#'
         self.repeat_indicator = '*'
-        self.responder = responder
-        self.directory_base = self.responder.get_directory_base()
+        self.maker = maker
+        self.directory_base = self.maker.get_directory_base()
 
     def set_delimiters(self, icon_delimiter=' ', pause='.', quaver_delimiter='-', comment_delimiter='#',
                        repeat_indicator='*'):
@@ -52,9 +52,9 @@ class SongParser:
 
         return self.repeat_indicator
 
-    def get_responder(self):
+    def get_maker(self):
 
-        return self.responder
+        return self.maker
 
     def check_delimiters(self):
 
@@ -232,7 +232,7 @@ class SongParser:
                 lyrics = line.split(self.comment_delimiter)
                 for lyric in lyrics:
                     if len(lyric) > 0:
-                        voice = instruments.Voice(self.get_responder())
+                        voice = instruments.Voice(self.get_maker())
                         voice.set_lyric(lyric.strip())
                         instrument_line.append(voice)
             else:
@@ -241,7 +241,7 @@ class SongParser:
                     chords = self.split_icon(icon)
                     # From here, real chords are still glued, quavers have been split in different list slots
                     chord_skygrid, harp_broken, harp_silent, repeat = self.parse_chords(chords, song_key, note_shift)
-                    harp = instruments.Harp(self.get_responder())
+                    harp = instruments.Harp(self.get_maker())
                     harp.set_repeat(repeat)
                     harp.set_is_silent(harp_silent)
                     harp.set_is_broken(harp_broken)
@@ -408,3 +408,4 @@ class SongParser:
             return items
         else:
             return sorted_items
+
