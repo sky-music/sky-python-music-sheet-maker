@@ -20,15 +20,15 @@ except (ImportError, ModuleNotFoundError):
 
 class Instrument:
 
-    def __init__(self, responder):
+    def __init__(self, maker):
         self.type = 'undefined'
         self.chord_skygrid = {}
         self.repeat = 1
         self.index = 0
         self.is_silent = True
         self.is_broken = False
-        self.responder = responder
-        self.directory_base = self.responder.get_directory_base()
+        self.maker = maker
+        self.directory_base = self.maker.get_directory_base()
         self.directory_elements = 'elements'
         self.directory_fonts = 'fonts'
         self.empty_chord_png = os.path.normpath(os.path.join(self.directory_elements, 'empty-chord.png'))  # blank harp
@@ -48,9 +48,9 @@ class Instrument:
         self.midi_pause_relduration = 1  # Spacing between midi notes, as a ratio of note duration
         self.midi_quaver_relspacing = 0.5
 
-    def get_responder(self):
+    def get_maker(self):
 
-        return self.responder
+        return self.maker
 
     def set_chord_skygrid(self, chord_skygrid):
         self.chord_skygrid = chord_skygrid
@@ -139,8 +139,8 @@ class Instrument:
 
 class Voice(Instrument):  # Lyrics or comments
 
-    def __init__(self, responder):
-        super().__init__(responder)
+    def __init__(self, maker):
+        super().__init__(maker)
         self.type = 'voice'
         self.lyric = ''
         # self.text_bkg = (255, 255, 255, 0)#Uncomment to make it different from the inherited class
@@ -217,8 +217,8 @@ class Voice(Instrument):  # Lyrics or comments
 
 class Harp(Instrument):
 
-    def __init__(self, responder):
-        super().__init__(responder)
+    def __init__(self, maker):
+        super().__init__(maker)
         self.type = 'harp'
         self.column_count = 5
         self.row_count = 3
@@ -453,3 +453,4 @@ class Harp(Instrument):
                                 t = durations[i]
 
         return harp_render
+

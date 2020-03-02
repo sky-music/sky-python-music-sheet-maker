@@ -4,6 +4,7 @@ from operator import truediv, itemgetter
 from modes import InputMode
 import instruments
 import noteparsers
+from songs import Song
 
 
 class SongParser:
@@ -250,6 +251,22 @@ class SongParser:
                     instrument_line.append(harp)
 
         return instrument_line
+
+    def parse_song(self, song_lines, song_key, octave_shift):
+
+        english_song_key = self.english_note_name(song_key)
+        
+        note_shift = self.get_note_parser().get_base_of_western_major_scale() * octave_shift
+
+        # Parses song line by line
+        song = Song(maker=self.get_maker(), music_key=english_song_key)  # The song key must be in English format
+        for song_line in song_lines:
+            instrument_line = self.parse_line(song_line, song_key,
+                                                           note_shift)  # The song key must be in the original format
+            song.add_line(instrument_line)
+
+        return song
+
 
     def find_key(self, song_lines):
 

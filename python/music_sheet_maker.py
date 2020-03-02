@@ -1,4 +1,4 @@
-import os
+import os,io,re
 from modes import InputMode
 from communicator import Communicator
 from parsers import SongParser
@@ -21,6 +21,15 @@ class MusicSheetMaker:
         self.parser = None
         self.init_working_directory()
         self.directory_base = os.getcwd()
+        self.song_dir_in = dir_in
+        self.song_dir_out = dir_out
+        self.css_path = "css/main.css"#TODO: move that into Renderer
+        self.css_mode = CSSMode.EMBED#TODO: move that into Renderer
+        self.render_modes_enabled = [mode for mode in RenderMode]
+        # self.render_modes_disabled = [RenderMode.JIANPUASCII, RenderMode.DOREMIASCII]
+        self.render_modes_disabled = []
+        self.render_modes_enabled = [mode for mode in self.render_modes_enabled if
+                                     mode not in self.render_modes_disabled]
         
         # self.parser = SongParser()
 
@@ -55,7 +64,18 @@ class MusicSheetMaker:
 
     def get_directory_base(self):
         return self.directory_base
-        
+    
+    def get_render_modes_enabled(self):
+
+        return self.render_modes_enabled
+
+    def is_render_mode_enabled(self, mode):
+
+        if mode in self.render_modes_enabled:
+            return True
+        else:
+            return False
+    
     def receive(self, *args, **kwargs):
         self.communicator.receive(*args, **kwargs)
 
@@ -89,7 +109,7 @@ class MusicSheetMaker:
 
     def create_song(self, **kwargs):
         '''
-        A very linear, sesuential way of building a song from user inputs
+        A very linear, sequential way of building a song from user inputs
         TODO: implement nonlinear parsing using prerequisites
         
         '''
@@ -97,7 +117,9 @@ class MusicSheetMaker:
             recipient = kwargs['sender']
         except KeyError:
             raise MusicMakerError('No recipient specified for the Song')
-            
+        
+        os.chdir(self.get_directory_base())
+        
         if self.song is not None:
             #q  = self.communicator.query_song_overwrite(recipient=recipient)
             q_overwrite = self.communicator.send_stock_query('song_overwrite', recipient=recipient)
@@ -114,7 +136,6 @@ class MusicSheetMaker:
                 #return something, a Reply or  do Query.reply_to if it has been passed as argument
         
         self.set_parser(SongParser(self))
-        os.chdir(self.get_directory_base())
         
         #Display instructions
         i_instructions = self.communicator.send_stock_query('instructions', recipient=recipient)
@@ -124,18 +145,7 @@ class MusicSheetMaker:
         notes = self.ask_notes(recipient=recipient)
         
         input_mode = self.ask_input_mode(recipient=recipient, notes=notes)
-        
         self.get_parser().set_input_mode(input_mode)
-        
-        print('%%%%DEBUG')
-        print(input_mode)
-        #TODO: Song rendering
-        #self.set_parser(SongParser(self))
-        #os.chdir(self.directory_base)   
-       
-        # Parse song
-        #TODO: parse notes
-        # self.parse_song(song_lines, song_key, note_shift))
         
         song_key = self.ask_song_key(recipient=recipient, notes=notes, input_mode=input_mode)
         
@@ -144,26 +154,16 @@ class MusicSheetMaker:
         recipient.execute_queries(q_shift)
         octave_shift = q_shift.get_reply().get_result()
         
+        # Parse song
+        self.get_parser().parse_song(notes, song_key, octave_shift)
         
         #Asks for song metadata
         title, artist, writer = self.ask_song_metadata(recipient=recipient)
         
         
-        #Render Song
-        #TODO: render songnobjects
-        #self.set_song(
-
-        #err=self.calculate_error_ratio()
-        #i_errors = self.communicator.send_stock_query('information', recipient=recipient, question=str(err))
-
-        # TODO: Send Output
-        #several options to answer the  query:
-        #1/ have the query passed as the first argument of the current method and use Query.reply_to
-        #2/ return the song as a reply object, and let the encapsulating method use query.reply_to
-        #3/ Find the query in the memory and reply to it
-        
-        # self.send_song(query,recipient)     
-    
+        #TODO: render song
+        #TODO: answer to query 
+        #self.send_song(recipient=recipient)
     
     def ask_song_metadata(self, recipient):
     
@@ -238,3 +238,111 @@ class MusicSheetMaker:
             song_key = q_key.get_reply().get_result()
                 
         return song_key
+                
+        
+    def send_song(self, recipient):
+        
+        pass
+        
+        
+    def calculate_error_ratio(self):
+        #TODO: use queries
+        self.output('===========================================')
+        error_ratio = self.get_song().get_num_broken() / max(1, self.get_song().get_num_instruments())
+        if error_ratio == 0:
+            self.output('Song successfully read with no errors!')
+        elif error_ratio < 0.05:
+            self.output('Song successfully read with few errors!')
+        else:
+            self.output('**WARNING**: Your song contains many errors. Please check the following:'
+                        '\n- All your notes are within octaves 4 and 6. If not, try again with an octave shift.'
+                        '\n- Your song is free of typos. Please check this website for full instructions: '
+                        'https://sky.bloomexperiment.com/t/summary-of-input-modes/403')
+
+    def write_buffer_to_file(self, buffer_list, file_path0):
+        """Writes the content of an IOString or IOBytes buffer list to one or several files
+        """
+        try:
+            numfiles = len(buffer_list)
+        except:
+            buffer_list = [buffer_list]
+            numfiles = 1
+
+        (file_base, file_ext) = os.path.splitext(file_path0)
+
+        for filenum, buffer in enumerate(buffer_list):
+            if numfiles > 1:
+                file_path = file_base + str(filenum) + file_ext
+            else:
+                file_path = file_path0
+
+            if isinstance(buffer, io.StringIO):
+                output_file = open(file_path, 'w+', encoding='utf-8', errors='ignore')
+            elif isinstance(buffer, io.BytesIO):
+                output_file = open(file_path, 'bw+')
+            else:
+                raise Exception('Unknown buffer type in ' + str(self))
+            output_file.write(buffer.getvalue())
+        return file_path
+
+    def write_song_to_buffer(self, render_mode):
+        """
+        Writes the song to files with different formats as defined in RenderMode
+        """
+        
+        if render_mode in self.get_render_modes_enabled():
+
+            if render_mode == RenderMode.HTML:
+                buffers = [self.get_song().write_html(self.get_css_mode(), self.get_css_path())]
+            elif render_mode == RenderMode.SVG:
+                buffers = self.get_song().write_svg(self.get_css_mode(), self.get_css_path())
+            elif render_mode == RenderMode.PNG:
+                buffers += self.get_song().write_png()
+            elif render_mode == RenderMode.MIDI:
+                buffers = [self.get_song().write_midi()]
+            else:  # Ascii
+                buffers = [self.get_song().write_ascii(render_mode)]
+
+        else:
+            buffers = []
+
+            numfiles = len(buffers)
+
+            if numfiles == 0:
+                print('No ' + render_mode.value[1] + ' was generated.')
+                return
+
+            file_ext = render_mode.value[2]
+            file_name0 = self.get_song().get_title() + file_ext
+
+            (file_base, file_ext) = os.path.splitext(file_name0)
+
+            for filenum, buffer in enumerate(buffer_list):
+                if filenum > 0:
+                    file_name = file_base + str(filenum) + file_ext
+                else:
+                    file_name = file_name0
+
+                buffer.seek(0)  # reset the reader to the beginning
+  
+            
+            
+            
+            
+            file_ext = render_mode.value[2]
+            file_path0 = os.path.join(self.get_song_dir_out(), self.get_song().get_title() + file_ext)
+
+            try:
+                file_path = self.write_buffer_to_file(buffer_list, file_path0)
+
+                if numfiles > 1:
+                    self.output('Your song in ' + render_mode.value[1] + ' is located in: ' + self.get_song_dir_out())
+                    self.output(
+                        'Your song has been split into ' + str(numfiles) + ' between ' + os.path.split(file_path0)[
+                            1] + ' and ' + os.path.split(file_path)[1])
+                else:
+                    self.output('Your song in ' + render_mode.value[1] + ' is located at:' + file_path)
+            except (OSError, IOError):
+                self.output('Could not write to ' + render_mode.value[1] + ' file.')
+            self.output('------------------------------------------')
+
