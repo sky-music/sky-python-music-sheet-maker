@@ -75,25 +75,24 @@ class Reply:
 
     def build_result(self):
 
-        if self.get_validity() == False:
+        if not self.get_validity():
             self.result = None
             return self.result
 
         if isinstance(self.query, QueryBoolean):
             self.result = (self.query.get_answer_index() % 2 == 0)
         elif isinstance(self.query, QueryChoice):
-            index =  self.query.get_answer_index()
+            index = self.query.get_answer_index()
             self.result = self.query.get_limits()[index]
         else:
             self.result = self.answer
             if self.query.reply_type == ReplyType.INTEGER:
                 self.result = int(self.answer)
-            
 
         return self.result
 
     def get_result(self):
-        if self.result == None:
+        if self.result is None:
             self.build_result()
         return self.result
 
@@ -195,9 +194,9 @@ class Query:
         return self.expect_reply
 
     def get_limits(self):
-        '''
+        """
         Returns None or a list with len>0
-        '''
+        """
         if self.limits is None:
             return None
         else:
@@ -405,7 +404,7 @@ class Query:
                         num = int(answer)
                         low_lim = min(limits)
                         high_lim = max(limits)
-                        if num >= low_lim and num <= high_lim:
+                        if low_lim <= num <= high_lim:
                             is_reply_valid = True
                         else:
                             is_reply_valid = False
@@ -732,9 +731,9 @@ class QueryMemory:
             return None
 
     def recall_first(self, filters=None):
-        '''
+        """
         Recalls the first query. If a topological sort has been made, it is the first one to be answered
-        '''
+        """
         queries = self.recall_filtered(filters)
 
         if len(queries) > 0:
