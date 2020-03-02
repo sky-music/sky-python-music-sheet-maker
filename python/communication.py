@@ -82,11 +82,13 @@ class Reply:
         if isinstance(self.query, QueryBoolean):
             self.result = (self.query.get_answer_index() % 2 == 0)
         elif isinstance(self.query, QueryChoice):
-            self.result = self.query.get_answer_index()
+            index =  self.query.get_answer_index()
+            self.result = self.query.get_limits()[index]
         else:
             self.result = self.answer
             if self.query.reply_type == ReplyType.INTEGER:
                 self.result = int(self.answer)
+            
 
         return self.result
 

@@ -64,7 +64,7 @@ class MusicSheetMaker:
 
     def execute_queries(self, queries=None):
 
-        if queries == None:
+        if queries is None:
             self.communicator.memory.clean()
             queries = self.communicator.memory.recall_unsatisfied(filters=('to_me'))
         else:
@@ -138,6 +138,7 @@ class MusicSheetMaker:
         song_key = self.ask_song_key(recipient=recipient, notes=notes)
 
         # Asks for octave shift
+
         q_shift = self.communicator.send_stock_query('octave_shift', recipient=recipient)
         recipient.execute_queries(q_shift)
         octave_shift = q_shift.get_reply().get_result()
@@ -163,6 +164,8 @@ class MusicSheetMaker:
     def ask_song_metadata(self, recipient):
 
         # TODO: Remember metadata so that, if parsing fails the questions are not asked again
+
+        queries = []
 
         queries += [self.communicator.send_stock_query('song_title', recipient=recipient)]
         queries += [self.communicator.send_stock_query('original_artist', recipient=recipient)]
@@ -226,6 +229,9 @@ class MusicSheetMaker:
                                                            foreword="\nYour song can be transposed in Sky with the following keys: " + ','.join(
                                                                possible_keys), limits=possible_keys)
                 recipient.execute_queries(q_key)
+
+                song_key = q_key.get_reply().get_answer()
+
         else:
             pass
         # song_key

@@ -54,7 +54,6 @@ class CommandLinePlayer:
                     reply_valid = q.get_reply_validity()
         return True
 
-
 player = CommandLinePlayer()
 
 maker = MusicSheetMaker()
@@ -72,3 +71,4 @@ print('\n\n%%%Player memory:')
 player.communicator.memory.print_out()
 print('\n%%%Maker memory:')
 maker.communicator.memory.print_out()
+
