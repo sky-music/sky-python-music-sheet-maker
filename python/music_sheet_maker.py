@@ -1,5 +1,5 @@
 import os,io,re
-from modes import InputMode
+from modes import InputMode, CSSMode, RenderMode
 from communicator import Communicator
 from parsers import SongParser
 from songs import Song
@@ -24,9 +24,9 @@ class MusicSheetMaker:
         self.parser = None
         self.init_working_directory()
         self.directory_base = os.getcwd()
-<<<<<<< dev
-        self.song_dir_in = dir_in
-        self.song_dir_out = dir_out
+        
+        self.song_dir_in = 'songs_in'
+        self.song_dir_out = 'songs_out'
         self.css_path = "css/main.css"#TODO: move that into Renderer
         self.css_mode = CSSMode.EMBED#TODO: move that into Renderer
         self.render_modes_enabled = [mode for mode in RenderMode]
@@ -34,11 +34,6 @@ class MusicSheetMaker:
         self.render_modes_disabled = []
         self.render_modes_enabled = [mode for mode in self.render_modes_enabled if
                                      mode not in self.render_modes_disabled]
-        
-=======
-
->>>>>>> origin/dev
-        # self.parser = SongParser()
 
     def __getattr__(self, attr_name):
         """
@@ -71,7 +66,6 @@ class MusicSheetMaker:
 
     def get_directory_base(self):
         return self.directory_base
-<<<<<<< dev
     
     def get_render_modes_enabled(self):
 
@@ -84,9 +78,6 @@ class MusicSheetMaker:
         else:
             return False
     
-=======
-
->>>>>>> origin/dev
     def receive(self, *args, **kwargs):
         self.communicator.receive(*args, **kwargs)
 
@@ -118,27 +109,18 @@ class MusicSheetMaker:
                     pass
 
     def create_song(self, **kwargs):
-<<<<<<< dev
-        '''
-        A very linear, sequential way of building a song from user inputs
-=======
         """
         A very linear, sesuential way of building a song from user inputs
->>>>>>> origin/dev
-        TODO: implement nonlinear parsing using prerequisites
+        TODO: implement nonlinear parsing using prerequisites?
 
         """
         try:
             recipient = kwargs['sender']
         except KeyError:
             raise MusicMakerError('No recipient specified for the Song')
-<<<<<<< dev
         
         os.chdir(self.get_directory_base())
         
-=======
-
->>>>>>> origin/dev
         if self.song is not None:
             # q  = self.communicator.query_song_overwrite(recipient=recipient)
             q_overwrite = self.communicator.send_stock_query('song_overwrite', recipient=recipient)
@@ -155,22 +137,18 @@ class MusicSheetMaker:
                 # return something, a Reply or  do Query.reply_to if it has been passed as argument
 
         self.set_parser(SongParser(self))
-<<<<<<< dev
-        
-        #Display instructions
-=======
-        os.chdir(self.get_directory_base())
 
         # Display instructions
->>>>>>> origin/dev
         i_instructions = self.communicator.send_stock_query('instructions', recipient=recipient)
         recipient.execute_queries(i_instructions)
 
         # Ask for notes
         notes = self.ask_notes(recipient=recipient)
-<<<<<<< dev
-        
+      
         input_mode = self.ask_input_mode(recipient=recipient, notes=notes)
+        
+        print('%%%%%DEBUG Input_mode=')
+        print(input_mode)
         self.get_parser().set_input_mode(input_mode)
         
         song_key = self.ask_song_key(recipient=recipient, notes=notes, input_mode=input_mode)
@@ -190,46 +168,11 @@ class MusicSheetMaker:
         #TODO: render song
         #TODO: answer to query 
         #self.send_song(recipient=recipient)
-    
-=======
-
-        mode = self.ask_input_mode(recipient=recipient, notes=notes)
-
-        # TODO: Song rendering
-        # self.set_parser(SongParser(self))
-        # os.chdir(self.directory_base)
-
-        # Parse song
-        # TODO: parse notes
-        # self.parse_song(song_lines, song_key, note_shift))
-
-        song_key = self.ask_song_key(recipient=recipient, notes=notes)
-
-        # Asks for octave shift
-
-        q_shift = self.communicator.send_stock_query('octave_shift', recipient=recipient)
-        recipient.execute_queries(q_shift)
-        octave_shift = q_shift.get_reply().get_result()
-
-        # Asks for song metadata
-        title, artist, writer = self.ask_song_metadata(recipient=recipient)
-
-        # Render Song
-        # TODO: render songnobjects
-        # self.set_song(
-
         # err=self.calculate_error_ratio()
         # i_errors = self.communicator.send_stock_query('information', recipient=recipient, question=str(err))
 
-        # TODO: Send Output
-        # several options to answer the  query:
-        # 1/ have the query passed as the first argument of the current method and use Query.reply_to
-        # 2/ return the song as a reply object, and let the encapsulating method use query.reply_to
-        # 3/ Find the query in the memory and reply to it
-
         # self.send_song(query,recipient)     
 
->>>>>>> origin/dev
     def ask_song_metadata(self, recipient):
 
         # TODO: Remember metadata so that, if parsing fails the questions are not asked again
@@ -248,7 +191,7 @@ class MusicSheetMaker:
 
     def ask_notes(self, recipient):
 
-        # TODO: ask for notes
+        # TODO: ask for notes, check for file, etc
         # communicator.ask_first_line()
         # fp = self.load_file(self.get_song_dir_in(), first_line)  # loads file or asks for next line
         # song_lines self.read_lines(first_line, fp)
@@ -266,9 +209,11 @@ class MusicSheetMaker:
         q_mode = self.communicator.send_stock_query('musical_notation', recipient=recipient, limits=possible_modes)
         recipient.execute_queries(q_mode)
 
-        result = q_mode.get_reply().get_answer()
+        result = q_mode.get_reply().get_result()
+        
+        return result
 
-    def ask_song_key(self, recipient, notes):
+    def ask_song_key(self, recipient, notes, input_mode):
         # asks for song key
         # possible_keys = ['do', 're']
         """
@@ -276,7 +221,9 @@ class MusicSheetMaker:
         """
         # TODO:
         if input_mode in [InputMode.ENGLISH, InputMode.DOREMI, InputMode.JIANPU]:
+            
             possible_keys = self.get_parser().find_key(notes)
+            
             if len(possible_keys) == 0:
                 self.communicator.tell(string="\nYour song cannot be transposed exactly in Sky.", recipient=recipient)
                 # trans = input('Enter a key or a number to transpose your song within the chromatic scale:')
@@ -289,20 +236,17 @@ class MusicSheetMaker:
                 self.communicator.tell(
                     string="\nYour song can be transposed in Sky with the following key: " + song_key,
                     recipient=recipient)
+                    
             else:
-                self.communicator.tell(
-                    string="\nYour song can be transposed in Sky with the following keys: " + ', '.join(possible_keys),
-                    recipient=recipient)
-
                 q_key = self.communicator.send_stock_query('possible_keys', recipient=recipient,
                                                            foreword="\nYour song can be transposed in Sky with the following keys: " + ','.join(
                                                                possible_keys), limits=possible_keys)
                 recipient.execute_queries(q_key)
 
-                song_key = q_key.get_reply().get_answer()
+                song_key = q_key.get_reply().get_result()
 
         else:
-            pass
+            song_key = 'C'
         # song_key
         # TODO: create stock query for this one
         # q_key = self.communicator.send_stock_query('text', recipient=recipient, foreword="\Recommended key to play the visual pattern: ",limits=possible_keys)
@@ -317,14 +261,14 @@ class MusicSheetMaker:
         
     def calculate_error_ratio(self):
         #TODO: use queries
-        self.output('===========================================')
+        print('===========================================')
         error_ratio = self.get_song().get_num_broken() / max(1, self.get_song().get_num_instruments())
         if error_ratio == 0:
-            self.output('Song successfully read with no errors!')
+            print('Song successfully read with no errors!')
         elif error_ratio < 0.05:
-            self.output('Song successfully read with few errors!')
+            print('Song successfully read with few errors!')
         else:
-            self.output('**WARNING**: Your song contains many errors. Please check the following:'
+            print('**WARNING**: Your song contains many errors. Please check the following:'
                         '\n- All your notes are within octaves 4 and 6. If not, try again with an octave shift.'
                         '\n- Your song is free of typos. Please check this website for full instructions: '
                         'https://sky.bloomexperiment.com/t/summary-of-input-modes/403')
@@ -359,7 +303,7 @@ class MusicSheetMaker:
         """
         Writes the song to files with different formats as defined in RenderMode
         """
-        
+        #TODO: Move this method to Renderer?
         if render_mode in self.get_render_modes_enabled():
 
             if render_mode == RenderMode.HTML:
@@ -367,7 +311,7 @@ class MusicSheetMaker:
             elif render_mode == RenderMode.SVG:
                 buffers = self.get_song().write_svg(self.get_css_mode(), self.get_css_path())
             elif render_mode == RenderMode.PNG:
-                buffers += self.get_song().write_png()
+                buffers = self.get_song().write_png()
             elif render_mode == RenderMode.MIDI:
                 buffers = [self.get_song().write_midi()]
             else:  # Ascii
@@ -375,10 +319,18 @@ class MusicSheetMaker:
 
         else:
             buffers = []
+            
+        for buffer in buffers:
+            buffer.seek(0)
+
+        return buffers
+    
+    def build_file_names(self, render_mode):
 
             numfiles = len(buffers)
 
             if numfiles == 0:
+                
                 print('No ' + render_mode.value[1] + ' was generated.')
                 return
 

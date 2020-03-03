@@ -6,6 +6,14 @@ import instruments
 import noteparsers
 from songs import Song
 
+class SongParserError(Exception):
+    def __init__(self, explanation):
+        self.explanation = explanation
+
+    def __str__(self):
+        return str(self.explanation)
+
+    pass
 
 class SongParser:
     """
@@ -91,6 +99,9 @@ class SongParser:
             self.input_mode = input_mode
             self.set_note_parser(self.input_mode)
             self.check_delimiters()
+        else:
+            raise SongParserError('Cannot set input_mode: invalid input_mode')
+                
 
     def get_input_mode(self):
 
@@ -125,7 +136,11 @@ class SongParser:
 
         if input_mode is None:
             input_mode = self.input_mode
-        self.note_parser = self.get_note_parser(input_mode)
+            
+        if input_mode is None:
+            raise SongParserError('cannot set NoteParser: Invalid input_mode')
+        else:
+            self.note_parser = self.get_note_parser(input_mode)
 
     def english_note_name(self, note_name, reverse=False):
         if self.note_parser is None:
@@ -255,7 +270,7 @@ class SongParser:
     def parse_song(self, song_lines, song_key, octave_shift):
 
         english_song_key = self.english_note_name(song_key)
-        
+                
         note_shift = self.get_note_parser().get_base_of_western_major_scale() * octave_shift
 
         # Parses song line by line
