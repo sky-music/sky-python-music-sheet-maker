@@ -27,6 +27,7 @@ class MusicSheetMaker:
         
         self.song_dir_in = 'songs_in'
         self.song_dir_out = 'songs_out'
+        #TODO: create output directory if doesnt exist => create set/get method
         self.css_path = "css/main.css"#TODO: move that into Renderer
         self.css_mode = CSSMode.EMBED#TODO: move that into Renderer
         self.render_modes_enabled = [mode for mode in RenderMode]
@@ -146,9 +147,6 @@ class MusicSheetMaker:
         notes = self.ask_notes(recipient=recipient)
       
         input_mode = self.ask_input_mode(recipient=recipient, notes=notes)
-        
-        print('%%%%%DEBUG Input_mode=')
-        print(input_mode)
         self.get_parser().set_input_mode(input_mode)
         
         song_key = self.ask_song_key(recipient=recipient, notes=notes, input_mode=input_mode)
@@ -159,11 +157,14 @@ class MusicSheetMaker:
         octave_shift = q_shift.get_reply().get_result()
         
         # Parse song
-        self.get_parser().parse_song(notes, song_key, octave_shift)
+        self.set_song(self.get_parser().parse_song(notes, song_key, octave_shift))
         
         #Asks for song metadata
         title, artist, writer = self.ask_song_metadata(recipient=recipient)
         
+        buffers = self.write_song_to_buffers(RenderMode.PNG)
+        file_paths = self.build_file_paths(RenderMode.PNG, len(buffers))
+        self.write_buffers_to_files(buffers, file_paths)
         
         #TODO: render song
         #TODO: answer to query 
@@ -273,33 +274,39 @@ class MusicSheetMaker:
                         '\n- Your song is free of typos. Please check this website for full instructions: '
                         'https://sky.bloomexperiment.com/t/summary-of-input-modes/403')
 
-    def write_buffer_to_file(self, buffer_list, file_path0):
-        """Writes the content of an IOString or IOBytes buffer list to one or several files
+    def write_buffers_to_files(self, buffers, file_paths):
+        """
+        Writes the content of an IOString or IOBytes buffer list to one or several files
         """
         try:
-            numfiles = len(buffer_list)
-        except:
-            buffer_list = [buffer_list]
+            numfiles = len(buffers)
+        except (TypeError, AttributeError):
+            buffers = [buffers]
             numfiles = 1
 
-        (file_base, file_ext) = os.path.splitext(file_path0)
+        print('%%%DEBUG')
+        print(file_paths)
+        print(len(buffers))
+        print(len(file_paths))
 
-        for filenum, buffer in enumerate(buffer_list):
-            if numfiles > 1:
-                file_path = file_base + str(filenum) + file_ext
-            else:
-                file_path = file_path0
+        if len(buffers) != len(file_paths):
+            raise MusicMakerError('inconsistent len gths of buffers and file_paths')
+
+        (file_base, file_ext) = os.path.splitext(file_paths[0])
+
+        for i, buffer in enumerate(buffers):
 
             if isinstance(buffer, io.StringIO):
-                output_file = open(file_path, 'w+', encoding='utf-8', errors='ignore')
+                output_file = open(file_paths[i], 'w+', encoding='utf-8', errors='ignore')
             elif isinstance(buffer, io.BytesIO):
-                output_file = open(file_path, 'bw+')
+                output_file = open(file_paths[i], 'bw+')
             else:
-                raise Exception('Unknown buffer type in ' + str(self))
+                raise MusicMakerError('Unknown buffer type in ' + str(self))
             output_file.write(buffer.getvalue())
-        return file_path
+            
+        return i
 
-    def write_song_to_buffer(self, render_mode):
+    def write_song_to_buffers(self, render_mode):
         """
         Writes the song to files with different formats as defined in RenderMode
         """
@@ -315,7 +322,7 @@ class MusicSheetMaker:
             elif render_mode == RenderMode.MIDI:
                 buffers = [self.get_song().write_midi()]
             else:  # Ascii
-                buffers = [self.get_song().write_ascii(render_mode)]
+                buffers = self.get_song().write_ascii(render_mode)
 
         else:
             buffers = []
@@ -325,46 +332,38 @@ class MusicSheetMaker:
 
         return buffers
     
-    def build_file_names(self, render_mode):
+    def build_file_paths(self, render_mode, numfiles):
 
-            numfiles = len(buffers)
-
-            if numfiles == 0:
-                
-                print('No ' + render_mode.value[1] + ' was generated.')
-                return
-
-            file_ext = render_mode.value[2]
-            file_name0 = self.get_song().get_title() + file_ext
-
-            (file_base, file_ext) = os.path.splitext(file_name0)
-
-            for filenum, buffer in enumerate(buffer_list):
-                if filenum > 0:
-                    file_name = file_base + str(filenum) + file_ext
-                else:
-                    file_name = file_name0
-
-                buffer.seek(0)  # reset the reader to the beginning
-  
+        if numfiles == 0:
+            return None
             
-            
-            
-            
-            file_ext = render_mode.value[2]
-            file_path0 = os.path.join(self.get_song_dir_out(), self.get_song().get_title() + file_ext)
+        file_base = os.path.join(self.song_dir_out, self.get_song().get_title())
+        file_ext = render_mode.value[2]
+        #TODO create output directory if it doesn't exist
+        
+        file_paths = []
+        if numfiles > 1:
+            for i in range(numfiles):
+                file_paths += [file_base + str(i) + file_ext]
+        else:
+            file_paths = [file_base + file_ext]
 
-            try:
-                file_path = self.write_buffer_to_file(buffer_list, file_path0)
-
-                if numfiles > 1:
-                    self.output('Your song in ' + render_mode.value[1] + ' is located in: ' + self.get_song_dir_out())
-                    self.output(
-                        'Your song has been split into ' + str(numfiles) + ' between ' + os.path.split(file_path0)[
-                            1] + ' and ' + os.path.split(file_path)[1])
-                else:
-                    self.output('Your song in ' + render_mode.value[1] + ' is located at:' + file_path)
-            except (OSError, IOError):
-                self.output('Could not write to ' + render_mode.value[1] + ' file.')
-            self.output('------------------------------------------')
+        return file_paths
+            
+#            file_ext = render_mode.value[2]
+#            file_path0 = os.path.join(self.get_song_dir_out(), self.get_song().get_title() + file_ext)
+#
+#            try:
+#                file_path = self.write_buffer_to_file(buffer_list, file_path0)
+#
+#                if numfiles > 1:
+#                    self.output('Your song in ' + render_mode.value[1] + ' is located in: ' + self.get_song_dir_out())
+#                    self.output(
+#                        'Your song has been split into ' + str(numfiles) + ' between ' + os.path.split(file_path0)[
+#                            1] + ' and ' + os.path.split(file_path)[1])
+#                else:
+#                    self.output('Your song in ' + render_mode.value[1] + ' is located at:' + file_path)
+#            except (OSError, IOError):
+#                self.output('Could not write to ' + render_mode.value[1] + ' file.')
+#            self.output('------------------------------------------')
 
