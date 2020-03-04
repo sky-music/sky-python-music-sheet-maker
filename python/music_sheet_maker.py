@@ -17,16 +17,15 @@ class MusicMakerError(Exception):
 
 class MusicSheetMaker:
 
-    def __init__(self):
+    def __init__(self, songs_in='test_songs', songs_out='songs_out'):
         self.name = 'music-sheet-maker'
         self.communicator = Communicator(owner=self)
         self.song = 0  # TODO reset song to None after debugging tests
         self.parser = None
+        self.directory_base = os.path.normpath(os.path.join(os.getcwd(),'../'))
+        self.song_dir_in = os.path.join(self.directory_base,songs_in)
+        self.song_dir_out = os.path.join(self.directory_base,songs_out)
         self.init_working_directory()
-        self.directory_base = os.getcwd()
-        
-        self.song_dir_in = 'songs_in'
-        self.song_dir_out = 'songs_out'
         #TODO: create output directory if doesnt exist => create set/get method
         self.css_path = "css/main.css"#TODO: move that into Renderer
         self.css_mode = CSSMode.EMBED#TODO: move that into Renderer
@@ -61,9 +60,8 @@ class MusicSheetMaker:
         self.parser = parser
 
     def init_working_directory(self):
-        os.chdir('../')
-        # if not os.path.isdir(self.song_dir_out):
-        # os.mkdir(self.song_dir_out)
+        if not os.path.isdir(self.song_dir_out):
+            os.mkdir(self.song_dir_out)
 
     def get_directory_base(self):
         return self.directory_base
@@ -119,8 +117,9 @@ class MusicSheetMaker:
             recipient = kwargs['sender']
         except KeyError:
             raise MusicMakerError('No recipient specified for the Song')
-        
-        os.chdir(self.get_directory_base())
+            
+        self.init_working_directory()
+        #os.chdir(self.get_directory_base())
         
         if self.song is not None:
             # q  = self.communicator.query_song_overwrite(recipient=recipient)
@@ -284,11 +283,6 @@ class MusicSheetMaker:
             buffers = [buffers]
             numfiles = 1
 
-        print('%%%DEBUG')
-        print(file_paths)
-        print(len(buffers))
-        print(len(file_paths))
-
         if len(buffers) != len(file_paths):
             raise MusicMakerError('inconsistent len gths of buffers and file_paths')
 
@@ -303,6 +297,12 @@ class MusicSheetMaker:
             else:
                 raise MusicMakerError('Unknown buffer type in ' + str(self))
             output_file.write(buffer.getvalue())
+            
+            print('\nYour song in ' + file_ext.upper() + ' is located in: ' + self.song_dir_out)
+            
+            if numfiles > 1:
+                print('Your song has been split into ' + str(numfiles) + ' between ' + os.path.split(file_paths[0])[
+                            1] + ' and ' + os.path.split(file_paths)[-1])
             
         return i
 

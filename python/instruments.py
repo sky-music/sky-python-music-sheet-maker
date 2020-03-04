@@ -29,8 +29,8 @@ class Instrument:
         self.is_broken = False
         self.maker = maker
         self.directory_base = self.maker.get_directory_base()
-        self.directory_elements = 'elements'
-        self.directory_fonts = 'fonts'
+        self.directory_elements = os.path.join(self.directory_base, 'elements')
+        self.directory_fonts = os.path.join(self.directory_base, 'fonts')
         self.empty_chord_png = os.path.normpath(os.path.join(self.directory_elements, 'empty-chord.png'))  # blank harp
         self.unhighlighted_chord_png = os.path.normpath(os.path.join(self.directory_elements,
                                                                      'unhighlighted-chord.png'))  # harp with unhighlighted notes
@@ -68,6 +68,15 @@ class Instrument:
     def get_type(self):
         return self.type
 
+    def get_directory_base(self):
+        return self.directory_base
+        
+    def get_directory_elements(self):
+        return self.directory_elements
+        
+    def get_directory_font(self):
+        return self.directory_fonts
+        
     def set_repeat(self, repeat):
         self.repeat = repeat
 
@@ -123,18 +132,6 @@ class Instrument:
                                          resample=Image.LANCZOS)
 
         return repeat_im
-
-    def get_directory_base(self):
-
-        return self.directory_base
-
-    def get_directory_fonts(self):
-
-        return os.path.join(self.get_directory_base(), self.directory_fonts)
-
-    def get_directory_elements(self):
-
-        return os.path.join(self.get_directory_base(), self.directory_elements)
 
 
 class Voice(Instrument):  # Lyrics or comments

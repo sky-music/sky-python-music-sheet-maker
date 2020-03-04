@@ -31,7 +31,7 @@ class Song():
 
         self.maker = maker
         self.directory_base = self.maker.get_directory_base()
-        self.directory_fonts = 'fonts'
+        self.directory_fonts = os.path.normpath(os.path.join(self.directory_base,'fonts'))
         self.lines = []
         self.title = 'Untitled'
         self.headers = [['Original Artist(s):', 'Transcript:', 'Musical key:'], ['', '', '']]
