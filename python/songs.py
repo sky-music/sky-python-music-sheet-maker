@@ -216,7 +216,7 @@ class Song():
                 with open(css_path, 'r', encoding='utf-8', errors='ignore') as css_file:
                     css_file = css_file.read()
             except:
-                print('Could not open CSS file to embed it in HTML.')
+                print('\nWarning: could not open CSS file to embed it in HTML.')
                 css_file = ''
             html_buffer.write('\n<style type=\"text/css\">\n')
             html_buffer.write(css_file)
@@ -329,7 +329,7 @@ class Song():
                 with open(css_path, 'r', encoding='utf-8', errors='ignore') as css_file:
                     css_file = css_file.read()
             except:
-                print('Could not open CSS file to embed it in SVG.')
+                print('\nWarning: could not open CSS file to embed it in SVG.')
                 css_file = ''
                 pass
             svg_buffer.write('\n<defs><style type=\"text/css\"><![CDATA[\n')

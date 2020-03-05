@@ -5,13 +5,20 @@ from communicator import Communicator
 
 class CommandLinePlayer:
 
+    """
+    A puppet to work with the Music Sheet Maker.
+    CAUTION: All puppets must have the following methods:
+        - get_name(), returning a name among the authorized locutors list of communication.py
+        - execute_queries()
+        - a Communicator to handle Queries
+    It is recommeneded to have a receive() method or to a __getattr__ method to
+    to call methods from communicator directly from the puppet.
+    """
+
     def __init__(self):
-        self.song = None  # Song object
         self.name = 'command-line'
         self.communicator = Communicator(owner=self)
-        # self.parser = SongParser()
-        # self.receive =  self.communicator.receive
-
+        
     def __getattr__(self, attr_name):
         """
         Default function to call in case no one else is found.
@@ -35,20 +42,26 @@ class CommandLinePlayer:
         else:
             if not isinstance(queries, (list, tuple)):
                 queries = [queries]
-        print('\n%%%%I AM PLAYER, MY UNSATISFIED QUERIES ARE:%%%%')
-        self.communicator.memory.print_out(filters=('to_me'))
-
-        for q in queries:
+        print('\n%%%%DEBUG. I AM PLAYER, THE UNSATISFIED QUERIES ARE:%%%%')
+        self.communicator.memory.print_out(filters=('unsatisfied'))
+        """
+        The following part is exclusive to the command line.
+        The executing code must be rewritten for discord, typically using:
             question = self.communicator.query_to_discord(q)
+            await Questions.ask_text(self.bot, channel, ctx.author, question...)
+        """
+        for q in queries:
+            question = self.communicator.query_to_stdout(q)
             reply_valid = False
             while not reply_valid:
+                reply_valid = True #to be sure to break the loop if nonl query
                 if q.get_expect_reply():
-                    print('%%%PLAYER, YOU ARE BEING PROMPTED%%%')
+                    print('%%%DEBUG. PLAYER, YOU ARE BEING PROMPTED%%%')
                     answer = input(question + ': ')
                     q.reply_to(answer)
                     reply_valid = q.get_reply_validity()
                 else:
-                    print('%%%PLAYER, YOU ARE BEING TOLD%%%')
+                    print('%%%DEBUG. PLAYER, YOU ARE BEING TOLD%%%')
                     print(question)
                     q.reply_to('ok')
                     reply_valid = q.get_reply_validity()
@@ -59,16 +72,15 @@ player = CommandLinePlayer()
 maker = MusicSheetMaker()
 
 q = player.communicator.send_stock_query('create_song', recipient=maker)
-# player.communicator.send(q, recipient=maker)
 
 maker.execute_queries()
 
 # player.execute_queries()
 
 
-print('\n%%%MAIN script has ended%%%')
-print('\n\n%%%Player memory:')
+print('\n%%%DEBUG. MAIN script has ended%%%')
+print('\n\n%%%DEBUG. Player memory:')
 player.communicator.memory.print_out()
-print('\n%%%Maker memory:')
+print('\n%%%DEBUG. Maker memory:')
 maker.communicator.memory.print_out()
 

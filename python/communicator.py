@@ -1,8 +1,8 @@
 # import os
-from modes import InputMode, ReplyType
-from communication import Query, QueryOpen, QueryChoice, QueryBoolean, QueryMemory, Information
+from modes import ReplyType
+from communication import Query, Reply, QueryOpen, QueryChoice, QueryBoolean, QueryMemory, Information
 import communication
-import copy
+#import copy
 
 """
 Classes to ask and answer questions called Query and Reply between the bot and the music sheet maker
@@ -45,16 +45,20 @@ class Communicator:
         # A dictionary of standard queries arguments
         # TODO: create generic (quasi-empty) stock queries, such as Information to output dome text
         self.query_stock = {
+            # Queries asked by the Player / Music Cog
             'create_song': {'class': QueryOpen.__name__, 'handler': 'create_song',
                             'question': 'create_song'},
-
+            
+            # Generic Query
+            'information': {'class': Information.__name__, 'handler': 'None',
+                            'question': '', 'reply_type': ReplyType.TEXT},
+                            
+            # Queries asked by Music Sheet Maker
             'song_overwrite': {'class': QueryBoolean.__name__, 'handler': 'None',
                                'foreword': 'A Song already exists in memory.',
                                'question': 'Do you want to overwrite it?', 'reply_type': ReplyType.TEXT},
 
-            'information': {'class': Information.__name__, 'handler': 'None',
-                            'question': '', 'reply_type': ReplyType.TEXT},
-
+            #TODO: Add more verbose instruction
             'instructions': {'class': Information.__name__, 'handler': 'None',
                              'foreword': '===== VISUAL MUSIC SHEETS FOR SKY:CHILDREN OF THE LIGHT =====',
                              'question': ''},
@@ -68,11 +72,12 @@ class Communicator:
             'transcript_writer': {'class': QueryOpen.__name__, 'handler': 'None',
                                   'question': 'What is the transcript writer?', 'reply_type': ReplyType.TEXT},
 
-            'song_notes': {'class': QueryOpen.__name__, 'handler': 'None',
-                           'question': 'Please type your notes', 'reply_type': ReplyType.NOTE, 'limits': None},
+            'song_notes_files': {'class': QueryOpen.__name__, 'handler': 'None', 'question': 'Please type or copy-paste notes, or enter file name', 'reply_type': ReplyType.TEXT, 'limits': None},
 
-            'musical_notation': {'class': QueryChoice.__name__, 'handler': 'None',
-                                 'question': 'Please choose your note format', 'reply_type': ReplyType.INPUTMODE,
+            'song_notes': {'class': QueryOpen.__name__, 'handler': 'None',
+                           'question': 'Please type or copy-paste notes', 'reply_type': ReplyType.NOTE, 'limits': None},
+
+            'musical_notation': {'class': QueryChoice.__name__, 'handler': 'None', 'foreword': '\nSeveral possible notations detected.', 'question': 'Please choose your note format', 'reply_type': ReplyType.INPUTMODE,
                                  'limits': []},
 
             'possible_keys': {'class': QueryChoice.__name__, 'handler': 'None',
@@ -107,22 +112,6 @@ class Communicator:
     def get_name(self):
         return self.name
 
-    #        def default_handler_function(*args, **kwargs):
-    #            thefunc = None
-    #            try:
-    #                thefunc = getattr(self.memory, attr_name) #If it's not for me, it's for my memory
-    #                print('RETURNING 1')
-    #            except AttributeError:
-    #                try:
-    #                    if isinstance(args[0], Query):
-    #                        print('RETURNING 2')
-    #                        thefunc = self.receive
-    #                except:
-    #                   pass
-    #            if thefunc is None:
-    #                raise AttributeError(type(self).__name__ + ' object has no attribute ' + str(attr_name))
-    #        print('RETURNING 4')
-    #        return default_handler_function
 
     def send_stock_query(self, stock_query_name, recipient, **kwargs):
         """
@@ -134,18 +123,17 @@ class Communicator:
         except KeyError:
             raise CommunicatorError(str(stock_query_name) + ' is not a standard query')
 
-        method_name = stock_query['class']
         method_args = stock_query.copy()
-        method_args.pop('class')
-        method_args.pop('handler')
+        method_args.pop('class') #The class was used and is not an argument for Query
+        method_args.pop('handler') #The handler is not useful here and is not an argument for Query
+        method_args['name'] = stock_query_name
         method_args['sender'] = self.owner
         method_args['recipient'] = recipient
+        method_args.update(kwargs) #Merge tuples to override default parameters with optional keyword arguments
 
-        method_args.update(kwargs)
+        query_method = getattr(communication, stock_query['class']) #QueryChoice, QueryOpen, QueryBoolean
 
-        query_method = getattr(communication, method_name)
-
-        q = query_method(**method_args)
+        q = query_method(**method_args) #Creates the Query
         self.memory.store(q)
         q.check_sender(allowed=self.owner)
         q.send(recipient=recipient)
@@ -181,26 +169,35 @@ class Communicator:
 
         for q in queries:
             if q.check_recipient(allowed=self.owner):
-                # print('I am ' + self.get_name() + ', storing a query upon receipt.')
                 self.memory.store(q)
-                # TODO: check for duplicates
+                # TODO: check for duplicates before storing?
 
-    def query_to_discord(self, obj):
+    def query_to_stdout(self, query):
 
-        question = obj.get_result()
+        question = query.get_result()
         return question
 
-    def discord_to_query(self, obj):
+    def query_to_discord(self, query):
 
+        utils_question = query.get_result()
+        return utils_question
+
+    def discord_to_query(self, utils_question):
+        
+        #TODO: This is the tricky part: how do we transform a free-text question in a precise Query?
+        #=> Requires interpreting strings or finding key strings within a sentence
+        #This is usually done in the Cog, note here
         return
-
-    def tell(self, recipient, string):
-
-        i = Information(sender=self, recipient=recipient, question=string)
+    
+    def send_information(self, recipient, string, prerequisites=None):
+        """
+        A shortcut to send an information Query. Could be replaced by a stock query though.
+        """
+        i = Information(sender=self, recipient=recipient, question=string, prerequisites=prerequisites)
         self.memory.store(i)
         i.send(recipient=recipient)
         return i
-
+    
     def translate(self, obj):
 
         if isinstance(obj, (Query, Reply)):
@@ -209,14 +206,6 @@ class Communicator:
             self.discord_to_query(obj)
         return
 
-    '''
-    def query_song_overwrite(self, recipient):
-        
-        q = QueryBoolean(sender=self, recipient=recipient, foreword='A Song already exist in memory.', question='Do you want to overwrite it?', reply_type=ReplyType.TEXT)
-        self.memory.store(q)
-        q.send(recipient=recipient)
-        return q
-     '''
     '''
     def send_unsent_queries(self, recipient=None):
 
