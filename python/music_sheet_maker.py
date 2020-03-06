@@ -1,4 +1,4 @@
-import os, io
+import os, io, re
 from modes import InputMode, CSSMode, RenderMode
 from communicator import Communicator
 from parsers import SongParser
@@ -122,9 +122,6 @@ class MusicSheetMaker:
             creation_query = kwargs['query']
         except KeyError:
             raise MusicMakerError('No Query passed to create_song')
-
-         
-        #self.init_working_directory()
         
         if self.song is not None:
             q_overwrite = self.communicator.send_stock_query('song_overwrite', recipient=recipient)
@@ -149,7 +146,11 @@ class MusicSheetMaker:
             recipient.execute_queries(i_instructions)
     
             # Ask for notes
-            notes = self.ask_notes(recipient=recipient)
+            #TODO: allow the player to enter the notes using several messages??? or maybe not
+            if recipient.get_name() == 'music-cog':
+                notes = self.ask_notes(recipient=recipient)
+            else:
+                notes = self.ask_notes_file(recipient=recipient)
           
             input_mode = self.ask_input_mode(recipient=recipient, notes=notes)
             self.get_parser().set_input_mode(input_mode)
@@ -168,9 +169,8 @@ class MusicSheetMaker:
         title, artist, writer = self.ask_song_metadata(recipient=recipient)
         
         #TODO:
-        #Detect if on Discord or in commandn line
+        #Detect if on Discord or in commandn line with a safer method
         #Loop over rendering modes, several for the command line, 1 for discord
-        #Send buffer to discord
         if recipient.get_name() == 'music-cog':
             render_mode = self.discord_render_mode
             buffers = self.write_song_to_buffers(render_mode)
@@ -214,23 +214,50 @@ class MusicSheetMaker:
         return tuple(result)
 
     def ask_notes(self, recipient, prerequisites=None):
-
-        # TODO: Check for file, etc, distinguish Discord / command line to avoid loading a file on Discord
         
-        # communicator.ask_first_line()
-        # fp = self.load_file(self.get_song_dir_in(), first_line)  # loads file or asks for next line
-        # song_lines self.read_lines(first_line, fp)
-        if recipient.get_name == 'music-cog':
-            q_notes = self.communicator.send_stock_query('song_notes', recipient=recipient, prerequisites=prerequisites)
-        else:
-            q_notes = self.communicator.send_stock_query('song_notes_files', question='Type or copy-paste notes, or enter file name (in ' + os.path.normpath(self.song_dir_in) + '/)',recipient=recipient, prerequisites=prerequisites)
-            #TODO: detect file name
-            #create a new ReplyType?
-            
+        q_notes = self.communicator.send_stock_query('song_notes', recipient=recipient, prerequisites=prerequisites)            
         recipient.execute_queries(q_notes)
 
         return q_notes.get_reply().get_result()
 
+    def ask_notes_file(self, recipient, prerequisites=None):
+
+        # TODO: Check for file, etc, distinguish Discord / command line to avoid loading a file on Discord
+        q_notes = self.communicator.send_stock_query('song_notes_files', question='Type or copy-paste notes, or enter file name (in ' + os.path.normpath(self.song_dir_in) + '/)',recipient=recipient, prerequisites=prerequisites)
+            #TODO: detect file name
+            #create a new ReplyType?
+            
+        recipient.execute_queries(q_notes)
+        
+        result = q_notes.get_reply().get_result()
+        
+        #Detects if the result is a file path
+        file_path = os.path.join(self.song_dir_in, os.path.normpath(result))
+        isfile = os.path.isfile(file_path)
+        
+        if not isfile:
+            splitted = os.path.splitext(result)
+            if len(splitted[0]) > 0 and 2 < len(splitted[1]) <= 5 and re.search('\\.', splitted[0]) is None:
+                # then probably a file name
+                self.communicator.memory.erase(q_notes)
+                
+                q_file = self.communicator.send_stock_query('song_file', question='Enter file name (in ' + os.path.normpath(self.song_dir_in) + '/)',recipient=recipient, prerequisites=prerequisites, limits=os.path.normpath(self.song_dir_in))
+            #TODO: detect file name
+            #create a new ReplyType?
+                recipient.execute_queries(q_file)
+                
+                result = q_file.get_reply().get_result()
+                file_path = os.path.join(self.song_dir_in, os.path.normpath(result))
+                isfile = os.path.isfile(file_path)
+        
+        if not isfile:
+            return result
+        else:
+            #load file
+            with open(file_path, mode='r', encoding='utf-8', errors='ignore') as fp:
+                result = fp.readlines()
+            return result
+        
 
     def ask_input_mode(self, recipient, notes, prerequisites=None):
         """
@@ -346,9 +373,6 @@ class MusicSheetMaker:
             output_file.write(buffer.getvalue())
             
             print('\nYour song in ' + file_ext.upper() + ' is located in: ' + self.song_dir_out)
-            
-            print('%%%DEBUG write')
-            print(file_paths)
             
             if numfiles > 1:
                 print('Your song has been split into ' + str(numfiles) + ' between ' + os.path.split(file_paths[0])[

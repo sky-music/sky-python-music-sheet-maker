@@ -74,6 +74,8 @@ class Communicator:
 
             'song_notes_files': {'class': QueryOpen.__name__, 'handler': 'None', 'question': 'Please type or copy-paste notes, or enter file name', 'reply_type': ReplyType.TEXT, 'limits': None},
 
+            'song_file': {'class': QueryOpen.__name__, 'handler': 'None', 'question': 'Please  enter file name in', 'reply_type': ReplyType.FILE, 'limits': '.'},
+
             'song_notes': {'class': QueryOpen.__name__, 'handler': 'None',
                            'question': 'Please type or copy-paste notes', 'reply_type': ReplyType.NOTE, 'limits': None},
 

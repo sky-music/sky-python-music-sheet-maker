@@ -49,4 +49,5 @@ class ReplyType(Enum):
     NOTE = 3
     INPUTMODE = 4
     IMAGE = 5
-    OTHER = 6
+    FILE = 6
+    OTHER = 7

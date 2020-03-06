@@ -1,4 +1,4 @@
-import re
+import re, os
 from modes import ReplyType, InputMode
 from datetime import datetime
 
@@ -138,9 +138,15 @@ class Query:
         self.foreword = foreword
         self.afterword = afterword
         self.reply_type = reply_type  # Expected type of the reply, among ReplyType
-        self.limits = limits  # Choices, regexp...
-        self.prerequisites = prerequisites  # Other Queries required to reply to this Query
-        self.identifier = None  # An almost-unique ID based on the Query content, excluding the timestamp
+        if not isinstance(limits, (list, tuple,set,type(None))):
+            self.limits = [limits]
+        else:
+            self.limits = limits # Choices, regexp...
+        if not isinstance(prerequisites, (list, tuple,set,type(None))):
+            self.prerequisites = [prerequisites]
+        else:
+            self.prerequisites = prerequisites # Other Queries required to reply to this Query
+        self.identifier = None# An almost-unique ID based on the Query content, excluding the timestamp
         self.sent_time = None  # The timestamp at which the Query was sent()
         self.expect_reply = True # Currently used for Information queries
 
@@ -152,10 +158,18 @@ class Query:
         self.is_replied = False  # Has been assigned a Reply object
 
         self.check_and_pack() # Checks the input parameters and build the result
+        
     def __repr__(self):
-        string = '<' + self.__class__.__name__ + ' ' + str(self.get_identifier()) + ' from ' + str(
-            self.sender.get_name()) + ' to ' + str(
-            self.recipient.get_name()) + ': ' + repr(self.question) + ', ' + str(self.reply_type) + ' expected'
+        try:
+            sender_name = self.sender.get_name()
+        except AttributeError:
+            sender_name = None
+        try:
+            recipient_name = self.recipient.get_name()
+        except AttributeError:
+            recipient_name = None
+        string = '<' + self.__class__.__name__ + ' ' + str(self.get_identifier()) + ' from ' + str(sender_name) + ' to ' + str(recipient_name) + ': ' + repr(self.question) + ', ' + str(self.reply_type) + ' expected'
+        
         try:
             limits = self.get_limits()
             limits[0]
@@ -247,12 +261,7 @@ class Query:
         return self.sent_time
 
     def get_prerequisites(self):
-        if self.prerequisites is None:
-            return []
-        if not isinstance(self.prerequisites, (list, tuple, set)):
-            return [self.prerequisites]
-        else:
-            return self.prerequisites
+        return self.prerequisites
 
     def check_locutor(self, locutor, allowed='all', forbidden=None):
 
@@ -355,10 +364,14 @@ class Query:
         limits = self.get_limits()
         if limits is None:
             return True
-        if len(limits) == 0:
-            return True
+        else:
+            try:
+                if len(limits) == 0:
+                    return True
+            except TypeError:
+                pass
 
-        if (self.reply_type == ReplyType.TEXT or self.reply_type == ReplyType.NOTE) and not isinstance(limits[0], str):
+        if self.reply_type in [ReplyType.TEXT, ReplyType.NOTE, ReplyType.FILE] and not isinstance(limits[0], str):
             raise InvalidQueryTypeError('incorrect limits type', limits[0], str)
 
         if self.reply_type == ReplyType.INTEGER:
@@ -369,6 +382,14 @@ class Query:
 
         if self.reply_type == ReplyType.INPUTMODE and not isinstance(limits[0], InputMode):
             raise InvalidQueryTypeError('incorrect limits type', limits[0], InputMode)
+
+        if self.reply_type == ReplyType.FILE:
+            if os.path.isdir(limits[0]):
+                pass
+            elif len(limits[0]) >= 2 and len(limits[0]) <= 5:
+                pass
+            else: #Limits is neither an extension or a directory
+                InvalidQueryTypeError('directory not found for limit', limits[0], InputMode)
 
         if any([type(limit) != type(limits[0]) for limit in limits]):
             raise InvalidQueryError('limits are not all of the same type')
@@ -406,7 +427,7 @@ class Query:
             limits = self.get_limits()
                         
             if answer is not None:
-                if self.get_reply_type() in [ReplyType.TEXT, ReplyType.NOTE]:
+                if self.get_reply_type() in [ReplyType.TEXT, ReplyType.NOTE, ReplyType.FILE]:
                     if isinstance(answer, str):
                         is_reply_valid = True
                 elif self.get_reply_type() == ReplyType.INTEGER:
@@ -421,6 +442,22 @@ class Query:
                 else:
                     is_reply_valid = True
 
+                if self.get_reply_type() == ReplyType.FILE and limits is not None:
+                    '''
+                    Checks if the file exist in the directories and with the extensions specified in limits
+                    '''
+                    directories = [lim for lim in limits if os.path.isdir(lim)]
+                    extensions = [lim for lim in limits if not os.path.isdir(lim) and len(lim) >= 2 and len(lim) <= 5]
+                    extensions = ['.'+ext.split('.')[-1] for ext in extensions]
+                    
+                    directories += ['.']
+                    
+                    if all([not os.path.isfile(os.path.normpath(os.path.join(directory, answer))) for directory in directories]) and len(directories) != 0:
+                        is_reply_valid = False
+                    
+                    if all([re.search(ext,os.path.splitext(answer)[-1]) is None for ext in extensions]) and len(extensions) != 0:
+                        is_reply_valid = False
+                
                 if self.get_reply_type() == ReplyType.INTEGER and limits is not None and is_reply_valid is True:
                     try:
                         num = int(answer)
@@ -432,15 +469,17 @@ class Query:
                             is_reply_valid = False
                     except (ValueError, TypeError):
                         pass
-
-            return is_reply_valid
+        print('return='+str(is_reply_valid))
+        return is_reply_valid
 
     def check_prerequisites(self):
         """
         Checks that all prerequisites Queries have been satisfied, i.e. received a valid Reply
         """
         pre = self.get_prerequisites()
-        if len(pre) == 0:
+        if pre is None:
+            satisfied = True
+        elif len(pre) == 0:
             satisfied = True
         else:
             satisfied = all([q.get_reply_validity() for q in pre])
@@ -593,6 +632,7 @@ class QueryChoice(Query):
         """
         answer = self.reply.get_answer()
         choices = self.get_limits()
+        #limits cannot be None in QueryChoice, we made sure of that
 
         if isinstance(answer, str):
             answer = answer.lower().strip()
@@ -621,12 +661,12 @@ class QueryBoolean(QueryChoice):
         # repairing missing choices
         self.default_limits = ['y', 'n']
         try:
-            kwargs['limits'][0]
-            kwargs['limits'][1]
+            kwargs['limits'] = list(kwargs['limits'])
             if len(kwargs['limits']) % 2 != 0: # a tuple of couples is accepted: (yes,no,true,false,oui,non)
                 kwargs['limits'] = self.default_limits
         except:
             kwargs['limits'] = self.default_limits
+            
         super().__init__(*args, **kwargs)
 
     def build_result(self):
@@ -658,12 +698,17 @@ class QueryOpen(Query):
         if is_reply_valid is not True:
             return is_reply_valid
 
-        try:
-            match = re.search(self.get_limits(), self.reply.get_answer()) #self.limits can be a RegEx
-            if match is None:
-                is_reply_valid = False
-        except TypeError:
-            pass
+        limits = self.get_limits()
+        answer = self.reply.get_answer()
+        
+        if limits is not None:
+            if len(limits) == 1:
+                try:
+                    regex = re.compile(limits[0])
+                    if regex.search(answer) is None:#self.limits can be a RegEx
+                        is_reply_valid = False
+                except (re.error, TypeError):
+                    pass
 
         return is_reply_valid
 
@@ -716,7 +761,7 @@ class QueryMemory:
 
         return len(self.queries)
 
-    def print_out(self, filters=None, criterion=None):
+    def print_out(self, criterion=None, filters=None):
 
         queries = self.recall(filters=filters, criterion=criterion)
         
@@ -917,7 +962,7 @@ class QueryMemory:
         self.queries.clear()
         return True
 
-    def erase(self, filters=None, criterion=None):
+    def erase(self, criterion=None, filters=None):
         """
         Erases Queries matching criterion
         """

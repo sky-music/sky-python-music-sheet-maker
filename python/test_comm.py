@@ -5,7 +5,7 @@ from communication import QueryOpen, QueryChoice, QueryBoolean, QueryMemory
 # song_dir_in = 'test_songs'
 # song_dir_out = 'songs_out'
 
-brain = QueryMemory()
+brain = QueryMemory('music-cog')
 
 print('\n\n####Testing QueryOpen####\n')
 
@@ -124,7 +124,15 @@ qs = brain.recall(ReplyType.TEXT)
 print('\n\nBrain inventory:\n')
 print(brain)
 
-graph = QueryMemory()
+q_file = QueryOpen(sender='music-cog',recipient='music-sheet-maker',question='Please reply a file name',reply_type=ReplyType.FILE,limits=('../test_songs','.txt','.py'))
+brain.store(q_file)
+q_file.reply_to('englishC.txt')
+
+print('\n####Testing file name handling\n###')
+print(q_file)
+
+###Testing topological sort
+graph = QueryMemory('main')
 q5 = QueryOpen(sender='music-cog', recipient='music-sheet-maker', question='5', prerequisites=[])
 q7 = QueryOpen(sender='music-cog', recipient='music-sheet-maker', question='7', prerequisites=[])
 q3 = QueryOpen(sender='music-cog', recipient='music-sheet-maker', question='3', prerequisites=[])
@@ -147,3 +155,5 @@ for i in range(len(graph)):
 
 test_dict = {'sender': 'music-cog', 'recipient': 'music-sheet-maker', 'question': 'how are you?'}
 test_q = QueryOpen(**test_dict)
+
+
