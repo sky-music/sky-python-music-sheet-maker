@@ -81,8 +81,8 @@ class Reply:
         answer = self.answer
         if isinstance(answer, str):
             answer = answer.strip()
-        if self.query.get_reply_type()==ReplyType.INTEGER:
-            if answer=='':
+        if self.query.get_reply_type() == ReplyType.INTEGER:
+            if answer == '':
                 answer = '0'
         
         self.answer = answer
@@ -105,7 +105,7 @@ class Reply:
         elif isinstance(self.query, QueryChoice):
             index = self.query.get_answer_index()
             self.result = self.query.get_limits()[index]
-        else:
+        else:#QueryOpen
             self.result = self.answer
             if self.query.reply_type == ReplyType.INTEGER:
                 self.result = int(self.answer)
@@ -120,8 +120,7 @@ class Reply:
 
 class Query:
 
-    def __init__(self, name=None, sender=None, recipient=None, question=None, foreword=None, afterword=None,
-                 reply_type=ReplyType.OTHER, limits=None, prerequisites=None):
+    def __init__(self, name=None, sender=None, recipient=None, question=None, foreword=None, afterword=None, reply_type=ReplyType.OTHER, limits=None, prerequisites=None):
         """
         The general Query class
 
@@ -138,10 +137,12 @@ class Query:
         self.foreword = foreword
         self.afterword = afterword
         self.reply_type = reply_type  # Expected type of the reply, among ReplyType
+        #Repairing limits:
         if not isinstance(limits, (list, tuple,set,type(None))):
             self.limits = [limits]
         else:
             self.limits = limits # Choices, regexp...
+        #Repairing prerequisites:
         if not isinstance(prerequisites, (list, tuple,set,type(None))):
             self.prerequisites = [prerequisites]
         else:
@@ -233,6 +234,7 @@ class Query:
         """
         if self.limits is None:
             return None
+            #return [] #another possibility
         else:
             try:
                 self.limits[0]
@@ -261,8 +263,21 @@ class Query:
         return self.sent_time
 
     def get_prerequisites(self):
-        return self.prerequisites
-
+        """
+        Returns None or a list with len>0
+        """
+        if self.prerequisites is None:
+            return None
+            #return [] #another possibility
+        else:
+            try:
+                self.prerequisites[0]
+                return self.prerequisites
+            except IndexError:
+                return None
+            except TypeError:
+                return [self.prerequisites]
+                
     def check_locutor(self, locutor, allowed='all', forbidden=None):
 
         def get_name_and_sanitize(obj):
@@ -302,8 +317,6 @@ class Query:
 
             if locutor_name not in self.valid_locutors_names:
                 locutor_ok = False
-                # print(locutor_name)
-                # print(self.valid_locutors_names)
                 print('locutor is not in internal validation list')
 
         if allowed != 'all':
@@ -348,14 +361,12 @@ class Query:
         return recipient_ok
 
     def check_question(self):
-        if self.question is not None:
-            # TODO: add checking among more types, if needed
-            if isinstance(self.question, str):
-                return True
-            else:
-                raise InvalidQueryError('only string (str) questions are allowed at the moment')
+        
+        # TODO: add checking among more types, if needed
+        if isinstance(self.get_question(), str):
+            return True
         else:
-            raise InvalidQueryError('question is None')
+            raise InvalidQueryError('only string (str) questions are allowed at the moment')
 
         return False
 
@@ -370,7 +381,7 @@ class Query:
                     return True
             except TypeError:
                 pass
-
+        #From now on limits is an non empty list or a non-None object
         if self.reply_type in [ReplyType.TEXT, ReplyType.NOTE, ReplyType.FILE] and not isinstance(limits[0], str):
             raise InvalidQueryTypeError('incorrect limits type', limits[0], str)
 
@@ -387,9 +398,10 @@ class Query:
             if os.path.isdir(limits[0]):
                 pass
             elif len(limits[0]) >= 2 and len(limits[0]) <= 5:
+                #limits is an extension
                 pass
             else: #Limits is neither an extension or a directory
-                InvalidQueryTypeError('directory not found for limit', limits[0], InputMode)
+                InvalidQueryError('limit is neither a directory or an extension')
 
         if any([type(limit) != type(limits[0]) for limit in limits]):
             raise InvalidQueryError('limits are not all of the same type')
@@ -405,7 +417,6 @@ class Query:
             elif isinstance(limits[0], InputMode):
                 self.reply_type = ReplyType.INPUTMODE
             else:
-                # TODO: decide if its better to leave it to none instead
                 self.reply_type = ReplyType.OTHER
 
     def check_reply(self):
@@ -426,7 +437,10 @@ class Query:
             answer = self.get_reply().get_answer()
             limits = self.get_limits()
                         
-            if answer is not None:
+            if answer is None:
+                is_reply_valid = False
+                return is_reply_valid
+            else:
                 if self.get_reply_type() in [ReplyType.TEXT, ReplyType.NOTE, ReplyType.FILE]:
                     if isinstance(answer, str):
                         is_reply_valid = True
@@ -451,13 +465,24 @@ class Query:
                     extensions = ['.'+ext.split('.')[-1] for ext in extensions]
                     
                     directories += ['.']
-                    
+                    '''
+                    print('%%DEBUG directories=')
+                    print(directories)
+                    print('%%DEBUG extensions=')
+                    print(extensions)
+                    '''
                     if all([not os.path.isfile(os.path.normpath(os.path.join(directory, answer))) for directory in directories]) and len(directories) != 0:
+                        #print('%%DEBUG failed 1st')
                         is_reply_valid = False
+                    
+                    #print('%%%DEBUG')
+                    #print(os.path.normpath(os.path.join(directories[0], answer)))
                     
                     if all([re.search(ext,os.path.splitext(answer)[-1]) is None for ext in extensions]) and len(extensions) != 0:
+                        #print('%%DEBUG failed 2nd')
                         is_reply_valid = False
                 
+                #Maybe limits is an integer range
                 if self.get_reply_type() == ReplyType.INTEGER and limits is not None and is_reply_valid is True:
                     try:
                         num = int(answer)
@@ -469,7 +494,7 @@ class Query:
                             is_reply_valid = False
                     except (ValueError, TypeError):
                         pass
-        print('return='+str(is_reply_valid))
+        
         return is_reply_valid
 
     def check_prerequisites(self):
@@ -489,20 +514,23 @@ class Query:
     def build_result(self):
         """
         The result is the complete query, with foreword, afterword, et caetera
+        This a generic return, that is  overridden in derived classes
         """
         result = [self.get_foreword()]
         result += [self.get_question()]
         result += [self.get_afterword()]
-        result = '\n'.join(filter(None, result))
+        try:
+            result = '\n'.join(filter(None, result))
+        except:
+            pass
         self.result = result
-        return result  # Generic return, will be overridden in derived classes
+        return result
 
     def hash_identifier(self):
         """
         Builds an ID of the Query. Two queries with the same ID are considered as duplicates. 
         """
-        hashables = [self.get_sender(), self.get_recipient(), self.get_result(), self.get_limits(),
-                     self.get_prerequisites()]
+        hashables = [self.get_sender(), self.get_recipient(), self.get_result(), self.get_limits(), self.get_prerequisites()]
         hashables = [str(hashable).lower().strip() for hashable in hashables]
         self.identifier = hash(','.join(hashables))
 
@@ -532,9 +560,8 @@ class Query:
         Querying is a protocol during which you first check that you are allowed to speak, that
         there is someone to listen, that your question is meaningful (or allowed) and then you can send your query
         """
-        if self.is_replied:
-            if self.reply.check_reply():
-                raise QueryRepliedError('this question has already been correctly answered')
+        if self.is_replied and self.check_reply():
+            raise QueryRepliedError('this question has already been correctly answered, you don''t need to send it twice.')
         self.check_and_pack()
         self.stamp()
         self.is_sent = True
@@ -545,7 +572,7 @@ class Query:
         if recipient is None:
             recipient = self.get_recipient()
 
-        recipient.receive(self)  # Assumes that all recipients contain a method to handle queries
+        recipient.receive(self)  # Assumes that all recipients contain a method to receive() queries
 
         return self.is_sent
 
@@ -700,11 +727,12 @@ class QueryOpen(Query):
         limits = self.get_limits()
         answer = self.reply.get_answer()
         
-        if limits is not None:
-            if len(limits) == 1:
+        if limits is not None: 
+            if len(limits) == 1 and self.reply_type == ReplyType.TEXT:
                 try:
                     regex = re.compile(limits[0])
                     if regex.search(answer) is None:#self.limits can be a RegEx
+                        #print('%%%DEBUG applying regex malus')
                         is_reply_valid = False
                 except (re.error, TypeError):
                     pass

@@ -1,8 +1,8 @@
-# import os
+
 from modes import ReplyType
 from communication import Query, Reply, QueryOpen, QueryChoice, QueryBoolean, QueryMemory, Information
 import communication
-#import copy
+
 
 """
 Classes to ask and answer questions called Query and Reply between the bot and the music sheet maker
@@ -43,57 +43,40 @@ class Communicator:
         self.name = self.owner.get_name()
 
         # A dictionary of standard queries arguments
+        #The key must be lower case without blanks, use _ instead
         # TODO: create generic (quasi-empty) stock queries, such as Information to output dome text
         self.query_stock = {
             # Queries asked by the Player / Music Cog
-            'create_song': {'class': QueryOpen.__name__, 'handler': 'create_song',
-                            'question': 'create_song'},
+            'create_song': {'class': QueryOpen.__name__, 'handler': 'create_song', 'question': 'create_song'},
             
             # Generic Query
-            'information': {'class': Information.__name__, 'handler': 'None',
-                            'question': '', 'reply_type': ReplyType.TEXT},
+            'information': {'class': Information.__name__, 'handler': 'None', 'question': '', 'reply_type': ReplyType.TEXT},
                             
             # Queries asked by Music Sheet Maker
-            'song_overwrite': {'class': QueryBoolean.__name__, 'handler': 'None',
-                               'foreword': 'A Song already exists in memory.',
-                               'question': 'Do you want to overwrite it?', 'reply_type': ReplyType.TEXT},
+            'song_overwrite': {'class': QueryBoolean.__name__, 'handler': 'None', 'foreword': 'A Song already exists in memory.', 'question': 'Do you want to overwrite it?', 'reply_type': ReplyType.TEXT},
 
-            #TODO: Add more verbose instruction
-            'instructions': {'class': Information.__name__, 'handler': 'None',
-                             'foreword': '===== VISUAL MUSIC SHEETS FOR SKY:CHILDREN OF THE LIGHT =====',
-                             'question': ''},
+            #TODO: Add complete instructions, see responder.py
+            'instructions': {'class': Information.__name__, 'handler': 'None', 'foreword': '===== VISUAL MUSIC SHEETS FOR SKY:CHILDREN OF THE LIGHT =====', 'question': ''},
 
-            'song_title': {'class': QueryOpen.__name__, 'handler': 'None',
-                           'question': 'What is the song title?', 'reply_type': ReplyType.TEXT},
+            'song_title': {'class': QueryOpen.__name__, 'handler': 'None', 'question': 'What is the song title?', 'reply_type': ReplyType.TEXT},
 
-            'original_artist': {'class': QueryOpen.__name__, 'handler': 'None',
-                                'question': 'What is the Original artist(s)?', 'reply_type': ReplyType.TEXT},
+            'original_artist': {'class': QueryOpen.__name__, 'handler': 'None', 'question': 'What is the Original artist(s)?', 'reply_type': ReplyType.TEXT},
 
-            'transcript_writer': {'class': QueryOpen.__name__, 'handler': 'None',
-                                  'question': 'What is the transcript writer?', 'reply_type': ReplyType.TEXT},
+            'transcript_writer': {'class': QueryOpen.__name__, 'handler': 'None', 'question': 'What is the transcript writer?', 'reply_type': ReplyType.TEXT},
 
-            'song_notes_files': {'class': QueryOpen.__name__, 'handler': 'None', 'question': 'Please type or copy-paste notes, or enter file name', 'reply_type': ReplyType.TEXT, 'limits': None},
+            'song_notes_files': {'class': QueryOpen.__name__, 'handler': 'None', 'question': 'Please type or copy-paste notes, or enter file name', 'reply_type': ReplyType.OTHER, 'limits': None},
 
             'song_file': {'class': QueryOpen.__name__, 'handler': 'None', 'question': 'Please  enter file name in', 'reply_type': ReplyType.FILE, 'limits': '.'},
 
-            'song_notes': {'class': QueryOpen.__name__, 'handler': 'None',
-                           'question': 'Please type or copy-paste notes', 'reply_type': ReplyType.NOTE, 'limits': None},
+            'song_notes': {'class': QueryOpen.__name__, 'handler': 'None', 'question': 'Please type or copy-paste notes', 'reply_type': ReplyType.NOTE, 'limits': None},
 
-            'musical_notation': {'class': QueryChoice.__name__, 'handler': 'None', 'foreword': '\nSeveral possible notations detected.', 'question': 'Please choose your note format', 'reply_type': ReplyType.INPUTMODE,
-                                 'limits': []},
+            'musical_notation': {'class': QueryChoice.__name__, 'handler': 'None', 'foreword': '\nSeveral possible notations detected.', 'question': 'Please choose your note format', 'reply_type': ReplyType.INPUTMODE, 'limits': []},
 
-            'possible_keys': {'class': QueryChoice.__name__, 'handler': 'None',
-                              'question': 'Please choose your musical key', 'reply_type': ReplyType.NOTE,
-                              'limits': None},
+            'possible_keys': {'class': QueryChoice.__name__, 'handler': 'None', 'question': 'Please choose your musical key', 'reply_type': ReplyType.NOTE, 'limits': None},
 
-            'recommended_key': {'class': QueryOpen.__name__, 'handler': 'None',
-                                'foreword': 'Your notes use relative pitch notation.',
-                                'question': 'What is the recommended key to play in Sky?', 'reply_type': ReplyType.NOTE,
-                                'limits': None},
+            'recommended_key': {'class': QueryOpen.__name__, 'handler': 'None', 'foreword': 'Your notes use relative pitch notation.', 'question': 'What is the recommended key to play in Sky?', 'reply_type': ReplyType.NOTE, 'limits': None},
 
-            'octave_shift': {'class': QueryOpen.__name__, 'handler': 'None',
-                             'question': 'Do you want to shift by n octaves?', 'reply_type': ReplyType.INTEGER,
-                             'limits': [-6, 6]}
+            'octave_shift': {'class': QueryOpen.__name__, 'handler': 'None', 'question': 'Do you want to shift by n octaves?', 'reply_type': ReplyType.INTEGER, 'limits': [-6, 6]}
 
         }
 

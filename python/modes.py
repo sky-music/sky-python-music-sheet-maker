@@ -48,6 +48,6 @@ class ReplyType(Enum):
     INTEGER = 2
     NOTE = 3
     INPUTMODE = 4
-    IMAGE = 5
-    FILE = 6
+    FILE = 5
+    IMAGE = 6
     OTHER = 7
