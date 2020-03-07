@@ -582,12 +582,11 @@ class QueryChoice(Query):
 
         result = self.get_foreword()
 
-        if self.get_limits() is not None:
-            result += '\n'
+        result += '\n'
 
         # TODO: handles types other than string
         for i, choice in enumerate(self.get_limits()):
-
+        #We made sure limits is not None
             if self.reply_type == ReplyType.NOTE:
                 if i > 0:
                     choice_str = ', '
@@ -1011,7 +1010,9 @@ class QueryMemory:
         edgeless_nodes = set()
 
         for i, q in enumerate(queries):
-            if len(q.get_prerequisites()) == 0:
+            if q.get_prerequisites() is None:
+                edgeless_nodes.add((i, q))
+            elif len(q.get_prerequisites()) == 0:
                 edgeless_nodes.add((i, q))
 
         if len(edgeless_nodes) == 0:
@@ -1028,10 +1029,11 @@ class QueryMemory:
 
             for m, query in enumerate(queries):
                 edges = query.get_prerequisites()
-                if node[1] in edges:
-                    edges.remove(node[1])
-                    if len(edges) == 0:
-                        edgeless_nodes.add((m, query))
+                if edges is not None:
+                    if node[1] in edges:
+                        edges.remove(node[1])
+                        if len(edges) == 0:
+                            edgeless_nodes.add((m, query))
 
         if len(sorted_nodes) == len(self.queries):
             self.queries = [self.queries[node[0]] for node in sorted_nodes]

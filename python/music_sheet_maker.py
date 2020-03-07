@@ -164,6 +164,7 @@ class MusicSheetMaker:
             
             # Parse song
             self.set_song(self.get_parser().parse_song(notes, song_key, octave_shift))
+            self.display_error_ratio(recipient=recipient, prerequisites=None)
         
         #Asks for song metadata
         title, artist, writer = self.ask_song_metadata(recipient=recipient)
@@ -223,7 +224,7 @@ class MusicSheetMaker:
     def ask_notes_file(self, recipient, prerequisites=None):
 
         # TODO: Check for file, etc, distinguish Discord / command line to avoid loading a file on Discord
-        q_notes = self.communicator.send_stock_query('song_notes_files', question='Type or copy-paste notes, or enter file name (in ' + os.path.normpath(self.song_dir_in) + '/)',recipient=recipient, prerequisites=prerequisites)
+        q_notes = self.communicator.send_stock_query('song_notes_files', question='Type or copy-paste notes, or enter file name (in ' + os.path.relpath(os.path.normpath(self.song_dir_in)) + '/)',recipient=recipient, prerequisites=prerequisites)
             #TODO: detect file name
             #create a new ReplyType?
             
@@ -241,7 +242,7 @@ class MusicSheetMaker:
                 # then probably a file name
                 self.communicator.memory.erase(q_notes)
                 
-                q_file = self.communicator.send_stock_query('song_file', question='Enter file name (in ' + os.path.normpath(self.song_dir_in) + '/)',recipient=recipient, prerequisites=prerequisites, limits=os.path.normpath(self.song_dir_in))
+                q_file = self.communicator.send_stock_query('song_file', question='Enter file name (in ' + os.path.relpath(os.path.normpath(self.song_dir_in)) + '/)',recipient=recipient, prerequisites=prerequisites, limits=os.path.normpath(self.song_dir_in))
             #TODO: detect file name
             #create a new ReplyType?
                 recipient.execute_queries(q_file)
@@ -254,10 +255,16 @@ class MusicSheetMaker:
             return result
         else:
             #load file
-            with open(file_path, mode='r', encoding='utf-8', errors='ignore') as fp:
-                result = fp.readlines()
-            return result
-        
+            try:
+                with open(file_path, mode='r', encoding='utf-8', errors='ignore') as fp:
+                    result = fp.readlines()
+                return result
+            except (OSError, IOError) as err:
+                print('Error opening file.')
+                raise err
+            else:
+                print('(Song imported from ' + os.path.abspath(file_path) + ')')
+                
 
     def ask_input_mode(self, recipient, notes, prerequisites=None):
         """
@@ -311,7 +318,7 @@ class MusicSheetMaker:
                 recipient.execute_queries(i_key)
             else:
                 q_key = self.communicator.send_stock_query('possible_keys', recipient=recipient,
-                                                           foreword="\nYour song can be transposed in Sky with the following keys: " + ','.join(
+                                                   foreword="\nYour song can be transposed in Sky with the following keys: " + ','.join(
                                                                possible_keys), limits=possible_keys, prerequisites=prerequisites)
                 recipient.execute_queries(q_key)
 
@@ -331,20 +338,26 @@ class MusicSheetMaker:
         pass
         
         
-    def calculate_error_ratio(self):
+    def display_error_ratio(self, recipient, prerequisites=None):
         #TODO: use queries
         #TODO: use this method in create_song
         print('===========================================')
         error_ratio = self.get_song().get_num_broken() / max(1, self.get_song().get_num_instruments())
         if error_ratio == 0:
-            print('Song successfully read with no errors!')
+            message = 'Song successfully read with no errors!'
         elif error_ratio < 0.05:
-            print('Song successfully read with few errors!')
+            message = 'Song successfully read with few errors!'
         else:
-            print('**WARNING**: Your song contains many errors. Please check the following:'
-                        '\n- All your notes are within octaves 4 and 6. If not, try again with an octave shift.'
-                        '\n- Your song is free of typos. Please check this website for full instructions: '
-                        'https://sky.bloomexperiment.com/t/summary-of-input-modes/403')
+            message = '**WARNING**: Your song contains many errors. Please check the following:'+\
+            '\n- All your notes are within octaves 4 and 6. If not, try again with an octave shift.'+\
+            '\n- Your song is free of typos. Please check this website for full instructions: '+\
+            'https://sky.bloomexperiment.com/t/summary-of-input-modes/403'
+            
+        i_error = self.communicator.send_information(recipient=recipient, string=message, prerequisites=prerequisites)
+        
+        #i_error = self.communicator.send_stock_query('information', recipient=recipient, prerequisites=prerequisites)
+        recipient.execute_queries(i_error)
+        
 
     def write_buffers_to_files(self, buffers, file_paths):
         """
@@ -372,10 +385,10 @@ class MusicSheetMaker:
                 raise MusicMakerError('Unknown buffer type in ' + str(self))
             output_file.write(buffer.getvalue())
             
-            print('\nYour song in ' + file_ext.upper() + ' is located in: ' + self.song_dir_out)
+            print('\nYour song in ' + file_ext.upper() + ' is located in: ' + os.path.relpath(self.song_dir_out))
             
             if numfiles > 1:
-                print('Your song has been split into ' + str(numfiles) + ' between ' + os.path.split(file_paths[0])[
+                print('Your song has been split into ' + str(numfiles) + ' files between ' + os.path.split(file_paths[0])[
                             1] + ' and ' + os.path.split(file_paths[-1])[1])
             
         return i

@@ -40,7 +40,7 @@ class CommandLinePlayer:
             self.communicator.memory.clean()
             queries = self.communicator.recall_unsatisfied(filters=('to_me'))
         else:
-            if not isinstance(queries, (list, tuple)):
+            if not isinstance(queries, (list, tuple, set)):
                 queries = [queries]
         print('\n%%%%DEBUG. I AM PLAYER, THE UNSATISFIED QUERIES ARE:%%%%')
         self.communicator.memory.print_out(filters=('unsatisfied'))
@@ -65,7 +65,7 @@ class CommandLinePlayer:
                     print(question)
                     q.reply_to('ok')
                     reply_valid = q.get_reply_validity()
-        return True
+        #return True
 
 player = CommandLinePlayer()
 
