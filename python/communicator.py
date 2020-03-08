@@ -56,7 +56,9 @@ class Communicator:
             'song_overwrite': {'class': QueryBoolean.__name__, 'handler': 'None', 'foreword': 'A Song already exists in memory.', 'question': 'Do you want to overwrite it?', 'reply_type': ReplyType.TEXT},
 
             #TODO: Add complete instructions, see responder.py
-            'instructions': {'class': Information.__name__, 'handler': 'None', 'foreword': '===== VISUAL MUSIC SHEETS FOR SKY:CHILDREN OF THE LIGHT =====', 'question': ''},
+            'instructions_stdout': {'class': Information.__name__, 'handler': 'None', 'foreword': '===== VISUAL MUSIC SHEETS FOR SKY:CHILDREN OF THE LIGHT =====', 'question': '','afterword': '='*30},
+            
+            'instructions': {'class': Information.__name__, 'handler': 'None', 'foreword': '', 'question': '','afterword': ''},
 
             'song_title': {'class': QueryOpen.__name__, 'handler': 'None', 'question': 'What is the song title?', 'reply_type': ReplyType.TEXT},
 

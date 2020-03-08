@@ -46,6 +46,14 @@ class MusicSheetMaker:
     def get_name(self):
         return self.name
 
+    def is_botcog(self, recipient):
+        
+        try:
+            recipient.bot
+            return True
+        except AttributeError:
+            return False
+
     def get_song(self):
         return self.song
 
@@ -82,8 +90,9 @@ class MusicSheetMaker:
         else:
             if not isinstance(queries, (list, tuple)):
                 queries = [queries]
-        print('\n%%%%I AM MAKER, THE UNSATISFIED QUERIES ARE:%%%%')
-        self.communicator.memory.print_out(filters=('unsatisfied'))
+        #FIXME: 2 lines for debugging:
+        #print('\n%%%%I AM MAKER, THE UNSATISFIED QUERIES ARE:%%%%')
+        #self.communicator.memory.print_out(filters=('unsatisfied'))
 
         """
         The query statisfaction loop:
@@ -140,14 +149,11 @@ class MusicSheetMaker:
             self.set_parser(SongParser(self))
     
             # Display instructions
-            #TODO: add more explicit instructions, see Responder.py for an example
-            #tricky part: generate the list of input modes
-            i_instructions = self.communicator.send_stock_query('instructions', recipient=recipient)
-            recipient.execute_queries(i_instructions)
-    
+            self.ask_instructions(recipient=recipient)
+        
             # Ask for notes
             #TODO: allow the player to enter the notes using several messages??? or maybe not
-            if recipient.get_name() == 'music-cog':
+            if self.is_botcog(recipient):
                 notes = self.ask_notes(recipient=recipient)
             else:
                 notes = self.ask_notes_file(recipient=recipient)
@@ -170,29 +176,50 @@ class MusicSheetMaker:
         title, artist, writer = self.ask_song_metadata(recipient=recipient)
         
         #TODO:
-        #Detect if on Discord or in commandn line with a safer method
+        #Detect if on Discord or in command line with a safer method
         #Loop over rendering modes, several for the command line, 1 for discord
-        if recipient.get_name() == 'music-cog':
+        if self.is_botcog(recipient):
             render_mode = self.discord_render_mode
             buffers = self.write_song_to_buffers(render_mode)
             
             #TODO: write this method:
             answer = self.send_buffers_to_discord(buffers=buffers, recipient=recipient)
-        else:
+        else: #command line
             render_modes = self.get_render_modes_enabled()
             
             all_paths = []
             
+            print("="*40)
+            
             for render_mode in render_modes:
                 buffers = self.write_song_to_buffers(render_mode)
                 file_paths = self.build_file_paths(render_mode, len(buffers))
-                self.write_buffers_to_files(buffers, file_paths)
+                
+                print("-"*40)
+                self.write_buffers_to_files(render_mode, buffers, file_paths)
                 all_paths += file_paths
             
             answer = all_paths
             #TODO: decide what to reply
         
         return answer
+   
+    def ask_instructions(self, recipient):
+        
+        question = '\nAccepted music notes formats:'
+        for mode in InputMode:
+            question += '\n* ' + mode.value[2]
+        question += '\nNotes composing a chord must be glued together (e.g. A1B1C1).'
+        question += '\nSeparate chords with \"' + self.get_parser().get_icon_delimiter() + '\".'
+        question += '\nUse \"' + self.get_parser().get_pause() + '\" for a silence (rest).'
+        question += '\nUse \"' + self.get_parser().get_quaver_delimiter() + '\" to link notes within an icon, for triplets, quavers... (e.g. ' + self.get_parser().get_quaver_delimiter().join(('A1','B1','C1'))
+        question +=( '\nAdd \""' + self.get_parser().get_repeat_indicator() + '2\"" after a chord to indicate repetition.')
+        question += '\nSharps # and flats b (semitones) are supported for Western and Jianpu notations.'
+        
+        if not self.is_botcog(recipient):
+        
+            i_instructions = self.communicator.send_stock_query('instructions_stdout', recipient=recipient, question=question)
+            recipient.execute_queries(i_instructions)
    
     def ask_song_metadata(self, recipient, prerequisites=None):
 
@@ -349,9 +376,10 @@ class MusicSheetMaker:
         recipient.execute_queries(i_error)
         
 
-    def write_buffers_to_files(self, buffers, file_paths):
+    def write_buffers_to_files(self, render_mode, buffers, file_paths):
         """
-        Writes the content of an IOString or IOBytes buffer list to one or several files. command line only
+        Writes the content of an IOString or IOBytes buffer list to one or several files.
+        Command line only
         """
         #TODO: Move this method in Renderer???
         try:
@@ -375,9 +403,15 @@ class MusicSheetMaker:
                 raise MusicMakerError('Unknown buffer type in ' + str(self))
             output_file.write(buffer.getvalue())
             
-            print('\nYour song in ' + file_ext.upper() + ' is located in: ' + os.path.relpath(self.song_dir_out))
             
-            if numfiles > 1:
+            if numfiles == 1:
+                
+                print('\nYour song in ' + render_mode.value[1] + ' is located at: ' + os.path.relpath(file_paths[0]))
+                
+            elif numfiles > 1 and i == 0:
+                
+                print('\nYour song in ' + render_mode.value[1] + ' is located in: ' + os.path.relpath(self.song_dir_out))
+                
                 print('Your song has been split into ' + str(numfiles) + ' files between ' + os.path.split(file_paths[0])[
                             1] + ' and ' + os.path.split(file_paths[-1])[1])
             

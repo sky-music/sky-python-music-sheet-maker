@@ -42,8 +42,9 @@ class CommandLinePlayer:
         else:
             if not isinstance(queries, (list, tuple, set)):
                 queries = [queries]
-        print('\n%%%%DEBUG. I AM PLAYER, THE UNSATISFIED QUERIES ARE:%%%%')
-        self.communicator.memory.print_out(filters=('unsatisfied'))
+        #FIXME: 2 lines for debugging:
+        #print('\n%%%%DEBUG. I AM PLAYER, THE UNSATISFIED QUERIES ARE:%%%%')
+        #self.communicator.memory.print_out(filters=('unsatisfied'))
         """
         The following part is exclusive to the command line.
         The executing code must be rewritten for discord, typically using:
@@ -56,12 +57,14 @@ class CommandLinePlayer:
             while not reply_valid:
                 reply_valid = True #to be sure to break the loop if nonl query
                 if q.get_expect_reply():
-                    print('%%%DEBUG. PLAYER, YOU ARE BEING PROMPTED%%%')
+                    #FIXME: for debugging
+                    #print('%%%DEBUG. PLAYER, YOU ARE BEING PROMPTED%%%')
                     answer = input(question + ': ')
                     q.reply_to(answer)
                     reply_valid = q.get_reply_validity()
                 else:
-                    print('%%%DEBUG. PLAYER, YOU ARE BEING TOLD%%%')
+                    #FIXME: for debugging
+                    #print('%%%DEBUG. PLAYER, YOU ARE BEING TOLD%%%')
                     print(question)
                     q.reply_to('ok')
                     reply_valid = q.get_reply_validity()
@@ -77,10 +80,11 @@ maker.execute_queries()
 
 # player.execute_queries()
 
-
+#FIXME: for debugging
+'''
 print('\n%%%DEBUG. MAIN script has ended%%%')
 print('\n\n%%%DEBUG. Player memory:')
 player.communicator.memory.print_out()
 print('\n%%%DEBUG. Maker memory:')
 maker.communicator.memory.print_out()
-
+'''
