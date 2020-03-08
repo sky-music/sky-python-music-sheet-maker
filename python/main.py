@@ -4,6 +4,10 @@ from parsers import SongParser
 from songs import Song
 import os
 import re
+try:
+    import readline
+except ModuleNotFoundError:
+    pass  # probably Windows
 
 
 def ask_for_mode(modes, myparser=None):
