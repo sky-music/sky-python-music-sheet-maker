@@ -399,10 +399,13 @@ class MusicSheetMaker:
                 output_file = open(file_paths[i], 'w+', encoding='utf-8', errors='ignore')
             elif isinstance(buffer, io.BytesIO):
                 output_file = open(file_paths[i], 'bw+')
+            elif buffer is None:
+                pass
             else:
                 raise MusicMakerError('Unknown buffer type in ' + str(self))
             
-            try:
+            
+            if buffer is not None:
                 output_file.write(buffer.getvalue())
             
                 if numfiles == 1:
@@ -415,7 +418,7 @@ class MusicSheetMaker:
                     
                     print('Your song has been split into ' + str(numfiles) + ' files between ' + os.path.split(file_paths[0])[
                                 1] + ' and ' + os.path.split(file_paths[-1])[1])
-            except AttributeError:
+            else:
                 print('\nYour song in ' + render_mode.value[1] + ' was not saved to file.')    
             
         return i
