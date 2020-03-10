@@ -401,19 +401,22 @@ class MusicSheetMaker:
                 output_file = open(file_paths[i], 'bw+')
             else:
                 raise MusicMakerError('Unknown buffer type in ' + str(self))
-            output_file.write(buffer.getvalue())
             
+            try:
+                output_file.write(buffer.getvalue())
             
-            if numfiles == 1:
+                if numfiles == 1:
                 
-                print('\nYour song in ' + render_mode.value[1] + ' is located at: ' + os.path.relpath(file_paths[0]))
-                
-            elif numfiles > 1 and i == 0:
-                
-                print('\nYour song in ' + render_mode.value[1] + ' is located in: ' + os.path.relpath(self.song_dir_out))
-                
-                print('Your song has been split into ' + str(numfiles) + ' files between ' + os.path.split(file_paths[0])[
-                            1] + ' and ' + os.path.split(file_paths[-1])[1])
+                    print('\nYour song in ' + render_mode.value[1] + ' is located at: ' + os.path.relpath(file_paths[0]))
+                    
+                elif numfiles > 1 and i == 0:
+                    
+                    print('\nYour song in ' + render_mode.value[1] + ' is located in: ' + os.path.relpath(self.song_dir_out))
+                    
+                    print('Your song has been split into ' + str(numfiles) + ' files between ' + os.path.split(file_paths[0])[
+                                1] + ' and ' + os.path.split(file_paths[-1])[1])
+            except AttributeError:
+                print('\nYour song in ' + render_mode.value[1] + ' was not saved to file.')    
             
         return i
 
@@ -439,7 +442,8 @@ class MusicSheetMaker:
             buffers = []
             
         for buffer in buffers:
-            buffer.seek(0)
+            if buffer is not None:
+                buffer.seek(0)
 
         return buffers
     
