@@ -11,7 +11,7 @@ class CommandLinePlayer:
         - get_name(), returning a name among the authorized locutors list of communication.py
         - execute_queries()
         - a Communicator to handle Queries
-    It is recommeneded to have a receive() method or to a __getattr__ method to
+    It is recommended to have a receive() method or to a __getattr__ method to
     to call methods from communicator directly from the puppet.
     """
 

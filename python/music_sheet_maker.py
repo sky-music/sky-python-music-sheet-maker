@@ -114,8 +114,7 @@ class MusicSheetMaker:
                     #TODO: handle non-stock queries???
                     raise MusicMakerError('Unknown query ' + repr(query_name))
                     pass
-                
-
+     
     def create_song(self, **kwargs):
         """
         A very linear, sequential way of building a song from user inputs
@@ -138,6 +137,8 @@ class MusicSheetMaker:
             recipient.execute_queries()
             overwrite = q_overwrite.get_reply().get_result()
         else:
+            q_overwrite = self.communicator.send_information(recipient=recipient, string='Creating new song.')
+            recipient.execute_queries()
             overwrite = True
             
         if not overwrite:
@@ -146,23 +147,24 @@ class MusicSheetMaker:
             recipient.execute_queries(i)
             
         else:  #NEW SONG
+            self.communicator.memory.erase(filters=('from_me'))
             
             self.set_parser(SongParser(self))
     
             # Display instructions
-            self.ask_instructions(recipient=recipient)
+            i_instr, res = self.ask_instructions(recipient=recipient, prerequisites=[q_overwrite])
         
             # Ask for notes
             #TODO: allow the player to enter the notes using several messages??? or maybe not
             if self.is_botcog(recipient):
-                notes = self.ask_notes(recipient=recipient)
+                (q_notes, notes) = self.ask_notes(recipient=recipient, prerequisites=[i_instr])
             else:
-                notes = self.ask_notes_file(recipient=recipient)
+                (q_notes, notes) = self.ask_notes_file(recipient=recipient, prerequisites=[i_instr])
           
-            input_mode = self.ask_input_mode(recipient=recipient, notes=notes)
+            (q_mode, input_mode) = self.ask_input_mode(recipient=recipient, notes=notes, prerequisites=[q_notes])
             self.get_parser().set_input_mode(input_mode)
             
-            song_key = self.ask_song_key(recipient=recipient, notes=notes, input_mode=input_mode)
+            (q_key, song_key) = self.ask_song_key(recipient=recipient, notes=notes, input_mode=input_mode, prerequisites=[q_mode])
             
             #Asks for octave shift
             q_shift = self.communicator.send_stock_query('octave_shift', recipient=recipient)
@@ -174,7 +176,7 @@ class MusicSheetMaker:
             self.display_error_ratio(recipient=recipient, prerequisites=None)
         
         #Asks for song metadata
-        title, artist, writer = self.ask_song_metadata(recipient=recipient)
+        (q_meta, (title, artist, writer)) = self.ask_song_metadata(recipient=recipient)
         
         #TODO:
         #Detect if on Discord or in command line with a safer method
@@ -204,6 +206,7 @@ class MusicSheetMaker:
             #TODO: decide what to reply
         
         return answer
+    
    
     def ask_instructions(self, recipient, prerequisites=None, execute=True):
         
@@ -224,14 +227,13 @@ class MusicSheetMaker:
         
         if execute:
             recipient.execute_queries(i_instructions)
-            return i_instructions.get_reply().get_result()
+            result = i_instructions.get_reply().get_result()
+            return (i_instructions, result)
         else:
-            return i_instructions
+            return (i_instructions, None)
                                   
    
     def ask_song_metadata(self, recipient, prerequisites=None, execute=True):
-
-        # TODO: Remember metadata so that, if parsing fails the questions are not asked again?
 
         queries = []
 
@@ -242,9 +244,9 @@ class MusicSheetMaker:
         if execute:
             recipient.execute_queries(queries)
             result = [q.get_reply().get_result() for q in queries]
-            return tuple(result)
+            return (queries, tuple(result))
         else:
-            return queries
+            return (queries, None)
 
     def ask_notes(self, recipient, prerequisites=None, execute=True):
         
@@ -252,9 +254,10 @@ class MusicSheetMaker:
              
         if execute:
             recipient.execute_queries(q_notes)
-            return q_notes.get_reply().get_result()
+            result = q_notes.get_reply().get_result()
+            return (q_notes, result)
         else:
-            return q_notes
+            return (q_notes, None)
 
     
     def ask_file(self, recipient, prerequisites=None, execute=True):
@@ -266,9 +269,9 @@ class MusicSheetMaker:
             recipient.execute_queries(q_file)
             file_name = q_file.get_reply().get_result()
             file_path = os.path.join(self.song_dir_in, os.path.normpath(file_name))
-            return file_path #should return file name
+            return (q_file, file_path) #should return file name
         else:
-            return q_file
+            return (q_file, None)
         
     
     def read_file(self, file_path):
@@ -293,16 +296,16 @@ class MusicSheetMaker:
     def ask_notes_file(self, recipient, prerequisites=None, execute=True):
 
         # TODO: Check for file, etc, distinguish Discord / command line to avoid loading a file on Discord
-        q_notes_files = self.communicator.send_stock_query('song_notes_files', \
+        q_notes = self.communicator.send_stock_query('song_notes_files', \
                                                      question='Type or copy-paste notes, or enter file name (in ' + os.path.relpath(os.path.normpath(self.song_dir_in)) + '/)',\
                                                      recipient=recipient, prerequisites=prerequisites)
         
         if not execute:            
-            return q_notes_files        
+            return (q_notes, None)      
         else:            
-            recipient.execute_queries(q_notes_files)
+            recipient.execute_queries(q_notes)
             
-            result = q_notes_files.get_reply().get_result()
+            result = q_notes.get_reply().get_result()
             
             #Detects if the result is a file path
             file_path = os.path.join(self.song_dir_in, os.path.normpath(result))
@@ -312,19 +315,19 @@ class MusicSheetMaker:
                 splitted = os.path.splitext(result)
                 if len(splitted[0]) > 0 and 2 < len(splitted[1]) <= 5 and re.search('\\.', splitted[0]) is None:
                     # then certainly a file name
-                    self.communicator.memory.erase(q_notes_files)
+                    self.communicator.memory.erase(q_notes)
                                     
-                    file_path = self.ask_file(recipient=recipient, prerequisites=prerequisites, execute=execute)
+                    q_notes, file_path = self.ask_file(recipient=recipient, prerequisites=prerequisites, execute=execute)
                      
             if isfile:
                 notes = self.read_file(file_path)
             else:
                 notes = result
                     
-            return notes
+            return (q_notes, notes)
                 
 
-    def ask_input_mode(self, recipient, notes, prerequisites=None, execute=True):
+    def ask_input_mode(self, recipient, notes=None, prerequisites=None, execute=True):
         """
         Try to guess the musical notation and ask the player to confirm
         """
@@ -353,12 +356,12 @@ class MusicSheetMaker:
                 result = possible_modes[0]
             else:
                 result = q_mode.get_reply().get_result()
-            return result
+            return (q_mode, result)
         else:
-            return q_mode
+            return (q_mode, None)
 
 
-    def ask_song_key(self, recipient, notes, input_mode, prerequisites=None, execute=True):
+    def ask_song_key(self, recipient, notes=None, input_mode=None, prerequisites=None, execute=True):
         """
         Attempts to detect key for input written in absolute musical scales (western, Jianpu)
         """
@@ -396,9 +399,9 @@ class MusicSheetMaker:
             else:
                 raise MusicMakerError('Possible keys is an empty list.')
                 
-            return song_key
+            return (q_key, song_key)
         else:
-            return q_key
+            return (q_key, None)
 
         
     def send_buffers_to_discord(self, buffers, recipient):
@@ -426,9 +429,10 @@ class MusicSheetMaker:
        
         if execute:
             recipient.execute_queries(i_error)
-            return i_error.get_reply().get_result()
+            result = i_error.get_reply().get_result()
+            return (i_error, result)
         else:
-            return i_error
+            return (i_error, None)
         
 
     def write_buffers_to_files(self, render_mode, buffers, file_paths):
