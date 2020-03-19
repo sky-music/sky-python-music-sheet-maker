@@ -52,6 +52,7 @@ class CommandLinePlayer:
             await Questions.ask_text(self.bot, channel, ctx.author, question...)
         """
         for q in queries:
+            #TODO: update q recipient.update(q)
             question = self.communicator.query_to_stdout(q)
             reply_valid = False
             while not reply_valid:

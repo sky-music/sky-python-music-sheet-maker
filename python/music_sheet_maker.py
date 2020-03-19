@@ -114,8 +114,7 @@ class MusicSheetMaker:
                     #TODO: handle non-stock queries???
                     raise MusicMakerError('Unknown query ' + repr(query_name))
                     pass
-
-
+                
 
     def create_song(self, **kwargs):
         """
@@ -256,57 +255,80 @@ class MusicSheetMaker:
             return q_notes.get_reply().get_result()
         else:
             return q_notes
-        
 
-    def ask_notes_file(self, recipient, prerequisites=None, execute=True):
-
-        # TODO: Check for file, etc, distinguish Discord / command line to avoid loading a file on Discord
-        q_notes = self.communicator.send_stock_query('song_notes_files', \
-                                                     question='Type or copy-paste notes, or enter file name (in ' + os.path.relpath(os.path.normpath(self.song_dir_in)) + '/)',\
-                                                     recipient=recipient, prerequisites=prerequisites)
-            
-        recipient.execute_queries(q_notes)
+    
+    def ask_file(self, recipient, prerequisites=None, execute=True):
+                   
+        q_file = self.communicator.send_stock_query('song_file', question='Enter file name (in ' + os.path.relpath(os.path.normpath(self.song_dir_in)) + '/)',\
+                                                    recipient=recipient, prerequisites=prerequisites, limits=(os.path.normpath(self.song_dir_in)))
         
-        result = q_notes.get_reply().get_result()
+        if execute:
+            recipient.execute_queries(q_file)
+            file_name = q_file.get_reply().get_result()
+            file_path = os.path.join(self.song_dir_in, os.path.normpath(file_name))
+            return file_path #should return file name
+        else:
+            return q_file
         
-        #Detects if the result is a file path
-        file_path = os.path.join(self.song_dir_in, os.path.normpath(result))
+    
+    def read_file(self, file_path):
+        
         isfile = os.path.isfile(file_path)
         
         if not isfile:
-            splitted = os.path.splitext(result)
-            if len(splitted[0]) > 0 and 2 < len(splitted[1]) <= 5 and re.search('\\.', splitted[0]) is None:
-                # then probably a file name
-                self.communicator.memory.erase(q_notes)
-                
-                q_file = self.communicator.send_stock_query('song_file', question='Enter file name (in ' + os.path.relpath(os.path.normpath(self.song_dir_in)) + '/)',\
-                                                            recipient=recipient, prerequisites=prerequisites, limits=(os.path.normpath(self.song_dir_in)))
-                recipient.execute_queries(q_file)
-                
-                result = q_file.get_reply().get_result()
-                
-                file_path = os.path.join(self.song_dir_in, os.path.normpath(result))
-                isfile = os.path.isfile(file_path)
-        
-        if not isfile:
-            return result
+            MusicMakerError('File does not exist: ' + os.path.abspath(file_path))
         else:
             #load file
             try:
                 with open(file_path, mode='r', encoding='utf-8', errors='ignore') as fp:
-                    result = fp.readlines()
-                return result
+                    lines = fp.readlines()
             except (OSError, IOError) as err:
-                print('Error opening file.')
+                #print('Error opening file: ' + os.path.abspath(file_path))
                 raise err
+                
+            print('(Song imported from ' + os.path.abspath(file_path) + ')')
+            return lines
+
+
+    def ask_notes_file(self, recipient, prerequisites=None, execute=True):
+
+        # TODO: Check for file, etc, distinguish Discord / command line to avoid loading a file on Discord
+        q_notes_files = self.communicator.send_stock_query('song_notes_files', \
+                                                     question='Type or copy-paste notes, or enter file name (in ' + os.path.relpath(os.path.normpath(self.song_dir_in)) + '/)',\
+                                                     recipient=recipient, prerequisites=prerequisites)
+        
+        if not execute:            
+            return q_notes_files        
+        else:            
+            recipient.execute_queries(q_notes_files)
+            
+            result = q_notes_files.get_reply().get_result()
+            
+            #Detects if the result is a file path
+            file_path = os.path.join(self.song_dir_in, os.path.normpath(result))
+            isfile = os.path.isfile(file_path)
+            
+            if not isfile:
+                splitted = os.path.splitext(result)
+                if len(splitted[0]) > 0 and 2 < len(splitted[1]) <= 5 and re.search('\\.', splitted[0]) is None:
+                    # then certainly a file name
+                    self.communicator.memory.erase(q_notes_files)
+                                    
+                    file_path = self.ask_file(recipient=recipient, prerequisites=prerequisites, execute=execute)
+                     
+            if isfile:
+                notes = self.read_file(file_path)
             else:
-                print('(Song imported from ' + os.path.abspath(file_path) + ')')
+                notes = result
+                    
+            return notes
                 
 
     def ask_input_mode(self, recipient, notes, prerequisites=None, execute=True):
         """
         Try to guess the musical notation and ask the player to confirm
         """
+
         possible_modes = self.get_parser().get_possible_modes(notes)
 
         if len(possible_modes) == 0:
@@ -316,20 +338,14 @@ class MusicSheetMaker:
             q_mode = self.communicator.send_stock_query('musical_notation', recipient=recipient,
             foreword = '\nCould not detect your note format. Maybe your song contains typo errors?',
             limits=all_input_modes, prerequisites=prerequisites)
-            #recipient.execute_queries(q_mode)
-            #result = q_mode.get_reply().get_result()
             
         elif len(possible_modes) == 1:
             q_mode = self.communicator.send_information(recipient=recipient, \
                                                         string='\nWe detected that you use the following notation: ' + possible_modes[0].value[1] + '.', \
                                                         prerequisites=prerequisites)
-            #recipient.execute_queries(q_mode)
-            #result = possible_modes[0]
             
         else:
             q_mode = self.communicator.send_stock_query('musical_notation', recipient=recipient, limits=possible_modes, prerequisites=prerequisites)
-            #recipient.execute_queries(q_mode)
-            #result = q_mode.get_reply().get_result()
         
         if execute:
             recipient.execute_queries(q_mode) 
