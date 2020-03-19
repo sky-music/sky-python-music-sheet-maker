@@ -1,7 +1,8 @@
 
 from modes import ReplyType
-from communication import Query, Reply, QueryOpen, QueryChoice, QueryBoolean, QueryMemory, Information
 import communication
+from communication import Query, Reply, QueryOpen, QueryChoice, QueryBoolean, QueryMemory, Information
+
 
 
 """
@@ -47,39 +48,94 @@ class Communicator:
         # TODO: create generic (quasi-empty) stock queries, such as Information to output dome text
         self.query_stock = {
             # Queries asked by the Player / Music Cog
-            'create_song': {'class': QueryOpen.__name__, 'handler': 'create_song', 'question': 'create_song'},
+            'create_song': {'class': QueryOpen.__name__,
+                            'handler': 'create_song',
+                            'question': 'create_song'},
             
             # Generic Query
-            'information': {'class': Information.__name__, 'handler': 'None', 'question': '', 'reply_type': ReplyType.TEXT},
+            'information': {'class': Information.__name__,
+                            'handler': 'None',
+                            'question': '',
+                            'reply_type': ReplyType.TEXT},
                             
             # Queries asked by Music Sheet Maker
-            'song_overwrite': {'class': QueryBoolean.__name__, 'handler': 'None', 'foreword': 'A Song already exists in memory.', 'question': 'Do you want to overwrite it?', 'reply_type': ReplyType.TEXT},
-
+            'song_overwrite': {'class': QueryBoolean.__name__,
+                             'handler': 'None',
+                             'foreword': 'A Song already exists in memory.',
+                             'question': 'Do you want to overwrite it?',
+                             'reply_type': ReplyType.TEXT},
+                            
             #TODO: Add complete instructions, see responder.py
-            'instructions_stdout': {'class': Information.__name__, 'handler': 'None', 'foreword': '===== VISUAL MUSIC SHEETS FOR SKY:CHILDREN OF THE LIGHT =====', 'question': '','afterword': '='*30},
-            
-            'instructions': {'class': Information.__name__, 'handler': 'None', 'foreword': '', 'question': '','afterword': ''},
-
-            'song_title': {'class': QueryOpen.__name__, 'handler': 'None', 'question': 'What is the song title?', 'reply_type': ReplyType.TEXT},
-
-            'original_artist': {'class': QueryOpen.__name__, 'handler': 'None', 'question': 'What is the Original artist(s)?', 'reply_type': ReplyType.TEXT},
-
-            'transcript_writer': {'class': QueryOpen.__name__, 'handler': 'None', 'question': 'What is the transcript writer?', 'reply_type': ReplyType.TEXT},
-
-            'song_notes_files': {'class': QueryOpen.__name__, 'handler': 'None', 'question': 'Please type or copy-paste notes, or enter file name', 'reply_type': ReplyType.OTHER, 'limits': None},
-
-            'song_file': {'class': QueryOpen.__name__, 'handler': 'None', 'question': 'Please  enter file name in', 'reply_type': ReplyType.FILE, 'limits': '.'},
-
-            'song_notes': {'class': QueryOpen.__name__, 'handler': 'None', 'question': 'Please type or copy-paste notes', 'reply_type': ReplyType.NOTE, 'limits': None},
-
-            'musical_notation': {'class': QueryChoice.__name__, 'handler': 'None', 'foreword': '\nSeveral possible notations detected.', 'question': 'Please choose your note format', 'reply_type': ReplyType.INPUTMODE, 'limits': []},
-
-            'possible_keys': {'class': QueryChoice.__name__, 'handler': 'None', 'question': 'Please choose your musical key', 'reply_type': ReplyType.NOTE, 'limits': None},
-
-            'recommended_key': {'class': QueryOpen.__name__, 'handler': 'None', 'foreword': 'Your notes use relative pitch notation.', 'question': 'What is the recommended key to play in Sky?', 'reply_type': ReplyType.NOTE, 'limits': None},
-
-            'octave_shift': {'class': QueryOpen.__name__, 'handler': 'None', 'question': 'Do you want to shift by n octaves?', 'reply_type': ReplyType.INTEGER, 'limits': [-6, 6]}
-
+            'instructions_stdout': {'class': Information.__name__,
+                             'handler': 'None',
+                             'foreword': '===== VISUAL MUSIC SHEETS FOR SKY:CHILDREN OF THE LIGHT =====',
+                             'question': '',
+                             'afterword': '='*30},
+                                        
+            'instructions': {'class': Information.__name__,
+                             'handler': 'None',
+                             'foreword': '',
+                             'question': '',
+                             'afterword': ''},
+                            
+            'song_title': {'class': QueryOpen.__name__,
+                             'handler': 'None',
+                             'question': 'What is the song title?',
+                             'reply_type': ReplyType.TEXT},
+                            
+            'original_artist': {'class': QueryOpen.__name__,
+                             'handler': 'None',
+                             'question': 'What is the Original artist(s)?',
+                             'reply_type': ReplyType.TEXT},
+                            
+            'transcript_writer': {'class': QueryOpen.__name__,
+                             'handler': 'None',
+                             'question': 'What is the transcript writer?',
+                             'reply_type': ReplyType.TEXT},
+                            
+            'song_notes_files': {'class': QueryOpen.__name__,
+                             'handler': 'None',
+                             'question': 'Please type or copy-paste notes, or enter file name',
+                             'reply_type': ReplyType.OTHER,
+                             'limits': None},
+                            
+            'song_file': {'class': QueryOpen.__name__,
+                             'handler': 'None',
+                             'question': 'Please  enter file name in',
+                             'reply_type': ReplyType.FILE,
+                             'limits': '.'},
+                            
+            'song_notes': {'class': QueryOpen.__name__,
+                             'handler': 'None',
+                             'question': 'Please type or copy-paste notes',
+                             'reply_type': ReplyType.NOTE,
+                             'limits': None},
+                            
+            'musical_notation': {'class': QueryChoice.__name__,
+                             'handler': 'None',
+                             'foreword': '\nSeveral possible notations detected.',
+                             'question': 'Please choose your note format',
+                             'reply_type': ReplyType.INPUTMODE,
+                             'limits': []},
+                            
+            'possible_keys': {'class': QueryChoice.__name__,
+                             'handler': 'None',
+                             'question': 'Please choose your musical key',
+                             'reply_type': ReplyType.NOTE,
+                             'limits': None},
+                            
+            'recommended_key': {'class': QueryOpen.__name__,
+                             'handler': 'None',
+                             'foreword': 'Your notes use relative pitch notation.',
+                             'question': 'What is the recommended key to play in Sky (default is C)',
+                             'reply_type': ReplyType.NOTE,
+                             'limits': None},
+                            
+            'octave_shift': {'class': QueryOpen.__name__,
+                             'handler': 'None',
+                             'question': 'Do you want to shift by n octaves?',
+                             'reply_type': ReplyType.INTEGER,
+                             'limits': [-6,6]}
         }
 
     def __str__(self):
@@ -118,9 +174,11 @@ class Communicator:
         method_args['recipient'] = recipient
         method_args.update(kwargs) #Merge tuples to override default parameters with optional keyword arguments
 
-        query_method = getattr(communication, stock_query['class']) #QueryChoice, QueryOpen, QueryBoolean
+        #query_object = getattr(communication, stock_query['class'])  # in case we only import communication
+        query_object = eval(stock_query['class']) #supposes we have imported QueryChoice, QueryOpen, QueryBoolean, Information, etc
 
-        q = query_method(**method_args) #Creates the Query
+
+        q = query_object(**method_args) #Creates the Query
         self.memory.store(q)
         q.check_sender(allowed=self.owner)
         q.send(recipient=recipient)

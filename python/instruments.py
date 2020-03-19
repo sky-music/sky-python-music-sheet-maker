@@ -249,7 +249,7 @@ class Harp(Instrument):
         if note_index % 7 == 0:  # the 7 comes from the heptatonic scale of Sky's music (no semitones)
             # Note is a root note
             return notes.NoteRoot(self, pos)  # very important: the chord creating the note is passed as a parameter
-        elif note_index % self.get_column_count % 2 == 0:
+        elif note_index % self.get_column_count() % 2 == 0:
             # Note is in an odd column, so it is a circle
             return notes.NoteCircle(self, pos)
         else:

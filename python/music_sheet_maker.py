@@ -115,6 +115,8 @@ class MusicSheetMaker:
                     raise MusicMakerError('Unknown query ' + repr(query_name))
                     pass
 
+
+
     def create_song(self, **kwargs):
         """
         A very linear, sequential way of building a song from user inputs
@@ -204,7 +206,7 @@ class MusicSheetMaker:
         
         return answer
    
-    def ask_instructions(self, recipient):
+    def ask_instructions(self, recipient, prerequisites=None, execute=True):
         
         question = '\nAccepted music notes formats:'
         for mode in InputMode:
@@ -216,12 +218,19 @@ class MusicSheetMaker:
         question +=( '\nAdd \""' + self.get_parser().get_repeat_indicator() + '2\"" after a chord to indicate repetition.')
         question += '\nSharps # and flats b (semitones) are supported for Western and Jianpu notations.'
         
-        if not self.is_botcog(recipient):
+        if not self.is_botcog(recipient):        
+            i_instructions = self.communicator.send_stock_query('instructions_stdout', recipient=recipient, question=question, prerequisites=prerequisites)
+        else:
+            i_instructions = self.communicator.send_stock_query('instructions', recipient=recipient, question=question, prerequisites=prerequisites)
         
-            i_instructions = self.communicator.send_stock_query('instructions_stdout', recipient=recipient, question=question)
+        if execute:
             recipient.execute_queries(i_instructions)
+            return i_instructions.get_reply().get_result()
+        else:
+            return i_instructions
+                                  
    
-    def ask_song_metadata(self, recipient, prerequisites=None):
+    def ask_song_metadata(self, recipient, prerequisites=None, execute=True):
 
         # TODO: Remember metadata so that, if parsing fails the questions are not asked again?
 
@@ -231,23 +240,30 @@ class MusicSheetMaker:
         queries += [self.communicator.send_stock_query('original_artist', recipient=recipient, prerequisites=prerequisites)]
         queries += [self.communicator.send_stock_query('transcript_writer', recipient=recipient, prerequisites=prerequisites)]
 
-        recipient.execute_queries(queries)
+        if execute:
+            recipient.execute_queries(queries)
+            result = [q.get_reply().get_result() for q in queries]
+            return tuple(result)
+        else:
+            return queries
 
-        result = [q.get_reply().get_result() for q in queries]
-
-        return tuple(result)
-
-    def ask_notes(self, recipient, prerequisites=None):
+    def ask_notes(self, recipient, prerequisites=None, execute=True):
         
         q_notes = self.communicator.send_stock_query('song_notes', recipient=recipient, prerequisites=prerequisites)            
-        recipient.execute_queries(q_notes)
+             
+        if execute:
+            recipient.execute_queries(q_notes)
+            return q_notes.get_reply().get_result()
+        else:
+            return q_notes
+        
 
-        return q_notes.get_reply().get_result()
-
-    def ask_notes_file(self, recipient, prerequisites=None):
+    def ask_notes_file(self, recipient, prerequisites=None, execute=True):
 
         # TODO: Check for file, etc, distinguish Discord / command line to avoid loading a file on Discord
-        q_notes = self.communicator.send_stock_query('song_notes_files', question='Type or copy-paste notes, or enter file name (in ' + os.path.relpath(os.path.normpath(self.song_dir_in)) + '/)',recipient=recipient, prerequisites=prerequisites)
+        q_notes = self.communicator.send_stock_query('song_notes_files', \
+                                                     question='Type or copy-paste notes, or enter file name (in ' + os.path.relpath(os.path.normpath(self.song_dir_in)) + '/)',\
+                                                     recipient=recipient, prerequisites=prerequisites)
             
         recipient.execute_queries(q_notes)
         
@@ -263,7 +279,8 @@ class MusicSheetMaker:
                 # then probably a file name
                 self.communicator.memory.erase(q_notes)
                 
-                q_file = self.communicator.send_stock_query('song_file', question='Enter file name (in ' + os.path.relpath(os.path.normpath(self.song_dir_in)) + '/)',recipient=recipient, prerequisites=prerequisites, limits=(os.path.normpath(self.song_dir_in)))
+                q_file = self.communicator.send_stock_query('song_file', question='Enter file name (in ' + os.path.relpath(os.path.normpath(self.song_dir_in)) + '/)',\
+                                                            recipient=recipient, prerequisites=prerequisites, limits=(os.path.normpath(self.song_dir_in)))
                 recipient.execute_queries(q_file)
                 
                 result = q_file.get_reply().get_result()
@@ -286,7 +303,7 @@ class MusicSheetMaker:
                 print('(Song imported from ' + os.path.abspath(file_path) + ')')
                 
 
-    def ask_input_mode(self, recipient, notes, prerequisites=None):
+    def ask_input_mode(self, recipient, notes, prerequisites=None, execute=True):
         """
         Try to guess the musical notation and ask the player to confirm
         """
@@ -299,56 +316,74 @@ class MusicSheetMaker:
             q_mode = self.communicator.send_stock_query('musical_notation', recipient=recipient,
             foreword = '\nCould not detect your note format. Maybe your song contains typo errors?',
             limits=all_input_modes, prerequisites=prerequisites)
-            recipient.execute_queries(q_mode)
-            result = q_mode.get_reply().get_result()
+            #recipient.execute_queries(q_mode)
+            #result = q_mode.get_reply().get_result()
             
         elif len(possible_modes) == 1:
-            i_mode = self.communicator.send_information(recipient=recipient, string='\nWe detected that you use the following notation: ' + possible_modes[0].value[1] + '.', prerequisites=prerequisites)
-            recipient.execute_queries(i_mode)
-            result = possible_modes[0]
+            q_mode = self.communicator.send_information(recipient=recipient, \
+                                                        string='\nWe detected that you use the following notation: ' + possible_modes[0].value[1] + '.', \
+                                                        prerequisites=prerequisites)
+            #recipient.execute_queries(q_mode)
+            #result = possible_modes[0]
             
         else:
             q_mode = self.communicator.send_stock_query('musical_notation', recipient=recipient, limits=possible_modes, prerequisites=prerequisites)
-            recipient.execute_queries(q_mode)
-            result = q_mode.get_reply().get_result()
+            #recipient.execute_queries(q_mode)
+            #result = q_mode.get_reply().get_result()
         
-        return result
+        if execute:
+            recipient.execute_queries(q_mode) 
+            if len(possible_modes) == 1:
+                result = possible_modes[0]
+            else:
+                result = q_mode.get_reply().get_result()
+            return result
+        else:
+            return q_mode
 
-    def ask_song_key(self, recipient, notes, input_mode, prerequisites=None):
+
+    def ask_song_key(self, recipient, notes, input_mode, prerequisites=None, execute=True):
         """
         Attempts to detect key for input written in absolute musical scales (western, Jianpu)
         """
-        # TODO:
         if input_mode in [InputMode.ENGLISH, InputMode.DOREMI, InputMode.JIANPU]:
             
             possible_keys = self.get_parser().find_key(notes)
             
             if len(possible_keys) == 0:
-                i_C = self.communicator.send_information(string="\nYour song cannot be transposed exactly in Sky\nDefault key will be set to C.", recipient=recipient, prerequisites=prerequisites)
-                # trans = input('Enter a key or a number to transpose your song within the chromatic scale:')
-                recipient.execute_queries(i_C)
-
-                song_key = 'C'
-
+                q_key = self.communicator.send_information(string="\nYour song cannot be transposed exactly in Sky\nDefault key will be set to C.", \
+                                                           recipient=recipient, prerequisites=prerequisites)
+                possible_keys = ['C']
+                # trans = input('Enter a key or a number to transpose your song within the chromatic scale:')                
             elif len(possible_keys) == 1:
-                song_key = possible_keys[0]
-                i_key = self.communicator.send_information(
-                    string="\nYour song can be transposed in Sky with the following key: " + str(song_key),
+                q_key = self.communicator.send_information(
+                    string="\nYour song can be transposed in Sky with the following key: " + str(possible_keys[0]),
                     recipient=recipient, prerequisites=prerequisites)
-                recipient.execute_queries(i_key)
             else:
-                q_key = self.communicator.send_stock_query('possible_keys', recipient=recipient,
-                                                   foreword="\nYour song can be transposed in Sky with the following keys: " + ','.join(
-                                                               possible_keys), limits=possible_keys, prerequisites=prerequisites)
-                recipient.execute_queries(q_key)
-
-                song_key = q_key.get_reply().get_result()
-
+                q_key = self.communicator.send_stock_query('possible_keys', recipient=recipient, \
+                                                           foreword="\nYour song can be transposed in Sky with the following keys: " + ','.join(possible_keys), \
+                                                           limits=possible_keys, prerequisites=prerequisites)
         else:
-            song_key = 'C'
+            q_key = self.communicator.send_stock_query('recommended_key', recipient=recipient, prerequisites=prerequisites)
+            possible_keys = self.get_parser().find_key('') #should return None
 
-        return song_key
+        if execute:
+            recipient.execute_queries(q_key)
+            if possible_keys is None:
+                song_key = q_key.get_reply().get_result()
+                if len(song_key) == 0:
+                    song_key = 'C'
+            elif len(possible_keys) > 1:
+                song_key = q_key.get_reply().get_result()
+            elif len(possible_keys) == 1:
+               song_key =  possible_keys[0]  
+            else:
+                raise MusicMakerError('Possible keys is an empty list.')
                 
+            return song_key
+        else:
+            return q_key
+
         
     def send_buffers_to_discord(self, buffers, recipient):
         '''
@@ -358,7 +393,7 @@ class MusicSheetMaker:
         pass
         
         
-    def display_error_ratio(self, recipient, prerequisites=None):
+    def display_error_ratio(self, recipient, prerequisites=None, execute=True):
 
         error_ratio = self.get_song().get_num_broken() / max(1, self.get_song().get_num_instruments())
         if error_ratio == 0:
@@ -372,8 +407,12 @@ class MusicSheetMaker:
             'https://sky.bloomexperiment.com/t/summary-of-input-modes/403'
             
         i_error = self.communicator.send_information(recipient=recipient, string=message, prerequisites=prerequisites)
-
-        recipient.execute_queries(i_error)
+       
+        if execute:
+            recipient.execute_queries(i_error)
+            return i_error.get_reply().get_result()
+        else:
+            return i_error
         
 
     def write_buffers_to_files(self, render_mode, buffers, file_paths):

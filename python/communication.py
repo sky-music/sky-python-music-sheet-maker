@@ -608,9 +608,9 @@ class QueryChoice(Query):
     def build_result(self):
 
         result = self.get_foreword()
-
         result += '\n'
-
+        result = self.get_question()
+        
         # TODO: handles types other than string
         for i, choice in enumerate(self.get_limits()):
         #We made sure limits is not None
@@ -618,7 +618,7 @@ class QueryChoice(Query):
                 if i > 0:
                     choice_str = ', '
                 else:
-                    choice_str = ''
+                    choice_str = ' among '
                 choice_str += str(choice)
 
             elif self.reply_type == ReplyType.INPUTMODE:
@@ -980,7 +980,7 @@ class QueryMemory:
             for q in query:
                 self.queries.append(q)
         else:
-            raise InvalidQueryError('cannot store other objects than ' + str(Query.__name__))
+            raise InvalidQueryError('cannot store ' + str(type(query)) + ' in memory, only ' + str(Query.__name__) + ' are supported')
 
         return True
 
