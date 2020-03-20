@@ -164,7 +164,7 @@ class MusicSheetMaker:
             (q_mode, input_mode) = self.ask_input_mode(recipient=recipient, notes=notes, prerequisites=[q_notes])
             self.get_parser().set_input_mode(input_mode)
             
-            (q_key, song_key) = self.ask_song_key(recipient=recipient, notes=notes, input_mode=input_mode, prerequisites=[q_mode])
+            (q_key, song_key) = self.ask_song_key(recipient=recipient, notes=notes, input_mode=input_mode, prerequisites=[q_notes, q_mode])
             
             #Asks for octave shift
             q_shift = self.communicator.send_stock_query('octave_shift', recipient=recipient)
@@ -327,11 +327,11 @@ class MusicSheetMaker:
             return (q_notes, notes)
                 
 
-    def ask_input_mode(self, recipient, notes=None, prerequisites=None, execute=True):
+    def ask_input_mode(self, recipient, notes, prerequisites=None, execute=True):
         """
         Try to guess the musical notation and ask the player to confirm
         """
-
+        
         possible_modes = self.get_parser().get_possible_modes(notes)
 
         if len(possible_modes) == 0:
@@ -361,7 +361,7 @@ class MusicSheetMaker:
             return (q_mode, None)
 
 
-    def ask_song_key(self, recipient, notes=None, input_mode=None, prerequisites=None, execute=True):
+    def ask_song_key(self, recipient, notes, input_mode, prerequisites=None, execute=True):
         """
         Attempts to detect key for input written in absolute musical scales (western, Jianpu)
         """
