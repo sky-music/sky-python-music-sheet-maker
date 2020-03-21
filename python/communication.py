@@ -151,7 +151,7 @@ class Query:
         self.sent_time = None  # The timestamp at which the Query was sent()
         self.expect_reply = True # Currently used for Information queries
 
-        self.valid_locutors_names = ['music-cog', 'music-sheet-maker', 'command-line']  # A list of valid locutors
+        self.valid_locutors_names = ['music-cog', 'music-sheet-maker', 'command-line', 'sky-music-website']  # A list of valid locutors for security purposes
 
         self.reply = None  # Reply object
         self.result = None  # The full question with foreword and afterword

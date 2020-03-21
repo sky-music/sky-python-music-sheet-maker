@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from music_sheet_maker import MusicSheetMaker
+from music_sheet_maker import MusicSheetMaker, MusicSheetMakerAbort
 from communicator import Communicator
 
 
@@ -52,37 +52,40 @@ class CommandLinePlayer:
             await Questions.ask_text(self.bot, channel, ctx.author, question...)
         """
         for q in queries:
-            #TODO: update q recipient.update(q)
             question = self.communicator.query_to_stdout(q)
             reply_valid = False
             while not reply_valid:
-                reply_valid = True #to be sure to break the loop if nonl query
-                if q.get_expect_reply():
-                    #FIXME: for debugging
-                    #print('%%%DEBUG. PLAYER, YOU ARE BEING PROMPTED%%%')
+                reply_valid = True #to be sure to break the loop
+                #if q.get_name() == 'original_artist': #FIXME: for debugging only
+                #    raise MusicSheetMakerAbort(q)
+                if q.get_expect_reply():                  
+                    #print('%%%DEBUG. PLAYER, YOU ARE BEING PROMPTED%%%') #FIXME: for debugging only
                     answer = input(question + ': ')
                     q.reply_to(answer)
                     reply_valid = q.get_reply_validity()
-                else:
-                    #FIXME: for debugging
-                    #print('%%%DEBUG. PLAYER, YOU ARE BEING TOLD%%%')
+                else:                  
+                    #print('%%%DEBUG. PLAYER, YOU ARE BEING TOLD%%%') #FIXME: for debugging only
                     print(question)
                     q.reply_to('ok')
                     reply_valid = q.get_reply_validity()
-        #return True
 
-player = CommandLinePlayer()
 
-maker = MusicSheetMaker()
+try:
 
-q = player.communicator.send_stock_query('create_song', recipient=maker)
+    player = CommandLinePlayer()
 
-maker.execute_queries()
+    maker = MusicSheetMaker()
 
-# player.execute_queries()
+    q = player.communicator.send_stock_query('create_song', recipient=maker)
 
-#FIXME: for debugging
+    maker.execute_queries(q)
+
+except MusicSheetMakerAbort as err:
+    print(repr(err))
+    
+    
 '''
+#FIXME: for debugging only
 print('\n%%%DEBUG. MAIN script has ended%%%')
 print('\n\n%%%DEBUG. Player memory:')
 player.communicator.memory.print_out()

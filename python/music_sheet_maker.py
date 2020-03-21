@@ -5,14 +5,31 @@ from parsers import SongParser
 #from songs import Song
 
 
-class MusicMakerError(Exception):
+class MusicSheetMakerError(Exception):
     def __init__(self, explanation):
         self.explanation = explanation
 
     def __str__(self):
         return str(self.explanation)
+    
     pass
 
+
+class MusicSheetMakerAbort(Exception):
+    '''
+    A special exception to abort execution of queries in execute_queries (and create_song)
+    '''
+    def __init__(self, query):
+        self.query = query
+
+    def __repr__(self):
+        return '<' + self.__class__.__name__+', query=" '+str(self.query)+'">'
+
+    def __str__(self):
+        return str(self.query)
+    
+    pass
+    
 
 class MusicSheetMaker:
 
@@ -46,11 +63,16 @@ class MusicSheetMaker:
     def get_name(self):
         return self.name
 
-    def is_botcog(self, recipient):
-        
+    def is_botcog(self, recipient):       
         try:
             recipient.bot
             return True
+        except AttributeError:
+            return False
+
+    def is_commandline(self, recipient):       
+        try:
+            return recipient.get_name() == "command-line"
         except AttributeError:
             return False
 
@@ -88,7 +110,7 @@ class MusicSheetMaker:
             self.communicator.memory.clean()
             queries = self.communicator.memory.recall_unsatisfied(filters=('to_me'))
         else:
-            if not isinstance(queries, (list, tuple)):
+            if not isinstance(queries, (list, tuple, set)):
                 queries = [queries]
         #FIXME: 2 lines for debugging:
         #print('\n%%%%I AM MAKER, THE UNSATISFIED QUERIES ARE:%%%%')
@@ -109,11 +131,13 @@ class MusicSheetMaker:
                     answer = eval('self.' + stock_query['handler'] + '(' + handler_args + ')')
                     q.reply_to(answer)
                     reply_valid = q.get_reply_validity()
-
                 except KeyError:
                     #TODO: handle non-stock queries???
-                    raise MusicMakerError('Unknown query ' + repr(query_name))
+                    raise MusicSheetMakerError('Unknown query ' + repr(query_name))
                     pass
+                except MusicSheetMakerAbort:
+                    raise
+
      
     def create_song(self, **kwargs):
         """
@@ -124,13 +148,13 @@ class MusicSheetMaker:
         try:
             recipient = kwargs['sender']
         except KeyError:
-            raise MusicMakerError('No recipient specified for the Song')
+            raise MusicSheetMakerError('No recipient specified for the Song')
 
         #Actually the following is not used but it may be useful to have the triggering query as an argument
         try:
             creation_query = kwargs['query']
         except KeyError:
-            raise MusicMakerError('No Query passed to create_song')
+            raise MusicSheetMakerError('No Query passed to create_song')
         
         if self.song is not None:
             q_overwrite = self.communicator.send_stock_query('song_overwrite', recipient=recipient)
@@ -158,8 +182,10 @@ class MusicSheetMaker:
             #TODO: allow the player to enter the notes using several messages??? or maybe not
             if self.is_botcog(recipient):
                 (q_notes, notes) = self.ask_notes(recipient=recipient, prerequisites=[i_instr])
-            else:
+            elif recipient.get_name() == 'command-line':
                 (q_notes, notes) = self.ask_notes_file(recipient=recipient, prerequisites=[i_instr])
+            else:
+                (q_notes, notes) = self.ask_notes(recipient=recipient, prerequisites=[i_instr])
           
             (q_mode, input_mode) = self.ask_input_mode(recipient=recipient, notes=notes, prerequisites=[q_notes])
             self.get_parser().set_input_mode(input_mode)
@@ -181,7 +207,7 @@ class MusicSheetMaker:
         #TODO:
         #Detect if on Discord or in command line with a safer method
         #Loop over rendering modes, several for the command line, 1 for discord
-        if self.is_botcog(recipient):
+        if not self.is_commandline(recipient):
             render_mode = self.discord_render_mode
             buffers = self.write_song_to_buffers(render_mode)
             
@@ -204,7 +230,7 @@ class MusicSheetMaker:
             
             answer = all_paths
             #TODO: decide what to reply
-        
+                
         return answer
     
    
@@ -220,7 +246,7 @@ class MusicSheetMaker:
         question +=( '\nAdd \""' + self.get_parser().get_repeat_indicator() + '2\"" after a chord to indicate repetition.')
         question += '\nSharps # and flats b (semitones) are supported for Western and Jianpu notations.'
         
-        if not self.is_botcog(recipient):        
+        if recipient.get_name() == 'command-line':        
             i_instructions = self.communicator.send_stock_query('instructions_stdout', recipient=recipient, question=question, prerequisites=prerequisites)
         else:
             i_instructions = self.communicator.send_stock_query('instructions', recipient=recipient, question=question, prerequisites=prerequisites)
@@ -279,7 +305,7 @@ class MusicSheetMaker:
         isfile = os.path.isfile(file_path)
         
         if not isfile:
-            MusicMakerError('File does not exist: ' + os.path.abspath(file_path))
+            MusicSheetMakerError('File does not exist: ' + os.path.abspath(file_path))
         else:
             #load file
             try:
@@ -397,7 +423,7 @@ class MusicSheetMaker:
             elif len(possible_keys) == 1:
                song_key =  possible_keys[0]  
             else:
-                raise MusicMakerError('Possible keys is an empty list.')
+                raise MusicSheetMakerError('Possible keys is an empty list.')
                 
             return (q_key, song_key)
         else:
@@ -448,7 +474,7 @@ class MusicSheetMaker:
             numfiles = 1
 
         if len(buffers) != len(file_paths):
-            raise MusicMakerError('inconsistent len gths of buffers and file_paths')
+            raise MusicSheetMakerError('inconsistent len gths of buffers and file_paths')
 
         (file_base, file_ext) = os.path.splitext(file_paths[0])
 
@@ -461,7 +487,7 @@ class MusicSheetMaker:
             elif buffer is None:
                 pass
             else:
-                raise MusicMakerError('Unknown buffer type in ' + str(self))
+                raise MusicSheetMakerError('Unknown buffer type in ' + str(self))
             
             
             if buffer is not None:

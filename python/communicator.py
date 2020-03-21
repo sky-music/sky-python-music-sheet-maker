@@ -1,9 +1,5 @@
-
 from modes import ReplyType
-import communication
-from communication import Query, Reply, QueryOpen, QueryChoice, QueryBoolean, QueryMemory, Information
-
-
+from communication import QueryOpen, QueryChoice, QueryBoolean, QueryMemory, Information
 
 """
 Classes to ask and answer questions called Query and Reply between the bot and the music sheet maker
@@ -50,7 +46,9 @@ class Communicator:
             # Queries asked by the Player / Music Cog
             'create_song': {'class': QueryOpen.__name__,
                             'handler': 'create_song',
-                            'question': 'create_song'},
+                            'question': 'create_song',
+                            'reply_type': ReplyType.OTHER
+                            },
             
             # Generic Query
             'information': {'class': Information.__name__,
@@ -218,12 +216,31 @@ class Communicator:
                 # TODO: check for duplicates before storing?
 
     def query_to_stdout(self, query):
-
-        question = query.get_result()
+        '''
+        Returns a text that can be printed in the standard output
+        '''
+        question = str(query.get_result())
         return question
 
-    def query_to_discord(self, query):
 
+    def query_to_website(self, query):
+        '''
+        Returns a dictionary of arguments to be used to create Question, Choices
+        by the web app music_maker in sky-music-website-project
+        '''
+        choices = [str(limit) for limit in query.get_limits()]
+        
+        return {'text': query.get_foreword()+query.get_question(),
+                'identifier': query.get_identifier(),
+                'choices': choices,
+                'answer': query.get_answer()
+                }
+
+    def query_to_discord(self, query):
+        '''
+        Returns a text that can be sent to a Discord utils.Question model
+        TODO: send just a text or a dictionary of arguments?
+        '''
         utils_question = query.get_result()
         return utils_question
 
@@ -243,13 +260,6 @@ class Communicator:
         i.send(recipient=recipient)
         return i
     
-    def translate(self, obj):
-
-        if isinstance(obj, (Query, Reply)):
-            self.query_to_discord(obj)
-        else:
-            self.discord_to_query(obj)
-        return
 
     '''
     def send_unsent_queries(self, recipient=None):
