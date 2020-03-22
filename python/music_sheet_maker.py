@@ -28,8 +28,7 @@ class MusicSheetMakerAbort(Exception):
     def __str__(self):
         return str(self.query)
     
-    pass
-    
+    pass 
 
 class MusicSheetMaker:
 
@@ -38,10 +37,11 @@ class MusicSheetMaker:
         self.communicator = Communicator(owner=self)
         self.song = None
         self.parser = None
-        self.directory_base = os.path.normpath(os.path.join(os.getcwd(),'../'))
+        #self.directory_base = os.path.normpath(os.path.join(os.getcwd(),'../'))
+        self.directory_base = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)),'..'))
         self.song_dir_in = os.path.join(self.directory_base,songs_in)
         self.song_dir_out = os.path.join(self.directory_base,songs_out)
-        self.init_working_directory()
+        #self.init_working_directory()
         self.css_path = os.path.normpath(os.path.join(self.directory_base, "css/main.css"))#TODO: move that into Renderer
         self.css_mode = CSSMode.EMBED#TODO: move that into Renderer
         self.render_modes_enabled = [mode for mode in RenderMode]
@@ -88,9 +88,9 @@ class MusicSheetMaker:
     def set_parser(self, parser):
         self.parser = parser
 
-    def init_working_directory(self):
-        if not os.path.isdir(self.song_dir_out):
-            os.mkdir(self.song_dir_out)
+#    def init_working_directory(self):
+#        if not os.path.isdir(self.song_dir_out):
+#            os.mkdir(self.song_dir_out)
 
     def get_directory_base(self):
         return self.directory_base
@@ -472,6 +472,10 @@ class MusicSheetMaker:
         except (TypeError, AttributeError):
             buffers = [buffers]
             numfiles = 1
+        
+        #Creates output directory if did not exist
+        if not os.path.isdir(self.song_dir_out):
+            os.mkdir(self.song_dir_out)
 
         if len(buffers) != len(file_paths):
             raise MusicSheetMakerError('inconsistent len gths of buffers and file_paths')
