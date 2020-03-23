@@ -1,4 +1,4 @@
-from modes import ReplyType
+from modes import InputMode, ReplyType
 from communication import QueryOpen, QueryChoice, QueryBoolean, QueryMemory, Information
 
 """
@@ -245,26 +245,29 @@ class Communicator:
         by the web app music_maker in sky-music-website-project
         '''
         limits = query.get_limits()
-        if limits is None:
-            choices = []
+        
+        if isinstance(query, QueryChoice):
+            if isinstance(limits[0], InputMode):
+                choices_dict = [{'number': int(limit.value[1]), 'text': str(limit.value[2])} for i, limit in enumerate(limits)]
+            else:
+                choices_dict = [{'number': i, 'text': str(limit)} for i, limit in enumerate(limits)]
         else:
-            choices = [str(limit) for limit in limits]
+                choices_dict = None
         
         try:
-            answer = query.get_reply().get_answer()
+            answer_text = str(query.get_reply().get_answer())
         except AttributeError:
-            answer = None
+            answer_text = None
             
         if 'song_notes' in query.get_name().strip().lower():
-            answer_length = 'long'
+            answer_dict = {'answer_length': 'long', 'long_text': answer_text, 'short_text': ''}
         else:
-            answer_length = 'short'
+            answer_dict = {'answer_length': 'short', 'long_text': '', 'short_text': answer_text}
         
-        return {'text': query.get_foreword()+query.get_question(),
-                'identifier': query.get_identifier(),
-                'choices': choices,
-                'answer': answer,
-                'answer_length': answer_length
+        return {'question': {'text': query.get_foreword()+'\n'+query.get_question(),
+                              'identifier': query.get_identifier()},
+                'choices': choices_dict,
+                'answer': answer_dict
                 }
 
     def query_to_discord(self, query):

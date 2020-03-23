@@ -624,14 +624,17 @@ class QueryChoice(Query):
         # TODO: handles types other than string
         for i, choice in enumerate(self.get_limits()): #We made sure limits is not None
             if self.reply_type == ReplyType.NOTE:
-                if i > 0:
-                    choice_str = ', '
-                else:
+                if i == 0:
                     choice_str = ' among '
+                else:
+                    choice_str = ', '
                 choice_str += str(choice)
 
             elif self.reply_type == ReplyType.INPUTMODE:
-                choice_str = str(i) + ') ' + choice.value[2] + '\n'
+                if i == 0:
+                    choice_str = ' among:\n'
+                else:
+                    choice_str = str(i) + ') ' + choice.value[2] + '\n'
 
             else:
                 choice_str = str(i) + ') ' + str(choice) + '\n'
