@@ -434,7 +434,7 @@ class Query:
 
             self.is_replied = True
             is_reply_valid = False
-            answer = self.get_reply().get_answer()
+            answer = self.get_reply().get_answer() #answer exists because reply is a Reply object
             limits = self.get_limits()
                         
             if answer is None:
@@ -641,15 +641,11 @@ class QueryChoice(Query):
 
         if is_reply_valid is not True:
             return is_reply_valid
-
-        answer_index = self.get_answer_index()
-
-        if answer_index is None:
-            is_reply_valid = False
         else:
-            is_reply_valid = True
-
-        return is_reply_valid
+            if self.get_answer_index() is None: #answer exists otherwise is_reply_valid would be false
+                is_reply_valid = False
+    
+            return is_reply_valid
 
     def get_answer_index(self):
         """
@@ -719,23 +715,22 @@ class QueryOpen(Query):
 
         is_reply_valid = super().check_reply()
 
-        if is_reply_valid is not True:
+        if is_reply_valid is False:
             return is_reply_valid
-
-        limits = self.get_limits()
-        answer = self.reply.get_answer()
-        
-        if limits is not None: 
-            if len(limits) == 1 and self.reply_type == ReplyType.TEXT:
-                try:
-                    regex = re.compile(limits[0])
-                    if regex.search(answer) is None:#self.limits can be a RegEx
-                        #print('%%%DEBUG applying regex malus')
-                        is_reply_valid = False
-                except (re.error, TypeError):
-                    pass
-
-        return is_reply_valid
+        else:
+            limits = self.get_limits()
+            answer = self.reply.get_answer() #answer exists otherwise is_reply_valid would be false
+            
+            if limits is not None: 
+                if len(limits) == 1 and self.reply_type == ReplyType.TEXT:
+                    try:
+                        regex = re.compile(limits[0])
+                        if regex.search(answer) is None:#self.limits can be a RegEx
+                            is_reply_valid = False
+                    except (re.error, TypeError):
+                        pass
+    
+            return is_reply_valid
 
 
 class Information(QueryOpen):

@@ -234,10 +234,15 @@ class Communicator:
         else:
             choices = [str(limit) for limit in limits]
         
+        try:
+            answer = query.get_reply().get_answer()
+        except AttributeError:
+            answer = None
+        
         return {'text': query.get_foreword()+query.get_question(),
                 'identifier': query.get_identifier(),
                 'choices': choices,
-                'answer': query.get_reply().get_answer()
+                'answer': answer
                 }
 
     def query_to_discord(self, query):
