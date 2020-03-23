@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-from music_sheet_maker import MusicSheetMaker, MusicSheetMakerAbort
-from communicator import Communicator
+from music_sheet_maker import MusicSheetMaker
+from communicator import Communicator, QueriesExecutionAbort
 
 
 class CommandLinePlayer:
@@ -80,7 +80,7 @@ try:
 
     maker.execute_queries(q)
 
-except MusicSheetMakerAbort as err:
+except QueriesExecutionAbort as err:
     print(repr(err))
     
     

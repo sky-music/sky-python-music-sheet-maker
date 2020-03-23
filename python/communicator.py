@@ -31,6 +31,21 @@ class CommunicatorError(Exception):
 
     pass
 
+class QueriesExecutionAbort(Exception):
+    '''
+    A special exception to abort execution of queries in execute_queries (and create_song)
+    '''
+    def __init__(self, query):
+        self.query = query
+
+    def __repr__(self):
+        return '<' + self.__class__.__name__+', query=" '+str(self.query)+'">'
+
+    def __str__(self):
+        return str(self.query)
+    
+    pass
+
 
 class Communicator:
 
