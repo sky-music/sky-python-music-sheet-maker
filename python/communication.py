@@ -103,7 +103,7 @@ class Reply:
         if isinstance(self.query, QueryBoolean):
             self.result = (self.query.get_answer_index() % 2 == 0)
         elif isinstance(self.query, QueryChoice):
-            index = self.query.get_answer_index()
+            index = self.query.get_answer_index() #QueryChoice always have limits
             self.result = self.query.get_limits()[index]
         else:#QueryOpen
             self.result = self.answer
@@ -612,8 +612,7 @@ class QueryChoice(Query):
         result = self.get_question()
         
         # TODO: handles types other than string
-        for i, choice in enumerate(self.get_limits()):
-        #We made sure limits is not None
+        for i, choice in enumerate(self.get_limits()): #We made sure limits is not None
             if self.reply_type == ReplyType.NOTE:
                 if i > 0:
                     choice_str = ', '
@@ -657,8 +656,7 @@ class QueryChoice(Query):
         Returns the index of the answer among choices, for QueryChoice and QueryBoolean
         """
         answer = self.reply.get_answer()
-        choices = self.get_limits()
-        #limits cannot be None in QueryChoice, we made sure of that
+        choices = self.get_limits()  #limits cannot be None in QueryChoice, we made sure of that
 
         if isinstance(answer, str):
             answer = answer.lower().strip()

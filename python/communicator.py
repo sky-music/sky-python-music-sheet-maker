@@ -228,7 +228,11 @@ class Communicator:
         Returns a dictionary of arguments to be used to create Question, Choices
         by the web app music_maker in sky-music-website-project
         '''
-        choices = [str(limit) for limit in query.get_limits()]
+        limits = query.get_limits()
+        if limits is None:
+            choices = None
+        else:
+            choices = [str(limit) for limit in limits]
         
         return {'text': query.get_foreword()+query.get_question(),
                 'identifier': query.get_identifier(),
