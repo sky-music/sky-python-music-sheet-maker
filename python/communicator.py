@@ -35,11 +35,12 @@ class QueriesExecutionAbort(Exception):
     '''
     A special exception to abort execution of queries in execute_queries (and create_song)
     '''
-    def __init__(self, query):
+    def __init__(self, query, explanation=''):
         self.query = query
+        self.explanation = explanation
 
     def __repr__(self):
-        return '<' + self.__class__.__name__+', query=" '+str(self.query)+'">'
+        return '<' + self.__class__.__name__+', query=" '+str(self.query)+', explanation=" '+str(self.explanation)+'">'
 
     def __str__(self):
         return str(self.query)
