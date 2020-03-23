@@ -121,7 +121,7 @@ class Communicator:
             'song_notes': {'class': QueryOpen.__name__,
                              'handler': 'None',
                              'question': 'Please type or copy-paste notes',
-                             'reply_type': ReplyType.NOTE,
+                             'reply_type': ReplyType.TEXT,
                              'limits': None},
                             
             'musical_notation': {'class': QueryChoice.__name__,
@@ -253,11 +253,17 @@ class Communicator:
             answer = query.get_reply().get_answer()
         except AttributeError:
             answer = None
+            
+        if 'song_notes' in query.get_name().strip().lower():
+            answer_length = 'long'
+        else:
+            answer_length = 'short'
         
         return {'text': query.get_foreword()+query.get_question(),
                 'identifier': query.get_identifier(),
                 'choices': choices,
-                'answer': answer
+                'answer': answer,
+                'answer_length': answer_length
                 }
 
     def query_to_discord(self, query):
