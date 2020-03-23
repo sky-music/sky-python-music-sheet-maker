@@ -248,11 +248,11 @@ class Communicator:
         
         if isinstance(query, QueryChoice):
             if isinstance(limits[0], InputMode):
-                choices_dict = [{'number': int(limit.value[1]), 'text': str(limit.value[2])} for i, limit in enumerate(limits)]
+                choices_dicts = [{'number': int(limit.value[1]), 'text': str(limit.value[2])} for i, limit in enumerate(limits)]
             else:
-                choices_dict = [{'number': i, 'text': str(limit)} for i, limit in enumerate(limits)]
+                choices_dicts = [{'number': i, 'text': str(limit)} for i, limit in enumerate(limits)]
         else:
-                choices_dict = None
+                choices_dicts = []
         
         try:
             answer_text = str(query.get_reply().get_answer())
@@ -266,7 +266,7 @@ class Communicator:
         
         return {'question': {'text': query.get_foreword()+'\n'+query.get_question(),
                               'identifier': query.get_identifier()},
-                'choices': choices_dict,
+                'choices': choices_dicts,
                 'answer': answer_dict
                 }
 
