@@ -80,8 +80,8 @@ try:
 
     maker.execute_queries(q)
 
-except QueriesExecutionAbort as err:
-    print(repr(err))
+except QueriesExecutionAbort as qExecAbort:
+    print(repr(qExecAbort))
     
     
 '''
