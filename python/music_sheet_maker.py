@@ -113,13 +113,16 @@ class MusicSheetMaker:
                     query_name = q.get_name()
                     stock_query = self.communicator.query_stock[query_name]
                     handler_args = ', '.join(('sender=q.get_sender()','query=q'))
-                    answer = eval('self.' + stock_query['handler'] + '(' + handler_args + ')')
+                    expression = 'self.' + stock_query['handler'] + '(' + handler_args + ')'
+                except KeyError as err:
+                    #TODO: handle non-stock queries???
+                    raise MusicSheetMakerError('Cannot create stock query ' + repr(query_name) + ', because of ' + repr(err))
+                    pass
+                
+                try:
+                    answer = eval(expression) 
                     q.reply_to(answer)
                     reply_valid = q.get_reply_validity()
-                except KeyError:
-                    #TODO: handle non-stock queries???
-                    raise MusicSheetMakerError('Unknown query ' + repr(query_name))
-                    pass
                 except QueriesExecutionAbort as qExecAbort:
                     raise qExecAbort
 
