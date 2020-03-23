@@ -120,7 +120,7 @@ class MusicSheetMaker:
                     #TODO: handle non-stock queries???
                     raise MusicSheetMakerError('Unknown query ' + repr(query_name))
                     pass
-                except QueriesExecutionAbort(q) as qExecAbort:
+                except QueriesExecutionAbort as qExecAbort:
                     raise qExecAbort
 
      
