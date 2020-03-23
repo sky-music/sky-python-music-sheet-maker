@@ -40,7 +40,7 @@ class QueriesExecutionAbort(Exception):
         self.explanation = explanation
 
     def __repr__(self):
-        return '<' + self.__class__.__name__+', query=" '+str(self.query)+', explanation=" '+str(self.explanation)+'">'
+        return '<' + self.__class__.__name__+', query="'+str(self.query)+', explanation="'+str(self.explanation)+'">'
 
     def __str__(self):
         return str(self.query)

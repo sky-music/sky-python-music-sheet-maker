@@ -1,7 +1,7 @@
 import re, os
 from modes import ReplyType, InputMode
 from datetime import datetime
-
+import hashlib
 
 class QueryError(Exception):
     def __init__(self, explanation):
@@ -528,11 +528,15 @@ class Query:
 
     def hash_identifier(self):
         """
-        Builds an ID of the Query. Two queries with the same ID are considered as duplicates. 
+        Builds an ID of the Query. Two queries with the same ID are considered as duplicates.
         """
         hashables = [self.get_sender(), self.get_recipient(), self.get_result(), self.get_limits(), self.get_prerequisites()]
         hashables = [str(hashable).lower().strip() for hashable in hashables]
-        self.identifier = hash(','.join(hashables))
+        #self.identifier = hash(','.join(hashables)) #Python built-in has method, changes at each python sessions
+        m = hashlib.md5()
+        for hashable in hashables:
+            m.update(hashable.encode())
+        self.identifier = m.hexdigest() #hashlib md5, session-persistent hash
 
         return self.identifier
 
