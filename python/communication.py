@@ -277,24 +277,25 @@ class Query:
                 return None
             except TypeError:
                 return [self.prerequisites]
-                
-    def check_locutor(self, locutor, allowed='all', forbidden=None):
-
-        def get_name_and_sanitize(obj):
-            '''
-            Try really hard to find a name for the locutor
-            '''
-            if isinstance(obj, str):
-                obj_name = obj
-            else:
+    
+    def get_locutor_name(self, locutor):
+        '''
+        Try really hard to find a name for the locutor
+        '''
+        if isinstance(locutor, str):
+            locutor_name = locutor
+        else:
+            try:
+                locutor_name = locutor.get_name().lower().strip()
+            except AttributeError:
                 try:
-                    obj_name = obj.get_name().lower().strip()
+                    locutor_name = locutor.__name__.lower().strip()
                 except AttributeError:
-                    try:
-                        obj_name = obj.__name__.lower().strip()
-                    except AttributeError:
-                        obj_name = type(obj).__name__.lower().strip()
-            return obj_name.lower().strip()
+                    locutor_name = type(locutor).__name__.lower().strip()
+        return locutor_name.lower().strip()    
+    
+    
+    def check_locutor(self, locutor, allowed='all', forbidden=None):
 
         def get_list_and_sanitize(obj):
             if not isinstance(obj, (list, tuple)):
@@ -313,7 +314,7 @@ class Query:
         if len(self.valid_locutors_names) != 0:
             # Try to retrieve the locutor name
 
-            locutor_name = get_name_and_sanitize(locutor)
+            locutor_name = self.get_locutor_name(locutor)
 
             if locutor_name not in self.valid_locutors_names:
                 locutor_ok = False
@@ -530,13 +531,18 @@ class Query:
         """
         Builds an ID of the Query. Two queries with the same ID are considered as duplicates.
         """
-        hashables = [self.get_sender(), self.get_recipient(), self.get_result(), self.get_limits(), self.get_prerequisites()]
+        
+        sender_name = self.get_locutor_name(self.get_sender())
+        recipient_name = self.get_locutor_name(self.get_recipient())
+        
+        hashables = [sender_name, recipient_name, self.get_result(), self.get_limits(), self.get_prerequisites()]
         hashables = [str(hashable).lower().strip() for hashable in hashables]
         #self.identifier = hash(','.join(hashables)) #Python built-in has method, changes at each python sessions
         m = hashlib.md5()
         for hashable in hashables:
             m.update(hashable.encode())
-        self.identifier = m.hexdigest() #hashlib md5, session-persistent hash
+        self.identifier = m.hexdigest()
+        #hashlib md5, session-persistent hasho
 
         return self.identifier
 
@@ -850,6 +856,8 @@ class QueryMemory:
         Recalls Queries with the given identifier
         """
         queries = self.recall_filtered(filters)
+        if isinstance(identifier, str):
+            identifier = identifier.lower().strip()
         return [q for q in queries if q.get_identifier() == identifier]
 
     def recall_by_sender(self, sender, filters=None):
@@ -882,7 +890,7 @@ class QueryMemory:
             try:
                 q_found = queries[criterion]  # Maybe criterion is an index
             except IndexError:
-                q_found = self.recall_by_identifier(criterion)  # Maybe criterion is an identifier
+                q_found = self.recall_by_identifier(criterion)  # Maybe criterion is an integer identifier
         elif isinstance(criterion, Query):  # Maybe criterion is a Query
             if criterion in queries:
                 q_found.append(criterion)
@@ -892,17 +900,18 @@ class QueryMemory:
                 if criterion in attr_vals:
                     q_found += [q]
             #Maybe criterion is a regular expression
-            try:
-                regex = re.compile(criterion.lower())
-            except:
-                pass
-            else:
-                #Maybe criterion is a regular expression
-                for q in queries:
-                    str_attr = filter(lambda x: isinstance(x,str),list(q.__dict__.values()))
-                    if any([regex.search(attr.lower()) is not None for attr in str_attr]):
-                        q_found += [q]
-                        break
+            if len(q_found) == 0:
+                try:
+                    regex = re.compile(criterion.lower().strip())
+                except:
+                    pass
+                else:
+                    #Maybe criterion is a regular expression
+                    for q in queries:
+                        str_attr = filter(lambda x: isinstance(x,str),list(q.__dict__.values()))
+                        if any([regex.search(attr.lower().strip()) is not None for attr in str_attr]):
+                            q_found += [q]
+                            break
 
         return q_found
 
