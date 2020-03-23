@@ -233,8 +233,8 @@ class Query:
         Returns None or a list with len>0
         """
         if self.limits is None:
-            return None
-            #return [] #another possibility
+            #return None
+            return [] #another possibility
         else:
             try:
                 self.limits[0]

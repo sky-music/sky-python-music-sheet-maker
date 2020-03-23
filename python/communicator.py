@@ -230,7 +230,7 @@ class Communicator:
         '''
         limits = query.get_limits()
         if limits is None:
-            choices = None
+            choices = []
         else:
             choices = [str(limit) for limit in limits]
         
