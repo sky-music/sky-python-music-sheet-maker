@@ -72,12 +72,12 @@ class Communicator:
                             'question': '',
                             'reply_type': ReplyType.TEXT},
                             
-            # Queries asked by Music Sheet Maker
-            'song_overwrite': {'class': QueryBoolean.__name__,
-                             'handler': 'None',
-                             'foreword': 'A Song already exists in memory.',
-                             'question': 'Do you want to overwrite it?',
-                             'reply_type': ReplyType.TEXT},
+#            # Queries asked by Music Sheet Maker
+#            'song_overwrite': {'class': QueryBoolean.__name__,
+#                             'handler': 'None',
+#                             'foreword': 'A Song already exists in memory.',
+#                             'question': 'Do you want to overwrite it?',
+#                             'reply_type': ReplyType.TEXT},
                             
             #TODO: Add complete instructions, see responder.py
             'instructions_stdout': {'class': Information.__name__,

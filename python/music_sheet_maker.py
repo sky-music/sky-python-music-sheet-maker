@@ -55,11 +55,24 @@ class MusicSheetMaker:
         except AttributeError:
             return False
 
-    def is_commandline(self, recipient):       
+    def is_commandline(self, recipient): 
         try:
             return recipient.get_name() == "command-line"
         except AttributeError:
             return False
+
+    def is_website(self, recipient):
+        is_website = False
+        try:
+            is_website = recipient.get_name() == "sky-music-website"
+        except AttributeError:
+            if not self.is_botcog(recipient) and not self.is_commandline(recipient):
+                is_website = True
+            else:
+                is_website = False
+
+        return is_website
+        
 
     def get_song(self):
         return self.song
@@ -109,8 +122,9 @@ class MusicSheetMaker:
         while not reply_valid:
             reply_valid = True #To break the loop if no query
             for q in queries:
-                try:
-                    query_name = q.get_name()
+                #Fetching the stock Query name and arguments 
+                query_name = q.get_name()
+                try:   
                     stock_query = self.communicator.query_stock[query_name]
                     handler_args = ', '.join(('sender=q.get_sender()','query=q'))
                     expression = 'self.' + stock_query['handler'] + '(' + handler_args + ')'
@@ -118,7 +132,7 @@ class MusicSheetMaker:
                     #TODO: handle non-stock queries???
                     raise MusicSheetMakerError('Cannot create stock query ' + repr(query_name) + ', because of ' + repr(err))
                     pass
-                
+                #Actual evaluation of the stock query
                 try:
                     answer = eval(expression) 
                     q.reply_to(answer)
@@ -144,50 +158,51 @@ class MusicSheetMaker:
         except KeyError:
             raise MusicSheetMakerError('No Query passed to create_song')
         
-        if self.song is not None:
-            q_overwrite = self.communicator.send_stock_query('song_overwrite', recipient=recipient)
-            recipient.execute_queries()
-            overwrite = q_overwrite.get_reply().get_result()
-        else:
-            q_overwrite = self.communicator.send_information(recipient=recipient, string='Creating new song.')
-            recipient.execute_queries()
-            overwrite = True
+#        if self.song is not None:
+#            q_overwrite = self.communicator.send_stock_query('song_overwrite', recipient=recipient)
+#            recipient.execute_queries(q_overwrite)
+#            overwrite = q_overwrite.get_reply().get_result()
+#        else:
+#            q_overwrite = self.communicator.send_information(recipient=recipient, string='Creating new song.')
+#            recipient.execute_queries(q_overwrite)
+#            overwrite = True
+#            
+#        if not overwrite:
+#            
+#            i = self.communicator.send_information(string='Aborting.', recipient=recipient)
+#            recipient.execute_queries(i)
             
-        if not overwrite:
-            
-            i = self.communicator.send_information(string='Aborting.', recipient=recipient)
-            recipient.execute_queries(i)
-            
-        else:  #NEW SONG
-            self.communicator.memory.erase(filters=('from_me'))
-            
-            self.set_parser(SongParser(self))
-    
-            # Display instructions
-            i_instr, res = self.ask_instructions(recipient=recipient, prerequisites=[q_overwrite])
+        #self.communicator.memory.erase(filters=('from_me'))
         
-            # Ask for notes
-            #TODO: allow the player to enter the notes using several messages??? or maybe not
-            if self.is_botcog(recipient):
-                (q_notes, notes) = self.ask_notes(recipient=recipient, prerequisites=[i_instr])
-            elif recipient.get_name() == 'command-line':
-                (q_notes, notes) = self.ask_notes_file(recipient=recipient, prerequisites=[i_instr])
-            else:
-                (q_notes, notes) = self.ask_notes(recipient=recipient, prerequisites=[i_instr])
-          
-            (q_mode, input_mode) = self.ask_input_mode(recipient=recipient, notes=notes, prerequisites=[q_notes])
-            self.get_parser().set_input_mode(input_mode)
-            
-            (q_key, song_key) = self.ask_song_key(recipient=recipient, notes=notes, input_mode=input_mode, prerequisites=[q_notes, q_mode])
-            
-            #Asks for octave shift
-            q_shift = self.communicator.send_stock_query('octave_shift', recipient=recipient)
-            recipient.execute_queries(q_shift)
-            octave_shift = q_shift.get_reply().get_result()
-            
-            # Parse song
-            self.set_song(self.get_parser().parse_song(notes, song_key, octave_shift))
-            self.display_error_ratio(recipient=recipient, prerequisites=None)
+        
+        #======= NEW SONG =======
+        self.set_parser(SongParser(self))
+
+        # Display instructions
+        i_instr, res = self.ask_instructions(recipient=recipient)
+    
+        # Ask for notes
+        #TODO: allow the player to enter the notes using several messages??? or maybe not
+        if self.is_botcog(recipient):
+            (q_notes, notes) = self.ask_notes(recipient=recipient, prerequisites=[i_instr])
+        elif recipient.get_name() == 'command-line':
+            (q_notes, notes) = self.ask_notes_file(recipient=recipient, prerequisites=[i_instr])
+        else:
+            (q_notes, notes) = self.ask_notes(recipient=recipient, prerequisites=[i_instr])
+      
+        (q_mode, input_mode) = self.ask_input_mode(recipient=recipient, notes=notes, prerequisites=[q_notes])
+        self.get_parser().set_input_mode(input_mode)
+        
+        (q_key, song_key) = self.ask_song_key(recipient=recipient, notes=notes, input_mode=input_mode, prerequisites=[q_notes, q_mode])
+        
+        #Asks for octave shift
+        q_shift = self.communicator.send_stock_query('octave_shift', recipient=recipient)
+        recipient.execute_queries(q_shift)
+        octave_shift = q_shift.get_reply().get_result()
+        
+        # Parse song
+        self.set_song(self.get_parser().parse_song(notes, song_key, octave_shift))
+        self.display_error_ratio(recipient=recipient, prerequisites=[q_notes, q_mode, q_shift])
         
         #Asks for song metadata
         (q_meta, (title, artist, writer)) = self.ask_song_metadata(recipient=recipient)
@@ -423,7 +438,7 @@ class MusicSheetMaker:
         Discord only
         TODO: fill this method, or if very short, put it inside create_song directly
         '''
-        pass
+        return buffers
         
         
     def display_error_ratio(self, recipient, prerequisites=None, execute=True):
