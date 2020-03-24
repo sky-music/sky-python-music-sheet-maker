@@ -442,6 +442,10 @@ class Query:
                 is_reply_valid = False
                 return is_reply_valid
             else:
+                
+                if not self.expect_reply:
+                    return True
+                
                 if self.get_reply_type() in [ReplyType.TEXT, ReplyType.NOTE, ReplyType.FILE]:
                     if isinstance(answer, str):
                         is_reply_valid = True

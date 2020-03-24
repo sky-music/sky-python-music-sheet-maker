@@ -265,7 +265,7 @@ class Communicator:
             answer_dict = {'answer_length': 'short', 'long_text': '', 'short_text': answer_text}
         
         return {'question': {'text': query.get_foreword()+'\n'+query.get_question(),
-                              'identifier': query.get_identifier()},
+                              'identifier': query.get_identifier(), 'expect_answer': query.get_expect_reply()},
                 'choices': choices_dicts,
                 'answer': answer_dict
                 }
