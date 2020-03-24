@@ -255,14 +255,16 @@ class Communicator:
                 choices_dicts = []
         
         try:
-            answer_text = str(query.get_reply().get_answer())
+            answer_text = query.get_reply().get_answer()
+            if answer_text is None:
+                answer_text = ''
         except AttributeError:
-            answer_text = None
+            answer_text = ''
             
         if 'song_notes' in query.get_name().strip().lower():
-            answer_dict = {'answer_length': 'long', 'long_text': answer_text, 'short_text': ''}
+            answer_dict = {'answer_length': 'long', 'long_text': str(answer_text), 'short_text': ''}
         else:
-            answer_dict = {'answer_length': 'short', 'long_text': '', 'short_text': answer_text}
+            answer_dict = {'answer_length': 'short', 'long_text': '', 'short_text': str(answer_text)}
         
         return {'question': {'text': query.get_foreword()+'\n'+query.get_question(),
                               'identifier': query.get_identifier(), 'expect_answer': query.get_expect_reply()},
