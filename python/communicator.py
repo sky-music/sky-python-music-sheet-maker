@@ -256,7 +256,7 @@ class Communicator:
         '''
         Returns a dictionary of arguments to be used to create Question, Choices
         by the web app music_maker in sky-music-website-project
-        '''
+        '''        
         if not isinstance(queries, (list, tuple, set)):
             queries = [queries]
         
@@ -285,7 +285,7 @@ class Communicator:
             else:
                 answer_dict = {'answer_length': 'short', 'long_text': '', 'short_text': str(answer_text)}
         
-        queries_kwargs += {'question': {'text': query.get_foreword()+'\n'+query.get_question(),
+            queries_kwargs += {'question': {'text': query.get_foreword()+'\n'+query.get_question(),
                               'identifier': query.get_identifier(), 'expect_answer': query.get_expect_reply()},
                 'choices': choices_dicts,
                 'answer': answer_dict
