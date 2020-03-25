@@ -26,7 +26,6 @@ class MusicSheetMaker:
         self.directory_base = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)),'..'))
         self.song_dir_in = os.path.join(self.directory_base,songs_in)
         self.song_dir_out = os.path.join(self.directory_base,songs_out)
-        #self.init_working_directory()
         self.css_path = os.path.normpath(os.path.join(self.directory_base, "css/main.css"))#TODO: move that into Renderer
         self.css_mode = CSSMode.EMBED#TODO: move that into Renderer
         self.render_modes_enabled = [mode for mode in RenderMode]
@@ -71,8 +70,7 @@ class MusicSheetMaker:
             else:
                 is_website = False
 
-        return is_website
-        
+        return is_website      
 
     def get_song(self):
         return self.song
@@ -86,10 +84,6 @@ class MusicSheetMaker:
     def set_parser(self, parser):
         self.parser = parser
 
-#    def init_working_directory(self):
-#        if not os.path.isdir(self.song_dir_out):
-#            os.mkdir(self.song_dir_out)
-
     def get_directory_base(self):
         return self.directory_base
     
@@ -97,10 +91,6 @@ class MusicSheetMaker:
 
         return self.render_modes_enabled
 
-#    def is_render_mode_enabled(self, mode):
-#    
-#    def receive(self, *args, **kwargs):
-#        self.communicator.receive(*args, **kwargs)
 
     def execute_queries(self, queries=None):
 
@@ -195,44 +185,43 @@ class MusicSheetMaker:
         
         (q_key, song_key) = self.ask_song_key(recipient=recipient, notes=notes, input_mode=input_mode, prerequisites=[q_notes, q_mode])
         
-        #Asks for octave shift
+        # Asks for octave shift
         q_shift = self.communicator.send_stock_query('octave_shift', recipient=recipient)
         recipient.execute_queries(q_shift)
         octave_shift = q_shift.get_reply().get_result()
         
         # Parse song
         self.set_song(self.get_parser().parse_song(notes, song_key, octave_shift))
-        self.display_error_ratio(recipient=recipient, prerequisites=[q_notes, q_mode, q_shift])
+        (i_error, res) = self.display_error_ratio(recipient=recipient, prerequisites=[q_notes, q_mode, q_shift])
         
-        #Asks for song metadata
+        # Asks for song metadata
         (q_meta, (title, artist, writer)) = self.ask_song_metadata(recipient=recipient)
         
-        #TODO:
-        #Detect if on Discord or in command line with a safer method
-        #Loop over rendering modes, several for the command line, 1 for discord
-        if not self.is_commandline(recipient):
-            render_mode = self.discord_render_mode
-            buffers = self.write_song_to_buffers(render_mode)
+
+        if self.is_botcog(recipient):
             
-            #TODO: write this method:
-            answer = self.send_buffers_to_discord(buffers=buffers, recipient=recipient)
+            buffers = self.write_song_to_buffers(self.discord_render_mode)           
+            #TODO: write the content of this method:
+            self.send_buffers_to_discord(buffers=buffers, recipient=recipient, prerequisites=[i_error])
+        
+        elif self.is_website(recipient):
+        
+            buffers = self.write_song_to_buffers(self.discord_render_mode)   
+            creation_query.reply_to(buffers)
+        
         else: #command line
-            render_modes = self.get_render_modes_enabled()
-            
-            all_paths = []
             
             print("="*40)
+            all_paths = []
             
-            for render_mode in render_modes:
+            for render_mode in self.get_render_modes_enabled():
                 buffers = self.write_song_to_buffers(render_mode)
-                file_paths = self.build_file_paths(render_mode, len(buffers))
-                
-                print("-"*40)
-                self.write_buffers_to_files(render_mode, buffers, file_paths)
+                file_paths = self.build_file_paths(render_mode, len(buffers))              
+                self.send_buffers_to_files(render_mode, buffers, file_paths, recipient=recipient, prerequisites=[i_error])
                 all_paths += file_paths
             
             answer = all_paths
-            #TODO: decide what to reply
+            #TODO: decide what to reply instead
                 
         return answer
     
@@ -433,7 +422,7 @@ class MusicSheetMaker:
             return (q_key, None)
 
         
-    def send_buffers_to_discord(self, buffers, recipient):
+    def send_buffers_to_discord(self, buffers, recipient, prerequisites=None, execute=True):
         '''
         Discord only
         TODO: fill this method, or if very short, put it inside create_song directly
@@ -464,7 +453,7 @@ class MusicSheetMaker:
             return (i_error, None)
         
 
-    def write_buffers_to_files(self, render_mode, buffers, file_paths):
+    def send_buffers_to_files(self, render_mode, buffers, file_paths, recipient, prerequisites=None, execute=True):
         """
         Writes the content of an IOString or IOBytes buffer list to one or several files.
         Command line only
@@ -501,20 +490,28 @@ class MusicSheetMaker:
                 output_file.write(buffer.getvalue())
             
                 if numfiles == 1:
-                
-                    print('\nYour song in ' + render_mode.value[1] + ' is located at: ' + os.path.relpath(file_paths[0]))
+                    
+                    message = '\nYour song in ' + render_mode.value[1] + ' is located at: ' + os.path.relpath(file_paths[0])
                     
                 elif numfiles > 1 and i == 0:
                     
-                    print('\nYour song in ' + render_mode.value[1] + ' is located in: ' + os.path.relpath(self.song_dir_out))
+                    message = '\nYour song in ' + render_mode.value[1] + ' is located in: ' + os.path.relpath(self.song_dir_out)
                     
-                    print('Your song has been split into ' + str(numfiles) + ' files between ' + os.path.split(file_paths[0])[
-                                1] + ' and ' + os.path.split(file_paths[-1])[1])
+                    message += 'Your song has been split into ' + str(numfiles) + ' files between ' + os.path.split(file_paths[0])[
+                                1] + ' and ' + os.path.split(file_paths[-1])[1]
             else:
-                print('\nYour song in ' + render_mode.value[1] + ' was not saved to file.')    
-            
-        return i
+                message = '\nYour song in ' + render_mode.value[1] + ' was not saved to file.'   
 
+        i_song_files = self.communicator.send_stock_query('information', foreword="-"*40, \
+                                                     question=message, recipient=recipient, prerequisites=prerequisites)    
+        if execute:
+            recipient.execute_queries(i_song_files)
+            result = i_song_files.get_reply().get_result()
+            return (i_song_files, result)
+        else:
+            return (i_song_files, None)
+
+            
     def write_song_to_buffers(self, render_mode):
         """
         Writes the song to files with different formats as defined in RenderMode

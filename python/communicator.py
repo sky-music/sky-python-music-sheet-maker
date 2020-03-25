@@ -54,7 +54,7 @@ class Communicator:
         self.owner = owner
         self.memory = QueryMemory(self.owner)
         self.name = self.owner.get_name()
-
+        
         # A dictionary of standard queries arguments
         #The key must be lower case without blanks, use _ instead
         # TODO: create generic (quasi-empty) stock queries, such as Information to output dome text
@@ -238,8 +238,16 @@ class Communicator:
         question = str(query.get_result())
         return question
 
+    
+    def query_to_website_result(self, query):
+        
+        result = query.get_result()
+        
+        return {'result': {'result_type': type(result), 'content': result}
+                }
+    
 
-    def query_to_website(self, query):
+    def query_to_website_question(self, query):
         '''
         Returns a dictionary of arguments to be used to create Question, Choices
         by the web app music_maker in sky-music-website-project
