@@ -144,7 +144,7 @@ class MusicSheetMaker:
 
         #Actually the following is not used but it may be useful to have the triggering query as an argument
         try:
-            creation_query = kwargs['query']
+            q_create_song = kwargs['query']
         except KeyError:
             raise MusicSheetMakerError('No Query passed to create_song')
         
@@ -198,16 +198,11 @@ class MusicSheetMaker:
         (q_meta, (title, artist, writer)) = self.ask_song_metadata(recipient=recipient)
         
 
-        if self.is_botcog(recipient):
-            
-            buffers = self.write_song_to_buffers(self.discord_render_mode)           
-            #TODO: write the content of this method:
-            self.send_buffers_to_discord(buffers=buffers, recipient=recipient, prerequisites=[i_error])
-        
-        elif self.is_website(recipient):
+        if self.is_botcog(recipient) or self.is_website(recipient):
         
             buffers = self.write_song_to_buffers(self.discord_render_mode)   
-            creation_query.reply_to(buffers)
+            q_create_song.reply_to(buffers)
+            answer = q_create_song
         
         else: #command line
             

@@ -35,15 +35,20 @@ class QueriesExecutionAbort(Exception):
     '''
     A special exception to abort execution of queries in execute_queries (and create_song)
     '''
-    def __init__(self, query, explanation=''):
-        self.query = query
-        self.explanation = explanation
+    def __init__(self, queries, explanations=None):
+        if not isinstance(queries, (list, tuple, set)):
+            queries = [queries]
+        self.queries = queries
+        self.explanations = explanations
 
     def __repr__(self):
-        return '<' + self.__class__.__name__+', query="'+str(self.query)+', explanation="'+str(self.explanation)+'">'
+        queries_str = ''
+        for query in self.queries:
+            queries_str += str(query) + '",'
+        return '<' + self.__class__.__name__+', queries='+queries_str+', explanations="'+str(self.explanations)+'">'
 
     def __str__(self):
-        return str(self.query)
+        return str(self.queries)
     
     pass
 
@@ -247,38 +252,47 @@ class Communicator:
                 }
     
 
-    def query_to_website_question(self, query):
+    def queries_to_website_questions(self, queries):
         '''
         Returns a dictionary of arguments to be used to create Question, Choices
         by the web app music_maker in sky-music-website-project
         '''
-        limits = query.get_limits()
+        if not isinstance(queries, (list, tuple, set)):
+            queries = [queries]
         
-        if isinstance(query, QueryChoice):
-            if isinstance(limits[0], InputMode):
-                choices_dicts = [{'number': int(limit.value[1]), 'text': str(limit.value[2])} for i, limit in enumerate(limits)]
-            else:
-                choices_dicts = [{'number': i, 'text': str(limit)} for i, limit in enumerate(limits)]
-        else:
-                choices_dicts = []
+        queries_kwargs = []
         
-        try:
-            answer_text = query.get_reply().get_answer()
-            if answer_text is None:
-                answer_text = ''
-        except AttributeError:
-            answer_text = ''
+        for query in queries:
+            limits = query.get_limits()
             
-        if 'song_notes' in query.get_name().strip().lower():
-            answer_dict = {'answer_length': 'long', 'long_text': str(answer_text), 'short_text': ''}
-        else:
-            answer_dict = {'answer_length': 'short', 'long_text': '', 'short_text': str(answer_text)}
+            if isinstance(query, QueryChoice):
+                if isinstance(limits[0], InputMode):
+                    choices_dicts = [{'number': int(limit.value[1]), 'text': str(limit.value[2])} for i, limit in enumerate(limits)]
+                else:
+                    choices_dicts = [{'number': i, 'text': str(limit)} for i, limit in enumerate(limits)]
+            else:
+                    choices_dicts = []
+            
+            try:
+                answer_text = query.get_reply().get_answer()
+                if answer_text is None:
+                    answer_text = ''
+            except AttributeError:
+                answer_text = ''
+                
+            if 'song_notes' in query.get_name().strip().lower():
+                answer_dict = {'answer_length': 'long', 'long_text': str(answer_text), 'short_text': ''}
+            else:
+                answer_dict = {'answer_length': 'short', 'long_text': '', 'short_text': str(answer_text)}
         
-        return {'question': {'text': query.get_foreword()+'\n'+query.get_question(),
+        queries_kwargs += {'question': {'text': query.get_foreword()+'\n'+query.get_question(),
                               'identifier': query.get_identifier(), 'expect_answer': query.get_expect_reply()},
                 'choices': choices_dicts,
                 'answer': answer_dict
                 }
+        
+        return queries_kwargs
+            
 
     def query_to_discord(self, query):
         '''
