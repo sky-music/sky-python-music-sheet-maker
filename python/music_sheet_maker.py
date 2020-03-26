@@ -27,6 +27,7 @@ class MusicSheetMaker:
         self.song_dir_in = os.path.join(self.directory_base,songs_in)
         self.song_dir_out = os.path.join(self.directory_base,songs_out)
         self.css_path = os.path.normpath(os.path.join(self.directory_base, "css/main.css"))#TODO: move that into Renderer
+        self.rel_css_path = os.path.relpath(self.css_path, start=self.song_dir_out)
         self.css_mode = CSSMode.EMBED#TODO: move that into Renderer
         self.render_modes_enabled = [mode for mode in RenderMode]
         # self.render_modes_disabled = [RenderMode.JIANPUASCII, RenderMode.DOREMIASCII]
@@ -196,12 +197,15 @@ class MusicSheetMaker:
         
         # Asks for song metadata
         (q_meta, (title, artist, writer)) = self.ask_song_metadata(recipient=recipient)
+        self.get_song().set_headers(original_artist=artist, transcript_writer=writer, song_key=song_key)
+        self.get_song().set_title(title)
         
 
         if self.is_botcog(recipient) or self.is_website(recipient):
-        
-            buffers = self.write_song_to_buffers(self.discord_render_mode)   
-            q_create_song.reply_to(buffers)
+            
+            self.css_mode = CSSMode.EMBED #Prevent the HTML/SVG from depending on an auxiliary .css file
+            buffers = self.write_song_to_buffers(self.discord_render_mode)
+            q_create_song.reply_to((self.discord_render_mode, buffers))
             answer = q_create_song
         
         else: #command line
@@ -215,7 +219,8 @@ class MusicSheetMaker:
                 self.send_buffers_to_files(render_mode, buffers, file_paths, recipient=recipient, prerequisites=[i_error])
                 all_paths += file_paths
             
-            answer = all_paths
+            q_create_song.reply_to((self.get_render_modes_enabled(), all_paths))
+            answer = q_create_song
             #TODO: decide what to reply instead
                 
         return answer
@@ -515,9 +520,9 @@ class MusicSheetMaker:
         if render_mode in self.get_render_modes_enabled():
 
             if render_mode == RenderMode.HTML:
-                buffers = [self.get_song().write_html(self.css_mode, self.css_path)]
+                buffers = [self.get_song().write_html(self.css_mode, self.css_path, self.rel_css_path)]
             elif render_mode == RenderMode.SVG:
-                buffers = self.get_song().write_svg(self.css_mode, self.css_path)
+                buffers = self.get_song().write_svg(self.css_mode, self.css_path, self.rel_css_path)
             elif render_mode == RenderMode.PNG:
                 buffers = self.get_song().write_png()
             elif render_mode == RenderMode.MIDI:

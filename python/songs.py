@@ -169,8 +169,8 @@ class Song():
     def set_title(self, title):
         self.title = title
 
-    def set_headers(self, original_artists='', transcript_writer='', musical_key=''):
-        self.headers[1] = [original_artists, transcript_writer, musical_key]
+    def set_headers(self, original_artist='', transcript_writer='', musical_key=''):
+        self.headers[1] = [original_artist, transcript_writer, musical_key]
 
     def get_voice_SVG_height(self):
         """Tries to predict the height of the lyrics text when rendered in SVG"""
@@ -203,7 +203,7 @@ class Song():
         """Calculates the text height in PNG for a standard text depending on the input font size"""
         return fnt.getsize('HQfgjyp')[1]
 
-    def write_html(self, css_mode=CSSMode.EMBED, css_path='css/main.css'):
+    def write_html(self, css_mode=CSSMode.EMBED, css_path='css/main.css', rel_css_path='../css/main.css'):
 
         html_buffer = io.StringIO()
 
@@ -224,11 +224,9 @@ class Song():
         elif css_mode == CSSMode.IMPORT:
             html_buffer.write('\n<style type=\"text/css\">')
             html_buffer.write(
-                "@import url(\'" + os.path.relpath(css_path, start=os.path.dirname(file_path)).replace('\\',
-                                                                                                       '/') + "\');</style>")
+                "@import url(\'" + rel_css_path.replace('\\','/') + "\');</style>")
         elif css_mode == CSSMode.XML:
-            html_buffer.write('\n<link href=\"' + os.path.relpath(css_path, start=os.path.dirname(
-                file_path)) + '\" rel=\"stylesheet\" />')
+            html_buffer.write('\n<link href=\"' + rel_css_path + '\" rel=\"stylesheet\" />')
 
         html_buffer.write('\n<meta charset="utf-8"/></head>\n<body>')
         html_buffer.write('\n<h1> ' + self.title + ' </h1>')
@@ -300,7 +298,7 @@ class Song():
 
         return ascii_buffer
 
-    def write_svg(self, css_mode=CSSMode.EMBED, css_path='css/main.css', start_row=0, buffer_list=None):
+    def write_svg(self, css_mode=CSSMode.EMBED, css_path='css/main.css', rel_css_path='../css/main.css', start_row=0, buffer_list=None):
 
         if buffer_list is None:
             buffer_list = []
@@ -315,8 +313,7 @@ class Song():
         svg_buffer.write('<?xml version=\"1.0\" encoding=\"utf-8\" ?>')
 
         if css_mode == CSSMode.HREF:
-            svg_buffer.write('\n<?xml-stylesheet href=\"' + os.path.relpath(css_path, start=os.path.dirname(
-                file_path)) + '\" type=\"text/css\" alternate=\"no\" media=\"all\"?>')
+            svg_buffer.write('\n<?xml-stylesheet href=\"' + rel_css_path + '\" type=\"text/css\" alternate=\"no\" media=\"all\"?>')
 
         svg_buffer.write(
             '\n<svg baseProfile=\"full\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:ev=\"http://www.w3.org/2001/xml-events\" xmlns:xlink=\"http://www.w3.org/1999/xlink\"'
@@ -338,8 +335,7 @@ class Song():
         elif css_mode == CSSMode.IMPORT:
             svg_buffer.write('\n<defs><style type=\"text/css\">')
             svg_buffer.write(
-                "@import url(\'" + os.path.relpath(css_path, start=os.path.dirname(file_path)).replace('\\',
-                                                                                                       '/') + "\');</style></defs>")
+                "@import url(\'" + rel_css_path.replace('\\','/') + "\');</style></defs>")
         else:
             svg_buffer.write('\n<defs></defs>')
 
@@ -483,7 +479,7 @@ class Song():
 
         # Open new file
         if end_row < len(self.lines):
-            buffer_list = self.write_svg(css_mode, css_path, end_row, buffer_list)
+            buffer_list = self.write_svg(css_mode, css_path, rel_css_path, end_row, buffer_list)
 
         return buffer_list
 

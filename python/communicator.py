@@ -1,5 +1,6 @@
-from modes import InputMode, ReplyType
+from modes import InputMode, ReplyType, RenderMode
 from communication import QueryOpen, QueryChoice, QueryBoolean, QueryMemory, Information
+import io
 
 """
 Classes to ask and answer questions called Query and Reply between the bot and the music sheet maker
@@ -246,11 +247,26 @@ class Communicator:
     
     def query_to_website_result(self, query):
         
-        result = query.get_result()
+        (render_mode, buffers) = query.get_result() #Should be a RenderMode and a list of IOString or IOBytes buffers
         
-        return {'result': {'result_type': type(result), 'content': result}
-                }
+        try:
+            buffers[0]
+        except (TypeError, KeyError):
+            raise CommunicatorError('Result is not a list: ' + str(type(buffers)))
+        else:
+            if isinstance(buffers[0],io.BytesIO):
+                pass
+            elif isinstance(buffers[0],io.StringIO):
+                raise CommunicatorError('Cannot process string buffers yet')
+            else:
+                raise CommunicatorError('Cannot process ' + str(type(buffers)))
+        
     
+        return {'result': {'result_type': type(buffers[0])},
+                'images': [{'image_type': render_mode.value[1], 'number': i, 'base_name': 'image_'} for i, buffer in enumerate(buffers)],
+                'save': [{'name': 'image_'+str(i), 'buffer': buffer} for i, buffer in enumerate(buffers)]
+                }
+
 
     def queries_to_website_questions(self, queries):
         '''
