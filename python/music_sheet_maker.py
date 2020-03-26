@@ -196,10 +196,8 @@ class MusicSheetMaker:
         (i_error, res) = self.display_error_ratio(recipient=recipient, prerequisites=[q_notes, q_mode, q_shift])
         
         # Asks for song metadata
-        (q_meta, (title, artist, writer)) = self.ask_song_metadata(recipient=recipient)
-        self.get_song().set_headers(original_artist=artist, transcript_writer=writer, song_key=song_key)
-        self.get_song().set_title(title)
-        
+        (q_meta, (title, artist, transcript)) = self.ask_song_metadata(recipient=recipient)
+        self.get_song().set_meta(title=title, artist=artist, transcript=transcript, song_key=song_key)
 
         if self.is_botcog(recipient) or self.is_website(recipient):
             
