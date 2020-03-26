@@ -1,7 +1,8 @@
 import re, os
-from modes import ReplyType, InputMode
+from modes import ReplyType, InputMode, RenderMode
 from datetime import datetime
 import hashlib
+import io
 
 class QueryError(Exception):
     def __init__(self, explanation):
@@ -446,22 +447,33 @@ class Query:
                 if not self.expect_reply:
                     return True
                 
-                if self.get_reply_type() in [ReplyType.TEXT, ReplyType.NOTE, ReplyType.FILE]:
+                if self.reply_type in [ReplyType.TEXT, ReplyType.NOTE, ReplyType.FILE]:
                     if isinstance(answer, str):
                         is_reply_valid = True
-                elif self.get_reply_type() == ReplyType.INTEGER:
+                elif self.reply_type == ReplyType.INTEGER:
                     try:
                         int(answer)
                         is_reply_valid = True
                     except:
                         is_reply_valid = False
-                elif self.get_reply_type() == ReplyType.INPUTMODE:
+                elif self.reply_type == ReplyType.INPUTMODE:
                     if isinstance(answer, InputMode) or isinstance(answer, str):
                         is_reply_valid = True
+                elif self.reply_type == ReplyType.BUFFERS:
+                    try:
+                        buffers, render_modes = answer
+                    except ValueError:
+                        is_reply_valid = False
+                    else:
+                        if isinstance(buffers[0],(io.BytesIO, io.StringIO)) and isinstance(render_modes[0], RenderMode):
+                            is_reply_valid = True
+                        else:
+                            is_reply_valid = False
+
                 else:
                     is_reply_valid = True
 
-                if self.get_reply_type() == ReplyType.FILE and limits is not None:
+                if self.reply_type == ReplyType.FILE and limits is not None:
                     '''
                     Checks if the file exist in the directories and with the extensions specified in limits
                     '''
@@ -470,25 +482,18 @@ class Query:
                     extensions = ['.'+ext.split('.')[-1] for ext in extensions]
                     
                     directories += ['.']
-                    '''
-                    print('%%DEBUG directories=')
-                    print(directories)
-                    print('%%DEBUG extensions=')
-                    print(extensions)
-                    '''
+
+
                     if all([not os.path.isfile(os.path.normpath(os.path.join(directory, answer))) for directory in directories]) and len(directories) != 0:
-                        #print('%%DEBUG failed 1st')
+
                         is_reply_valid = False
-                    
-                    #print('%%%DEBUG')
-                    #print(os.path.normpath(os.path.join(directories[0], answer)))
-                    
+                                        
                     if all([re.search(ext,os.path.splitext(answer)[-1]) is None for ext in extensions]) and len(extensions) != 0:
-                        #print('%%DEBUG failed 2nd')
+
                         is_reply_valid = False
                 
                 #Maybe limits is an integer range
-                if self.get_reply_type() == ReplyType.INTEGER and limits is not None and is_reply_valid is True:
+                if self.reply_type == ReplyType.INTEGER and limits is not None and is_reply_valid is True:
                     try:
                         num = int(answer)
                         low_lim = min(limits)
@@ -986,7 +991,6 @@ class QueryMemory:
 
     def store(self, query):
 
-        # print(self)
         if isinstance(query, Query):
             self.queries.append(query)
         elif isinstance(query, (list, tuple)):

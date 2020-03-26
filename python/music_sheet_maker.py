@@ -128,6 +128,7 @@ class MusicSheetMaker:
                     answer = eval(expression) 
                     q.reply_to(answer)
                     reply_valid = q.get_reply_validity()
+                    
                 except QueriesExecutionAbort as qExecAbort:
                     raise qExecAbort
 
@@ -203,8 +204,7 @@ class MusicSheetMaker:
             
             self.css_mode = CSSMode.EMBED #Prevent the HTML/SVG from depending on an auxiliary .css file
             buffers = self.write_song_to_buffers(self.discord_render_mode)
-            q_create_song.reply_to((self.discord_render_mode, buffers))
-            answer = q_create_song
+            answer = (buffers, [self.discord_render_mode]*len(buffers))
         
         else: #command line
             
@@ -217,9 +217,7 @@ class MusicSheetMaker:
                 self.send_buffers_to_files(render_mode, buffers, file_paths, recipient=recipient, prerequisites=[i_error])
                 all_paths += file_paths
             
-            q_create_song.reply_to((self.get_render_modes_enabled(), all_paths))
-            answer = q_create_song
-            #TODO: decide what to reply instead
+            answer = (buffers, self.get_render_modes_enabled())
                 
         return answer
     

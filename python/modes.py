@@ -44,10 +44,10 @@ class ResponseMode(Enum):
 
 
 class ReplyType(Enum):
-    TEXT = 1
-    INTEGER = 2
-    NOTE = 3
-    INPUTMODE = 4
-    FILE = 5
-    IMAGE = 6
+    TEXT = 1 #str
+    INTEGER = 2 #int
+    NOTE = 3 #str, with possible additional checks
+    INPUTMODE = 4 #modes.InputMode
+    FILE = 5 #A file path
+    BUFFERS = 6
     OTHER = 7

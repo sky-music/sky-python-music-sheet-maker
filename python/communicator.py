@@ -69,7 +69,7 @@ class Communicator:
             'create_song': {'class': QueryOpen.__name__,
                             'handler': 'create_song',
                             'question': 'create_song',
-                            'reply_type': ReplyType.OTHER
+                            'reply_type': ReplyType.BUFFERS
                             },
             
             # Generic Query
@@ -250,7 +250,7 @@ class Communicator:
         print('%%%DEBUG%%%')
         print(repr(reply))
         print(reply.get_result())
-        (render_mode, buffers) = reply.get_result() #Should be a RenderMode and a list of IOString or IOBytes buffers
+        (buffers, render_modes) = reply.get_result() #Should be a list of IOString or IOBytes buffers and a list of RenderModes
         
         try:
             buffers[0]
@@ -263,10 +263,9 @@ class Communicator:
                 raise CommunicatorError('Cannot process string buffers yet')
             else:
                 raise CommunicatorError('Cannot process ' + str(type(buffers)))
-        
-    
+            
         return {'result': {'result_type': type(buffers[0])},
-                'images': [{'image_type': render_mode.value[1], 'number': i, 'base_name': 'image_'} for i, buffer in enumerate(buffers)],
+                'images': [{'image_type': render_modes[i].value[1], 'number': i, 'base_name': 'image_'} for i, buffer in enumerate(buffers)],
                 'save': [{'name': 'image_'+str(i), 'buffer': buffer} for i, buffer in enumerate(buffers)]
                 }
 
