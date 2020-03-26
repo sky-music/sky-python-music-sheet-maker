@@ -247,6 +247,9 @@ class Communicator:
     
     def reply_to_website_result(self, reply):
         
+        print('%%%DEBUG%%%')
+        print(repr(reply))
+        print(reply.get_result())
         (render_mode, buffers) = reply.get_result() #Should be a RenderMode and a list of IOString or IOBytes buffers
         
         try:
