@@ -245,9 +245,9 @@ class Communicator:
         return question
 
     
-    def query_to_website_result(self, query):
+    def reply_to_website_result(self, reply):
         
-        (render_mode, buffers) = query.get_result() #Should be a RenderMode and a list of IOString or IOBytes buffers
+        (render_mode, buffers) = reply.get_result() #Should be a RenderMode and a list of IOString or IOBytes buffers
         
         try:
             buffers[0]
