@@ -4,8 +4,8 @@ import os
 import re
 
 from modes import InputMode, RenderMode, CSSMode, ResponseMode
-from parsers import SongParser
-from songs import Song
+from songparser import SongParser
+from song import Song
 from communication import Query, QueryChoice, QueryOpen
 
 

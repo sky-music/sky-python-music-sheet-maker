@@ -122,7 +122,7 @@ class Communicator:
             'song_file': {'class': QueryOpen.__name__,
                              'handler': 'None',
                              'question': 'Please  enter file name in',
-                             'reply_type': ReplyType.FILE,
+                             'reply_type': ReplyType.FILEPATH,
                              'limits': '.'},
                             
             'song_notes': {'class': QueryOpen.__name__,
@@ -204,28 +204,6 @@ class Communicator:
         q.send(recipient=recipient)
 
         return q
-
-    '''
-    def send(self, communication_objects, recipient=None):
-
-        try:
-            communication_objects[0]
-        except (TypeError, IndexError):
-            communication_objects = [communication_objects]
-
-        for obj in communication_objects:
-            if isinstance(obj, Query):
-                self.send_query(obj, recipient)
-
-    def send_query(self, query, recipient):
-
-        if not self.memory.has_query(query):
-            print('I am ' + self.owner.get_name() + ', storing a query before sending.')
-            self.memory.store(query)
-
-        query.check_sender(allowed=self.owner)#TODO: previously self.get_name()
-        query.send(recipient=recipient)
-    '''
 
     def receive(self, queries):
 
@@ -336,10 +314,3 @@ class Communicator:
         i.send(recipient=recipient)
         return i
     
-
-    '''
-    def send_unsent_queries(self, recipient=None):
-
-        for q in self.memory.recall_unsent():
-            q.send(recipient)
-    '''

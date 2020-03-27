@@ -124,7 +124,7 @@ qs = brain.recall(ReplyType.TEXT)
 print('\n\nBrain inventory:\n')
 print(brain)
 
-q_file = QueryOpen(sender='music-cog',recipient='music-sheet-maker',question='Please reply a file name',reply_type=ReplyType.FILE,limits=('../test_songs','.txt','.py'))
+q_file = QueryOpen(sender='music-cog',recipient='music-sheet-maker',question='Please reply a file name',reply_type=ReplyType.FILEPATH,limits=('../test_songs','.txt','.py'))
 brain.store(q_file)
 q_file.reply_to('englishC.txt')
 

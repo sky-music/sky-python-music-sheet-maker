@@ -383,8 +383,9 @@ class Query:
                     return True
             except TypeError:
                 pass
+            
         #From now on limits is an non empty list or a non-None object
-        if self.reply_type in [ReplyType.TEXT, ReplyType.NOTE, ReplyType.FILE] and not isinstance(limits[0], str):
+        if self.reply_type in [ReplyType.TEXT, ReplyType.NOTE, ReplyType.FILEPATH] and not isinstance(limits[0], str):
             raise InvalidQueryTypeError('incorrect limits type', limits[0], str)
 
         if self.reply_type == ReplyType.INTEGER:
@@ -396,7 +397,7 @@ class Query:
         if self.reply_type == ReplyType.INPUTMODE and not isinstance(limits[0], InputMode):
             raise InvalidQueryTypeError('incorrect limits type', limits[0], InputMode)
 
-        if self.reply_type == ReplyType.FILE:
+        if self.reply_type == ReplyType.FILEPATH:
             if os.path.isdir(limits[0]):
                 pass
             elif len(limits[0]) >= 2 and len(limits[0]) <= 5:
@@ -415,12 +416,15 @@ class Query:
                     int(limits[0])
                     self.reply_type = ReplyType.INTEGER
                 except:
-                    self.reply_type = ReplyType.TEXT
+                    self.reply_type == ReplyType.TEXT
             elif isinstance(limits[0], InputMode):
                 self.reply_type = ReplyType.INPUTMODE
             else:
                 self.reply_type = ReplyType.OTHER
-
+           
+        return True     
+                
+                
     def check_reply(self):
 
         if not isinstance(self.reply, Reply):
@@ -447,7 +451,7 @@ class Query:
                 if not self.expect_reply:
                     return True
                 
-                if self.reply_type in [ReplyType.TEXT, ReplyType.NOTE, ReplyType.FILE]:
+                if self.reply_type in [ReplyType.TEXT, ReplyType.NOTE, ReplyType.FILEPATH]:
                     if isinstance(answer, str):
                         is_reply_valid = True
                 elif self.reply_type == ReplyType.INTEGER:
@@ -473,7 +477,7 @@ class Query:
                 else:
                     is_reply_valid = True
 
-                if self.reply_type == ReplyType.FILE and limits is not None:
+                if self.reply_type == ReplyType.FILEPATH and limits is not None:
                     '''
                     Checks if the file exist in the directories and with the extensions specified in limits
                     '''
@@ -581,7 +585,7 @@ class Query:
         """
         if self.is_replied and self.check_reply():
             raise QueryRepliedError('this question has already been correctly answered, you don''t need to send it twice.')
-        self.check_and_pack()
+        #self.check_and_pack() I dunno if an additional checking is necessary
         self.stamp()
         self.is_sent = True
         # TODO: decide whether asking again resets the question to unreplied to (as here)
@@ -624,34 +628,30 @@ class QueryChoice(Query):
 
         super().__init__(*args, **kwargs)
 
-    def build_result(self):
 
+    def build_result(self):
+        
         result = self.get_foreword()
         result += '\n'
-        result = self.get_question()
+        result += self.get_question()
         
         # TODO: handles types other than string
-        for i, choice in enumerate(self.get_limits()): #We made sure limits is not None
-            if self.reply_type == ReplyType.NOTE:
-                if i == 0:
-                    choice_str = ' among '
-                else:
-                    choice_str = ', '
-                choice_str += str(choice)
-
-            elif self.reply_type == ReplyType.INPUTMODE:
-                if i == 0:
-                    choice_str = ' among:\n'
-                else:
-                    choice_str = str(i) + ') ' + choice.value[2] + '\n'
-
-            else:
-                choice_str = str(i) + ') ' + str(choice) + '\n'
-
-            result += choice_str
-
+        if self.reply_type == ReplyType.NOTE:
+            result += ' among: '
+        else:
+            result += ' among:\n\n'
+        
+        if self.reply_type == ReplyType.NOTE:
+            result += ', '.join(list(self.get_limits()))
+        elif self.reply_type == ReplyType.INPUTMODE:
+            choices = [str(i) + ') '+ str(choice.value[2]) for i, choice in enumerate(self.get_limits())]
+            result += '\n'.join(choices)
+        else:
+            choices = [str(i) + ') '+ str(choice) for i, choice in enumerate(self.get_limits())]
+            result += '\n'.join(choices)
+       
         result += self.get_afterword()
-
+        result += '\n'
         self.result = result
 
         return result

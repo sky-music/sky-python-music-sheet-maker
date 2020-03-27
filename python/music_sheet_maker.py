@@ -1,8 +1,8 @@
 import os, io, re
 from modes import InputMode, CSSMode, RenderMode
 from communicator import Communicator, QueriesExecutionAbort
-from parsers import SongParser
-#from songs import Song
+from songparser import SongParser
+#from song import Song
 
 
 class MusicSheetMakerError(Exception):
@@ -181,7 +181,7 @@ class MusicSheetMaker:
             (q_notes, notes) = self.ask_notes_file(recipient=recipient, prerequisites=[i_instr])
         else:
             (q_notes, notes) = self.ask_notes(recipient=recipient, prerequisites=[i_instr])
-      
+        
         (q_mode, input_mode) = self.ask_input_mode(recipient=recipient, notes=notes, prerequisites=[q_notes])
         self.get_parser().set_input_mode(input_mode)
         
@@ -191,7 +191,7 @@ class MusicSheetMaker:
         q_shift = self.communicator.send_stock_query('octave_shift', recipient=recipient)
         recipient.execute_queries(q_shift)
         octave_shift = q_shift.get_reply().get_result()
-        
+                
         # Parse song
         self.set_song(self.get_parser().parse_song(notes, song_key, octave_shift))
         (i_error, res) = self.display_error_ratio(recipient=recipient, prerequisites=[q_notes, q_mode, q_shift])
@@ -298,9 +298,8 @@ class MusicSheetMaker:
             #load file
             try:
                 with open(file_path, mode='r', encoding='utf-8', errors='ignore') as fp:
-                    lines = fp.readlines()
+                    lines = fp.readlines() #Returns a list of strings
             except (OSError, IOError) as err:
-                #print('Error opening file: ' + os.path.abspath(file_path))
                 raise err
                 
             print('(Song imported from ' + os.path.abspath(file_path) + ')')
@@ -335,8 +334,18 @@ class MusicSheetMaker:
                      
             if isfile:
                 notes = self.read_file(file_path)
-            else:
-                notes = result
+            else:             
+                notes = result.split(os.linesep)
+                
+                if self.is_commandline(recipient): #Loop to ask for several lines in the standard input interface           
+                    while result:                            
+                        q_notes = self.communicator.send_stock_query('song_notes', recipient=recipient, prerequisites=prerequisites)
+                        recipient.execute_queries(q_notes)
+                        result = q_notes.get_reply().get_result()
+                        
+                        result = result.split(os.linesep)
+                        for result in result:
+                            notes.append(result)
                     
             return (q_notes, notes)
                 
@@ -394,7 +403,7 @@ class MusicSheetMaker:
                     recipient=recipient, prerequisites=prerequisites)
             else:
                 q_key = self.communicator.send_stock_query('possible_keys', recipient=recipient, \
-                                                           foreword="\nYour song can be transposed in Sky with the following keys: " + ','.join(possible_keys), \
+                                                           foreword="\nYour song can be transposed in Sky with the following keys: " + ', '.join(possible_keys), \
                                                            limits=possible_keys, prerequisites=prerequisites)
         else:
             q_key = self.communicator.send_stock_query('recommended_key', recipient=recipient, prerequisites=prerequisites)
@@ -542,7 +551,7 @@ class MusicSheetMaker:
         #TODO: move this method in Renderer???
         if numfiles == 0:
             return None
-            
+
         file_base = os.path.join(self.song_dir_out, self.get_song().get_title())
         file_ext = render_mode.value[2]
         

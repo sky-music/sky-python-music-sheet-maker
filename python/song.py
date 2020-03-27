@@ -168,10 +168,11 @@ class Song():
             return 0
         
     def set_meta(self, **kwargs):
-            
+                
         for k in kwargs:
             try:
-                self.meta[k.lower().strip()][1] = kwargs[k]
+                if kwargs[k].lower().strip() != '':
+                    self.meta[k.lower().strip()][1] = kwargs[k]
             except KeyError:
                 pass         
        

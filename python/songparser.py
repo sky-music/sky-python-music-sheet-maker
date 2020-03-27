@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-import re, os, math
+import re, os
 from operator import truediv, itemgetter
 from modes import InputMode
 import instruments
 import noteparsers
-from songs import Song
+from song import Song
 
 class SongParserError(Exception):
     def __init__(self, explanation):
@@ -268,7 +268,10 @@ class SongParser:
         return instrument_line
 
     def parse_song(self, song_lines, song_key, octave_shift):
-
+        
+        if isinstance(song_lines,str): #Break newlines and make sure the result is a List
+            song_lines = song_lines.split(os.linesep)
+                
         english_song_key = self.english_note_name(song_key)
                 
         note_shift = self.get_note_parser().get_base_of_western_major_scale() * octave_shift

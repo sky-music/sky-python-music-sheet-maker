@@ -59,8 +59,8 @@ class CommandLinePlayer:
                 #if q.get_name() == 'original_artist': #FIXME: for debugging only
                 #    raise MusicSheetMakerAbort(q)
                 if q.get_expect_reply():                  
-                    #print('%%%DEBUG. PLAYER, YOU ARE BEING PROMPTED%%%') #FIXME: for debugging only
-                    answer = input(question + ': ')
+                    #print('%%%DEBUG. PLAYER, YOU ARE BEING PROMPTED%%%') #FIXME: for debugging only                    
+                    answer = input(question + ':')   
                     q.reply_to(answer)
                     reply_valid = q.get_reply_validity()
                 else:                  
