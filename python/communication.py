@@ -253,7 +253,10 @@ class Query:
         return self.is_replied
 
     def get_reply_validity(self):
-        return self.reply.get_validity()
+        try:
+            return self.reply.get_validity()
+        except AttributeError:
+            return None
 
     def get_is_sent(self):
         return self.is_sent
