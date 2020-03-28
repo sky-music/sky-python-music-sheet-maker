@@ -256,6 +256,12 @@ class Query:
     def get_is_replied(self):
         return self.is_replied
 
+    def get_reply_validity(self):
+        try:
+            return self.replies[-1].get_validity()
+        except (IndexError, AttributeError):
+            return None 
+
     def get_replies_validity(self):
         if len(self.get_replies()) == 0:
             return None
