@@ -90,7 +90,7 @@ class Reply:
 
     def get_validity(self):
         if self.is_valid is not True:
-            self.is_valid = self.query.check_reply(self)
+            self.is_valid = self.query.check_reply()
         return self.is_valid
 
     def build_result(self):
@@ -102,9 +102,12 @@ class Reply:
             return self.result
 
         if isinstance(self.query, QueryBoolean):
-            self.result = (self.query.get_answer_index(self) % 2 == 0)
-        elif isinstance(self.query, (QueryChoices, QuerySingleChoice)):
-            index = self.query.get_answer_index(self) #QueryChoices always have limits
+            self.result = (self.query.get_answer_index() % 2 == 0)
+        elif isinstance(self.query, QueryMultipleChoices):
+            indices = self.query.get_answer_indices() #Must be checked before QueryChoice because it is a subclass
+            self.result = [self.query.get_limits()[index] for index in indices]
+        elif isinstance(self.query, QueryChoice):
+            index = self.query.get_answer_index() #QueryChoices always have limits
             self.result = self.query.get_limits()[index]
         else:#QueryOpen
             self.result = self.answer
@@ -125,7 +128,8 @@ class Query:
         """
         The general Query class
 
-        QueryChoices is for questions where the user chooses 1 item from multiple choices
+        QueryChoice is for questions where the user chooses 1 item from multiple choices
+        QueryMultipleChoice is for questions where the user chooses several items from multiple choices
         QueryBoolean means choosing between 2 choices
         QueryOpen is for an open-ended query
         """
@@ -139,7 +143,7 @@ class Query:
         self.afterword = afterword
         self.reply_type = reply_type  # Expected type of the reply, among ReplyType
         #Repairing limits:
-        if not isinstance(limits, (list, tuple,set,type(None))):
+        if not isinstance(limits, (list,tuple,set,type(None))):
             self.limits = [limits]
         else:
             self.limits = limits # Choices, regexp...
@@ -154,7 +158,7 @@ class Query:
 
         self.valid_locutors_names = ['music-cog', 'music-sheet-maker', 'command-line', 'sky-music-website']  # A list of valid locutors for security purposes
 
-        self.replies = []  # Reply objects
+        self.reply = None  # Reply object
         self.result = None  # The full question with foreword and afterword
         self.is_sent = False  # The send() command has been called
         self.is_replied = False  # Has been assigned a Reply object
@@ -179,7 +183,7 @@ class Query:
         except (TypeError, IndexError):
             pass
         string += ', answer='
-        is_valid = self.get_replies_validity()
+        is_valid = self.get_reply_validity()
         if is_valid is True:
             string += 'valid'
         elif is_valid is None:
@@ -209,15 +213,7 @@ class Query:
         return self.result
 
     def get_reply(self):
-        try:
-            return self.replies[-1] #Returns the latest reply
-        except IndexError:
-            return None
-
-    def get_replies(self):
-        #if not isinstance(self.replies, (list, set, tuple, type(None))):
-        #    self.replies = [self.replies]
-        return self.replies
+        return self.reply #Returns the latest reply
 
     def get_foreword(self):
         if self.foreword is None:
@@ -257,16 +253,7 @@ class Query:
         return self.is_replied
 
     def get_reply_validity(self):
-        try:
-            return self.replies[-1].get_validity()
-        except (IndexError, AttributeError):
-            return None 
-
-    def get_replies_validity(self):
-        if len(self.get_replies()) == 0:
-            return None
-        else:
-            return all([reply.get_validity() for reply in self.get_replies()])
+        return self.reply.get_validity()
 
     def get_is_sent(self):
         return self.is_sent
@@ -442,65 +429,54 @@ class Query:
                 self.reply_type = ReplyType.OTHER
            
         return True     
-
-
-    def check_replies(self):
-
-        if len(self.get_replies()) == 0:
-            self.is_replied = False
-            return None
-        else:
-            return all([self.check_reply(reply) for reply in self.get_replies()])
                 
                 
-    def check_reply(self, reply=None):
-        
-        if reply is None:
-            reply = self.get_reply()
-        
-        if not isinstance(reply, Reply): #Checks first Reply of self.replies
+    def check_reply(self):
+                
+        if not isinstance(self.reply, Reply):
             
             self.is_replied = False
             return None
 
         else:
-            # TODO: add checks for testing the validity of the reply
-            # check for length, type, length
-            # Typically this method is overridden by derived classes
-            #Check whether Information with expect_reply == False must be treated separatly
-
+ 
             self.is_replied = True
             is_reply_valid = False
-            answer = reply.get_answer() #answer exists because reply is a Reply object
+            answers = self.reply.get_answer() #answer exists because reply is a Reply object
             limits = self.get_limits()
                         
-            if answer is None:
-                is_reply_valid = False
-                return is_reply_valid
+            if answers is None:
+                return False
             else:
-                
-                if not self.expect_reply:
+                               
+                if not self.expect_reply: # An answer is expected, whatever it is
                     return True
                 
+                if not isinstance(answers, list):
+                    answers = [answers]
+  
+                if any([type(answer) != type(answers[0]) for answer in answers]):
+                    return False
+                                
                 if self.reply_type in [ReplyType.TEXT, ReplyType.NOTE, ReplyType.FILEPATH]:
-                    if isinstance(answer, str):
+                    if isinstance(answers[0], str):
                         is_reply_valid = True
                 elif self.reply_type == ReplyType.INTEGER:
                     try:
-                        int(answer)
+                        int(answers[0])
                         is_reply_valid = True
                     except:
                         is_reply_valid = False
                 elif self.reply_type == ReplyType.INPUTMODE:
-                    if isinstance(answer, InputMode) or isinstance(answer, str):
+                    if isinstance(answers[0], InputMode) or isinstance(answers[0], (str,int)):
                         is_reply_valid = True
                 elif self.reply_type == ReplyType.RENDERMODES:
-                    if isinstance(answer, RenderMode) or isinstance(answer, str):
+                    if isinstance(answers[0], RenderMode) or isinstance(answers[0], (str,int)):
                         is_reply_valid = True
                 elif self.reply_type == ReplyType.BUFFERS:
-                    #FIXME: this part is buggy
+
                     try:
-                        buffers, render_modes = answer
+                        buffers, render_modes = answers[0]
                     except ValueError:
                         is_reply_valid = False
                     else:
@@ -523,18 +499,18 @@ class Query:
                     directories += ['.']
 
 
-                    if all([not os.path.isfile(os.path.normpath(os.path.join(directory, answer))) for directory in directories]) and len(directories) != 0:
+                    if all([not os.path.isfile(os.path.normpath(os.path.join(directory, answers[0]))) for directory in directories]) and len(directories) != 0:
 
                         is_reply_valid = False
                                         
-                    if all([re.search(ext,os.path.splitext(answer)[-1]) is None for ext in extensions]) and len(extensions) != 0:
+                    if all([re.search(ext,os.path.splitext(answers[0])[-1]) is None for ext in extensions]) and len(extensions) != 0:
 
                         is_reply_valid = False
                 
                 #Maybe limits is an integer range
                 if self.reply_type == ReplyType.INTEGER and limits is not None and is_reply_valid is True:
                     try:
-                        num = int(answer)
+                        num = int(answers[0])
                         low_lim = min(limits)
                         high_lim = max(limits)
                         if low_lim <= num <= high_lim:
@@ -543,7 +519,7 @@ class Query:
                             is_reply_valid = False
                     except (ValueError, TypeError):
                         pass
-        
+
         return is_reply_valid
     
 
@@ -557,7 +533,7 @@ class Query:
         elif len(pre) == 0:
             satisfied = True
         else:
-            satisfied = all([q.get_replies_validity() for q in pre])
+            satisfied = all([q.get_reply_validity() for q in pre])
 
         return satisfied
     
@@ -624,7 +600,7 @@ class Query:
         Querying is a protocol during which you first check that you are allowed to speak, that
         there is someone to listen, that your question is meaningful (or allowed) and then you can send your query
         """
-        if self.is_replied and self.check_replies():
+        if self.is_replied and self.get_reply_validity():
             raise QueryRepliedError('this question has already been correctly answered, you don''t need to send it twice.')
         #self.check_and_pack() I dunno if an additional checking is necessary
         self.stamp()
@@ -647,20 +623,20 @@ class Query:
         Caution: lists, tuples and sets are considered as a single object
         """       
         reply = Reply(self, answer)
-        self.replies.append(reply)
+        self.reply = reply
         reply.build_result()
         reply.get_validity()
         pre_satisfied = self.check_prerequisites()
         if not pre_satisfied:
             raise InvalidReplyError('This Query requires other queries to be satisfied first.')
-        # TODO: decide if is_replied must be set to False of the reply is invalid.
+        # TODO: decide if is_replied must be set to False if the reply is invalid.
         return reply
 
 
-class QueryChoices(Query):
+class QueryChoice(Query):
     """
     Query with multiple choices, defined in self.limits
-    A QueryChoices accepts several answers. It is up to the user to handle one or several.
+    A QueryChoice accepts several answers. It is up to the user to handle one or several.
     """
 
     def __init__(self, *args, **kwargs):
@@ -668,7 +644,7 @@ class QueryChoices(Query):
         try:
             kwargs['limits'][0]
         except (TypeError, IndexError, KeyError):
-            raise InvalidQueryError('QueryChoices called with no choices')
+            raise InvalidQueryError('QueryChoice called with no choices')
 
         super().__init__(*args, **kwargs)
 
@@ -681,7 +657,7 @@ class QueryChoices(Query):
         if self.reply_type == ReplyType.NOTE:
             result[-1] += ' among ' + ', '.join(list(self.get_limits()))
         elif self.reply_type in [ReplyType.INPUTMODE, ReplyType.RENDERMODES]:
-            choices = [str(i) + ') '+ str(choice.value[2]) for i, choice in enumerate(self.get_limits())]
+            choices = [str(i) + ') '+ str(choice.value[1]) for i, choice in enumerate(self.get_limits())]
             result[-1] += ' among:\n\n' + '\n'.join(choices)
         else:
             choices = [str(i) + ') '+ str(choice) for i, choice in enumerate(self.get_limits())]
@@ -694,41 +670,28 @@ class QueryChoices(Query):
         return self.result
 
 
-    def check_reply(self, reply=None):
+    def check_reply(self):
 
-        if reply is None:
-            reply = self.get_reply()
-        
         # Performs basic checking against ReplyType
-        is_reply_valid = super().check_reply(reply)
+        is_reply_valid = super().check_reply()
 
         if is_reply_valid is not True:
             return is_reply_valid
         else:
-            if len(self.get_answer_indices()) == 0: #answer exists otherwise is_reply_valid would be false
+            if self.get_answer_index() is None: #answer exists otherwise is_reply_valid would be false
                 is_reply_valid = False
             
             return is_reply_valid
-     
-
-    def get_answer_indices(self):
-        """
-        Returns the index of the answer among choices, for QueryChoices and QueryBoolean
-        """
-
-        return list(filter(lambda x: x is not None,[self.get_answer_index(reply) for reply in self.get_replies()]))
-
-
-    def get_answer_index(self, reply=None):
-
-        """
-        Returns the index of the answer among choices, for QueryChoices and QueryBoolean
-        """
         
-        if reply is None:
-            reply = self.get_reply()          
-            
-        answer = reply.get_answer()
+
+    def get_answer_index(self, answer=None):
+
+        """
+        Returns the index of the answer among choices, for QueryChoice and QueryBoolean
+        """
+        if answer is None:
+            answer = self.reply.get_answer()
+        
         choices = self.get_limits()  #limits cannot be None in QueryChoices, we made sure of that
 
         if isinstance(answer, str):
@@ -749,45 +712,57 @@ class QueryChoices(Query):
         return index
 
 
-    def reply_to(self, answers):
-        """
-        Assigns a list or set of Replies to the Query
-        Caution: tuples are considered as a single object
-        """
-        
-        if isinstance(answers, str):
-            answers = list(filter(None,re.split(r' |,|;', answers)))
-            if answers == []:
-                answers = ['']
-        elif not isinstance(answers, (list, set)):
-            answers = [answers]
-        
-        for answer in answers:
-            super().reply_to(answer)
 
-
-class QuerySingleChoice(QueryChoices):
+class QueryMultipleChoices(QueryChoice):
     """
-    Query with a single choice, defined in self.limits
-    A QuerySingleChoice accepts only one answer.
+    Query with several choices, defined in self.limits
+    A QueryMultipleChoice accepts several answers.
     """
 
     def __init__(self, *args, **kwargs):
 
         super().__init__(*args, **kwargs)
+ 
 
+    def check_reply(self):
+
+        # Performs basic checking against ReplyType
+        is_reply_valid = Query.check_reply(self)
+
+        if is_reply_valid is not True:
+            return is_reply_valid
+        else:
+            indices = self.get_answer_indices()
+            print('%%%DEBUG')
+            print(indices)
+            if any([index is None for index in indices]):#also return False if indices is empty
+                is_reply_valid = False
+            
+            return is_reply_valid
+       
 
     def reply_to(self, answer):
         """
-        Assigns a single reply to the Query
+        Assigns a Reply to the Query
         Caution: tuples are considered as a single object
         """
-        if isinstance(answer, list):
-            answer = answer[-1]
-        super().reply_to(answer)
+        
+        if isinstance(answer, str):
+            answers = list(filter(None,re.split(r' |,|;', answer)))
+            if answers == []:
+                answers = ['']
+        elif not isinstance(answer, list):
+            answers = [answer] #maybe the user has selected only 1 choice
+        
+        super().reply_to(answers)
 
 
-class QueryBoolean(QueryChoices):
+    def get_answer_indices(self):
+        
+        return [QueryChoice.get_answer_index(self,answer) for answer in self.reply.get_answer()]
+
+
+class QueryBoolean(QueryChoice):
     """
     A yes/no, true/false question type
     """
@@ -826,18 +801,15 @@ class QueryOpen(Query):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def check_reply(self, reply=None):
-
-        if reply is None:
-            reply = self.get_reply()
+    def check_reply(self):
         
-        is_reply_valid = super().check_reply(reply)
+        is_reply_valid = super().check_reply()
 
         if is_reply_valid is False:
             return is_reply_valid
         else:
             limits = self.get_limits()
-            answer = reply.get_answer() #answer exists otherwise is_reply_valid would be false
+            answer = self.reply.get_answer() #answer exists otherwise is_reply_valid would be false
             
             if limits is not None: 
                 if len(limits) == 1 and self.reply_type == ReplyType.TEXT:
@@ -877,11 +849,9 @@ class QueryMemory:
             'replied': lambda q: q.get_is_replied(),
             'sent': lambda q: q.get_is_sent(),
             'unreplied': lambda q: not q.get_is_replied(),
-            'replied_once': lambda q: len(q.get_replies()) == 1,
-            'replied_several': lambda q: len(q.get_replies()) > 1,
             'unsent': lambda q: not q.get_is_sent(),
-            'valid_reply': lambda q: q.get_replies_validity(), 'invalid_reply': lambda q: not q.get_replies_validity(),
-            'unsatisfied': lambda q: not q.get_is_replied() or not q.get_replies_validity(),
+            'valid_reply': lambda q: q.get_reply_validity(), 'invalid_reply': lambda q: not q.get_reply_validity(),
+            'unsatisfied': lambda q: not q.get_is_replied() or not q.get_reply_validity(),
             'from_me': lambda q: q.get_sender() == self.owner,
             'to_me': lambda q: q.get_recipient() == self.owner,
             'information': lambda q: not q.expect_reply(),
@@ -1053,18 +1023,17 @@ class QueryMemory:
     
     def recall_by_invalid_reply(self, filters=None):
         q_replied = self.recall_replied(filters=filters)
-        return [q for q in q_replied if not q.get_replies_validity()]
+        return [q for q in q_replied if not q.get_reply_validity()]
     
 
     def recall_unsatisfied(self, filters=None):
         queries = self.recall_filtered(filters)
-        return [q for q in queries if (not q.get_is_replied() or not q.get_replies_validity())]
+        return [q for q in queries if (not q.get_is_replied() or not q.get_reply_validity())]
     
 
     def recall_repeated(self, filters=None):
         """
         Recall queries that have been stored twice or more
-        TODO: decide if we check for is_sent
         """
         queries = self.recall_filtered(filters)
 

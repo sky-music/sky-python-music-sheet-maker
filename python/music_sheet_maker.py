@@ -109,9 +109,9 @@ class MusicSheetMaker:
         The query statisfaction loop:
         runs until all queries are satisfied
         """
-        replies_valid = False
-        while not replies_valid:
-            replies_valid = True #To break the loop if no query
+        reply_valid = False
+        while not reply_valid:
+            reply_valid = True #To break the loop if no query
             for q in queries:
                 #Fetching the stock Query name and arguments 
                 query_name = q.get_name()
@@ -125,13 +125,9 @@ class MusicSheetMaker:
                     pass
                 #Actual evaluation of the stock query
                 try:
-                    answers = eval(expression)
-                    if isinstance(answers, list):
-                        for answer in answers:
-                            q.reply_to(answer)
-                    else:
-                        q.reply_to(answers)
-                    replies_valid = q.get_replies_validity()
+                    answer = eval(expression)
+                    q.reply_to(answer)
+                    reply_valid = q.get_reply_validity()
                     
                 except QueriesExecutionAbort as qExecAbort:
                     raise qExecAbort
@@ -140,7 +136,7 @@ class MusicSheetMaker:
     def create_song(self, **kwargs):
         """
         A very linear, sequential way of building a song from user inputs
-        Returns a tuple (buffers, types) where buffers is a list of IOString/IOBytes buffers, and types the list of their types
+        Returns a list of tuples (buffers, types) where buffers is a list of IOString/IOBytes buffers, and types the list of their types
         """
         try:
             recipient = kwargs['sender']
@@ -377,7 +373,7 @@ class MusicSheetMaker:
         
         if execute:
             recipient.execute_queries(q_render) 
-            result = [reply.get_result() for reply in q_render.get_replies()]
+            result = q_render.get_reply() #TODO: parse several choices
             return (q_render, result)
         else:
             return (q_render, None)

@@ -53,21 +53,21 @@ class CommandLinePlayer:
         """
         for q in queries:
             question = self.communicator.query_to_stdout(q)
-            replies_valid = False
-            while not replies_valid:
-                replies_valid = True #to be sure to break the loop
+            reply_valid = False
+            while not reply_valid:
+                reply_valid = True #to be sure to break the loop
                 #if q.get_name() == 'original_artist': #FIXME: for debugging only
                 #    raise MusicSheetMakerAbort(q)
                 if q.get_expect_reply():                  
                     #print('%%%DEBUG. PLAYER, YOU ARE BEING PROMPTED%%%') #FIXME: for debugging only                    
                     answer = input(question + ': ')   
                     q.reply_to(answer)
-                    replies_valid = q.get_replies_validity()
+                    reply_valid = q.get_reply_validity()
                 else:                  
                     #print('%%%DEBUG. PLAYER, YOU ARE BEING TOLD%%%') #FIXME: for debugging only
                     print(question)
                     q.reply_to('ok')
-                    replies_valid = q.get_replies_validity()
+                    reply_valid = q.get_reply_validity()
 
 
 try:

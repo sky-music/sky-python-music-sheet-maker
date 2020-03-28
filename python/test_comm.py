@@ -1,6 +1,6 @@
 #import os
 from modes import InputMode, ReplyType
-from communication import QueryOpen, QueryChoices, QuerySingleChoice, QueryBoolean, QueryMemory
+from communication import QueryOpen, QueryChoice, QueryMultipleChoices, QueryBoolean, QueryMemory
 
 # song_dir_in = 'test_songs'
 # song_dir_out = 'songs_out'
@@ -72,10 +72,10 @@ brain.store(q_boolean3)
 #q_boolean3.send()
 
 
-print('\n\n####Testing QueryChoices####\n')
+print('\n\n####Testing QueryChoice####\n')
 
 modes_list = [InputMode.JIANPU, InputMode.SKY]
-q_choice = QueryChoices(sender='music-cog', recipient='music-sheet-maker', question="Mode (1-" + str(len(modes_list)) + "): ",
+q_choice = QueryChoice(sender='music-cog', recipient='music-sheet-maker', question="Mode (1-" + str(len(modes_list)) + "): ",
                        foreword="Please choose your note format:\n", afterword=None, reply_type=ReplyType.INPUTMODE,
                        limits=modes_list)
 brain.store(q_choice)
@@ -103,7 +103,7 @@ print('\nUnreplied queries:\n')
 for q in brain.recall_unreplied():
     print(q)
 
-print('\n\nQueries with invalid replies:\n')
+print('\n\nQueries with invalid reply:\n')
 for q in brain.recall_by_invalid_reply():
     print(q)
     print(q.get_reply())

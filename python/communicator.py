@@ -1,5 +1,5 @@
 from modes import InputMode, ReplyType
-from communication import QueryOpen, QueryChoices, QuerySingleChoice, QueryBoolean, QueryMemory, Information
+from communication import QueryOpen, QueryChoice, QueryMultipleChoices, QueryBoolean, QueryMemory, Information
 import io
 
 """
@@ -98,7 +98,7 @@ class Communicator:
                              'question': '',
                              'afterword': ''},
 
-            'render_modes': {'class': QuerySingleChoice.__name__,
+            'render_modes': {'class': QueryMultipleChoices.__name__,
                              'handler': 'None',
                              'foreword': '',
                              'question': 'Please choose one or several output rendering formats',
@@ -138,14 +138,14 @@ class Communicator:
                              'reply_type': ReplyType.TEXT,
                              'limits': None},
                             
-            'musical_notation': {'class': QuerySingleChoice.__name__,
+            'musical_notation': {'class': QueryChoice.__name__,
                              'handler': 'None',
                              'foreword': 'Several possible notations detected.',
                              'question': 'Please choose your note format',
                              'reply_type': ReplyType.INPUTMODE,
                              'limits': []},
                             
-            'possible_keys': {'class': QuerySingleChoice.__name__,
+            'possible_keys': {'class': QueryChoice.__name__,
                              'handler': 'None',
                              'question': 'Please choose your musical key',
                              'reply_type': ReplyType.NOTE,
@@ -202,7 +202,7 @@ class Communicator:
         method_args.update(kwargs) #Merge tuples to override default parameters with optional keyword arguments
 
         #query_object = getattr(communication, stock_query['class'])  # in case we only import communication
-        query_object = eval(stock_query['class']) #supposes we have imported QuerySingleChoice, QueryOpen, QueryBoolean, Information, etc
+        query_object = eval(stock_query['class']) #supposes we have imported QueryChoice, QueryOpen, QueryBoolean, Information, etc
 
         q = query_object(**method_args) #Creates the Query
         self.memory.store(q)
@@ -231,28 +231,37 @@ class Communicator:
     
     def reply_to_website_result(self, reply):
         
-        (buffers, render_modes) = reply.get_result() #Should be a list of IOString or IOBytes buffers and a list of RenderModes
+        results = reply.get_result() #Should be a list of IOString or IOBytes buffers and a list of RenderModes
         
-        try:
-            buffers[0]
-        except (TypeError, KeyError):
-            raise CommunicatorError('Result is not a list: ' + str(type(buffers)))
-        else:
-            if isinstance(buffers[0],io.BytesIO):
-                return {
-                        'result': {'result_type': type(buffers[0])},
-                        'song_images': [{'image_type': render_modes[i].value[1], 'number': i, 'base_name': 'image_'} for i, buffer in enumerate(buffers)],
-                        'save': [{'name': 'image_'+str(i), 'buffer': buffer} for i, buffer in enumerate(buffers)]
-                        }
-            elif isinstance(buffers[0],io.StringIO):
-                return {
-                        'result': {'result_type': type(buffers[0])},
-                        'song_files': [{'file_type': render_modes[i].value[1], 'number': i, 'base_name': 'file_'} for i, buffer in enumerate(buffers)],
-                        'save': [{'name': 'file_'+str(i), 'buffer': buffer} for i, buffer in enumerate(buffers)]
-                        }
+        if not isinstance (results, list):
+            results = [results]
+        
+        dict_list = []
+        
+        for (buffers, render_modes) in results:
+                    
+            try:
+                buffers[0]
+            except (TypeError, KeyError):
+                raise CommunicatorError('Song buffers are not wrapped in a list, but a single object of type ' + str(type(buffers)))
             else:
-                raise CommunicatorError('Cannot process ' + str(type(buffers)))
-            
+                if isinstance(buffers[0],io.BytesIO):
+                    dict_list.append({
+                            'result': {'result_type': type(buffers[0])},
+                            'song_images': [{'image_type': render_modes[i].value[1], 'number': i, 'base_name': 'image_'} for i, buffer in enumerate(buffers)],
+                            'save': [{'name': 'image_'+str(i), 'buffer': buffer} for i, buffer in enumerate(buffers)]
+                            })
+                elif isinstance(buffers[0],io.StringIO):
+                    dict_list.append({
+                            'result': {'result_type': type(buffers[0])},
+                            'song_files': [{'file_type': render_modes[i].value[1], 'number': i, 'base_name': 'file_'} for i, buffer in enumerate(buffers)],
+                            'save': [{'name': 'file_'+str(i), 'buffer': buffer} for i, buffer in enumerate(buffers)]
+                            })
+                else:
+                    raise CommunicatorError('Cannot process ' + str(type(buffers)))
+      
+        return dict_list
+        
 
     def queries_to_website_questions(self, queries):
         '''
@@ -269,7 +278,7 @@ class Communicator:
             
             
             #Question keyword arguments dictionary
-            if isinstance(query, QuerySingleChoice):
+            if isinstance(query, QueryChoice):
                 multiple_answers = True
             else:
                 multiple_answers = False
@@ -278,7 +287,7 @@ class Communicator:
                              'expect_answer': query.get_expect_reply(), 'multiple_answers': multiple_answers}
             
             #Choices keyword arguments dictionary
-            if isinstance(query, (QuerySingleChoice, QueryChoices)):
+            if isinstance(query, (QueryMultipleChoices, QueryChoice)):
                 if isinstance(limits[0], InputMode):
                     choices_dicts = [{'number': int(limit.value[1]), 'text': str(limit.value[2])} for i, limit in enumerate(limits)]
                 else:
