@@ -6,7 +6,7 @@ import re
 from modes import InputMode, RenderMode, CSSMode, ResponseMode
 from songparser import SongParser
 from song import Song
-from communication import Query, QueryChoice, QueryOpen
+from communication import Query, QueryChoices, QueryOpen
 
 
 class Responder:
@@ -98,7 +98,7 @@ class Responder:
 
     def create_query_mode(self, modes_list):
 
-        query_mode = QueryChoice(sender=self, recipient=None, question="Mode (1-" + str(len(modes_list)) + "): ",
+        query_mode = QueryChoices(sender=self, recipient=None, question="Mode (1-" + str(len(modes_list)) + "): ",
                                  foreword="Please choose your note format:\n", afterword="None", choices=modes_list)
 
         return query_mode

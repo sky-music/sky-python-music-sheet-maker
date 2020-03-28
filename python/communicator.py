@@ -1,5 +1,5 @@
 from modes import InputMode, ReplyType
-from communication import QueryOpen, QueryChoice, QueryBoolean, QueryMemory, Information
+from communication import QueryOpen, QueryChoices, QuerySingleChoice, QueryBoolean, QueryMemory, Information
 import io
 
 """
@@ -98,7 +98,7 @@ class Communicator:
                              'question': '',
                              'afterword': ''},
 
-            'render_modes': {'class': QueryChoice.__name__,
+            'render_modes': {'class': QuerySingleChoice.__name__,
                              'handler': 'None',
                              'foreword': '',
                              'question': 'Please choose one or several output rendering formats',
@@ -138,14 +138,14 @@ class Communicator:
                              'reply_type': ReplyType.TEXT,
                              'limits': None},
                             
-            'musical_notation': {'class': QueryChoice.__name__,
+            'musical_notation': {'class': QuerySingleChoice.__name__,
                              'handler': 'None',
                              'foreword': 'Several possible notations detected.',
                              'question': 'Please choose your note format',
                              'reply_type': ReplyType.INPUTMODE,
                              'limits': []},
                             
-            'possible_keys': {'class': QueryChoice.__name__,
+            'possible_keys': {'class': QuerySingleChoice.__name__,
                              'handler': 'None',
                              'question': 'Please choose your musical key',
                              'reply_type': ReplyType.NOTE,
@@ -202,8 +202,7 @@ class Communicator:
         method_args.update(kwargs) #Merge tuples to override default parameters with optional keyword arguments
 
         #query_object = getattr(communication, stock_query['class'])  # in case we only import communication
-        query_object = eval(stock_query['class']) #supposes we have imported QueryChoice, QueryOpen, QueryBoolean, Information, etc
-
+        query_object = eval(stock_query['class']) #supposes we have imported QuerySingleChoice, QueryOpen, QueryBoolean, Information, etc
 
         q = query_object(**method_args) #Creates the Query
         self.memory.store(q)
@@ -268,7 +267,18 @@ class Communicator:
         for query in queries:
             limits = query.get_limits()
             
-            if isinstance(query, QueryChoice):
+            
+            #Question keyword arguments dictionary
+            if isinstance(query, QuerySingleChoice):
+                multiple_answers = True
+            else:
+                multiple_answers = False
+            
+            question_dict = {'text': query.get_foreword()+'\n'+query.get_question(), 'identifier': query.get_identifier(), \
+                             'expect_answer': query.get_expect_reply(), 'multiple_answers': multiple_answers}
+            
+            #Choices keyword arguments dictionary
+            if isinstance(query, (QuerySingleChoice, QueryChoices)):
                 if isinstance(limits[0], InputMode):
                     choices_dicts = [{'number': int(limit.value[1]), 'text': str(limit.value[2])} for i, limit in enumerate(limits)]
                 else:
@@ -276,6 +286,7 @@ class Communicator:
             else:
                     choices_dicts = []
             
+            #Answer keyword arguments dictionary
             try:
                 answer_text = query.get_reply().get_answer()
                 if answer_text is None:
@@ -288,13 +299,10 @@ class Communicator:
             else:
                 answer_dict = {'answer_length': 'short', 'long_text': '', 'short_text': str(answer_text)}
         
-            queries_kwargs += [{'question': {'text': query.get_foreword()+'\n'+query.get_question(),
-                              'identifier': query.get_identifier(), 'expect_answer': query.get_expect_reply()},
-                'choices': choices_dicts,
-                'answer': answer_dict
-                }]
+            # Dictionary or dictionaries
+            queries_kwargs += [{'question': question_dict, 'choices': choices_dicts, 'answer': answer_dict}]
         
-        return queries_kwargs
+        return queries_kwargs #List of queries dictionaries
             
 
     def query_to_discord(self, query):
@@ -321,3 +329,4 @@ class Communicator:
         i.send(recipient=recipient)
         return i
     
+

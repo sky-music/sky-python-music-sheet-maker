@@ -103,8 +103,8 @@ class Reply:
 
         if isinstance(self.query, QueryBoolean):
             self.result = (self.query.get_answer_index(self) % 2 == 0)
-        elif isinstance(self.query, QueryChoice):
-            index = self.query.get_answer_index(self) #QueryChoice always have limits
+        elif isinstance(self.query, (QueryChoices, QuerySingleChoice)):
+            index = self.query.get_answer_index(self) #QueryChoices always have limits
             self.result = self.query.get_limits()[index]
         else:#QueryOpen
             self.result = self.answer
@@ -125,7 +125,7 @@ class Query:
         """
         The general Query class
 
-        QueryChoice is for questions where the user chooses 1 item from multiple choices
+        QueryChoices is for questions where the user chooses 1 item from multiple choices
         QueryBoolean means choosing between 2 choices
         QueryOpen is for an open-ended query
         """
@@ -657,10 +657,10 @@ class Query:
         return reply
 
 
-class QueryChoice(Query):
+class QueryChoices(Query):
     """
     Query with multiple choices, defined in self.limits
-    A QueryChoice accepets several answers. It is up to the user to handle one or several.
+    A QueryChoices accepts several answers. It is up to the user to handle one or several.
     """
 
     def __init__(self, *args, **kwargs):
@@ -668,7 +668,7 @@ class QueryChoice(Query):
         try:
             kwargs['limits'][0]
         except (TypeError, IndexError, KeyError):
-            raise InvalidQueryError('QueryChoice called with no choices')
+            raise InvalidQueryError('QueryChoices called with no choices')
 
         super().__init__(*args, **kwargs)
 
@@ -707,29 +707,29 @@ class QueryChoice(Query):
         else:
             if len(self.get_answer_indices()) == 0: #answer exists otherwise is_reply_valid would be false
                 is_reply_valid = False
-    
+            
             return is_reply_valid
      
 
     def get_answer_indices(self):
         """
-        Returns the index of the answer among choices, for QueryChoice and QueryBoolean
+        Returns the index of the answer among choices, for QueryChoices and QueryBoolean
         """
 
-        return [self.get_answer_index(reply) for reply in self.get_replies()]
+        return list(filter(lambda x: x is not None,[self.get_answer_index(reply) for reply in self.get_replies()]))
 
 
     def get_answer_index(self, reply=None):
 
         """
-        Returns the index of the answer among choices, for QueryChoice and QueryBoolean
+        Returns the index of the answer among choices, for QueryChoices and QueryBoolean
         """
         
         if reply is None:
             reply = self.get_reply()          
             
         answer = reply.get_answer()
-        choices = self.get_limits()  #limits cannot be None in QueryChoice, we made sure of that
+        choices = self.get_limits()  #limits cannot be None in QueryChoices, we made sure of that
 
         if isinstance(answer, str):
             answer = answer.lower().strip()
@@ -766,7 +766,28 @@ class QueryChoice(Query):
             super().reply_to(answer)
 
 
-class QueryBoolean(QueryChoice):
+class QuerySingleChoice(QueryChoices):
+    """
+    Query with a single choice, defined in self.limits
+    A QuerySingleChoice accepts only one answer.
+    """
+
+    def __init__(self, *args, **kwargs):
+
+        super().__init__(*args, **kwargs)
+
+
+    def reply_to(self, answer):
+        """
+        Assigns a single reply to the Query
+        Caution: tuples are considered as a single object
+        """
+        if isinstance(answer, list):
+            answer = answer[-1]
+        super().reply_to(answer)
+
+
+class QueryBoolean(QueryChoices):
     """
     A yes/no, true/false question type
     """
@@ -1187,3 +1208,5 @@ class QueryMemory:
         else:
             raise QueryMemoryError('Topological sort has failed at i=' + str(i))
             return None
+
+

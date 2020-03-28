@@ -1,6 +1,6 @@
 #import os
 from modes import InputMode, ReplyType
-from communication import QueryOpen, QueryChoice, QueryBoolean, QueryMemory
+from communication import QueryOpen, QueryChoices, QuerySingleChoice, QueryBoolean, QueryMemory
 
 # song_dir_in = 'test_songs'
 # song_dir_out = 'songs_out'
@@ -72,10 +72,10 @@ brain.store(q_boolean3)
 #q_boolean3.send()
 
 
-print('\n\n####Testing QueryChoice####\n')
+print('\n\n####Testing QueryChoices####\n')
 
 modes_list = [InputMode.JIANPU, InputMode.SKY]
-q_choice = QueryChoice(sender='music-cog', recipient='music-sheet-maker', question="Mode (1-" + str(len(modes_list)) + "): ",
+q_choice = QueryChoices(sender='music-cog', recipient='music-sheet-maker', question="Mode (1-" + str(len(modes_list)) + "): ",
                        foreword="Please choose your note format:\n", afterword=None, reply_type=ReplyType.INPUTMODE,
                        limits=modes_list)
 brain.store(q_choice)
