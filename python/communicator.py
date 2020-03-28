@@ -289,7 +289,7 @@ class Communicator:
             #Choices keyword arguments dictionary
             if isinstance(query, (QueryMultipleChoices, QueryChoice)):
                 if isinstance(limits[0], InputMode):
-                    choices_dicts = [{'number': int(limit.value[1]), 'text': str(limit.value[2])} for i, limit in enumerate(limits)]
+                    choices_dicts = [{'number': int(limit.value[0]), 'text': str(limit.value[1])} for i, limit in enumerate(limits)]
                 else:
                     choices_dicts = [{'number': i, 'text': str(limit)} for i, limit in enumerate(limits)]
             else:
