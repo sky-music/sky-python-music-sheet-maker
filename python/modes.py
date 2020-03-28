@@ -48,6 +48,7 @@ class ReplyType(Enum):
     INTEGER = 2 #int
     NOTE = 3 #str, with possible additional checks
     INPUTMODE = 4 #modes.InputMode
-    FILEPATH = 5 #A file path
-    BUFFERS = 6
-    OTHER = 7
+    RENDERMODES = 5
+    FILEPATH = 6 #A file path
+    BUFFERS = 7
+    OTHER = 8

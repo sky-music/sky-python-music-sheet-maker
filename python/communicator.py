@@ -1,4 +1,4 @@
-from modes import InputMode, ReplyType, RenderMode
+from modes import InputMode, ReplyType
 from communication import QueryOpen, QueryChoice, QueryBoolean, QueryMemory, Information
 import io
 
@@ -37,7 +37,7 @@ class QueriesExecutionAbort(Exception):
     A special exception to abort execution of queries in execute_queries (and create_song)
     '''
     def __init__(self, queries, explanations=None):
-        if not isinstance(queries, (list, tuple, set)):
+        if not isinstance(queries, (list, set)):
             queries = [queries]
         self.queries = queries
         self.explanations = explanations
@@ -97,6 +97,13 @@ class Communicator:
                              'foreword': '',
                              'question': '',
                              'afterword': ''},
+
+            'render_modes': {'class': QueryChoice.__name__,
+                             'handler': 'None',
+                             'foreword': '',
+                             'question': 'Please choose one or several output rendering formats',
+                             'reply_type': ReplyType.RENDERMODES,
+                             'limits': []},
                             
             'song_title': {'class': QueryOpen.__name__,
                              'handler': 'None',
@@ -133,7 +140,7 @@ class Communicator:
                             
             'musical_notation': {'class': QueryChoice.__name__,
                              'handler': 'None',
-                             'foreword': '\nSeveral possible notations detected.',
+                             'foreword': 'Several possible notations detected.',
                              'question': 'Please choose your note format',
                              'reply_type': ReplyType.INPUTMODE,
                              'limits': []},
@@ -207,7 +214,7 @@ class Communicator:
 
     def receive(self, queries):
 
-        if not isinstance(queries, (list, tuple)):
+        if not isinstance(queries, list):
             queries = [queries]
 
         for q in queries:
@@ -225,9 +232,6 @@ class Communicator:
     
     def reply_to_website_result(self, reply):
         
-        print('%%%DEBUG%%%')
-        print(repr(reply))
-        print(reply.get_result())
         (buffers, render_modes) = reply.get_result() #Should be a list of IOString or IOBytes buffers and a list of RenderModes
         
         try:
@@ -236,24 +240,27 @@ class Communicator:
             raise CommunicatorError('Result is not a list: ' + str(type(buffers)))
         else:
             if isinstance(buffers[0],io.BytesIO):
-                pass
+                return {
+                        'result': {'result_type': type(buffers[0])},
+                        'song_images': [{'image_type': render_modes[i].value[1], 'number': i, 'base_name': 'image_'} for i, buffer in enumerate(buffers)],
+                        'save': [{'name': 'image_'+str(i), 'buffer': buffer} for i, buffer in enumerate(buffers)]
+                        }
             elif isinstance(buffers[0],io.StringIO):
-                raise CommunicatorError('Cannot process string buffers yet')
-            else:
+                return {
+                        'result': {'result_type': type(buffers[0])},
+                        'song_files': [{'file_type': render_modes[i].value[1], 'number': i, 'base_name': 'file_'} for i, buffer in enumerate(buffers)],
+                        'save': [{'name': 'file_'+str(i), 'buffer': buffer} for i, buffer in enumerate(buffers)]
+                        }
+             else:
                 raise CommunicatorError('Cannot process ' + str(type(buffers)))
             
-        return {'result': {'result_type': type(buffers[0])},
-                'images': [{'image_type': render_modes[i].value[1], 'number': i, 'base_name': 'image_'} for i, buffer in enumerate(buffers)],
-                'save': [{'name': 'image_'+str(i), 'buffer': buffer} for i, buffer in enumerate(buffers)]
-                }
-
 
     def queries_to_website_questions(self, queries):
         '''
         Returns a dictionary of arguments to be used to create Question, Choices
         by the web app music_maker in sky-music-website-project
         '''        
-        if not isinstance(queries, (list, tuple, set)):
+        if not isinstance(queries, (list, set)):
             queries = [queries]
         
         queries_kwargs = []

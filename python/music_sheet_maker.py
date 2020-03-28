@@ -99,7 +99,7 @@ class MusicSheetMaker:
             self.communicator.memory.clean()
             queries = self.communicator.memory.recall_unsatisfied(filters=('to_me'))
         else:
-            if not isinstance(queries, (list, tuple, set)):
+            if not isinstance(queries, (list, set)):
                 queries = [queries]
         #FIXME: 2 lines for debugging:
         #print('\n%%%%I AM MAKER, THE UNSATISFIED QUERIES ARE:%%%%')
@@ -109,9 +109,9 @@ class MusicSheetMaker:
         The query statisfaction loop:
         runs until all queries are satisfied
         """
-        reply_valid = False
-        while not reply_valid:
-            reply_valid = True #To break the loop if no query
+        replies_valid = False
+        while not replies_valid:
+            replies_valid = True #To break the loop if no query
             for q in queries:
                 #Fetching the stock Query name and arguments 
                 query_name = q.get_name()
@@ -125,9 +125,13 @@ class MusicSheetMaker:
                     pass
                 #Actual evaluation of the stock query
                 try:
-                    answer = eval(expression) 
-                    q.reply_to(answer)
-                    reply_valid = q.get_reply_validity()
+                    answers = eval(expression)
+                    if isinstance(answers, list):
+                        for answer in answers:
+                            q.reply_to(answer)
+                    else:
+                        q.reply_to(answers)
+                    replies_valid = q.get_replies_validity()
                     
                 except QueriesExecutionAbort as qExecAbort:
                     raise qExecAbort
@@ -136,8 +140,7 @@ class MusicSheetMaker:
     def create_song(self, **kwargs):
         """
         A very linear, sequential way of building a song from user inputs
-        TODO: Systematically pass pre-requisites queries in arguments
-        TODO: implement nonlinear parsing using prerequisites?
+        Returns a tuple (buffers, types) where buffers is a list of IOString/IOBytes buffers, and types the list of their types
         """
         try:
             recipient = kwargs['sender']
@@ -173,6 +176,10 @@ class MusicSheetMaker:
         # Display instructions
         i_instr, res = self.ask_instructions(recipient=recipient)
     
+        #TODO: enable this fior website only
+        #if self.is_website(recipient):
+        q_render, website_render_modes = self.ask_render_modes(recipient=recipient)
+    
         # Ask for notes
         #TODO: allow the player to enter the notes using several messages??? or maybe not
         if self.is_botcog(recipient):
@@ -200,24 +207,32 @@ class MusicSheetMaker:
         (q_meta, (title, artist, transcript)) = self.ask_song_metadata(recipient=recipient)
         self.get_song().set_meta(title=title, artist=artist, transcript=transcript, song_key=song_key)
 
+
         if self.is_botcog(recipient) or self.is_website(recipient):
             
             self.css_mode = CSSMode.EMBED #Prevent the HTML/SVG from depending on an auxiliary .css file
             buffers = self.write_song_to_buffers(self.discord_render_mode)
             answer = (buffers, [self.discord_render_mode]*len(buffers))
         
+        elif self.is_website(recipient):
+            
+            self.css_mode = CSSMode.EMBED #Prevent the HTML/SVG from depending on an auxiliary .css file
+            
+            answer = []
+            for render_mode in website_render_modes:                
+                buffers = self.write_song_to_buffers(render_mode)
+                answer.append((buffers, [self.discord_render_mode]*len(buffers)))            
+        
         else: #command line
             
             print("="*40)
-            all_paths = []
             
+            answer = []
             for render_mode in self.get_render_modes_enabled():
                 buffers = self.write_song_to_buffers(render_mode)
                 file_paths = self.build_file_paths(render_mode, len(buffers))              
                 self.send_buffers_to_files(render_mode, buffers, file_paths, recipient=recipient, prerequisites=[i_error])
-                all_paths += file_paths
-            
-            answer = (buffers, self.get_render_modes_enabled())
+                answer.append((buffers, [render_mode]*len(buffers)))
                 
         return answer
     
@@ -350,6 +365,24 @@ class MusicSheetMaker:
             return (q_notes, notes)
                 
 
+    def ask_render_modes(self, recipient, prerequisites=None, execute=True):
+        """
+        
+        """
+        
+        render_modes = self.render_modes_enabled
+
+        if len(render_modes) > 1:
+            q_render = self.communicator.send_stock_query('render_modes', recipient=recipient, limits=render_modes, prerequisites=prerequisites)
+        
+        if execute:
+            recipient.execute_queries(q_render) 
+            result = [reply.get_result() for reply in q_render.get_replies()]
+            return (q_render, result)
+        else:
+            return (q_render, None)
+
+
     def ask_input_mode(self, recipient, notes, prerequisites=None, execute=True):
         """
         Try to guess the musical notation and ask the player to confirm
@@ -403,7 +436,7 @@ class MusicSheetMaker:
                     recipient=recipient, prerequisites=prerequisites)
             else:
                 q_key = self.communicator.send_stock_query('possible_keys', recipient=recipient, \
-                                                           foreword="\nYour song can be transposed in Sky with the following keys: " + ', '.join(possible_keys), \
+                                                           foreword="\nYour song can be transposed in Sky with the following keys: " + ', '.join(possible_keys) + '.', \
                                                            limits=possible_keys, prerequisites=prerequisites)
         else:
             q_key = self.communicator.send_stock_query('recommended_key', recipient=recipient, prerequisites=prerequisites)
