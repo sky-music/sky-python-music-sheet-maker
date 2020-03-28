@@ -278,7 +278,7 @@ class Communicator:
             
             
             #Question keyword arguments dictionary
-            if isinstance(query, QueryChoice):
+            if isinstance(query, QueryMultipleChoices):
                 multiple_answers = True
             else:
                 multiple_answers = False
