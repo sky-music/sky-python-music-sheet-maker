@@ -173,8 +173,8 @@ class MusicSheetMaker:
         i_instr, res = self.ask_instructions(recipient=recipient)
     
         #TODO: enable this for website only
-        if self.is_website(recipient):
-            q_render, website_render_modes = self.ask_render_modes(recipient=recipient)
+        #if self.is_website(recipient):
+        #    q_render, website_render_modes = self.ask_render_modes(recipient=recipient)
     
         # Ask for notes
         #TODO: allow the player to enter the notes using several messages??? or maybe not
