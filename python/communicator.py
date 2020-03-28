@@ -279,12 +279,12 @@ class Communicator:
             
             #Question keyword arguments dictionary
             if isinstance(query, QueryMultipleChoices):
-                multiple_answers = True
+                multiple_choices = True
             else:
-                multiple_answers = False
+                multiple_choices = False
             
             question_dict = {'text': query.get_foreword()+'\n'+query.get_question(), 'identifier': query.get_identifier(), \
-                             'expect_answer': query.get_expect_reply(), 'multiple_answers': multiple_answers}
+                             'expect_answer': query.get_expect_reply(), 'multiple_choices': multiple_choices}
             
             #Choices keyword arguments dictionary
             if isinstance(query, (QueryMultipleChoices, QueryChoice)):
