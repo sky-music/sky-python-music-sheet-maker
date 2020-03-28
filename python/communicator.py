@@ -251,7 +251,7 @@ class Communicator:
                         'song_files': [{'file_type': render_modes[i].value[1], 'number': i, 'base_name': 'file_'} for i, buffer in enumerate(buffers)],
                         'save': [{'name': 'file_'+str(i), 'buffer': buffer} for i, buffer in enumerate(buffers)]
                         }
-             else:
+            else:
                 raise CommunicatorError('Cannot process ' + str(type(buffers)))
             
 
