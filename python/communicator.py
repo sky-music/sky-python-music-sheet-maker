@@ -44,9 +44,8 @@ class QueriesExecutionAbort(Exception):
 
     def __repr__(self):
         queries_str = ''
-        for query in self.queries:
-            queries_str += str(query) + '",'
-        return '<' + self.__class__.__name__+', queries='+queries_str+', explanations="'+str(self.explanations)+'">'
+        queries_str = ','.join([str(query) for query in self.queries])
+        return '<%s, queries="%s", explanations="%s">'%(self.__class__.__name__, queries_str, str(self.explanations))
 
     def __str__(self):
         return str(self.queries)
@@ -236,7 +235,7 @@ class Communicator:
         if not isinstance (results, list):
             results = [results]
         
-        dict_list = []
+        results_dicts = []
         
         for (buffers, render_modes) in results:
                     
@@ -246,21 +245,21 @@ class Communicator:
                 raise CommunicatorError('Song buffers are not wrapped in a list, but a single object of type ' + str(type(buffers)))
             else:
                 if isinstance(buffers[0],io.BytesIO):
-                    dict_list.append({
+                    results_dicts.append({
                             'result': {'result_type': type(buffers[0])},
-                            'song_images': [{'image_type': render_modes[i].value[1].lower().strip(), 'number': i, 'base_name': 'image_'} for i, buffer in enumerate(buffers)],
-                            'save': [{'name': 'image_'+str(i)+'.'+render_modes[i].value[1].lower().strip(), 'buffer': buffer} for i, buffer in enumerate(buffers)]
+                            'song_images': [{'image_type': render_modes[i].value[1].lower().strip(), 'base_name': 'image_', 'number': i, 'ext': render_modes[i].value[2].lower().strip()} for i, buffer in enumerate(buffers)],
+                            'save': [{'name': 'image_'+str(i)+render_modes[i].value[2].lower().strip(), 'buffer': buffer} for i, buffer in enumerate(buffers)]
                             })
                 elif isinstance(buffers[0],io.StringIO):
-                    dict_list.append({
+                    results_dicts.append({
                             'result': {'result_type': type(buffers[0])},
-                            'song_files': [{'file_type': render_modes[i].value[1].lower().strip(), 'number': i, 'base_name': 'file_'} for i, buffer in enumerate(buffers)],
-                            'save': [{'name': 'file_'+str(i)+'.'+render_modes[i].value[1].lower().strip(), 'buffer': buffer} for i, buffer in enumerate(buffers)]
+                            'song_files': [{'file_type': render_modes[i].value[1].lower().strip(), 'base_name': 'file_', 'number': i, 'ext': render_modes[i].value[2].lower().strip()} for i, buffer in enumerate(buffers)],
+                            'save': [{'name': 'file_'+str(i)+render_modes[i].value[2].lower().strip(), 'buffer': buffer} for i, buffer in enumerate(buffers)]
                             })
                 else:
                     raise CommunicatorError('Cannot process ' + str(type(buffers)))
       
-        return dict_list
+        return results_dicts
         
 
     def queries_to_website_questions(self, queries):

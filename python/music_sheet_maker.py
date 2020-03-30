@@ -175,6 +175,7 @@ class MusicSheetMaker:
         #TODO: enable this for website only
         #if self.is_website(recipient):
         #    q_render, website_render_modes = self.ask_render_modes(recipient=recipient)
+        website_render_modes = self.render_modes_enabled
     
         # Ask for notes
         #TODO: allow the player to enter the notes using several messages??? or maybe not
@@ -184,6 +185,7 @@ class MusicSheetMaker:
             (q_notes, notes) = self.ask_notes_file(recipient=recipient, prerequisites=[i_instr])
         else:
             (q_notes, notes) = self.ask_notes(recipient=recipient, prerequisites=[i_instr])
+        
         
         (q_mode, input_mode) = self.ask_input_mode(recipient=recipient, notes=notes, prerequisites=[q_notes])
         self.get_parser().set_input_mode(input_mode)
@@ -204,7 +206,7 @@ class MusicSheetMaker:
         self.get_song().set_meta(title=title, artist=artist, transcript=transcript, song_key=song_key)
 
 
-        if self.is_botcog(recipient) or self.is_website(recipient):
+        if self.is_botcog(recipient):
             
             self.css_mode = CSSMode.EMBED #Prevent the HTML/SVG from depending on an auxiliary .css file
             buffers = self.write_song_to_buffers(self.discord_render_mode)
@@ -217,7 +219,7 @@ class MusicSheetMaker:
             answer = []
             for render_mode in website_render_modes:                
                 buffers = self.write_song_to_buffers(render_mode)
-                answer.append((buffers, [self.discord_render_mode]*len(buffers)))            
+                answer.append((buffers, [render_mode]*len(buffers)))            
         
         else: #command line
             
@@ -385,7 +387,7 @@ class MusicSheetMaker:
         """
         
         possible_modes = self.get_parser().get_possible_modes(notes)
-
+        
         if len(possible_modes) == 0:
             #To avoid loopholes. I am not sure this case is ever reached, because get_possible_modes should return all modes if None is found.
             all_input_modes = [mode for mode in InputMode]
@@ -549,6 +551,7 @@ class MusicSheetMaker:
     def write_song_to_buffers(self, render_mode):
         """
         Writes the song to files with different formats as defined in RenderMode
+        Returns a list [], even if it has only 1 element
         """
         #TODO: Move this method to Renderer?
         if render_mode in self.get_render_modes_enabled():

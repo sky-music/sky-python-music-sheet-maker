@@ -32,8 +32,7 @@ class SongParser:
         self.maker = maker
         self.directory_base = self.maker.get_directory_base()
 
-    def set_delimiters(self, icon_delimiter=' ', pause='.', quaver_delimiter='-', comment_delimiter='#',
-                       repeat_indicator='*'):
+    def set_delimiters(self, icon_delimiter=' ', pause='.', quaver_delimiter='-', comment_delimiter='#', repeat_indicator='*'):
 
         self.icon_delimiter = icon_delimiter
         self.pause = pause
@@ -91,6 +90,8 @@ class SongParser:
         if self.input_mode is not None:
             return [self.input_mode]
         else:
+            if isinstance(song_lines,str): #Break newlines and make sure the result is a List
+                song_lines = song_lines.split(os.linesep)            
             return self.detect_input_mode(song_lines)
 
     def set_input_mode(self, input_mode):
@@ -287,7 +288,10 @@ class SongParser:
 
 
     def find_key(self, song_lines):
-
+        
+        if isinstance(song_lines,str): #Break newlines and make sure the result is a List
+            song_lines = song_lines.split(os.linesep)
+       
         if self.note_parser is None:
             self.set_note_parser()
         # print('note parser is:')
@@ -333,6 +337,9 @@ class SongParser:
         """
         Attempts to detect input musical notation
         """
+        if isinstance(song_lines,str): #Break newlines and make sure the result is a List
+            song_lines = song_lines.split(os.linesep)
+        
         possible_modes = [mode for mode in InputMode]
         possible_parsers = [self.get_note_parser(mode) for mode in possible_modes]
         # position_maps = [self.get_note_parser(mode).position_map for mode in possible_modes]

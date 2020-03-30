@@ -736,8 +736,6 @@ class QueryMultipleChoices(QueryChoice):
             return is_reply_valid
         else:
             indices = self.get_answer_indices()
-            print('%%%DEBUG')
-            print(indices)
             if any([index is None for index in indices]):#also return False if indices is empty
                 is_reply_valid = False
             
