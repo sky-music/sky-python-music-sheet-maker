@@ -1,3 +1,5 @@
+import os
+
 try:
     from PIL import Image
 
@@ -29,27 +31,28 @@ class Note:
         self.harp_is_silent = instrument.get_is_silent()
         self.row_count = instrument.get_row_count()
         self.column_count = instrument.get_column_count()
-        self.A_root_png = 'elements/A-root.png'
-        self.A_diamond_png = 'elements/A-diamond.png'
-        self.A_circle_png = 'elements/A-circle.png'
-        self.B_root_png = 'elements/B-root.png'
-        self.B_diamond_png = 'elements/B-diamond.png'
-        self.B_circle_png = 'elements/B-circle.png'
-        self.C_root_png = 'elements/C-root.png'
-        self.C_diamond_png = 'elements/C-diamond.png'
-        self.C_circle_png = 'elements/C-circle.png'
-        self.dead_png = 'elements/dead-note.png'
-        self.dead_png = 'elements/dead-note.png'
-        self.A_unhighlighted_png = 'elements/A-unhighlighted.png'
-        self.B_unhighlighted_png = 'elements/B-unhighlighted.png'
-        self.C_unhighlighted_png = 'elements/C-unhighlighted.png'
-        self.root_highlighted_pngs = ['elements/root-highlighted-' + str(i) + '.png' for i in range(1, 8)]
-        self.diamond_highlighted_pngs = ['elements/diamond-highlighted-' + str(i) + '.png' for i in range(1, 8)]
-        self.circle_highlighted_pngs = ['elements/circle-highlighted-' + str(i) + '.png' for i in range(1, 8)]
+        self.directory_base = instrument.get_directory_base()
+        self.directory_elements = instrument.get_directory_elements()
+        self.A_root_png = os.path.normpath(os.path.join(self.directory_elements, 'A-root.png'))
+        self.A_diamond_png = os.path.normpath(os.path.join(self.directory_elements, 'A-diamond.png'))
+        self.A_circle_png = os.path.normpath(os.path.join(self.directory_elements, 'A-circle.png'))
+        self.B_root_png = os.path.normpath(os.path.join(self.directory_elements, 'B-root.png'))
+        self.B_diamond_png = os.path.normpath(os.path.join(self.directory_elements, 'B-diamond.png'))
+        self.B_circle_png = os.path.normpath(os.path.join(self.directory_elements, 'B-circle.png'))
+        self.C_root_png = os.path.normpath(os.path.join(self.directory_elements, 'C-root.png'))
+        self.C_diamond_png = os.path.normpath(os.path.join(self.directory_elements, 'C-diamond.png'))
+        self.C_circle_png = os.path.normpath(os.path.join(self.directory_elements, 'C-circle.png'))
+        self.dead_png = os.path.normpath(os.path.join(self.directory_elements, 'dead-note.png'))
+        self.A_unhighlighted_png = os.path.normpath(os.path.join(self.directory_elements, 'A-unhighlighted.png'))   
+        self.B_unhighlighted_png = os.path.normpath(os.path.join(self.directory_elements, 'B-unhighlighted.png'))   
+        self.C_unhighlighted_png = os.path.normpath(os.path.join(self.directory_elements, 'C-unhighlighted.png'))
+        self.root_highlighted_pngs = [os.path.normpath(os.path.join(self.directory_elements, 'root-highlighted-' + str(i) + '.png')) for i in range(1, 8)]
+        self.diamond_highlighted_pngs = [os.path.normpath(os.path.join(self.directory_elements, 'diamond-highlighted-' + str(i) + '.png')) for i in range(1, 8)]
+        self.circle_highlighted_pngs = [os.path.normpath(os.path.join(self.directory_elements, 'circle-highlighted-' + str(i) + '.png')) for i in range(1, 8)]
         self.png_size = None
 
-        self.midi_pitches = {'C': 60, 'C#': 61, 'Db': 61, 'D': 62, 'D#': 63, 'Eb': 63, 'E': 64, \
-                             'F': 65, 'F#': 66, 'Gb': 66, 'G': 67, 'G#': 68, 'Ab': 68, 'A': 69, \
+        self.midi_pitches = {'C': 60, 'C#': 61, 'Db': 61, 'D': 62, 'D#': 63, 'Eb': 63, 'E': 64,
+                             'F': 65, 'F#': 66, 'Gb': 66, 'G': 67, 'G#': 68, 'Ab': 68, 'A': 69,
                              'A#': 70, 'Bb': 70, 'B': 71}
         self.midi_semitones = [0, 2, 4, 5, 7, 9, 11]  # May no longer be used when Western_scales is merged
 
@@ -246,7 +249,8 @@ class NoteCircle(Note):
 
     def get_svg(self, highlighted_classes):
         note_render = '<path class="instrument-button ' + ' '.join(
-            highlighted_classes).rstrip() + '" d="M90.7 76.5c0 7.8-6.3 14.2-14.2 14.2H14.2C6.3 90.7 0 84.4 0 76.5V14.2C0 6.3 6.3 0 14.2 0h62.3c7.8 0 14.2 6.3 14.2 14.2V76.5z"/>\n'
+            highlighted_classes).rstrip() + '" d="M90.7 76.5c0 7.8-6.3 14.2-14.2 14.2H14.2C6.3 90.7 0 84.4 0 ' \
+                                            '76.5V14.2C0 6.3 6.3 0 14.2 0h62.3c7.8 0 14.2 6.3 14.2 14.2V76.5z"/>\n '
         note_render += '<circle cx="45.4" cy="45.4" r="25.5" class="instrument-button-icon ' + ' '.join(
             highlighted_classes).rstrip() + '"/>'
         return note_render
@@ -278,8 +282,18 @@ class NoteDiamond(Note):
         self.svgclass = 'note-diamond'
 
     def get_svg(self, highlighted_classes):
-        note_render = '<path class="instrument-button ' + ' '.join(highlighted_classes).rstrip() + '" d="M90.7 76.5c0 7.8-6.3 14.2-14.2 14.2H14.2C6.3 90.7 0 84.4 0 76.5V14.2C0 6.3 6.3 0 14.2 0h62.3c7.8 0 14.2 6.3 14.2 14.2V76.5z"/>\n'
-        note_render += '<rect x="22.6" y="22.7" transform="matrix(-0.7071 -0.7071 0.7071 -0.7071 45.3002 109.5842)" width="45.4" height="45.4" class="instrument-button-icon ' + ' '.join(highlighted_classes).rstrip() + '"/>'
+        note_render = '<path class="instrument-button ' + ' '.join(highlighted_classes).rstrip() + '" d="M90.7 76.5c0 ' \
+                                                                                                   '7.8-6.3 14.2-14.2 ' \
+                                                                                                   '14.2H14.2C6.3 ' \
+                                                                                                   '90.7 0 84.4 0 ' \
+                                                                                                   '76.5V14.2C0 6.3 ' \
+                                                                                                   '6.3 0 14.2 ' \
+                                                                                                   '0h62.3c7.8 0 14.2 ' \
+                                                                                                   '6.3 14.2 ' \
+                                                                                                   '14.2V76.5z"/>\n '
+        note_render += '<rect x="22.6" y="22.7" transform="matrix(-0.7071 -0.7071 0.7071 -0.7071 45.3002 109.5842)" ' \
+                       'width="45.4" height="45.4" class="instrument-button-icon ' + ' '.join(
+            highlighted_classes).rstrip() + '"/> '
         return note_render
 
     def get_png(self, highlighted_frames):
@@ -310,10 +324,12 @@ class NoteRoot(Note):
 
     def get_svg(self, highlighted_classes):
         note_render = '<path class="instrument-button ' + ' '.join(
-            highlighted_classes).rstrip() + '" d="M90.7 76.5c0 7.8-6.3 14.2-14.2 14.2H14.2C6.3 90.7 0 84.4 0 76.5V14.2C0 6.3 6.3 0 14.2 0h62.3c7.8 0 14.2 6.3 14.2 14.2V76.5z"/>\n'
+            highlighted_classes).rstrip() + '" d="M90.7 76.5c0 7.8-6.3 14.2-14.2 14.2H14.2C6.3 90.7 0 84.4 0 ' \
+                                            '76.5V14.2C0 6.3 6.3 0 14.2 0h62.3c7.8 0 14.2 6.3 14.2 14.2V76.5z"/>\n '
         note_render += '<circle cx="45.5" cy="45.4" r="26" class="instrument-button-icon ' + ' '.join(
             highlighted_classes).rstrip() + '"/>'
-        note_render += '<rect x="19.5" y="19.3" transform="matrix(-0.7071 0.7071 -0.7071 -0.7071 109.7415 45.2438)" width="52" height="52" class="instrument-button-icon ' + ' '.join(
+        note_render += '<rect x="19.5" y="19.3" transform="matrix(-0.7071 0.7071 -0.7071 -0.7071 109.7415 45.2438)" ' \
+                       'width="52" height="52" class="instrument-button-icon ' + ' '.join(
             highlighted_classes).rstrip() + '"/>\n'
         return note_render
 
