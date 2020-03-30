@@ -256,8 +256,10 @@ class Communicator:
                             'song_files': [{'file_type': render_modes[i].value[1].lower().strip(), 'base_name': 'file_', 'number': i, 'ext': render_modes[i].value[2].lower().strip()} for i, buffer in enumerate(buffers)],
                             'save': [{'name': 'file_'+str(i)+render_modes[i].value[2].lower().strip(), 'buffer': buffer} for i, buffer in enumerate(buffers)]
                             })
+                elif buffers[0] is None:
+                    pass
                 else:
-                    raise CommunicatorError('Cannot process ' + str(type(buffers)))
+                    raise CommunicatorError('Cannot process ' + str(type(buffers[0])))
       
         return results_dicts
         
