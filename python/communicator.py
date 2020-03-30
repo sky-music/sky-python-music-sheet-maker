@@ -248,14 +248,14 @@ class Communicator:
                 if isinstance(buffers[0],io.BytesIO):
                     dict_list.append({
                             'result': {'result_type': type(buffers[0])},
-                            'song_images': [{'image_type': render_modes[i].value[1], 'number': i, 'base_name': 'image_'} for i, buffer in enumerate(buffers)],
-                            'save': [{'name': 'image_'+str(i), 'buffer': buffer} for i, buffer in enumerate(buffers)]
+                            'song_images': [{'image_type': render_modes[i].value[1].lower().strip(), 'number': i, 'base_name': 'image_'} for i, buffer in enumerate(buffers)],
+                            'save': [{'name': 'image_'+str(i)+'.'+render_modes[i].value[1].lower().strip(), 'buffer': buffer} for i, buffer in enumerate(buffers)]
                             })
                 elif isinstance(buffers[0],io.StringIO):
                     dict_list.append({
                             'result': {'result_type': type(buffers[0])},
-                            'song_files': [{'file_type': render_modes[i].value[1], 'number': i, 'base_name': 'file_'} for i, buffer in enumerate(buffers)],
-                            'save': [{'name': 'file_'+str(i), 'buffer': buffer} for i, buffer in enumerate(buffers)]
+                            'song_files': [{'file_type': render_modes[i].value[1].lower().strip(), 'number': i, 'base_name': 'file_'} for i, buffer in enumerate(buffers)],
+                            'save': [{'name': 'file_'+str(i)+'.'+render_modes[i].value[1].lower().strip(), 'buffer': buffer} for i, buffer in enumerate(buffers)]
                             })
                 else:
                     raise CommunicatorError('Cannot process ' + str(type(buffers)))
@@ -289,7 +289,7 @@ class Communicator:
             #Choices keyword arguments dictionary
             if isinstance(query, (QueryMultipleChoices, QueryChoice)):
                 if isinstance(limits[0], InputMode):
-                    choices_dicts = [{'number': int(limit.value[0]), 'text': str(limit.value[1])} for i, limit in enumerate(limits)]
+                    choices_dicts = [{'number': i, 'text': str(limit.value[1])} for i, limit in enumerate(limits)]
                 else:
                     choices_dicts = [{'number': i, 'text': str(limit)} for i, limit in enumerate(limits)]
             else:
