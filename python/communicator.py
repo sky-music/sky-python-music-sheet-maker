@@ -257,6 +257,7 @@ class Communicator:
                             'save': [{'name': 'file_'+str(i)+render_modes[i].value[2].lower().strip(), 'buffer': buffer} for i, buffer in enumerate(buffers)]
                             })
                 elif buffers[0] is None:
+                    print('A None buffer was passed to WebsitePlayer.')
                     pass
                 else:
                     raise CommunicatorError('Cannot process ' + str(type(buffers[0])))

@@ -56,8 +56,6 @@ class CommandLinePlayer:
             reply_valid = False
             while not reply_valid:
                 reply_valid = True #to be sure to break the loop
-                #if q.get_name() == 'original_artist': #FIXME: for debugging only
-                #    raise MusicSheetMakerAbort(q)
                 if q.get_expect_reply():                  
                     #print('%%%DEBUG. PLAYER, YOU ARE BEING PROMPTED%%%') #FIXME: for debugging only                    
                     answer = input(question + ': ')   
@@ -85,7 +83,7 @@ except QueriesExecutionAbort as qExecAbort:
     
     
 '''
-#FIXME: for debugging only
+# for debugging only
 print('\n%%%DEBUG. MAIN script has ended%%%')
 print('\n\n%%%DEBUG. Player memory:')
 player.communicator.memory.print_out()
