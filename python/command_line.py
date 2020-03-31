@@ -3,9 +3,9 @@ from responder import Responder
 from modes import ResponseMode
 
 try:
-     import readline
- except ModuleNotFoundError:
-     pass  # probably Windows
+    import readline
+except ModuleNotFoundError:
+    pass  # probably Windows
 
 song_responder = Responder()
 song_responder.set_response_mode(ResponseMode.COMMAND_LINE)
