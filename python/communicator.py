@@ -285,15 +285,15 @@ class Communicator:
             else:
                 multiple_choices = False
             
-            question_dict = {'text': query.get_foreword()+'\n'+query.get_question(), 'identifier': query.get_identifier(), \
+            question_dict = {'text': query.get_foreword()+'\n'+query.get_question().strip(), 'identifier': query.get_identifier(), \
                              'expect_answer': query.get_expect_reply(), 'multiple_choices': multiple_choices}
             
             #Choices keyword arguments dictionary
             if isinstance(query, (QueryMultipleChoices, QueryChoice)):
                 if isinstance(limits[0], InputMode):
-                    choices_dicts = [{'number': i, 'text': str(limit.value[1])} for i, limit in enumerate(limits)]
+                    choices_dicts = [{'number': i, 'text': str(limit.value[1]).strip()} for i, limit in enumerate(limits)]
                 else:
-                    choices_dicts = [{'number': i, 'text': str(limit)} for i, limit in enumerate(limits)]
+                    choices_dicts = [{'number': i, 'text': str(limit).strip()} for i, limit in enumerate(limits)]
             else:
                     choices_dicts = []
             

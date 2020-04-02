@@ -229,7 +229,7 @@ class MusicSheetMaker:
             for render_mode in self.get_render_modes_enabled():
                 buffers = self.write_song_to_buffers(render_mode)
                 file_paths = self.build_file_paths(render_mode, len(buffers))              
-                self.send_buffers_to_files(render_mode, buffers, file_paths, recipient=recipient, prerequisites=[i_error])
+                self.send_buffers_to_files(render_mode, buffers, file_paths, recipient=recipient)
                 answer.append((buffers, [render_mode]*len(buffers)))
                 
         return answer
@@ -244,7 +244,7 @@ class MusicSheetMaker:
         question += '\nSeparate chords with \"' + self.get_parser().get_icon_delimiter() + '\".'
         question += '\nUse \"' + self.get_parser().get_pause() + '\" for a silence (rest).'
         question += '\nUse \"' + self.get_parser().get_quaver_delimiter() + '\" to link notes within an icon, for triplets, quavers... (e.g. ' + self.get_parser().get_quaver_delimiter().join(('A1','B1','C1'))
-        question +=( '\nAdd \""' + self.get_parser().get_repeat_indicator() + '2\"" after a chord to indicate repetition.')
+        question +=( '\nAdd \"' + self.get_parser().get_repeat_indicator() + '2\" after a chord to indicate repetition.')
         question += '\nSharps # and flats b (semitones) are supported for Western and Jianpu notations.'
         
         if recipient.get_name() == 'command-line':        
@@ -469,18 +469,20 @@ class MusicSheetMaker:
     def display_error_ratio(self, recipient, prerequisites=None, execute=True):
 
         error_ratio = self.get_song().get_num_broken() / max(1, self.get_song().get_num_instruments())
-        if error_ratio == 0:
-            message = 'Song successfully read with no errors!'
-        elif error_ratio < 0.05:
-            message = 'Song successfully read with few errors!'
+        message = ''
+        if error_ratio < 0.05:
+            message = 'Song successfully read with a few errors.'
         else:
             message = '**WARNING**: Your song contains many errors. Please check the following:' + \
             '\n- All your notes are within octaves 4 and 6. If not, try again with an octave shift.' + \
             '\n- Your song is free of typos. Please check this website for full instructions: ' + \
             'https://sky.bloomexperiment.com/t/summary-of-input-modes/403'
+        
+        if message != '':
+            i_error = self.communicator.send_information(recipient=recipient, string=message, prerequisites=prerequisites)
+        else:
+            i_error = None
             
-        i_error = self.communicator.send_information(recipient=recipient, string=message, prerequisites=prerequisites)
-       
         if execute:
             recipient.execute_queries(i_error)
             result = i_error.get_reply().get_result()
