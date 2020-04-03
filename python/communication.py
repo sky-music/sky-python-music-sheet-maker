@@ -95,7 +95,8 @@ class Reply:
 
     def build_result(self):
         """
-        Builds the result of the Reply, a processed version of self.answer 
+        Builds the result of the Reply, useful to music-maker,
+        from self.answer, the raw input from the user
         """
         if not self.get_validity():
             self.result = None
@@ -174,7 +175,7 @@ class Query:
             recipient_name = self.recipient.get_name()
         except AttributeError:
             recipient_name = None
-        string = '<' + self.__class__.__name__ + ' ' + str(self.get_identifier()) + ' from ' + str(sender_name) + ' to ' + str(recipient_name) + ': ' + repr(self.question) + ', ' + str(self.reply_type) + ' expected'
+        string = '<' + self.__class__.__name__ + ' ' + str(self.get_identifier()) + ' from ' + str(sender_name) + ' to ' + str(recipient_name) + ': ' + repr(self.question)[:20] + '..., ' + str(self.reply_type) + ' expected'
         
         try:
             limits = self.get_limits()
@@ -272,8 +273,8 @@ class Query:
         Returns None or a list with len>0
         """
         if self.prerequisites is None:
-            return None
-            #return [] #another possibility
+            #return None
+            return [] #another possibility
         else:
             try:
                 self.prerequisites[0]
@@ -472,10 +473,10 @@ class Query:
                         is_reply_valid = False
                 elif self.reply_type == ReplyType.INPUTMODE:
                     if isinstance(answers[0], InputMode) or isinstance(answers[0], (str,int)):
-                        is_reply_valid = True
+                        is_reply_valid = True #An input mode can be chosen using its order number in a list or its string description
                 elif self.reply_type == ReplyType.RENDERMODES:
                     if isinstance(answers[0], RenderMode) or isinstance(answers[0], (str,int)):
-                        is_reply_valid = True
+                        is_reply_valid = True #A render mode can be chosen using its order number in a list or its string description
                 elif self.reply_type == ReplyType.BUFFERS:
 
                     try:
@@ -660,7 +661,7 @@ class QueryChoice(Query):
         if self.reply_type == ReplyType.NOTE:
             result[-1] += ' among ' + ', '.join(list(self.get_limits()))
         elif self.reply_type in [ReplyType.INPUTMODE, ReplyType.RENDERMODES]:
-            choices = [str(i) + ') '+ str(choice.value[1]) for i, choice in enumerate(self.get_limits())]
+            choices = [str(i) + ') '+ str(choice.short_desc) for i, choice in enumerate(self.get_limits())]
             result[-1] += ' among:\n\n' + '\n'.join(choices)
         else:
             choices = [str(i) + ') '+ str(choice) for i, choice in enumerate(self.get_limits())]
@@ -688,9 +689,8 @@ class QueryChoice(Query):
         
 
     def get_answer_index(self, answer=None):
-
         """
-        Returns the index of the answer among choices, for QueryChoice and QueryBoolean
+        Returns the index i of the answer among n choices/limits (0<=i<=n), for QueryChoice and QueryBoolean
         """
         if answer is None:
             answer = self.reply.get_answer()
@@ -698,14 +698,17 @@ class QueryChoice(Query):
         choices = self.get_limits()  #limits cannot be None in QueryChoices, we made sure of that
 
         if isinstance(answer, str):
-            answer = answer.lower().strip()
+            answer = answer.lower().strip() #Sanitization for comparison
+        
         if isinstance(choices[0], str):
             choices = [c.lower().strip() for c in choices]
+        elif isinstance(choices[0], (InputMode, RenderMode)):
+            choices = [str(c).lower().strip() for c in choices]
 
         try:
-            index = choices.index(answer)
+            index = choices.index(answer) #Tries to find the answer directly in choices=self.limits
         except ValueError:
-            try:  # Maybe answer is the choice index (0-n)
+            try:  # Maybe answer is not a choice, but the choice index (0-n)
                 index = int(answer)
                 if index < 0 or index > len(choices):
                     index = None
@@ -720,6 +723,7 @@ class QueryMultipleChoices(QueryChoice):
     """
     Query with several choices, defined in self.limits
     A QueryMultipleChoice accepts several answers.
+    self.answer must be given as a list, eg ['answer1', 'answer2']
     """
 
     def __init__(self, *args, **kwargs):
@@ -744,23 +748,30 @@ class QueryMultipleChoices(QueryChoice):
 
     def reply_to(self, answer):
         """
-        Assigns a Reply to the Query
-        Caution: tuples are considered as a single object
+        Assigns a Reply to the Query, using answer as input
+        If input is a string it is splitted using common column separators
+        Caution: an answer tuple is considered as a single object
         """
         
         if isinstance(answer, str):
-            answers = list(filter(None,re.split(r' |,|;', answer)))
+            answers = list(filter(None,re.split(r'\t| |,|;', answer)))
             if answers == []:
                 answers = ['']
         elif not isinstance(answer, list):
             answers = [answer] #maybe the user has selected only 1 choice
+        else:
+            answers = answer
         
-        super().reply_to(answers)
+        super().reply_to(answers) #does self.answer=answer
 
 
     def get_answer_indices(self):
         
-        return [QueryChoice.get_answer_index(self,answer) for answer in self.reply.get_answer()]
+        answers = self.reply.get_answer()
+        if not isinstance(answers, (list, set)):
+            answers = [answers]  #repairing non-list answers o avoid looping over chars in a string
+                
+        return [QueryChoice.get_answer_index(self,answer) for answer in answers]
 
 
 class QueryBoolean(QueryChoice):
@@ -836,7 +847,7 @@ class Information(QueryOpen):
 
 class QueryMemory:
     """
-    Storage for Queries.
+    A volatile storage of Queries.
     With function to recall and erase Queries by type, property, content, ID...
     Note that erasing a Query here does *not* delete the object in Python
     """
@@ -1003,7 +1014,7 @@ class QueryMemory:
                         str_attr = filter(lambda x: isinstance(x,str),list(q.__dict__.values()))
                         if any([regex.search(attr.lower().strip()) is not None for attr in str_attr]):
                             q_found += [q]
-                            break
+                            
 
         return q_found
 
@@ -1139,39 +1150,41 @@ class QueryMemory:
         """
         Sort Queries by solving dependencies
         """
-        queries = self.queries.copy()
-
+        queries = self.queries.copy() # A copy of the queries list with the real queries inside
+        
         if len(queries) <= 1:
             return queries
 
-        edgeless_nodes = set()
+        edgeless_nodes = set() # node = (i, query) where i is an integer
 
         for i, q in enumerate(queries):
-            if q.get_prerequisites() is None:
-                edgeless_nodes.add((i, q))
-            elif len(q.get_prerequisites()) == 0:
+            if len(q.get_prerequisites()) == 0:
                 edgeless_nodes.add((i, q))
 
         if len(edgeless_nodes) == 0:
             raise QueryMemoryError('Queries have a circular dependency')
-
+        
+        
         sorted_nodes = list()  # L
 
+        queries_egdes = [q.get_prerequisites().copy() for q in queries] # A copy of the prerequisites
         i = 0
-        while len(edgeless_nodes) > 0 and i < len(queries) ** 2:
+        while len(edgeless_nodes) > 0 and i < len(queries) ** 2: # The algorithm complexity is not greater than n^2
             i += 1
 
-            node = edgeless_nodes.pop()
-            sorted_nodes.append(node)
+            sorted_node = edgeless_nodes.pop()
+            sorted_nodes.append(sorted_node) #If a node has not edge among remaining nodes to be sorted, then it is the next one in the sort order
+            (sorted_node_n, sorted_node_q) = sorted_node
+            #print('Added ' + str(sorted_node_q.get_name()) + ' to sorted_modes.')
 
-            for m, query in enumerate(queries):
-                edges = query.get_prerequisites()
-                if edges is not None:
-                    if node[1] in edges:
-                        edges.remove(node[1])
-                        if len(edges) == 0:
-                            edgeless_nodes.add((m, query))
-
+            for (m, query_egdes), query in zip(enumerate(queries_egdes), queries):
+                if sorted_node_q in query_egdes:
+                    query_egdes.remove(sorted_node_q) # This node has been sorted, so it can be removed from dependencies
+                    #print('Found in edges of ' + str(query.get_name()) + ': ' + str(sorted_node_q.get_name()))
+                    if len(query_egdes) == 0:
+                        edgeless_nodes.add((m, query))
+                        #print('Added ' + str(query.get_name()) + ' to edgeless_nodes.')
+        
         if len(sorted_nodes) == len(self.queries):
             self.queries = [self.queries[node[0]] for node in sorted_nodes]
             return self.queries

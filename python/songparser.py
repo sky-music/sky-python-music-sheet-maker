@@ -81,9 +81,9 @@ class SongParser:
             for delim in delims:
                 if (parser.not_note_name_regex.match(delim) is None or parser.not_octave_regex.match(
                         delim) is None) and delim != self.comment_delimiter:
-                    print('You chose an invalid delimiter for notation ' + self.input_mode.value[1] + ': ' + delim)
+                    print('You chose an invalid delimiter for notation ' + self.input_mode.short_desc + ': ' + delim)
                 if delims.count(delim) > 1:
-                    print('You chose twice the same delimiter for notation ' + self.input_mode.value[1] + ': ' + delim)
+                    print('You chose twice the same delimiter for notation ' + self.input_mode.short_desc + ': ' + delim)
 
     def get_possible_modes(self, song_lines=None):
 
@@ -109,7 +109,7 @@ class SongParser:
         return self.input_mode
 
     def get_note_parser(self, input_mode=None):
-
+        
         if self.note_parser is not None:
             return self.note_parser
 

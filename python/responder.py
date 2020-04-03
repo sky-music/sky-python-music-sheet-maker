@@ -111,7 +111,7 @@ class Responder:
         instructions += "Please choose your note format:\n"
         for mode in modes:
             i += 1
-            instructions += str(i) + ') ' + mode.value[2] + "\n"
+            instructions += str(i) + ') ' + mode.long_desc + "\n"
             modes_list[i] = mode
         self.output(instructions)
         try:
@@ -186,7 +186,7 @@ class Responder:
         self.output('===== VISUAL MUSIC SHEETS FOR SKY:CHILDREN OF THE LIGHT =====')
         self.output('\nAccepted music notes formats:')
         for mode in InputMode:
-            self.output('\n* ' + mode.value[2])
+            self.output('\n* ' + mode.long_desc)
         self.output('\nNotes composing a chord must be glued together (e.g. A1B1C1).')
         self.output('Separate chords with \"' + self.get_parser().get_icon_delimiter() + '\".')
         self.output('Use \"' + self.get_parser().get_pause() + '\" for a silence (rest).')
@@ -281,7 +281,7 @@ class Responder:
             self.output('\nCould not detect your note format. Maybe your song contains typo errors?')
             input_mode = self.ask_to_select_mode(possible_modes)
         else:
-            self.output('\nWe detected that you use the following notation: ' + possible_modes[0].value[1] + '.')
+            self.output('\nWe detected that you use the following notation: ' + possible_modes[0].short_desc + '.')
             input_mode = possible_modes[0]
 
         self.get_parser().set_input_mode(input_mode)
@@ -393,21 +393,21 @@ class Responder:
                 buffer_list = [self.get_song().write_ascii(render_mode)]
 
             numfiles = len(buffer_list)
-            file_ext = render_mode.value[2]
+            file_ext = render_mode.long_desc
             file_path0 = os.path.join(self.get_song_dir_out(), self.get_song().get_title() + file_ext)
 
             try:
                 file_path = self.write_buffer_to_file(buffer_list, file_path0)
 
                 if numfiles > 1:
-                    self.output('Your song in ' + render_mode.value[1] + ' is located in: ' + self.get_song_dir_out())
+                    self.output('Your ' + render_mode.short_desc + ' is located in: ' + self.get_song_dir_out())
                     self.output(
                         'Your song has been split into ' + str(numfiles) + ' between ' + os.path.split(file_path0)[
                             1] + ' and ' + os.path.split(file_path)[1])
                 else:
-                    self.output('Your song in ' + render_mode.value[1] + ' is located at:' + file_path)
+                    self.output('Your ' + render_mode.short_desc + ' is located at:' + file_path)
             except (OSError, IOError):
-                self.output('Could not write to ' + render_mode.value[1] + ' file.')
+                self.output('Could not write the ' + render_mode.short_desc + ' file.')
             self.output('------------------------------------------')
 
     def send_song_to_channel(self, render_mode):
@@ -429,10 +429,10 @@ class Responder:
             numfiles = len(buffer_list)
 
             if numfiles == 0:
-                self.output('No ' + render_mode.value[1] + ' was generated.')
+                self.output('No ' + render_mode.short_desc + ' was generated.')
                 return
 
-            file_ext = render_mode.value[2]
+            file_ext = render_mode.extension
             file_name0 = self.get_song().get_title() + file_ext
 
             (file_base, file_ext) = os.path.splitext(file_name0)

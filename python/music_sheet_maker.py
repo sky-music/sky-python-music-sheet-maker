@@ -101,7 +101,7 @@ class MusicSheetMaker:
         else:
             if not isinstance(queries, (list, set)):
                 queries = [queries]
-        #FIXME: 2 lines for debugging:
+        #2 lines for debugging:
         #print('\n%%%%I AM MAKER, THE UNSATISFIED QUERIES ARE:%%%%')
         #self.communicator.memory.print_out(filters=('unsatisfied'))
 
@@ -173,9 +173,9 @@ class MusicSheetMaker:
         i_instr, res = self.ask_instructions(recipient=recipient)
     
         #TODO: enable this for website only
-        #if self.is_website(recipient):
-        #    q_render, website_render_modes = self.ask_render_modes(recipient=recipient)
-        website_render_modes = self.render_modes_enabled
+        if self.is_website(recipient):
+            q_render, website_render_modes = self.ask_render_modes(recipient=recipient)
+        #website_render_modes = self.render_modes_enabled
     
         # Ask for notes
         #TODO: allow the player to enter the notes using several messages??? or maybe not
@@ -238,8 +238,8 @@ class MusicSheetMaker:
     def ask_instructions(self, recipient, prerequisites=None, execute=True):
         
         question = '\nAccepted music notes formats:'
-        for mode in InputMode:
-            question += '\n* ' + mode.value[2]
+        for input_mode in InputMode:
+            question += '\n* ' + input_mode.long_desc
         question += '\nNotes composing a chord must be glued together (e.g. A1B1C1).'
         question += '\nSeparate chords with \"' + self.get_parser().get_icon_delimiter() + '\".'
         question += '\nUse \"' + self.get_parser().get_pause() + '\" for a silence (rest).'
@@ -320,8 +320,11 @@ class MusicSheetMaker:
 
 
     def ask_notes_file(self, recipient, prerequisites=None, execute=True):
-
-        # TODO: Check for file, etc, distinguish Discord / command line to avoid loading a file on Discord
+        """
+        Asks for notes (all recipients) or a file name (command-line only)
+        If a file name is detected but the file does not exist, sends a query to ask for a valid file path
+        If notes are detected, return the notes as a list of strings splitted by the OS line separator
+        """
         q_notes = self.communicator.send_stock_query('song_notes_files', \
                                                      question='Type or copy-paste notes, or enter file name (in ' + os.path.relpath(os.path.normpath(self.song_dir_in)) + '/)',\
                                                      recipient=recipient, prerequisites=prerequisites)
@@ -333,22 +336,26 @@ class MusicSheetMaker:
             
             result = q_notes.get_reply().get_result()
             
-            #Detects if the result is a file path
-            file_path = os.path.join(self.song_dir_in, os.path.normpath(result))
-            isfile = os.path.isfile(file_path)
-            
-            if not isfile:
-                splitted = os.path.splitext(result)
-                if len(splitted[0]) > 0 and 2 < len(splitted[1]) <= 5 and re.search('\\.', splitted[0]) is None:
-                    # then certainly a file name
-                    self.communicator.memory.erase(q_notes)
-                                    
-                    q_notes, file_path = self.ask_file(recipient=recipient, prerequisites=prerequisites, execute=execute)
-                     
-            if isfile:
+            if self.is_commandline(recipient):
+                #Detects if the result is a file path
+                file_path = os.path.join(self.song_dir_in, os.path.normpath(result))
+                isfile = os.path.isfile(file_path)
+                
+                if not isfile:
+                    splitted = os.path.splitext(result)
+                    if len(splitted[0]) > 0 and 2 < len(splitted[1]) <= 5 and re.search('\\.', splitted[0]) is None:
+                        # then certainly a file name
+                        self.communicator.memory.erase(q_notes)
+                                        
+                        q_notes, file_path = self.ask_file(recipient=recipient, prerequisites=prerequisites, execute=execute)
+                        isfile = True #ask_file only returns when a valid file path is found
+            else:
+                isfile = False #Don't allow reading files on the website or music-cog
+                
+            if isfile and self.is_commandline(recipient):
                 notes = self.read_file(file_path)
             else:             
-                notes = result.split(os.linesep)
+                notes = result.split(os.linesep) # Returns a list of strings in any case
                 
                 if self.is_commandline(recipient): #Loop to ask for several lines in the standard input interface           
                     while result:                            
@@ -359,13 +366,13 @@ class MusicSheetMaker:
                         result = result.split(os.linesep)
                         for result in result:
                             notes.append(result)
-                    
+                  
             return (q_notes, notes)
                 
 
     def ask_render_modes(self, recipient, prerequisites=None, execute=True):
         """
-        
+        Asks for the desired render modes for the Song
         """
         
         render_modes = self.render_modes_enabled
@@ -374,8 +381,8 @@ class MusicSheetMaker:
             q_render = self.communicator.send_stock_query('render_modes', recipient=recipient, limits=render_modes, prerequisites=prerequisites)
         
         if execute:
-            recipient.execute_queries(q_render) 
-            result = q_render.get_reply() #TODO: parse several choices
+            recipient.execute_queries(q_render)
+            result = q_render.get_reply().get_result()
             return (q_render, result)
         else:
             return (q_render, None)
@@ -383,11 +390,11 @@ class MusicSheetMaker:
 
     def ask_input_mode(self, recipient, notes, prerequisites=None, execute=True):
         """
-        Try to guess the musical notation and ask the player to confirm
+        Try to guess the musical notation and asks the player to confirm
         """
         
         possible_modes = self.get_parser().get_possible_modes(notes)
-        
+                
         if len(possible_modes) == 0:
             #To avoid loopholes. I am not sure this case is ever reached, because get_possible_modes should return all modes if None is found.
             all_input_modes = [mode for mode in InputMode]
@@ -398,18 +405,21 @@ class MusicSheetMaker:
             
         elif len(possible_modes) == 1:
             q_mode = self.communicator.send_information(recipient=recipient, \
-                                                        string='\nWe detected that you use the following notation: ' + possible_modes[0].value[1] + '.', \
+                                                        string='\nWe detected that you use the following notation: ' + possible_modes[0].short_desc + '.', \
                                                         prerequisites=prerequisites)
             
         else:
             q_mode = self.communicator.send_stock_query('musical_notation', recipient=recipient, limits=possible_modes, prerequisites=prerequisites)
         
         if execute:
-            recipient.execute_queries(q_mode) 
+            recipient.execute_queries(q_mode)
             if len(possible_modes) == 1:
                 result = possible_modes[0]
             else:
                 result = q_mode.get_reply().get_result()
+                #print('%%%DEBUG, This is Music-Maker%%%%')
+                #print('anwer = ' + str(q_mode.get_reply().get_answer()))
+                #print('result = ' + str(q_mode.get_reply().get_result()))
             return (q_mode, result)
         else:
             return (q_mode, None)
@@ -469,8 +479,10 @@ class MusicSheetMaker:
     def display_error_ratio(self, recipient, prerequisites=None, execute=True):
 
         error_ratio = self.get_song().get_num_broken() / max(1, self.get_song().get_num_instruments())
-        message = ''
-        if error_ratio < 0.05:
+       
+        if error_ratio == 0:
+            message = ''
+        elif error_ratio < 0.05:
             message = 'Song successfully read with a few errors.'
         else:
             message = '**WARNING**: Your song contains many errors. Please check the following:' + \
@@ -482,8 +494,9 @@ class MusicSheetMaker:
             i_error = self.communicator.send_information(recipient=recipient, string=message, prerequisites=prerequisites)
         else:
             i_error = None
-            
-        if execute:
+            return (i_error, None)
+        
+        if execute and i_error is not None:
             recipient.execute_queries(i_error)
             result = i_error.get_reply().get_result()
             return (i_error, result)
@@ -529,16 +542,16 @@ class MusicSheetMaker:
             
                 if numfiles == 1:
                     
-                    message = '\nYour song in ' + render_mode.value[1] + ' is located at: ' + os.path.relpath(file_paths[0])
+                    message = '\nYour ' + render_mode.short_desc + ' is located at: ' + os.path.relpath(file_paths[0])
                     
                 elif numfiles > 1 and i == 0:
                     
-                    message = '\nYour song in ' + render_mode.value[1] + ' is located in: ' + os.path.relpath(self.song_dir_out)
+                    message = '\nYour ' + render_mode.short_desc + ' is located in: ' + os.path.relpath(self.song_dir_out)
                     
                     message += 'Your song has been split into ' + str(numfiles) + ' files between ' + os.path.split(file_paths[0])[
                                 1] + ' and ' + os.path.split(file_paths[-1])[1]
             else:
-                message = '\nYour song in ' + render_mode.value[1] + ' was not saved to file.'   
+                message = '\nYour ' + render_mode.short_desc + ' was not saved to file.'   
 
         i_song_files = self.communicator.send_stock_query('information', foreword="-"*40, \
                                                      question=message, recipient=recipient, prerequisites=prerequisites)    
@@ -587,7 +600,7 @@ class MusicSheetMaker:
             return None
 
         file_base = os.path.join(self.song_dir_out, self.get_song().get_title())
-        file_ext = render_mode.value[2]
+        file_ext = render_mode.extension
         
         file_paths = []
         if numfiles > 1:

@@ -1,4 +1,4 @@
-from modes import InputMode, ReplyType
+from modes import InputMode, RenderMode, ReplyType
 from communication import QueryOpen, QueryChoice, QueryMultipleChoices, QueryBoolean, QueryMemory, Information
 import io
 
@@ -244,17 +244,11 @@ class Communicator:
             except (TypeError, KeyError):
                 raise CommunicatorError('Song buffers are not wrapped in a list, but a single object of type ' + str(type(buffers)))
             else:
-                if isinstance(buffers[0],io.BytesIO):
+                if isinstance(buffers[0],(io.BytesIO, io.StringIO)):
                     results_dicts.append({
                             'result': {'result_type': type(buffers[0])},
-                            'song_images': [{'image_type': render_modes[i].value[1].lower().strip(), 'base_name': 'image_', 'number': i, 'ext': render_modes[i].value[2].lower().strip()} for i, buffer in enumerate(buffers)],
-                            'save': [{'name': 'image_'+str(i)+render_modes[i].value[2].lower().strip(), 'buffer': buffer} for i, buffer in enumerate(buffers)]
-                            })
-                elif isinstance(buffers[0],io.StringIO):
-                    results_dicts.append({
-                            'result': {'result_type': type(buffers[0])},
-                            'song_files': [{'file_type': render_modes[i].value[1].lower().strip(), 'base_name': 'file_', 'number': i, 'ext': render_modes[i].value[2].lower().strip()} for i, buffer in enumerate(buffers)],
-                            'save': [{'name': 'file_'+str(i)+render_modes[i].value[2].lower().strip(), 'buffer': buffer} for i, buffer in enumerate(buffers)]
+                            'song_files': [{'file_type': render_modes[i].mime_type, 'base_name': 'file_', 'number': i, 'ext': render_modes[i].extension} for i, buffer in enumerate(buffers)],
+                            'save': [{'name': 'file_'+str(i)+render_modes[i].extension, 'buffer': buffer} for i, buffer in enumerate(buffers)]
                             })
                 elif buffers[0] is None:
                     print('A None buffer was passed to WebsitePlayer.')
@@ -291,7 +285,9 @@ class Communicator:
             #Choices keyword arguments dictionary
             if isinstance(query, (QueryMultipleChoices, QueryChoice)):
                 if isinstance(limits[0], InputMode):
-                    choices_dicts = [{'number': i, 'text': str(limit.value[1]).strip()} for i, limit in enumerate(limits)]
+                    choices_dicts = [{'number': i, 'text': str(limit)} for i, limit in enumerate(limits)]
+                elif isinstance(limits[0], RenderMode):
+                    choices_dicts = [{'number': i, 'text': str(limit)} for i, limit in enumerate(limits)]
                 else:
                     choices_dicts = [{'number': i, 'text': str(limit).strip()} for i, limit in enumerate(limits)]
             else:
