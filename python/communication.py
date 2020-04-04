@@ -125,7 +125,7 @@ class Reply:
 
 class Query:
 
-    def __init__(self, name=None, sender=None, recipient=None, question=None, foreword=None, afterword=None, reply_type=ReplyType.OTHER, limits=None, prerequisites=None):
+    def __init__(self, name=None, sender=None, recipient=None, question=None, foreword=None, afterword=None, help_text=None, tooltip=None, reply_type=ReplyType.OTHER, limits=None, prerequisites=None):
         """
         The general Query class
 
@@ -142,6 +142,8 @@ class Query:
         self.question = question #The core question
         self.foreword = foreword
         self.afterword = afterword
+        self.help_text = help_text
+        self.tooltip = tooltip
         self.reply_type = reply_type  # Expected type of the reply, among ReplyType
         #Repairing limits:
         if not isinstance(limits, (list,tuple,set,type(None))):
@@ -163,6 +165,7 @@ class Query:
         self.result = None  # The full question with foreword and afterword
         self.is_sent = False  # The send() command has been called
         self.is_replied = False  # Has been assigned a Reply object
+        self.help_required = False
 
         self.check_and_pack() # Checks the input parameters and build the result
         
@@ -227,6 +230,18 @@ class Query:
             return ''
         else:
             return self.afterword
+
+    def get_help(self):
+        if self.help_text is None:
+            return ''
+        else:
+            return self.help_text
+
+    def get_tooltip(self):
+        if self.tooltip is None:
+            return ''
+        else:
+            return self.tooltip
 
     def get_reply_type(self):
         return self.reply_type
@@ -547,9 +562,13 @@ class Query:
         The result is the complete query, with foreword, afterword, et caetera
         This a generic return, that is  overridden in derived classes
         """
-        result = [self.get_foreword()]
+        result = []
+        if self.help_required:
+            result += [self.get_help()]
+        result += [self.get_foreword()]
         result += [self.get_question()]
         result += [self.get_afterword()]
+ 
         try:
             result = '\n'.join(filter(None, result))
         except:
@@ -625,7 +644,14 @@ class Query:
         """
         Assigns a Reply to the Query
         Caution: lists, tuples and sets are considered as a single object
-        """       
+        """    
+        self.help_required = False
+        try:
+            if answer[0].strip() == '?':
+                self.help_required = True
+                self.build_result()
+        except (IndexError, AttributeError, TypeError):
+            pass
         reply = Reply(self, answer)
         self.reply = reply
         reply.build_result()
@@ -655,7 +681,10 @@ class QueryChoice(Query):
     
     def build_result(self):
         
-        result = [self.get_foreword()]
+        result = []
+        if self.help_required:
+            result += [self.get_help()]
+        result += [self.get_foreword()]
         result += [self.get_question()]
         
         if self.reply_type == ReplyType.NOTE:
@@ -795,6 +824,8 @@ class QueryBoolean(QueryChoice):
 
         result = []
 
+        if self.help_required:
+            result += [self.get_help()]
         result += [self.get_foreword()]
         result += [self.get_question() + ' (' + (self.get_limits()[0] +
                                                  '/' + self.get_limits()[1]) + ')']

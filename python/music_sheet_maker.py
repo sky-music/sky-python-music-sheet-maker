@@ -118,7 +118,7 @@ class MusicSheetMaker:
                 try:   
                     stock_query = self.communicator.query_stock[query_name]
                     handler_args = ', '.join(('sender=q.get_sender()','query=q'))
-                    expression = 'self.' + stock_query['handler'] + '(' + handler_args + ')'
+                    expression = 'self.' + str(stock_query['handler']) + '(' + handler_args + ')'
                 except KeyError as err:
                     #TODO: handle non-stock queries???
                     raise MusicSheetMakerError('Cannot create stock query ' + repr(query_name) + ', because of ' + repr(err))
@@ -148,23 +148,7 @@ class MusicSheetMaker:
             q_create_song = kwargs['query']
         except KeyError:
             raise MusicSheetMakerError('No Query passed to create_song')
-        
-#        if self.song is not None:
-#            q_overwrite = self.communicator.send_stock_query('song_overwrite', recipient=recipient)
-#            recipient.execute_queries(q_overwrite)
-#            overwrite = q_overwrite.get_reply().get_result()
-#        else:
-#            q_overwrite = self.communicator.send_information(recipient=recipient, string='Creating new song.')
-#            recipient.execute_queries(q_overwrite)
-#            overwrite = True
-#            
-#        if not overwrite:
-#            
-#            i = self.communicator.send_information(string='Aborting.', recipient=recipient)
-#            recipient.execute_queries(i)
-            
-        #self.communicator.memory.erase(filters=('from_me'))
-        
+                
         
         #======= NEW SONG =======
         self.set_parser(SongParser(self))
@@ -400,12 +384,11 @@ class MusicSheetMaker:
             all_input_modes = [mode for mode in InputMode]
             
             q_mode = self.communicator.send_stock_query('musical_notation', recipient=recipient,
-            foreword = '\nCould not detect your note format. Maybe your song contains typo errors?',
             limits=all_input_modes, prerequisites=prerequisites)
             
         elif len(possible_modes) == 1:
-            q_mode = self.communicator.send_information(recipient=recipient, \
-                                                        string='\nWe detected that you use the following notation: ' + possible_modes[0].short_desc + '.', \
+            q_mode = self.communicator.send_stock_query('information', recipient=recipient,
+                                                        question='\nWe detected that you use the following notation: ' + possible_modes[0].short_desc + '.',
                                                         prerequisites=prerequisites)
             
         else:
@@ -434,13 +417,13 @@ class MusicSheetMaker:
             possible_keys = self.get_parser().find_key(notes)
             
             if len(possible_keys) == 0:
-                q_key = self.communicator.send_information(string="\nYour song cannot be transposed exactly in Sky\nDefault key will be set to C.", \
+                q_key = self.communicator.send_stock_query('information', question="\nYour song cannot be transposed exactly in Sky\nDefault key will be set to C.", \
                                                            recipient=recipient, prerequisites=prerequisites)
                 possible_keys = ['C']
                 # trans = input('Enter a key or a number to transpose your song within the chromatic scale:')                
             elif len(possible_keys) == 1:
-                q_key = self.communicator.send_information(
-                    string="\nYour song can be transposed in Sky with the following key: " + str(possible_keys[0]),
+                q_key = self.communicator.send_stock_query('information',
+                    question="\nYour song can be transposed in Sky with the following key: " + str(possible_keys[0]),
                     recipient=recipient, prerequisites=prerequisites)
             else:
                 q_key = self.communicator.send_stock_query('possible_keys', recipient=recipient, \
@@ -491,7 +474,7 @@ class MusicSheetMaker:
             'https://sky.bloomexperiment.com/t/summary-of-input-modes/403'
         
         if message != '':
-            i_error = self.communicator.send_information(recipient=recipient, string=message, prerequisites=prerequisites)
+            i_error = self.communicator.send_stock_query('information', recipient=recipient, question=message, prerequisites=prerequisites)
         else:
             i_error = None
             return (i_error, None)

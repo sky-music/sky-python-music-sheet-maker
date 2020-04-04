@@ -52,12 +52,14 @@ class CommandLinePlayer:
             await Questions.ask_text(self.bot, channel, ctx.author, question...)
         """
         for q in queries:
-            question = self.communicator.query_to_stdout(q)
             reply_valid = False
             while not reply_valid:
+                question = self.communicator.query_to_stdout(q)
                 reply_valid = True #to be sure to break the loop
                 if q.get_expect_reply():                  
                     #print('%%%DEBUG. PLAYER, YOU ARE BEING PROMPTED%%%') #FIXME: for debugging only                    
+                    #if not reply_valid and q.get_reply().get_answer() == '?':
+                    #    print('It seems you need help')                  
                     answer = input(question + ': ')   
                     q.reply_to(answer)
                     reply_valid = q.get_reply_validity()

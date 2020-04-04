@@ -66,7 +66,7 @@ class Communicator:
         self.query_stock = {
             # Queries asked by the Player / Music Cog
             'create_song': {'class': QueryOpen.__name__,
-                            'handler': 'create_song',
+                            'handler': 'create_song', #The name of the method that must be executed by the recipient
                             'question': 'create_song',
                             'reply_type': ReplyType.BUFFERS
                             },
@@ -76,90 +76,139 @@ class Communicator:
                             'handler': 'None',
                             'question': '',
                             'reply_type': ReplyType.TEXT},
-                            
-#            # Queries asked by Music Sheet Maker
-#            'song_overwrite': {'class': QueryBoolean.__name__,
-#                             'handler': 'None',
-#                             'foreword': 'A Song already exists in memory.',
-#                             'question': 'Do you want to overwrite it?',
-#                             'reply_type': ReplyType.TEXT},
-                            
-            #TODO: Add complete instructions, see responder.py
+                                                        
             'instructions_stdout': {'class': Information.__name__,
                              'handler': 'None',
                              'foreword': '===== VISUAL MUSIC SHEETS FOR SKY:CHILDREN OF THE LIGHT =====',
                              'question': '',
-                             'afterword': '='*30},
+                             'afterword': '='*30,
+                             'help_text': '',
+                             'tooltip': ''},
                                         
             'instructions': {'class': Information.__name__,
                              'handler': 'None',
                              'foreword': '',
-                             'question': '',
-                             'afterword': ''},
+                             'question': '', #Will be overwritten
+                             'afterword': '',
+                             'help_text': '',
+                             'tooltip': ''},
 
             'render_modes': {'class': QueryMultipleChoices.__name__,
                              'handler': 'None',
                              'foreword': '',
                              'question': 'Please choose one or several output rendering formats',
+                             'afterword': '',
+                             'help_text': '',
+                             'tooltip': '',
                              'reply_type': ReplyType.RENDERMODES,
                              'limits': []},
                             
             'song_title': {'class': QueryOpen.__name__,
                              'handler': 'None',
+                             'foreword': '',
                              'question': 'What is the song title?',
-                             'reply_type': ReplyType.TEXT},
+                             'afterword': '',
+                             'help_text': '',
+                             'tooltip': '',
+                             'reply_type': ReplyType.TEXT,
+                             'limits': None},
                             
             'original_artist': {'class': QueryOpen.__name__,
                              'handler': 'None',
+                             'foreword': '',
                              'question': 'What is the Original artist(s)?',
-                             'reply_type': ReplyType.TEXT},
+                             'afterword': '',
+                             'help_text': '',
+                             'tooltip': '',
+                             'reply_type': ReplyType.TEXT,
+                             'limits': None},
                             
             'transcript_writer': {'class': QueryOpen.__name__,
                              'handler': 'None',
+                             'foreword': '',
                              'question': 'What is the transcript writer?',
-                             'reply_type': ReplyType.TEXT},
+                             'afterword': '',
+                             'help_text': '',
+                             'tooltip': '',
+                             'reply_type': ReplyType.TEXT,
+                             'limits': None},
                             
             'song_notes_files': {'class': QueryOpen.__name__,
                              'handler': 'None',
-                             'question': 'Please type or copy-paste notes, or enter file name',
+                             'foreword': '',
+                             'question': '', #Will be overwritten
+                             'afterword': '',
+                             'help_text': '',
+                             'tooltip': '',
                              'reply_type': ReplyType.OTHER,
                              'limits': None},
                             
             'song_file': {'class': QueryOpen.__name__,
                              'handler': 'None',
-                             'question': 'Please  enter file name in',
+                             'foreword': '',
+                             'question': '', #Will be overwritten
+                             'afterword': '',
+                             'help_text': 'Type one or several notes in your favorite format, for instance C D E F G.'
+                                          'For chords (notes played together) glue the notes',
+                             'tooltip': 'any text with one or several notes',
                              'reply_type': ReplyType.FILEPATH,
                              'limits': '.'},
                             
             'song_notes': {'class': QueryOpen.__name__,
                              'handler': 'None',
+                             'foreword': '',
                              'question': 'Please type or copy-paste notes',
+                             'afterword': '',
+                             'help_text': '',
+                             'tooltip': '',
                              'reply_type': ReplyType.TEXT,
                              'limits': None},
-                            
+            
+#            'one_musical_notation': {'class': Information.__name__,
+#                             'handler': 'None',
+#                             'foreword': '===== VISUAL MUSIC SHEETS FOR SKY:CHILDREN OF THE LIGHT =====',
+#                             'question': '',
+#                             'afterword': '='*30,
+#                             'help_text': '',
+#                             'tooltip': ''},
+#                           
             'musical_notation': {'class': QueryChoice.__name__,
                              'handler': 'None',
-                             'foreword': 'Several possible notations detected.',
-                             'question': 'Please choose your note format',
+                             'foreword': 'Despite our efforts, we could not guess what musical notation you are using.',
+                             'question': 'Please help us by choosing your format in the list below',
+                             'afterword': '',
+                             'help_text': 'In the previous question, you have typed your song notes.',
+                             'tooltip': 'Choice number (integer between 0 and n-1)',
                              'reply_type': ReplyType.INPUTMODE,
                              'limits': []},
                             
             'possible_keys': {'class': QueryChoice.__name__,
                              'handler': 'None',
+                             'foreword': '',
                              'question': 'Please choose your musical key',
+                             'afterword': '',
+                             'help_text': '',
+                             'tooltip': '',
                              'reply_type': ReplyType.NOTE,
-                             'limits': None},
+                             'limits': []},
                             
             'recommended_key': {'class': QueryOpen.__name__,
                              'handler': 'None',
                              'foreword': 'Your notes use relative pitch notation.',
                              'question': 'What is the recommended key to play in Sky (default is C)',
+                             'afterword': '',
+                             'help_text': '',
+                             'tooltip': '',
                              'reply_type': ReplyType.NOTE,
                              'limits': None},
                             
             'octave_shift': {'class': QueryOpen.__name__,
                              'handler': 'None',
+                             'foreword': '',
                              'question': 'Do you want to shift by n octaves?',
+                             'afterword': '',
+                             'help_text': '',
+                             'tooltip': '',
                              'reply_type': ReplyType.INTEGER,
                              'limits': [-6,6]}
         }
@@ -279,7 +328,8 @@ class Communicator:
             else:
                 multiple_choices = False
             
-            question_dict = {'text': query.get_foreword()+'\n'+query.get_question().strip(), 'identifier': query.get_identifier(), \
+            question_dict = {'foreword': query.get_foreword().strip(), 'question': query.get_question().strip(), 'afterword': query.get_afterword().strip(),
+                             'help_text': query.get_help_text().strip(), 'tooltip': query.get_tooltip().strip(), 'identifier': query.get_identifier(),
                              'expect_answer': query.get_expect_reply(), 'multiple_choices': multiple_choices}
             
             #Choices keyword arguments dictionary
@@ -326,14 +376,4 @@ class Communicator:
         #=> Requires interpreting strings or finding key strings within a sentence
         #This is usually done in the Cog, note here
         return
-    
-    def send_information(self, recipient, string, prerequisites=None):
-        """
-        A shortcut to send an information Query. Could be replaced by a stock query though.
-        """
-        i = Information(sender=self, recipient=recipient, question=string, prerequisites=prerequisites)
-        self.memory.store(i)
-        i.send(recipient=recipient)
-        return i
-    
 
