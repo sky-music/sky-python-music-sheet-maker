@@ -58,9 +58,7 @@ class CommandLinePlayer:
                 reply_valid = True #to be sure to break the loop
                 if q.get_expect_reply():                  
                     #print('%%%DEBUG. PLAYER, YOU ARE BEING PROMPTED%%%') #FIXME: for debugging only                    
-                    #if not reply_valid and q.get_reply().get_answer() == '?':
-                    #    print('It seems you need help')                  
-                    answer = input(question + ': ')   
+                    answer = input('\n%s: '%question)   
                     q.reply_to(answer)
                     reply_valid = q.get_reply_validity()
                 else:                  

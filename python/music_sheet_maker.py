@@ -221,20 +221,14 @@ class MusicSheetMaker:
    
     def ask_instructions(self, recipient, prerequisites=None, execute=True):
         
-        question = '\nAccepted music notes formats:'
-        for input_mode in InputMode:
-            question += '\n* ' + input_mode.long_desc
-        question += '\nNotes composing a chord must be glued together (e.g. A1B1C1).'
-        question += '\nSeparate chords with \"' + self.get_parser().get_icon_delimiter() + '\".'
-        question += '\nUse \"' + self.get_parser().get_pause() + '\" for a silence (rest).'
-        question += '\nUse \"' + self.get_parser().get_quaver_delimiter() + '\" to link notes within an icon, for triplets, quavers... (e.g. ' + self.get_parser().get_quaver_delimiter().join(('A1','B1','C1'))
-        question +=( '\nAdd \"' + self.get_parser().get_repeat_indicator() + '2\" after a chord to indicate repetition.')
-        question += '\nSharps # and flats b (semitones) are supported for Western and Jianpu notations.'
-        
+        question_rep = ('\n'.join(['\n* ' + input_mode.long_desc for input_mode in InputMode]), self.get_parser().get_icon_delimiter(), self.get_parser().get_pause(),
+                        self.get_parser().get_quaver_delimiter(), self.get_parser().get_quaver_delimiter().join(['A1','B1','C1']),
+                        self.get_parser().get_repeat_indicator()+'2')
+                
         if recipient.get_name() == 'command-line':        
-            i_instructions = self.communicator.send_stock_query('instructions_stdout', recipient=recipient, question=question, prerequisites=prerequisites)
+            i_instructions = self.communicator.send_stock_query('instructions_stdout', recipient=recipient, question_rep=question_rep, prerequisites=prerequisites)
         else:
-            i_instructions = self.communicator.send_stock_query('instructions', recipient=recipient, question=question, prerequisites=prerequisites)
+            i_instructions = self.communicator.send_stock_query('instructions', recipient=recipient, question_rep=question_rep, prerequisites=prerequisites)
         
         if execute:
             recipient.execute_queries(i_instructions)
@@ -261,7 +255,7 @@ class MusicSheetMaker:
 
     def ask_notes(self, recipient, prerequisites=None, execute=True):
         
-        q_notes = self.communicator.send_stock_query('song_notes', recipient=recipient, prerequisites=prerequisites)            
+        q_notes = self.communicator.send_stock_query('notes', recipient=recipient, prerequisites=prerequisites)            
              
         if execute:
             recipient.execute_queries(q_notes)
@@ -273,8 +267,8 @@ class MusicSheetMaker:
     
     def ask_file(self, recipient, prerequisites=None, execute=True):
                    
-        q_file = self.communicator.send_stock_query('song_file', question='Enter file name (in ' + os.path.relpath(os.path.normpath(self.song_dir_in)) + '/)',\
-                                                    recipient=recipient, prerequisites=prerequisites, limits=(os.path.normpath(self.song_dir_in)))
+        q_file = self.communicator.send_stock_query('file', recipient=recipient, question_rep=(os.path.relpath(os.path.normpath(self.song_dir_in))),
+                                                    prerequisites=prerequisites, limits=(os.path.normpath(self.song_dir_in)))
         
         if execute:
             recipient.execute_queries(q_file)
@@ -309,8 +303,7 @@ class MusicSheetMaker:
         If a file name is detected but the file does not exist, sends a query to ask for a valid file path
         If notes are detected, return the notes as a list of strings splitted by the OS line separator
         """
-        q_notes = self.communicator.send_stock_query('song_notes_files', \
-                                                     question='Type or copy-paste notes, or enter file name (in ' + os.path.relpath(os.path.normpath(self.song_dir_in)) + '/)',\
+        q_notes = self.communicator.send_stock_query('notes_file', question_rep=(os.path.relpath(os.path.normpath(self.song_dir_in))),
                                                      recipient=recipient, prerequisites=prerequisites)
         
         if not execute:            
@@ -343,7 +336,7 @@ class MusicSheetMaker:
                 
                 if self.is_commandline(recipient): #Loop to ask for several lines in the standard input interface           
                     while result:                            
-                        q_notes = self.communicator.send_stock_query('song_notes', recipient=recipient, prerequisites=prerequisites)
+                        q_notes = self.communicator.send_stock_query('notes', recipient=recipient, prerequisites=prerequisites)
                         recipient.execute_queries(q_notes)
                         result = q_notes.get_reply().get_result()
                         
@@ -387,9 +380,8 @@ class MusicSheetMaker:
             limits=all_input_modes, prerequisites=prerequisites)
             
         elif len(possible_modes) == 1:
-            q_mode = self.communicator.send_stock_query('information', recipient=recipient,
-                                                        question='\nWe detected that you use the following notation: ' + possible_modes[0].short_desc + '.',
-                                                        prerequisites=prerequisites)
+            q_mode = self.communicator.send_stock_query('one_input_mode', recipient=recipient,
+                                                        question_rep=(possible_modes[0].short_desc), prerequisites=prerequisites)
             
         else:
             q_mode = self.communicator.send_stock_query('musical_notation', recipient=recipient, limits=possible_modes, prerequisites=prerequisites)
@@ -417,18 +409,15 @@ class MusicSheetMaker:
             possible_keys = self.get_parser().find_key(notes)
             
             if len(possible_keys) == 0:
-                q_key = self.communicator.send_stock_query('information', question="\nYour song cannot be transposed exactly in Sky\nDefault key will be set to C.", \
-                                                           recipient=recipient, prerequisites=prerequisites)
+                q_key = self.communicator.send_stock_query('no_possible_key', recipient=recipient, prerequisites=prerequisites)
                 possible_keys = ['C']
                 # trans = input('Enter a key or a number to transpose your song within the chromatic scale:')                
             elif len(possible_keys) == 1:
-                q_key = self.communicator.send_stock_query('information',
-                    question="\nYour song can be transposed in Sky with the following key: " + str(possible_keys[0]),
-                    recipient=recipient, prerequisites=prerequisites)
+                q_key = self.communicator.send_stock_query('one_possible_key', recipient=recipient,
+                                                           question_rep=(str(possible_keys[0])), prerequisites=prerequisites)
             else:
-                q_key = self.communicator.send_stock_query('possible_keys', recipient=recipient, \
-                                                           foreword="\nYour song can be transposed in Sky with the following keys: " + ', '.join(possible_keys) + '.', \
-                                                           limits=possible_keys, prerequisites=prerequisites)
+                q_key = self.communicator.send_stock_query('possible_keys', recipient=recipient,
+                                                           foreword_rep=(', '.join(possible_keys)), limits=possible_keys, prerequisites=prerequisites)
         else:
             q_key = self.communicator.send_stock_query('recommended_key', recipient=recipient, prerequisites=prerequisites)
             possible_keys = self.get_parser().find_key('') #should return None
@@ -464,20 +453,11 @@ class MusicSheetMaker:
         error_ratio = self.get_song().get_num_broken() / max(1, self.get_song().get_num_instruments())
        
         if error_ratio == 0:
-            message = ''
-        elif error_ratio < 0.05:
-            message = 'Song successfully read with a few errors.'
-        else:
-            message = '**WARNING**: Your song contains many errors. Please check the following:' + \
-            '\n- All your notes are within octaves 4 and 6. If not, try again with an octave shift.' + \
-            '\n- Your song is free of typos. Please check this website for full instructions: ' + \
-            'https://sky.bloomexperiment.com/t/summary-of-input-modes/403'
-        
-        if message != '':
-            i_error = self.communicator.send_stock_query('information', recipient=recipient, question=message, prerequisites=prerequisites)
-        else:
             i_error = None
-            return (i_error, None)
+        elif error_ratio < 0.05:
+            i_error = self.communicator.send_stock_query('few_errors', recipient=recipient, prerequisites=prerequisites)
+        else:
+            i_error = self.communicator.send_stock_query('many_errors', recipient=recipient, prerequisites=prerequisites)
         
         if execute and i_error is not None:
             recipient.execute_queries(i_error)
@@ -504,7 +484,7 @@ class MusicSheetMaker:
             os.mkdir(self.song_dir_out)
 
         if len(buffers) != len(file_paths):
-            raise MusicSheetMakerError('inconsistent len gths of buffers and file_paths')
+            raise MusicSheetMakerError('inconsistent lengths of buffers and file_paths')
 
         (file_base, file_ext) = os.path.splitext(file_paths[0])
 
@@ -525,19 +505,19 @@ class MusicSheetMaker:
             
                 if numfiles == 1:
                     
-                    message = '\nYour ' + render_mode.short_desc + ' is located at: ' + os.path.relpath(file_paths[0])
+                    question_rep = (render_mode.short_desc, str(os.path.relpath(file_paths[0])))
+                    
+                    i_song_files = self.communicator.send_stock_query('one_song_file', recipient=recipient, question_rep=question_rep, prerequisites=prerequisites)
                     
                 elif numfiles > 1 and i == 0:
                     
-                    message = '\nYour ' + render_mode.short_desc + ' is located in: ' + os.path.relpath(self.song_dir_out)
-                    
-                    message += 'Your song has been split into ' + str(numfiles) + ' files between ' + os.path.split(file_paths[0])[
-                                1] + ' and ' + os.path.split(file_paths[-1])[1]
+                    question_rep = (render_mode.short_desc, str(os.path.relpath(self.song_dir_out)))
+                    afterword_rep = (str(numfiles), str(os.path.split(file_paths[0])[1]), str(os.path.split(file_paths[-1])[1]))
+                    i_song_files = self.communicator.send_stock_query('several_song_files', recipient=recipient, question_rep=question_rep, afterword_rep=afterword_rep, prerequisites=prerequisites)
             else:
-                message = '\nYour ' + render_mode.short_desc + ' was not saved to file.'   
-
-        i_song_files = self.communicator.send_stock_query('information', foreword="-"*40, \
-                                                     question=message, recipient=recipient, prerequisites=prerequisites)    
+                question_rep = (render_mode.short_desc)
+                i_song_files = self.communicator.send_stock_query('np_song_file', recipient=recipient, question_rep=question_rep, prerequisites=prerequisites)
+        
         if execute:
             recipient.execute_queries(i_song_files)
             result = i_song_files.get_reply().get_result()

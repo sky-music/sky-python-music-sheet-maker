@@ -125,7 +125,7 @@ class Reply:
 
 class Query:
 
-    def __init__(self, name=None, sender=None, recipient=None, question=None, foreword=None, afterword=None, help_text=None, tooltip=None, reply_type=ReplyType.OTHER, limits=None, prerequisites=None):
+    def __init__(self, name=None, sender=None, recipient=None, question=None, foreword=None, afterword=None, help_text=None, input_tip=None, reply_type=ReplyType.OTHER, limits=None, prerequisites=None):
         """
         The general Query class
 
@@ -143,7 +143,7 @@ class Query:
         self.foreword = foreword
         self.afterword = afterword
         self.help_text = help_text
-        self.tooltip = tooltip
+        self.input_tip = input_tip
         self.reply_type = reply_type  # Expected type of the reply, among ReplyType
         #Repairing limits:
         if not isinstance(limits, (list,tuple,set,type(None))):
@@ -231,17 +231,17 @@ class Query:
         else:
             return self.afterword
 
-    def get_help(self):
+    def get_help_text(self):
         if self.help_text is None:
             return ''
         else:
             return self.help_text
 
-    def get_tooltip(self):
-        if self.tooltip is None:
+    def get_input_tip(self):
+        if self.input_tip is None:
             return ''
         else:
-            return self.tooltip
+            return self.input_tip
 
     def get_reply_type(self):
         return self.reply_type
@@ -451,7 +451,10 @@ class Query:
                 
                 
     def check_reply(self):
-                
+         
+        if self.help_required:
+            return False        
+        
         if not isinstance(self.reply, Reply):
             
             self.is_replied = False
@@ -564,7 +567,7 @@ class Query:
         """
         result = []
         if self.help_required:
-            result += [self.get_help()]
+            result += [self.get_help_text()+'\n']
         result += [self.get_foreword()]
         result += [self.get_question()]
         result += [self.get_afterword()]
@@ -585,7 +588,8 @@ class Query:
         sender_name = self.get_locutor_name(self.get_sender())
         recipient_name = self.get_locutor_name(self.get_recipient())
         
-        hashables = [sender_name, recipient_name, self.get_result(), self.get_limits(), self.get_prerequisites()]
+        hashables = [sender_name, recipient_name, self.get_foreword(), self.get_question(), self.get_afterword(), 
+        self.get_limits(), self.get_prerequisites()]
         hashables = [str(hashable).lower().strip() for hashable in hashables]
         #self.identifier = hash(','.join(hashables)) #Python built-in has method, changes at each python sessions
         m = hashlib.md5()
@@ -645,13 +649,13 @@ class Query:
         Assigns a Reply to the Query
         Caution: lists, tuples and sets are considered as a single object
         """    
-        self.help_required = False
         try:
-            if answer[0].strip() == '?':
-                self.help_required = True
+            if self.help_required is not (answer[0].strip() == '?'):
+                self.help_required = not self.help_required
                 self.build_result()
         except (IndexError, AttributeError, TypeError):
-            pass
+            self.help_required = False #Important: to avoid looping over an empty string
+            
         reply = Reply(self, answer)
         self.reply = reply
         reply.build_result()
@@ -683,7 +687,7 @@ class QueryChoice(Query):
         
         result = []
         if self.help_required:
-            result += [self.get_help()]
+            result += [self.get_help_text()]
         result += [self.get_foreword()]
         result += [self.get_question()]
         
@@ -825,7 +829,7 @@ class QueryBoolean(QueryChoice):
         result = []
 
         if self.help_required:
-            result += [self.get_help()]
+            result += [self.get_help_text()]
         result += [self.get_foreword()]
         result += [self.get_question() + ' (' + (self.get_limits()[0] +
                                                  '/' + self.get_limits()[1]) + ')']
