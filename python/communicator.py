@@ -187,7 +187,7 @@ class Communicator:
                              'foreword': 'Despite our efforts, we could not guess what musical notation you are using.',
                              'question': 'Please help us by choosing your format in the list below',
                              'afterword': '',
-                             'help_text': 'In the previous question, you have typed your song notes.',
+                             'help_text': 'In the previous question, you have typed your song notes. We tried to automatically guess which notation you are using. Despite our best efforts, there is still an ambiguity. Please select the right one in the list.',
                              'input_tip': 'Choice number (integer between 0 and n-1)',
                              'reply_type': ReplyType.INPUTMODE,
                              'limits': []},
@@ -212,7 +212,7 @@ class Communicator:
                              'question': 'Please choose your musical key',
                              'afterword': '',
                              'help_text': 'Sky\'s musical system does not include sharps # and flats b. Hence you cannot play any song from the outside world.'
-                                          ' We detected that your song can be played with several notes as the song key. Please choose the one which is most convenient for you.',
+                                          ' We detected that your song can be played with several notes as the song key. Please choose the one that is most convenient for you.',
                              'input_tip': 'Choice number (integer between 0 and n-1)',
                              'reply_type': ReplyType.NOTE,
                              'limits': []},
