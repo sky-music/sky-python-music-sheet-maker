@@ -438,7 +438,7 @@ class Communicator:
             except AttributeError:
                 answer_text = ''
                 
-            if 'song_notes' in query.get_name().strip().lower():
+            if 'notes' in query.get_name().strip().lower(): #FIXME: this trick is a bit ugly (not very robust)
                 answer_dict = {'answer_length': 'long', 'long_text': str(answer_text), 'short_text': ''}
             else:
                 answer_dict = {'answer_length': 'short', 'long_text': '', 'short_text': str(answer_text)}
