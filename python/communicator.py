@@ -81,24 +81,24 @@ class Communicator:
                              'handler': 'None',
                              'foreword': '===== VISUAL MUSIC SHEETS FOR SKY:CHILDREN OF THE LIGHT =====\n',
                              'question': 'Accepted music notes formats:%s'
-                             '\nNotes composing a chord must be glued together (e.g. A1B1C1).'
-                             '\nSeparate chords with %s'
-                             '\nUse "%s" for a silence (rest).'
-                             '\nUse "%s" to link notes within an icon, for triplets, quavers... (e.g. %s)'
-                             '\nAdd "%s" after a chord to indicate repetition.'
-                             '\nSharps # and flats b (semitones) are supported for Western and Jianpu notations.',
+                                         '\nNotes composing a chord must be glued together (e.g. A1B1C1).'
+                                         '\nSeparate chords with %s'
+                                         '\nUse "%s" for a silence (rest).'
+                                         '\nUse "%s" to link notes within an icon, for triplets, quavers... (e.g. %s)'
+                                         '\nAdd "%s" after a chord to indicate repetition.'
+                                         '\nSharps # and flats b (semitones) are supported for Western and Jianpu notations.',
                              'afterword': '='*30},
                                         
             'instructions': {'class': Information.__name__,
                              'handler': 'None',
                              'foreword': '',
                              'question': 'Accepted music notes formats:%s'
-                             '\nNotes composing a chord must be glued together (e.g. A1B1C1).'
-                             '\nSeparate chords with %s'
-                             '\nUse "%s" for a silence (rest).'
-                             '\nUse "%s" to link notes within an icon, for triplets, quavers... (e.g. %s)'
-                             '\nAdd "%s" after a chord to indicate repetition.'
-                             '\nSharps # and flats b (semitones) are supported for Western and Jianpu notations.',
+                                         '\nNotes composing a chord must be glued together (e.g. A1B1C1).'
+                                         '\nSeparate chords with %s'
+                                         '\nUse "%s" for a silence (rest).'
+                                         '\nUse "%s" to link notes within an icon, for triplets, quavers... (e.g. %s)'
+                                         '\nAdd "%s" after a chord to indicate repetition.'
+                                         '\nSharps # and flats b (semitones) are supported for Western and Jianpu notations.',
                              'afterword': '',
                              'input_tip': 'click OK to acknowledge'},
 
@@ -108,7 +108,7 @@ class Communicator:
                              'question': 'Please choose one or several output rendering formats',
                              'afterword': '',
                              'help_text': 'The visual sheet can be rendered in several file formats.'
-                             'Please choose the ones you want to generate.',
+                                          ' Please select the ones you want to generate (or deselect some).',
                              'input_tip': 'check one or several boxes',
                              'reply_type': ReplyType.RENDERMODES,
                              'limits': []},
@@ -149,7 +149,7 @@ class Communicator:
                              'question': 'Type or copy-paste notes, or enter file name (in %s/)',
                              'afterword': '',
                              'help_text': 'You can type or copy-paste notes directly in this field.'
-                             ' You can also enter the path to a a text file containing the notes.',
+                                          ' You can also enter the path to a a text file containing the notes.',
                              'input_tip': 'a string of notes such as C1 D1F1, or a file name such as song.txt',
                              'reply_type': ReplyType.OTHER,
                              'limits': None},
@@ -160,7 +160,7 @@ class Communicator:
                              'question': 'Enter file name (in %s/)',
                              'afterword': '',
                              'help_text': '',
-                             'input_tip': 'any text with one or several notes',
+                             'input_tip': 'any text with one or several musical notes',
                              'reply_type': ReplyType.FILEPATH,
                              'limits': '.'},
                             
@@ -171,7 +171,7 @@ class Communicator:
                              'afterword': '',
                              'help_text': 'Type one or several notes in your favorite format, for instance C D E F G.'
                                           ' For chords (notes played together) glue the notes together (eg C1D1)',
-                             'input_tip': '',
+                             'input_tip': 'any text with one or several musical notes',
                              'reply_type': ReplyType.TEXT,
                              'limits': None},
             
@@ -197,7 +197,7 @@ class Communicator:
                              'foreword': '',
                              'question': 'Your song cannot be transposed exactly in Sky\nDefault key will be set to C.',
                              'afterword': '',
-                             'input_tip': ''},                                                   
+                             'input_tip': 'click OK to acknowledge'},                                                   
                                 
             'one_possible_key': {'class': Information.__name__,
                              'handler': 'None',
@@ -212,7 +212,7 @@ class Communicator:
                              'question': 'Please choose your musical key',
                              'afterword': '',
                              'help_text': 'Sky\'s musical system does not include sharps # and flats b. Hence you cannot play any song from the outside world.'
-                             ' We detected that your song can be played with several notes as the song key. Please choose the one which is most convenient for you.',
+                                          ' We detected that your song can be played with several notes as the song key. Please choose the one which is most convenient for you.',
                              'input_tip': 'Choice number (integer between 0 and n-1)',
                              'reply_type': ReplyType.NOTE,
                              'limits': []},
@@ -223,7 +223,7 @@ class Communicator:
                              'question': 'What is the recommended key to play in Sky (default is C)',
                              'afterword': '',
                              'help_text': 'You have used a musical notation that does allow to determine the exact pitch of your notes.'
-                             ' Hence the visual sheet will sound differently in different places in Sky.',
+                                          ' Hence the visual sheet will sound differently in different places in Sky.',
                              'input_tip': 'leave blank, or type a note name (e.g. C in English notation)',
                              'reply_type': ReplyType.NOTE,
                              'limits': None},
@@ -234,9 +234,9 @@ class Communicator:
                              'question': 'Octave shift (leave blank to skip)',
                              'afterword': '',
                              'help_text': 'A musical note is identified by its name and an octave number. Sky\'s music system spans less than 3 octaves.'
-                             ' If you do not specify an octave number after a note, we will assume it is the first octave of Sky, so your notes will essential by played near the bass.'
-                             ' You can shift your notes to a higher pitch by setting a positive number in this field.'
-                             ' If you have specified an octave number and it is too high to be played within Sky\'s system, you can downshift the pitch by entering a negative integer',
+                                          ' If you do not specify an octave number after a note, we will assume it is the first octave of Sky, so your notes will essential by played near the bass.'
+                                          ' You can shift your notes to a higher pitch by setting a positive number in this field.'
+                                          ' If you have specified an octave number and it is too high to be played within Sky\'s system, you can downshift the pitch by entering a negative integer',
                              'input_tip': 'octave shift as an integer between -6 and +6',
                              'reply_type': ReplyType.INTEGER,
                              'limits': [-6,6]},
@@ -274,9 +274,9 @@ class Communicator:
                              'foreword': '',
                              'question': '**WARNING**: Your song contains many errors.',
                              'afterword': 'Please check the following:'
-                             '\n- All your notes are within octaves 4 and 6. If not, try again with an octave shift.'
-                             '\n- Your song is free of typos. Please check this website for full instructions: '
-                             'https://sky.bloomexperiment.com/t/summary-of-input-modes/403',
+                                          '\n- All your notes are within octaves 4 and 6. If not, try again with an octave shift.'
+                                          '\n- Your song is free of typos. Please check this website for full instructions: '
+                                          'https://sky.bloomexperiment.com/t/summary-of-input-modes/403',
                              'input_tip': 'click OK to acknowledge'}                                                                                                                                                                                                                                                                                                                   
         }
 
