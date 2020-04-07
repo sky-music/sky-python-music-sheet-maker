@@ -1,6 +1,6 @@
 import re
 
-import english
+from noteparsers import english
 
 
 class EnglishChords(english.English):

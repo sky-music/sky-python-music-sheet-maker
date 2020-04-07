@@ -180,7 +180,7 @@ class MusicSheetMaker:
         q_shift = self.communicator.send_stock_query('octave_shift', recipient=recipient)
         recipient.execute_queries(q_shift)
         octave_shift = q_shift.get_reply().get_result()
-                
+        
         # Parse song
         self.set_song(self.get_parser().parse_song(notes, song_key, octave_shift))
         (i_error, res) = self.display_error_ratio(recipient=recipient, prerequisites=[q_notes, q_mode, q_shift])
@@ -425,8 +425,10 @@ class MusicSheetMaker:
         if execute:
             recipient.execute_queries(q_key)
             if possible_keys is None:
+                print('%%%WE SHOULD REACH HERE 1%%%')
                 song_key = q_key.get_reply().get_result()
                 if len(song_key) == 0:
+                    print('%%%WE SHOULD REACH HERE 2%%%')
                     song_key = 'C'
             elif len(possible_keys) > 1:
                 song_key = q_key.get_reply().get_result()

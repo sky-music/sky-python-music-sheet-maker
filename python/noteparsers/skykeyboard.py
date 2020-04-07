@@ -1,7 +1,7 @@
 import re
 import os
 
-import sky
+from noteparsers import sky
 
 
 class SkyKeyboard(sky.Sky):
