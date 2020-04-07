@@ -17,8 +17,8 @@ async def ainput(prompt: str = ""):
 async def main():
     
     toto = CommandLinePlayer()
-    name = await ainput("What's your name? ")
-    print("Hello, {}!".format(name))
+    #name = await ainput("What's your name? ")
+    #print("Hello, {}!".format(name))
     #await means: Suspend execution of main() until the result of ainput() is returned
     return
 
@@ -30,5 +30,5 @@ loop = asyncio.get_event_loop()
 
 try:
     loop.run_until_complete(main())
-finally:
-    loop.close()
+except:
+    pass

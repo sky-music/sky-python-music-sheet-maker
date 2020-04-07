@@ -1,10 +1,10 @@
 import re
 import os
 
-from noteparsers import sky
+import noteparsers.sky
 
 
-class SkyKeyboard(sky.Sky):
+class SkyKeyboard(noteparsers.sky.Sky):
 
     def __init__(self):
 
