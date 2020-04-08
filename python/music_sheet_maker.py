@@ -22,7 +22,6 @@ class MusicSheetMaker:
         self.communicator = Communicator(owner=self)
         self.song = None
         self.song_parser = None
-        #self.directory_base = os.path.normpath(os.path.join(os.getcwd(),'../'))
         self.directory_base = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)),'..'))
         self.song_dir_in = os.path.join(self.directory_base,songs_in)
         self.song_dir_out = os.path.join(self.directory_base,songs_out)
@@ -34,8 +33,8 @@ class MusicSheetMaker:
         self.render_modes_disabled = []
         self.render_modes_enabled = [mode for mode in self.render_modes_enabled if
                                      mode not in self.render_modes_disabled]
-        self.discord_render_mode = RenderMode.PNG
-        self.website_render_modes = []
+        self.botcog_render_modes = [RenderMode.PNG]
+        self.website_render_modes = [RenderMode.HTML]
         
     def __getattr__(self, attr_name):
         """
@@ -49,12 +48,16 @@ class MusicSheetMaker:
     def get_name(self):
         return self.name
 
-    def is_botcog(self, recipient):       
+    def is_botcog(self, recipient):
         try:
-            recipient.bot
-            return True
+            is_bot = recipient.get_name() == "music-cog"
         except AttributeError:
-            return False
+            try:
+                recipient.bot
+                is_bot = True
+            except AttributeError:
+                is_bot = False
+        return is_bot
 
     def is_commandline(self, recipient): 
         try:
@@ -63,13 +66,13 @@ class MusicSheetMaker:
             return False
 
     def is_website(self, recipient):
-        is_website = False
         try:
             is_website = recipient.get_name() == "sky-music-website"
         except AttributeError:
-            if not self.is_botcog(recipient) and not self.is_commandline(recipient):
+            try:
+                recipient.session_ID
                 is_website = True
-            else:
+            except:
                 is_website = False
 
         return is_website      
@@ -94,7 +97,6 @@ class MusicSheetMaker:
     def get_render_modes_enabled(self):
 
         return self.render_modes_enabled
-
 
     def execute_queries(self, queries=None):
 
@@ -158,11 +160,10 @@ class MusicSheetMaker:
         self.set_song_parser()
 
         # 2. Display instructions
-        i_instr, res = self.ask_instructions(recipient=recipient)
+        (i_instr, res) = self.ask_instructions(recipient=recipient)
     
-        # 2.b Ask for render modes (website only)
-        if self.is_website(recipient):
-            q_render, self.website_render_modes = self.ask_render_modes(recipient=recipient)
+        # 2.b Ask for render modes (query created for website only)
+        (q_render, render_modes) = self.ask_render_modes(recipient=recipient)
     
         # 3. Ask for notes
         #TODO: allow the player to enter the notes using several messages??? or maybe not
@@ -175,7 +176,7 @@ class MusicSheetMaker:
         (q_mode, input_mode) = self.ask_input_mode(recipient=recipient, notes=notes, prerequisites=[q_notes])
         
         # 5. Set input_mode
-        self.get_song_parser().set_input_mode(input_mode)
+         self.get_song_parser().set_input_mode(input_mode)
         
         # 6. Ask for song keye (or display the only one possible)
         (q_key, song_key) = self.ask_song_key(recipient=recipient, notes=notes, input_mode=input_mode, prerequisites=[q_notes, q_mode])
@@ -194,7 +195,7 @@ class MusicSheetMaker:
         self.get_song().set_meta(title=title, artist=artist, transcript=transcript, song_key=song_key)
 
         # 11. Renders Song
-        answer = self.render_song(recipient)
+        answer = self.render_song(recipient, render_modes)
         
         # 12. Sends result back (required for website)
         return answer
@@ -335,15 +336,27 @@ class MusicSheetMaker:
         
         render_modes = self.render_modes_enabled
 
-        if len(render_modes) > 1:
-            q_render = self.communicator.send_stock_query('render_modes', recipient=recipient, limits=render_modes, prerequisites=prerequisites)
-        
-        if execute:
-            recipient.execute_queries(q_render)
-            render_modes = q_render.get_reply().get_result()
-            return (q_render, render_modes)
+        if len(render_modes) == 1:
+            return (None, render_modes)
+
+        if self.is_commandline(recipient):
+            
+            return (None, render_modes)
+            
+        elif self.is_botcog(recipient):
+            
+            return (None, self.botcog_render_modes)
+            
         else:
-            return (q_render, None)
+
+            q_render = self.communicator.send_stock_query('render_modes', recipient=recipient, limits=render_modes, prerequisites=prerequisites)
+            
+            if execute:
+                recipient.execute_queries(q_render)
+                render_modes = q_render.get_reply().get_result()
+                return (q_render, render_modes)
+            else:
+                return (q_render, None)
 
 
     def ask_input_mode(self, recipient, notes, prerequisites=None, execute=True):
@@ -376,9 +389,6 @@ class MusicSheetMaker:
             recipient.execute_queries(q_mode)
             if len(possible_modes) != 1:
                 result = q_mode.get_reply().get_result()
-                #print('%%%DEBUG, This is Music-Maker%%%%')
-                #print('anwer = ' + str(q_mode.get_reply().get_answer()))
-                #print('result = ' + str(q_mode.get_reply().get_result()))
             return (q_mode, result)
         else:
             return (q_mode, result)
@@ -444,10 +454,10 @@ class MusicSheetMaker:
             return (q_shift, None)
     
         
-    def send_buffers_to_discord(self, buffers, recipient, prerequisites=None, execute=True):
+    def send_buffers_to_botcog(self, buffers, recipient, prerequisites=None, execute=True):
         '''
         Discord only
-        TODO: fill this method, or if very short, put it inside create_song directly
+        TODO: fill this method, or if very short, put it inside create_song directly, or delete it if unused
         '''
         return buffers
         
@@ -472,21 +482,22 @@ class MusicSheetMaker:
 
 
 
-    def render_song(self, recipient):
+    def render_song(self, recipient, render_modes=None):
         
-        # 11. Renders Song
-        if self.is_botcog(recipient):
-            
-            self.css_mode = CSSMode.EMBED #Prevent the HTML/SVG from depending on an auxiliary .css file
-            buffers = self.write_song_to_buffers(self.discord_render_mode)
-            answer = (buffers, [self.discord_render_mode]*len(buffers))
+        if render_modes is None:
+            if self.is_botcog(recipient):
+                render_modes = self.botcog_render_modes
+            elif self.is_website():
+                render_modes = self.website_render_modes
+            else:
+                render_modes = self.render_modes_enabled
         
-        elif self.is_website(recipient):
-            
+        if self.is_botcog(recipient) or self.is_website(recipient):
+                        
             self.css_mode = CSSMode.EMBED #Prevent the HTML/SVG from depending on an auxiliary .css file
             
             answer = []
-            for render_mode in self.website_render_modes:                
+            for render_mode in render_modes:                
                 buffers = self.write_song_to_buffers(render_mode)
                 answer.append((buffers, [render_mode]*len(buffers)))            
         
@@ -495,7 +506,7 @@ class MusicSheetMaker:
             print("="*40)
             
             answer = []
-            for render_mode in self.get_render_modes_enabled():
+            for render_mode in render_modes:
                 buffers = self.write_song_to_buffers(render_mode)
                 file_paths = self.build_file_paths(render_mode, len(buffers))              
                 self.send_buffers_to_files(render_mode, buffers, file_paths, recipient=recipient)
