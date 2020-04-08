@@ -115,21 +115,8 @@ class SongParser:
 
         if input_mode is None:
             input_mode = self.input_mode
-
-        note_parser = None
-
-        if input_mode == InputMode.SKYKEYBOARD:
-            note_parser = noteparsers.skykeyboard.SkyKeyboard()
-        elif input_mode == InputMode.SKY:
-            note_parser = noteparsers.sky.Sky()
-        elif input_mode == InputMode.ENGLISH:
-            note_parser = noteparsers.english.English()
-        elif input_mode == InputMode.DOREMI:
-            note_parser = noteparsers.doremi.Doremi()
-        elif input_mode == InputMode.JIANPU:
-            note_parser = noteparsers.jianpu.Jianpu()
-        elif input_mode == InputMode.ENGLISHCHORDS:
-            note_parser = noteparsers.englishchords.EnglishChords()
+        
+        note_parser = input_mode.note_parser_method()
 
         return note_parser
 

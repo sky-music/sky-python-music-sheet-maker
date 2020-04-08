@@ -1,9 +1,8 @@
 import re
 
-import noteparser
+from . import noteparser
 
-
-class Sky(noteparser.NoteParser):
+class SkyABC15(noteparser.NoteParser):
 
     def __init__(self):
 

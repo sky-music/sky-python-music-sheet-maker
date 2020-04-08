@@ -273,17 +273,8 @@ class Song():
 
         ascii_buffer = io.StringIO()
 
-        if render_mode == RenderMode.SKYASCII:
-            note_parser = noteparsers.sky.Sky()
-        elif render_mode == RenderMode.ENGLISHASCII:
-            note_parser = noteparsers.english.English()
-        elif render_mode == RenderMode.JIANPUASCII:
-            note_parser = noteparsers.jianpu.Jianpu()
-        elif render_mode == RenderMode.DOREMIASCII:
-            note_parser = noteparsers.doremi.Doremi()
-        else:
-            note_parser = noteparsers.sky.Sky()
-
+        note_parser = render_mode.note_parser_method()
+        
         ascii_buffer.write('#' + self.meta['title'][1] + '\n')
 
         for k in self.meta:
