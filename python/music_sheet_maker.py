@@ -1,5 +1,5 @@
 import os, io, re
-from modes import InputMode, CSSMode, RenderMode
+from modes import InputMode, CSSMode, RenderMode, ReplyType
 from communicator import Communicator, QueriesExecutionAbort
 from songparser import SongParser
 #from song import Song
@@ -52,30 +52,30 @@ class MusicSheetMaker:
         try:
             is_bot = recipient.get_name() == "music-cog"
         except AttributeError:
-            try:
+            try: # Guesses harder
                 recipient.bot
                 is_bot = True
             except AttributeError:
                 is_bot = False
         return is_bot
 
-    def is_commandline(self, recipient): 
-        try:
-            return recipient.get_name() == "command-line"
-        except AttributeError:
-            return False
-
     def is_website(self, recipient):
         try:
             is_website = recipient.get_name() == "sky-music-website"
         except AttributeError:
-            try:
+            try: # Guesses harder
                 recipient.session_ID
                 is_website = True
             except:
                 is_website = False
 
-        return is_website      
+        return is_website
+
+    def is_commandline(self, recipient): 
+        try:
+            return recipient.get_name() == "command-line"
+        except AttributeError: # Guesses harder
+            return not (self.is_botcog(recipient) or self.is_website(recipient))
 
     def get_song(self):
         return self.song
@@ -167,25 +167,25 @@ class MusicSheetMaker:
     
         # 3. Ask for notes
         #TODO: allow the player to enter the notes using several messages??? or maybe not
-        if self.is_commandline(recipient):
-            (q_notes, notes) = self.ask_notes_file(recipient=recipient, prerequisites=[i_instr])
-        else:
-            (q_notes, notes) = self.ask_notes(recipient=recipient, prerequisites=[i_instr])       
+        (q_notes, notes) = self.ask_notes_or_file(recipient=recipient, prerequisites=[i_instr])
         
         # 4. Ask for input mode (or display the one found)
         (q_mode, input_mode) = self.ask_input_mode(recipient=recipient, notes=notes, prerequisites=[q_notes])
         
         # 5. Set input_mode
-         self.get_song_parser().set_input_mode(input_mode)
+        self.get_song_parser().set_input_mode(input_mode)
         
-        # 6. Ask for song keye (or display the only one possible)
+        # 6. Ask for song key (or display the only one possible)
         (q_key, song_key) = self.ask_song_key(recipient=recipient, notes=notes, input_mode=input_mode, prerequisites=[q_notes, q_mode])
-        
+        #(q_key, song_key) = self.ask_song_key(recipient=recipient, notes=notes, prerequisites=[q_notes, q_mode]) #TODO EXPERIMENTAL
+       
         # 7. Asks for octave shift
         (q_shift, octave_shift) = self.ask_octave_shift(recipient=recipient)
         
         # 8. Parse song
-        self.set_song(self.get_song_parser().parse_song(notes, song_key, octave_shift))
+        #self.set_song(self.get_song_parser().parse_song(notes, song_key, octave_shift))
+        self.parse_song(recipient, notes=notes, song_key=song_key, octave_shift=octave_shift)
+        # self.parse_song(recipient, notes, song_key) #TODO EXPERIMENTAL
         
         # 9. Displays error ratio
         (i_error, res) = self.display_error_ratio(recipient=recipient, prerequisites=[q_notes, q_mode, q_shift])
@@ -214,8 +214,8 @@ class MusicSheetMaker:
         
         if execute:
             recipient.execute_queries(i_instr)
-            result = i_instr.get_reply().get_result()
-            return (i_instr, result)
+            instructions = i_instr.get_reply().get_result()
+            return (i_instr, instructions)
         else:
             return (i_instr, None)
                                   
@@ -230,8 +230,8 @@ class MusicSheetMaker:
 
         if execute:
             recipient.execute_queries(queries)
-            result = [q.get_reply().get_result() for q in queries]
-            return (queries, tuple(result))
+            meta_data = [q.get_reply().get_result() for q in queries]
+            return (queries, tuple(meta_data))
         else:
             return (queries, None)
 
@@ -241,8 +241,8 @@ class MusicSheetMaker:
              
         if execute:
             recipient.execute_queries(q_notes)
-            result = q_notes.get_reply().get_result()
-            return (q_notes, result)
+            notes = q_notes.get_reply().get_result()
+            return (q_notes, notes)
         else:
             return (q_notes, None)
 
@@ -279,54 +279,61 @@ class MusicSheetMaker:
             return lines
 
 
-    def ask_notes_file(self, recipient, prerequisites=None, execute=True):
+    def ask_notes_or_file(self, recipient, prerequisites=None, execute=True):
         """
         Asks for notes (all recipients) or a file name (command-line only)
         If a file name is detected but the file does not exist, sends a query to ask for a valid file path
         If notes are detected, return the notes as a list of strings splitted by the OS line separator
         """
-        q_notes = self.communicator.send_stock_query('notes_file', question_rep=(os.path.relpath(os.path.normpath(self.song_dir_in))),
-                                                     recipient=recipient, prerequisites=prerequisites)
         
-        if not execute:            
-            return (q_notes, None)      
-        else:            
-            recipient.execute_queries(q_notes)
+        if not self.is_commandline(recipient):
             
-            result = q_notes.get_reply().get_result()
+            return self.ask_notes(recipient=recipient, prerequisites=prerequisites, execute=execute)
+        
+        else:
+                            
+            q_notes = self.communicator.send_stock_query('notes_file', question_rep=(os.path.relpath(os.path.normpath(self.song_dir_in))),
+                                                         recipient=recipient, prerequisites=prerequisites)
             
-            if self.is_commandline(recipient):
-                #Detects if the result is a file path
-                file_path = os.path.join(self.song_dir_in, os.path.normpath(result))
-                isfile = os.path.isfile(file_path)
+            if not execute:            
+                return (q_notes, None)      
+            else:            
+                recipient.execute_queries(q_notes)
                 
-                if not isfile:
-                    splitted = os.path.splitext(result)
-                    if len(splitted[0]) > 0 and 2 < len(splitted[1]) <= 5 and re.search('\\.', splitted[0]) is None:
-                        # then certainly a file name
-                        self.communicator.memory.erase(q_notes)
-                                        
-                        q_notes, file_path = self.ask_file(recipient=recipient, prerequisites=prerequisites, execute=execute)
-                        isfile = True #ask_file only returns when a valid file path is found
-            else:
-                isfile = False #Don't allow reading files on the website or music-cog
+                result = q_notes.get_reply().get_result()
                 
-            if isfile and self.is_commandline(recipient):
-                notes = self.read_file(file_path)
-            else:             
-                notes = result.split(os.linesep) # Returns a list of strings in any case
-                
-                if self.is_commandline(recipient): #Loop to ask for several lines in the standard input interface           
-                    while result:                            
-                        q_notes = self.communicator.send_stock_query('notes', recipient=recipient, prerequisites=prerequisites)
-                        recipient.execute_queries(q_notes)
-                        result = q_notes.get_reply().get_result()
-                        
-                        result = result.split(os.linesep)
-                        for result in result:
-                            notes.append(result)
-                  
-            return (q_notes, notes)
+                if self.is_commandline(recipient):
+                    #Detects if the result is a file path
+                    file_path = os.path.join(self.song_dir_in, os.path.normpath(result))
+                    isfile = os.path.isfile(file_path)
+                    
+                    if not isfile:
+                        splitted = os.path.splitext(result)
+                        if len(splitted[0]) > 0 and 2 < len(splitted[1]) <= 5 and re.search('\\.', splitted[0]) is None:
+                            # then certainly a file name
+                            self.communicator.memory.erase(q_notes)
+                                            
+                            q_notes, file_path = self.ask_file(recipient=recipient, prerequisites=prerequisites, execute=execute)
+                            isfile = True #ask_file only returns when a valid file path is found
+                else:
+                    isfile = False #Don't allow reading files on the website or music-cog
+                    
+                if isfile and self.is_commandline(recipient):
+                    notes = self.read_file(file_path)
+                else:             
+                    notes = result.split(os.linesep) # Returns a list of strings in any case
+                    
+                    if self.is_commandline(recipient): #Loop to ask for several lines in the standard input interface           
+                        while result:                            
+                            q_notes = self.communicator.send_stock_query('notes', recipient=recipient, prerequisites=prerequisites)
+                            recipient.execute_queries(q_notes)
+                            result = q_notes.get_reply().get_result()
+                            
+                            result = result.split(os.linesep)
+                            for result in result:
+                                notes.append(result)
+                      
+                return (q_notes, notes)
                 
 
     def ask_render_modes(self, recipient, prerequisites=None, execute=True):
@@ -381,23 +388,38 @@ class MusicSheetMaker:
             q_mode = self.communicator.send_stock_query('musical_notation', recipient=recipient, limits=possible_modes, prerequisites=prerequisites)
         
         if len(possible_modes) == 1:
-            result = possible_modes[0]
+            mode = possible_modes[0]
         else:
-            result = None
+            mode = None
         
         if execute:
             recipient.execute_queries(q_mode)
             if len(possible_modes) != 1:
-                result = q_mode.get_reply().get_result()
-            return (q_mode, result)
+                mode = q_mode.get_reply().get_result()
+            return (q_mode, mode)
         else:
-            return (q_mode, result)
+            return (q_mode, mode)
 
 
-    def ask_song_key(self, recipient, notes, input_mode, prerequisites=None, execute=True):
+    def ask_song_key(self, recipient, notes, input_mode=None, prerequisites=None, execute=True):
         """
         Attempts to detect key for input written in absolute musical scales (western, Jianpu)
         """
+        #EXPERIMENTAL
+        if input_mode is None:
+            try:
+                input_mode = self.get_song_parser.get_input_mode()
+            except:
+                input_mode = None
+                
+        if input_mode is None:
+            q_mode = self.communicator.recall(ReplyType.INPUTMODE, filters=["valid_reply"])
+            if len(q_mode) == 0:
+                input_mode = self.get_song_parser().get_possible_modes(notes)[0]
+            else:
+                input_mode = q_mode[-1].get_reply().get_result()
+                
+                        
         song_key = None
         
         if input_mode in [InputMode.ENGLISH, InputMode.DOREMI, InputMode.JIANPU]:
@@ -475,11 +497,25 @@ class MusicSheetMaker:
         
         if execute and i_error is not None:
             recipient.execute_queries(i_error)
-            result = i_error.get_reply().get_result()
-            return (i_error, result)
+            error_message = i_error.get_reply().get_result()
+            return (i_error, error_message)
         else:
             return (i_error, None)
 
+
+    def parse_song(self, recipient, notes, song_key, octave_shift=None):
+        
+        #EXPERIMENTAL
+        if octave_shift is None:
+            q_shift = self.communicator.recall("octave", filters=["valid_reply"])
+            if len(q_shift) == 0:
+                octave_shift = 0
+            else: 
+                octave_shift = q_shift[-1].q_shift.get_reply().get_result()
+        
+        self.set_song(self.get_song_parser().parse_song(notes, song_key, octave_shift))
+
+        return
 
 
     def render_song(self, recipient, render_modes=None):
@@ -492,26 +528,24 @@ class MusicSheetMaker:
             else:
                 render_modes = self.render_modes_enabled
         
-        if self.is_botcog(recipient) or self.is_website(recipient):
+        if self.is_commandline(recipient):
                         
-            self.css_mode = CSSMode.EMBED #Prevent the HTML/SVG from depending on an auxiliary .css file
-            
-            answer = []
-            for render_mode in render_modes:                
-                buffers = self.write_song_to_buffers(render_mode)
-                answer.append((buffers, [render_mode]*len(buffers)))            
-        
-        else: #command line
-            
-            print("="*40)
-            
+            print("="*40)            
             answer = []
             for render_mode in render_modes:
                 buffers = self.write_song_to_buffers(render_mode)
                 file_paths = self.build_file_paths(render_mode, len(buffers))              
                 self.send_buffers_to_files(render_mode, buffers, file_paths, recipient=recipient)
                 answer.append((buffers, [render_mode]*len(buffers)))
-         
+                
+        else: #website or botcog or...
+            
+            self.css_mode = CSSMode.EMBED #Prevent the HTML/SVG from depending on an auxiliary .css file            
+            answer = []
+            for render_mode in render_modes:                
+                buffers = self.write_song_to_buffers(render_mode)
+                answer.append((buffers, [render_mode]*len(buffers)))            
+        
         return answer
         
 
@@ -564,7 +598,7 @@ class MusicSheetMaker:
                     i_song_files = self.communicator.send_stock_query('several_song_files', recipient=recipient, question_rep=question_rep, afterword_rep=afterword_rep, prerequisites=prerequisites)
             else:
                 question_rep = (render_mode.short_desc)
-                i_song_files = self.communicator.send_stock_query('np_song_file', recipient=recipient, question_rep=question_rep, prerequisites=prerequisites)
+                i_song_files = self.communicator.send_stock_query('no_song_file', recipient=recipient, question_rep=question_rep, prerequisites=prerequisites)
         
         if execute:
             recipient.execute_queries(i_song_files)
