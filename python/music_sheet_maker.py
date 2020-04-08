@@ -191,7 +191,7 @@ class MusicSheetMaker:
         (i_error, res) = self.display_error_ratio(recipient=recipient, prerequisites=[q_notes, q_mode, q_shift])
         
         # 10. Asks for song metadata
-        (q_meta, (title, artist, transcript)) = self.ask_song_metadata(recipient=recipient)
+        (qs_meta, (title, artist, transcript)) = self.ask_song_metadata(recipient=recipient)
         self.get_song().set_meta(title=title, artist=artist, transcript=transcript, song_key=song_key)
 
         # 11. Renders Song
