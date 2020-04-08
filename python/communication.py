@@ -909,7 +909,9 @@ class QueryMemory:
                 'date': Query.get_sent_time,
                 'name': Query.get_name,
                 'identifier': Query.get_identifier,
-                'question': Query.get_question
+                'question': Query.get_question,
+                'sender': Query.get_sender,
+                'recipient': Query.get_recipient
                 }
 
     def __repr__(self):
@@ -944,17 +946,17 @@ class QueryMemory:
     def recall_filtered(self, filters=None, sort_by=None):
 
         queries = self.queries.copy()
+
         if filters is not None:
             if not isinstance(filters, (list, tuple, set)):
                 filters = [filters]
             for k in filters:
-                queries = filter(self.query_filters[k], queries)
+                queries = list(filter(self.query_filters[k], queries))
                 
         if sort_by in self.query_sorting.keys():
-            print('%%DEBUG OK 1')
             queries = sorted(queries, key=self.query_sorting[sort_by])
-            
-        return list(queries)
+        
+        return queries
     
 
     def recall_last(self, filters=None):
@@ -1004,13 +1006,13 @@ class QueryMemory:
         return [q for q in queries if q.get_identifier() == identifier]
           
 
-    def recall_by_sender(self, sender, filters=None, sort_by=None):
-        queries = self.recall_filtered(filters, sort_by)
+    def recall_by_sender(self, sender, criterion=None, filters=None, sort_by=None):
+        queries = self.recall(criterion=criterion, filters=filters, sort_by=sort_by)
         return [q for q in queries if q.get_sender() == sender]
                 
 
-    def recall_by_recipient(self, recipient, filters=None, sort_by=None):
-        queries = self.recall_filtered(filters, sort_by)
+    def recall_by_recipient(self, recipient, criterion=None, filters=None, sort_by=None):
+        queries = self.recall(criterion=criterion, filters=filters, sort_by=sort_by)
         return [q for q in queries if q.get_recipient() == recipient]
                 
 

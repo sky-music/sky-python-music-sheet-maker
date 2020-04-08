@@ -112,7 +112,7 @@ class NoteParser:
             foreign_parser = english.English()
 
         note_name = native_parser.note_name_regex.match(str(notes_string))
-        print('note_name='+str(note_name))
+
         if note_name is not None:
             note_name = native_parser.sanitize_note_name(note_name.group(0))
         else:

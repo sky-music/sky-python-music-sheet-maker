@@ -174,6 +174,7 @@ class MusicSheetMaker:
         
         # 5. Set input_mode
         self.get_song_parser().set_input_mode(input_mode)
+        #self.set_parser_input_mode(recipient, notes) #TODO EXPERIMENTAL
         
         # 6. Ask for song key (or display the only one possible)
         (q_key, song_key) = self.ask_song_key(recipient=recipient, notes=notes, input_mode=input_mode, prerequisites=[q_notes, q_mode])
@@ -183,9 +184,8 @@ class MusicSheetMaker:
         (q_shift, octave_shift) = self.ask_octave_shift(recipient=recipient)
         
         # 8. Parse song
-        #self.set_song(self.get_song_parser().parse_song(notes, song_key, octave_shift))
         self.parse_song(recipient, notes=notes, song_key=song_key, octave_shift=octave_shift)
-        # self.parse_song(recipient, notes, song_key) #TODO EXPERIMENTAL
+        #self.parse_song(recipient, notes) #TODO EXPERIMENTAL
         
         # 9. Displays error ratio
         (i_error, res) = self.display_error_ratio(recipient=recipient, prerequisites=[q_notes, q_mode, q_shift])
@@ -401,68 +401,111 @@ class MusicSheetMaker:
             return (q_mode, mode)
 
 
+    def retrieve_input_mode(self, recipient, notes):
+        
+        try:
+            input_mode = self.get_song_parser.get_input_mode()
+        except:
+            input_mode = None
+                
+        if input_mode is None:
+            q_mode = self.communicator.recall_by_recipient(recipient, criterion=ReplyType.INPUTMODE, filters=["valid_reply"], sort_by="date")
+            if len(q_mode) == 0:
+                input_mode = self.get_song_parser().get_possible_modes(notes)[0]
+            else:
+                input_mode = q_mode[-1].get_reply().get_result()
+
+        return input_mode
+
+
     def ask_song_key(self, recipient, notes, input_mode=None, prerequisites=None, execute=True):
         """
         Attempts to detect key for input written in absolute musical scales (western, Jianpu)
         """
         #EXPERIMENTAL
         if input_mode is None:
-            try:
-                input_mode = self.get_song_parser.get_input_mode()
-            except:
-                input_mode = None
-                
-        if input_mode is None:
-            q_mode = self.communicator.recall(ReplyType.INPUTMODE, filters=["valid_reply"])
-            if len(q_mode) == 0:
-                input_mode = self.get_song_parser().get_possible_modes(notes)[0]
-            else:
-                input_mode = q_mode[-1].get_reply().get_result()
-                
+            input_mode = self.retrieve_input_mode(recipient, notes)
                         
-        song_key = None
+        song_key = None       
+        possible_keys = self.get_song_parser().find_key(notes)
         
-        if input_mode in [InputMode.ENGLISH, InputMode.DOREMI, InputMode.JIANPU]:
-            
-            possible_keys = self.get_song_parser().find_key(notes)
-            
-            if len(possible_keys) == 0:
-                q_key = self.communicator.send_stock_query('no_possible_key', recipient=recipient, prerequisites=prerequisites)
-                possible_keys = ['C']
-                song_key = possible_keys[0]
-                # trans = input('Enter a key or a number to transpose your song within the chromatic scale:')                
-            elif len(possible_keys) == 1:
-                q_key = self.communicator.send_stock_query('one_possible_key', recipient=recipient,
-                                                           question_rep=(str(possible_keys[0])), prerequisites=prerequisites)
-                song_key = possible_keys[0]
-            else:
-                q_key = self.communicator.send_stock_query('possible_keys', recipient=recipient,
-                                                           foreword_rep=(', '.join(possible_keys)), limits=possible_keys, prerequisites=prerequisites)
-                song_key = None
-        else: #Relative pitch scale
-            
+        if possible_keys is None:
+            #Asks for any text string
             q_key = self.communicator.send_stock_query('recommended_key', recipient=recipient, prerequisites=prerequisites)
-            possible_keys = self.get_song_parser().find_key('') #should return None
-            song_key = None
+        
+        elif len(possible_keys) == 0:
+            #Sends information that there is no possible key
+            q_key = self.communicator.send_stock_query('no_possible_key', recipient=recipient, prerequisites=prerequisites)
+            possible_keys = ['C']
 
+        elif len(possible_keys) == 1:
+            #Sends information that there is only 1 possible key
+            q_key = self.communicator.send_stock_query('one_possible_key', recipient=recipient,
+                                                       question_rep=(str(possible_keys[0])), prerequisites=prerequisites)
+        else:
+            #Asks to choose a key within a list
+            q_key = self.communicator.send_stock_query('possible_keys', recipient=recipient,
+                                                       foreword_rep=(', '.join(possible_keys)), limits=possible_keys, prerequisites=prerequisites)
 
         if execute:
+            
             recipient.execute_queries(q_key)
             if possible_keys is None:
                 song_key = q_key.get_reply().get_result()
                 if len(song_key) == 0:
                     song_key = 'C'
-            elif len(possible_keys) > 1:
-                song_key = q_key.get_reply().get_result()
             elif len(possible_keys) == 1:
-               song_key =  possible_keys[0]  
+                song_key =  possible_keys[0]
+            elif len(possible_keys) > 1:
+                song_key = q_key.get_reply().get_result() 
             else:
                 raise MusicSheetMakerError('Possible keys is an empty list.')
                 
             return (q_key, song_key)
-        else:
+        
+        else:#Not execute
+            
+            if possible_keys is None:
+                song_key =  None
+            elif len(possible_keys) == 1:
+                song_key =  possible_keys[0]
+            else:
+                song_key = None
+                
             return (q_key, song_key)
+    
 
+    def retrieve_song_key(self, recipient, notes, input_mode=None):
+        
+        if input_mode is None:
+            input_mode = self.retrieve_input_mode(recipient, notes)
+
+        song_key = None
+        
+        q_key = self.communicator.recall_by_recipient(recipient, criterion="possible_keys", filters=["valid_reply"], sort_by="date")
+        if len(q_key) != 0:
+            return q_key[-1].get_reply().get_result()
+        
+        q_key = self.communicator.recall_by_recipient(recipient, criterion="recommended_key", filters=["valid_reply"], sort_by="date")
+        if len(q_key) != 0:
+            song_key = q_key[-1].get_reply().get_result()
+            if len(q_key) == 0:
+                song_key = 'C'
+            return song_key
+
+        q_key = self.communicator.recall_by_recipient(recipient, criterion="one_possible_key", filters=["valid_reply"], sort_by="date")
+        if len(q_key) != 0:
+            try:
+                return self.get_song_parser().find_key(notes)[0]
+            except TypeError:
+                return 'C'
+
+        q_key = self.communicator.recall_by_recipeint(recipient, criterion="no_possible_key", filters=["valid_reply"], sort_by="date")
+        if len(q_key) != 0:
+            return 'C'
+        
+        return 'C'                
+        
 
     def ask_octave_shift(self, recipient, prerequisites=None, execute=True):
     
@@ -474,6 +517,15 @@ class MusicSheetMaker:
             return (q_shift, octave_shift)
         else:
             return (q_shift, None)
+
+    def retrieve_octave_shift(self, recipient):    
+        #EXPERIMENTAL
+        q_shift = self.communicator.recall_by_recipient(recipient, criterion="octave_shift", filters=["valid_reply"], sort_by="date")
+        if len(q_shift) == 0:
+            octave_shift = 0
+        else: 
+            octave_shift = q_shift[-1].get_reply().get_result()
+        return octave_shift   
     
         
     def send_buffers_to_botcog(self, buffers, recipient, prerequisites=None, execute=True):
@@ -503,15 +555,24 @@ class MusicSheetMaker:
             return (i_error, None)
 
 
-    def parse_song(self, recipient, notes, song_key, octave_shift=None):
+    def set_parser_input_mode(self, recipient, notes=None, input_mode=None):
         
-        #EXPERIMENTAL
+        if input_mode is None:
+            if notes is not None:
+                input_mode = self.retrieve_input_mode(recipient, notes)
+            else:
+                raise MusicSheetMakerError('Could not retrieve input_modes because no notes were given.')
+
+        self.get_song_parser().set_input_mode(input_mode)
+
+
+    def parse_song(self, recipient, notes, song_key=None, octave_shift=None):
+        
         if octave_shift is None:
-            q_shift = self.communicator.recall("octave", filters=["valid_reply"])
-            if len(q_shift) == 0:
-                octave_shift = 0
-            else: 
-                octave_shift = q_shift[-1].q_shift.get_reply().get_result()
+            octave_shift = self.retrieve_octave_shift(recipient)
+
+        if song_key is None:
+            song_key = self.retrieve_song_key(recipient, notes)
         
         self.set_song(self.get_song_parser().parse_song(notes, song_key, octave_shift))
 
