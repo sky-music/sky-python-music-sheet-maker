@@ -295,7 +295,7 @@ class Query:
                 self.prerequisites[0]
                 return self.prerequisites
             except IndexError:
-                return None
+                return []
             except TypeError:
                 return [self.prerequisites]
     
@@ -905,6 +905,12 @@ class QueryMemory:
             'information': lambda q: not q.expect_reply(),
             'query': lambda q: q.expect_reply(),
         }
+        self.query_sorting = {
+                'date': Query.get_sent_time,
+                'name': Query.get_name,
+                'identifier': Query.get_identifier,
+                'question': Query.get_question
+                }
 
     def __repr__(self):
 
@@ -921,9 +927,9 @@ class QueryMemory:
         return len(self.queries)
     
 
-    def print_out(self, criterion=None, filters=None):
+    def print_out(self, criterion=None, filters=None, sort_by=None):
 
-        queries = self.recall(filters=filters, criterion=criterion)
+        queries = self.recall(filters=filters, criterion=criterion, sort_by=sort_by)
         
         if len(queries) == 0:
             print('None')
@@ -935,16 +941,19 @@ class QueryMemory:
                 print('---------------')
 
 
-    def recall_filtered(self, filters=None):
+    def recall_filtered(self, filters=None, sort_by=None):
 
-        if filters is None:
-            return self.queries
-        else:
-            queries = self.queries
+        queries = self.queries.copy()
+        if filters is not None:
             if not isinstance(filters, (list, tuple, set)):
                 filters = [filters]
             for k in filters:
                 queries = filter(self.query_filters[k], queries)
+                
+        if sort_by in self.query_sorting.keys():
+            print('%%DEBUG OK 1')
+            queries = sorted(queries, key=self.query_sorting[sort_by])
+            
         return list(queries)
     
 
@@ -985,41 +994,41 @@ class QueryMemory:
             return None
         
 
-    def recall_by_identifier(self, identifier, filters=None):
+    def recall_by_identifier(self, identifier, filters=None, sort_by=None):
         """
         Recalls Queries with the given identifier
         """
-        queries = self.recall_filtered(filters)
+        queries = self.recall_filtered(filters, sort_by)
         if isinstance(identifier, str):
             identifier = identifier.lower().strip()
         return [q for q in queries if q.get_identifier() == identifier]
-    
+          
 
-    def recall_by_sender(self, sender, filters=None):
-        queries = self.recall_filtered(filters)
+    def recall_by_sender(self, sender, filters=None, sort_by=None):
+        queries = self.recall_filtered(filters, sort_by)
         return [q for q in queries if q.get_sender() == sender]
-    
+                
 
-    def recall_by_recipient(self, recipient, filters=None):
-        queries = self.recall_filtered(filters)
+    def recall_by_recipient(self, recipient, filters=None, sort_by=None):
+        queries = self.recall_filtered(filters, sort_by)
         return [q for q in queries if q.get_recipient() == recipient]
-    
+                
 
     def has_query(self, criterion=None, filters=None):
         return len(self.recall(criterion=criterion, filters=filters) > 0)
     
 
-    def recall_information(self, filters=None):
+    def recall_information(self, filters=None, sort_by=None):
 
-        queries = self.recall_filtered(filters)
+        queries = self.recall_filtered(filters, sort_by)
         return [q for q in queries if q.get_expect_reply() == False]
     
 
-    def recall(self, criterion=None, filters=None):
+    def recall(self, criterion=None, filters=None, sort_by=None):
         """
         Recalls Queries matching criterion, which can be a list index, a string to be searched, or a Query identifier
         """
-        queries = self.recall_filtered(filters)
+        queries = self.recall_filtered(filters, sort_by)
 
         if criterion is None or criterion == '':
             return queries
@@ -1029,7 +1038,7 @@ class QueryMemory:
             try:
                 q_found = queries[criterion]  # Maybe criterion is an index
             except IndexError:
-                q_found = self.recall_by_identifier(criterion)  # Maybe criterion is an integer identifier
+                q_found = self.recall_by_identifier(criterion=criterion, filters=filters, sort_by=sort_by)  # Maybe criterion is an integer identifier
         elif isinstance(criterion, Query):  # Maybe criterion is a Query
             if criterion in queries:
                 q_found.append(criterion)
@@ -1051,39 +1060,39 @@ class QueryMemory:
                         if any([regex.search(attr.lower().strip()) is not None for attr in str_attr]):
                             q_found += [q]
                             
-
         return q_found
 
-    def recall_unsent(self, filters=None):
-        queries = self.recall_filtered(filters)
+
+    def recall_unsent(self, filters=None, sort_by=None):
+        queries = self.recall_filtered(filters, sort_by)
         return [q for q in queries if q.get_is_sent() == False]
     
 
-    def recall_replied(self, filters=None):
-        queries = self.recall_filtered(filters)
+    def recall_replied(self, filters=None, sort_by=None):
+        queries = self.recall_filtered(filters, sort_by)
         return [q for q in queries if q.get_is_replied()]
     
 
-    def recall_unreplied(self, filters=None):
-        queries = self.recall_filtered(filters)
+    def recall_unreplied(self, filters=None, sort_by=None):
+        queries = self.recall_filtered(filters, sort_by)
         return [q for q in queries if not q.get_is_replied()]
 
     
-    def recall_by_invalid_reply(self, filters=None):
-        q_replied = self.recall_replied(filters=filters)
+    def recall_by_invalid_reply(self, filters=None, sort_by=None):
+        q_replied = self.recall_replied(filters, sort_by)
         return [q for q in q_replied if not q.get_reply_validity()]
     
 
-    def recall_unsatisfied(self, filters=None):
-        queries = self.recall_filtered(filters)
+    def recall_unsatisfied(self, filters=None, sort_by=None):
+        queries = self.recall_filtered(filters, sort_by)
         return [q for q in queries if (not q.get_is_replied() or not q.get_reply_validity())]
     
 
-    def recall_repeated(self, filters=None):
+    def recall_repeated(self, filters=None, sort_by=None):
         """
         Recall queries that have been stored twice or more
         """
-        queries = self.recall_filtered(filters)
+        queries = self.recall_filtered(filters, sort_by)
 
         if len(queries) < 2:
             return None
@@ -1176,7 +1185,7 @@ class QueryMemory:
 
     def chronological_sort(self):
         """
-        Sort queries by sent date
+        Sort self.queries by sent date and affects stored list
         """
         self.queries = sorted(self.queries, key=Query.get_sent_time)
         return self.queries
@@ -1184,7 +1193,7 @@ class QueryMemory:
 
     def topological_sort(self):
         """
-        Sort Queries by solving dependencies
+        Sort self.queries by solving dependencies, and affects stored list
         """
         queries = self.queries.copy() # A copy of the queries list with the real queries inside
         
