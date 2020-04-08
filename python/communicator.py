@@ -231,7 +231,7 @@ class Communicator:
             'octave_shift': {'class': QueryOpen.__name__,
                              'handler': 'None',
                              'foreword': 'Do you want to shift the pitch of your notes?',
-                             'question': 'Octave shift (leave blank to skip)',
+                             'question': 'Octave shift (leave blank or type 0 to skip)',
                              'afterword': '',
                              'help_text': 'A musical note is identified by its name and an octave number. Sky\'s music system spans less than 3 octaves.'
                                           ' If you do not specify an octave number after a note, we will assume it is the first octave of Sky, so your notes will essential by played near the bass.'

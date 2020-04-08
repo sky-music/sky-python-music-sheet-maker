@@ -195,10 +195,10 @@ class MusicSheetMaker:
         self.get_song().set_meta(title=title, artist=artist, transcript=transcript, song_key=song_key)
 
         # 11. Renders Song
-        answer = self.render_song(recipient, render_modes)
+        song_bundle = self.render_song(recipient, render_modes)
         
         # 12. Sends result back (required for website)
-        return answer
+        return song_bundle
     
    
     def ask_instructions(self, recipient, prerequisites=None, execute=True):
@@ -592,22 +592,22 @@ class MusicSheetMaker:
         if self.is_commandline(recipient):
                         
             print("="*40)            
-            answer = []
+            song_bundle = []
             for render_mode in render_modes:
-                buffers = self.write_song_to_buffers(render_mode)
+                buffers = self.write_song_to_buffers(render_mode) # A list of IOString or IOBytes buffers
                 file_paths = self.build_file_paths(render_mode, len(buffers))              
                 self.send_buffers_to_files(render_mode, buffers, file_paths, recipient=recipient)
-                answer.append((buffers, [render_mode]*len(buffers)))
+                song_bundle.append((buffers, [render_mode]*len(buffers)))
                 
         else: #website or botcog or...
             
             self.css_mode = CSSMode.EMBED #Prevent the HTML/SVG from depending on an auxiliary .css file            
-            answer = []
+            song_bundle = [] # A list of tuples
             for render_mode in render_modes:                
-                buffers = self.write_song_to_buffers(render_mode)
-                answer.append((buffers, [render_mode]*len(buffers)))            
+                buffers = self.write_song_to_buffers(render_mode) # A list of IOString or IOBytes buffers
+                song_bundle.append((buffers, [render_mode]*len(buffers)))          
         
-        return answer
+        return song_bundle
         
 
     def send_buffers_to_files(self, render_mode, buffers, file_paths, recipient, prerequisites=None, execute=True):
