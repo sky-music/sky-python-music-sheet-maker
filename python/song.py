@@ -1,7 +1,8 @@
 import os, re, io
 from modes import RenderMode, CSSMode
 import instruments
-import noteparsers
+import Lang
+#import noteparsers
 
 
 try:
@@ -26,15 +27,15 @@ class Song():
         if isinstance(music_key, str):
             self.music_key = music_key
         else:
-            print('Warning: Invalid song key: using C instead')
+            print('\n***Warning: Invalid song key: using C instead\n')
             self.music_key = 'C'
 
         self.maker = maker
         self.directory_base = self.maker.get_directory_base()
         self.directory_fonts = os.path.normpath(os.path.join(self.directory_base,'fonts'))
         self.lines = []        
-        self.meta = {'title': ['Title', 'Untitled'], 'artist': ['Original Artist(s):', ''], 'transcript': ['Transcript writer:', ''],\
-                    'song_key': ['Musical key:', '']}
+        self.meta = {'title': [Lang.get_string("song_meta/title")+':', 'Untitled'], 'artist': [Lang.get_string("song_meta/artist")+':', ''],
+                    'transcript': [Lang.get_string("song_meta/transcript")+':', ''], 'song_key': [Lang.get_string("song_meta/musical_key")+':', '']}
         #self.title = self.meta['title'][1]
         self.maxIconsPerLine = 10
         self.maxLinesPerFile = 10
@@ -91,7 +92,7 @@ class Song():
             try:
                 self.midi_key = re.sub(r'#', '#m', self.music_key)  # For mido sharped keys are minor
             except:
-                print('Warning: Invalid music key passed to the MIDI renderer: using C instead')
+                print('\n***Warning: Invalid music key passed to the MIDI renderer: using C instead\n')
                 self.midi_key = 'C'
 
     def get_maker(self):
@@ -221,7 +222,7 @@ class Song():
                 with open(css_path, 'r', encoding='utf-8', errors='ignore') as css_file:
                     css_file = css_file.read()
             except:
-                print('\nWarning: could not open CSS file to embed it in HTML.')
+                print('\n***Warning: could not open CSS file to embed it in HTML.\n')
                 css_file = ''
             html_buffer.write('\n<style type=\"text/css\">\n')
             html_buffer.write(css_file)
@@ -324,7 +325,7 @@ class Song():
                 with open(css_path, 'r', encoding='utf-8', errors='ignore') as css_file:
                     css_file = css_file.read()
             except:
-                print('\nWarning: could not open CSS file to embed it in SVG.')
+                print('\n***Warning: could not open CSS file to embed it in SVG.\n')
                 css_file = ''
                 pass
             svg_buffer.write('\n<defs><style type=\"text/css\"><![CDATA[\n')
@@ -487,7 +488,7 @@ class Song():
         global no_PIL_module
 
         if no_PIL_module:
-            print('\n**** WARNING: PNG was not rendered because PIL module was not found. ****\n')
+            print('\n***WARNING: PNG was not rendered because PIL module was not found. ***\n')
             return None
 
         def trans_paste(bg, fg, box=(0, 0)):
@@ -662,7 +663,7 @@ class Song():
         global no_mido_module
 
         if no_mido_module:
-            print('\n**** WARNING: MIDI was not created because mido module was not found. ****\n')
+            print('\n***WARNING: MIDI was not created because mido module was not found. ***\n')
             return None
 
         mid = mido.MidiFile(type=0)
@@ -673,7 +674,7 @@ class Song():
             tempo = mido.bpm2tempo(self.midi_bpm)
             track.append(mido.MetaMessage('set_tempo', tempo=tempo))
         except ValueError:
-            print('Warning: invalid tempo passed to MIDI renderer. Using 120 bpm instead.')
+            print('\n***Warning: invalid tempo passed to MIDI renderer. Using 120 bpm instead.\n')
             tempo = mido.bpm2tempo(120)
             track.append(mido.MetaMessage('set_tempo', tempo=tempo))
 
@@ -683,12 +684,12 @@ class Song():
         try:
             track.append(mido.MetaMessage('key_signature', key=self.midi_key))
         except ValueError:
-            print('Warning: invalid key passed to MIDI renderer. Using C instead.')
+            print('\n***Warning: invalid key passed to MIDI renderer. Using C instead.\n')
             track.append(mido.MetaMessage('key_signature', key='C'))
         try:
             track.append(mido.Message('program_change', program=self.midi_instrument, time=0))
         except ValueError:
-            print('Warning: invalid instrument passed to MIDI renderer. Using piano instead.')
+            print('\n***Warning: invalid instrument passed to MIDI renderer. Using piano instead.\n')
             track.append(mido.Message('program_change', program=1, time=0))
 
         for line in self.lines:

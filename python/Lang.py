@@ -18,7 +18,7 @@ def get_string(key, **kwargs):
     obj = LANG
     for i in key_list:
         if i not in obj:
-            print('\n****WARNING: could not find lang key {%s}\n'%str(i))
+            print('\n***WARNING: could not find lang key {%s}\n'%str(i))
             return ''
             #raise KeyError(f"Unknown lang key: {i}")
 

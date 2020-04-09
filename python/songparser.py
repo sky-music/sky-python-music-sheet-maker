@@ -132,7 +132,7 @@ class SongParser:
 
     def english_note_name(self, note_name, reverse=False):
         if self.note_parser is None:
-            print('Warning: no note parser defined.')
+            print('***Warning: no note parser defined.\n')
             return ''
         else:
             return self.note_parser.english_note_name(note_name, reverse)

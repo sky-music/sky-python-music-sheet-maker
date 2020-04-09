@@ -76,231 +76,229 @@ class Communicator:
             'information': {'class': Information.__name__,
                             'handler': 'None',
                             'question': '',
-                            'reply_type': ReplyType.TEXT},
+                            'reply_type': ReplyType.TEXT
+                            },
                                                         
-#            'instructions_stdout': {'class': Information.__name__,
-#                             'handler': 'None',
-#                             'foreword': '===== VISUAL MUSIC SHEETS FOR SKY:CHILDREN OF THE LIGHT =====\n',
-#                             'question': 'Accepted music notes formats:%s'
-#                                         '\nNotes composing a chord must be glued together (e.g. A1B1C1).'
-#                                         '\nSeparate chords with %s'
-#                                         '\nUse "%s" for a silence (rest).'
-#                                         '\nUse "%s" to link notes within an icon, for triplets, quavers... (e.g. %s)'
-#                                         '\nAdd "%s" after a chord to indicate repetition.'
-#                                         '\nSharps # and flats b (semitones) are supported for Western and Jianpu notations.'
-#                                         '\nType \'?\' to get help for a particular question',
-#                             'afterword': '='*30},
-
             'instructions_stdout': {'class': Information.__name__,
-                             'handler': 'None',
-                             'foreword': Lang.get_string("stock_queries/instructions_stdout/foreword"),
-                             'question': Lang.get_string("stock_queries/instructions_stdout/question"),
-                             'afterword': Lang.get_string("stock_queries/instructions_stdout/afterword")},
+                                    'handler': 'None',
+                                    'foreword': Lang.get_string("stock_queries/instructions_stdout/foreword"),
+                                    'question': Lang.get_string("stock_queries/instructions_stdout/question"),
+                                    'afterword': Lang.get_string("stock_queries/instructions_stdout/afterword"),
+                                    'input_tip': Lang.get_string("stock_queries/instructions_stdout/input_tip"),
+                                    'help_text': Lang.get_string("stock_queries/instructions_stdout/help_text")
+                                    },
 
 
            'instructions_website': {'class': Information.__name__,
-                             'handler': 'None',
-                             'foreword': '',
-                             'question': 'Accepted music notes formats:%s'
-                                         '\nNotes composing a chord must be glued together (e.g. A1B1C1).'
-                                         '\nSeparate chords with %s'
-                                         '\nUse "%s" for a silence (rest).'
-                                         '\nUse "%s" to link notes within an icon, for triplets, quavers... (e.g. %s)'
-                                         '\nAdd "%s" after a chord to indicate repetition.'
-                                         '\nSharps # and flats b (semitones) are supported for Western and Jianpu notations.',
-                             'afterword': '',
-                             'input_tip': 'click OK to acknowledge'},
+                                    'handler': 'None',
+                                    'foreword': Lang.get_string("stock_queries/instructions_website/foreword"),
+                                    'question': Lang.get_string("stock_queries/instructions_website/question"),
+                                    'afterword': Lang.get_string("stock_queries/instructions_website/afterword"),
+                                    'input_tip': Lang.get_string("stock_queries/instructions_website/input_tip"),
+                                    'help_text': Lang.get_string("stock_queries/instructions_website/help_text")
+                                    },
                                         
             'instructions_botcog': {'class': Information.__name__,
-                             'handler': 'None',
-                             'foreword': '',
-                             'question': 'Accepted music notes formats:%s'
-                                         '\nNotes composing a chord must be glued together (e.g. A1B1C1).'
-                                         '\nSeparate chords with %s'
-                                         '\nUse "%s" for a silence (rest).'
-                                         '\nUse "%s" to link notes within an icon, for triplets, quavers... (e.g. %s)'
-                                         '\nAdd "%s" after a chord to indicate repetition.'
-                                         '\nSharps # and flats b (semitones) are supported for Western and Jianpu notations.'
-                                         '\nType \'?\' to get help for a particular question',
-                             'afterword': '',
-                             'input_tip': ''},
+                                    'handler': 'None',
+                                    'foreword': Lang.get_string("stock_queries/instructions_botcog/foreword"),
+                                    'question': Lang.get_string("stock_queries/instructions_botcog/question"),
+                                    'afterword': Lang.get_string("stock_queries/instructions_botcog/afterword"),
+                                    'input_tip': Lang.get_string("stock_queries/instructions_botcog/input_tip"),
+                                    'help_text': Lang.get_string("stock_queries/instructions_botcog/help_text")
+                                    },
 
             'render_modes': {'class': QueryMultipleChoices.__name__,
                              'handler': 'None',
-                             'foreword': '',
-                             'question': 'Please choose one or several output rendering formats',
-                             'afterword': '',
-                             'help_text': 'The visual sheet can be rendered in several file formats.'
-                                          ' Please select the ones you want to generate (or deselect some).',
-                             'input_tip': 'check one or several boxes',
+                             'foreword': Lang.get_string("stock_queries/render_modes/foreword"),
+                             'question': Lang.get_string("stock_queries/render_modes/question"),
+                             'afterword': Lang.get_string("stock_queries/render_modes/afterword"),
+                             'input_tip': Lang.get_string("stock_queries/render_modes/input_tip"),
+                             'help_text': Lang.get_string("stock_queries/render_modes/help_text"),
                              'reply_type': ReplyType.RENDERMODES,
-                             'limits': []},
+                             'limits': []
+                             },
                             
             'song_title': {'class': QueryOpen.__name__,
-                             'handler': 'None',
-                             'foreword': '',
-                             'question': 'What is the song title?',
-                             'afterword': '',
-                             'help_text': '',
-                             'input_tip': 'any text. Leave blank to use "untitled"',
-                             'reply_type': ReplyType.TEXT,
-                             'limits': None},
+                           'handler': 'None',
+                           'foreword': Lang.get_string("stock_queries/song_title/foreword"),
+                           'question': Lang.get_string("stock_queries/song_title/question"),
+                           'afterword': Lang.get_string("stock_queries/song_title/afterword"),
+                           'input_tip': Lang.get_string("stock_queries/song_title/input_tip"),
+                           'help_text': Lang.get_string("stock_queries/song_title/help_text"),
+                           'reply_type': ReplyType.TEXT,
+                           'limits': None
+                           },
                             
             'original_artist': {'class': QueryOpen.__name__,
-                             'handler': 'None',
-                             'foreword': '',
-                             'question': 'What is(are) the Original artist(s)?',
-                             'afterword': '',
-                             'help_text': 'Original artists incliude the composer, musician, singer, etc.',
-                             'input_tip': 'any text, including blank',
-                             'reply_type': ReplyType.TEXT,
-                             'limits': None},
+                                'handler': 'None',
+                                'foreword': Lang.get_string("stock_queries/original_artist/foreword"),
+                                'question': Lang.get_string("stock_queries/original_artist/question"),
+                                'afterword': Lang.get_string("stock_queries/original_artist/afterword"),
+                                'input_tip': Lang.get_string("stock_queries/original_artist/input_tip"),
+                                'help_text': Lang.get_string("stock_queries/original_artist/help_text"),
+                                'reply_type': ReplyType.TEXT,
+                                'limits': None
+                                },
                             
             'transcript_writer': {'class': QueryOpen.__name__,
-                             'handler': 'None',
-                             'foreword': '',
-                             'question': 'What is the transcript writer?',
-                             'afterword': '',
-                             'help_text': 'The transcript writer is the person who found the notes you typed earlier. It could be yourself!',
-                             'input_tip': 'any text, including blank',
-                             'reply_type': ReplyType.TEXT,
-                             'limits': None},
+                                  'handler': 'None',
+                                  'foreword': Lang.get_string("stock_queries/transcript_writer/foreword"),
+                                  'question': Lang.get_string("stock_queries/transcript_writer/question"),
+                                  'afterword': Lang.get_string("stock_queries/transcript_writer/afterword"),
+                                  'input_tip': Lang.get_string("stock_queries/transcript_writer/input_tip"),
+                                  'help_text': Lang.get_string("stock_queries/transcript_writer/help_text"),
+                                  'reply_type': ReplyType.TEXT,
+                                  'limits': None
+                                 },
                             
             'notes_file': {'class': QueryOpen.__name__,
-                             'handler': 'None',
-                             'foreword': '',
-                             'question': 'Type or copy-paste notes, or enter file name (in %s/)',
-                             'afterword': '',
-                             'help_text': 'You can type or copy-paste notes directly in this field.'
-                                          ' You can also enter the path to a a text file containing the notes.',
-                             'input_tip': 'a string of notes such as C1 D1F1, or a file name such as song.txt',
-                             'reply_type': ReplyType.OTHER,
-                             'limits': None},
+                           'handler': 'None',
+                           'foreword': Lang.get_string("stock_queries/notes_file/foreword"),
+                           'question': Lang.get_string("stock_queries/notes_file/question"),
+                           'afterword': Lang.get_string("stock_queries/notes_file/afterword"),
+                           'input_tip': Lang.get_string("stock_queries/notes_file/input_tip"),
+                           'help_text': Lang.get_string("stock_queries/notes_file/help_text"),
+                           'reply_type': ReplyType.OTHER,
+                           'limits': None
+                           },
                             
             'file': {'class': QueryOpen.__name__,
-                             'handler': 'None',
-                             'foreword': '',
-                             'question': 'Enter file name (in %s/)',
-                             'afterword': '',
-                             'help_text': '',
-                             'input_tip': 'any text with one or several musical notes',
-                             'reply_type': ReplyType.FILEPATH,
-                             'limits': '.'},
+                     'handler': 'None',
+                     'foreword': Lang.get_string("stock_queries/file/foreword"),
+                     'question': Lang.get_string("stock_queries/file/question"),
+                     'afterword': Lang.get_string("stock_queries/file/afterword"),
+                     'input_tip': Lang.get_string("stock_queries/file/input_tip"),
+                     'help_text': Lang.get_string("stock_queries/file/help_text"),
+                     'reply_type': ReplyType.FILEPATH,
+                     'limits': '.'
+                     },
                             
             'notes': {'class': QueryOpen.__name__,
-                             'handler': 'None',
-                             'foreword': '',
-                             'question': 'Please type or copy-paste notes',
-                             'afterword': '',
-                             'help_text': 'Type one or several notes in your favorite format, for instance C D E F G.'
-                                          ' For chords (notes played together) glue the notes together (eg C1D1)',
-                             'input_tip': 'any text with one or several musical notes',
-                             'reply_type': ReplyType.TEXT,
-                             'limits': None},
+                      'handler': 'None',
+                      'foreword': Lang.get_string("stock_queries/notes/foreword"),
+                      'question': Lang.get_string("stock_queries/notes/question"),
+                      'afterword': Lang.get_string("stock_queries/notes/afterword"),
+                      'input_tip': Lang.get_string("stock_queries/notes/input_tip"),
+                      'help_text': Lang.get_string("stock_queries/notes/help_text"),
+                      'reply_type': ReplyType.TEXT,
+                      'limits': None
+                      },
             
             'one_input_mode': {'class': Information.__name__,
-                             'handler': 'None',
-                             'foreword': '',
-                             'question': 'We detected that you use the following notation: %s.',
-                             'afterword': '',
-                             'input_tip': 'click OK to acknowledge'},                               
+                               'handler': 'None',
+                               'foreword': Lang.get_string("stock_queries/one_input_mode/foreword"),
+                               'question': Lang.get_string("stock_queries/one_input_mode/question"),
+                               'afterword': Lang.get_string("stock_queries/one_input_mode/afterword"),
+                               'input_tip': Lang.get_string("stock_queries/one_input_mode/input_tip"),
+                               'help_text': Lang.get_string("stock_queries/one_input_mode/help_text")
+                            },                               
                                                        
             'musical_notation': {'class': QueryChoice.__name__,
-                             'handler': 'None',
-                             'foreword': 'Despite our efforts, we could not guess what musical notation you are using.',
-                             'question': 'Please help us by choosing your format in the list below',
-                             'afterword': '',
-                             'help_text': 'In the previous question, you have typed your song notes. We tried to automatically guess which notation you are using. Despite our best efforts, there is still an ambiguity. Please select the right one in the list.',
-                             'input_tip': 'Choice number (integer between 0 and n-1)',
-                             'reply_type': ReplyType.INPUTMODE,
-                             'limits': []},
-                                 
+                                 'handler': 'None',
+                                 'foreword': Lang.get_string("stock_queries/musical_notation/foreword"),
+                                 'question': Lang.get_string("stock_queries/musical_notation/question"),
+                                 'afterword': Lang.get_string("stock_queries/musical_notation/afterword"),
+                                 'input_tip': Lang.get_string("stock_queries/musical_notation/input_tip"),
+                                 'help_text': Lang.get_string("stock_queries/musical_notation/help_text"),
+                                 'reply_type': ReplyType.INPUTMODE,
+                                 'limits': []
+                                 },
+                                     
             'no_possible_key': {'class': Information.__name__,
-                             'handler': 'None',
-                             'foreword': '',
-                             'question': 'Your song cannot be transposed exactly in Sky\nDefault key will be set to C.',
-                             'afterword': '',
-                             'input_tip': 'click OK to acknowledge'},                                                   
+                                'handler': 'None',
+                                'foreword': Lang.get_string("stock_queries/no_possible_key/foreword"),
+                                'question': Lang.get_string("stock_queries/no_possible_key/question"),
+                                'afterword': Lang.get_string("stock_queries/no_possible_key/afterword"),
+                                'input_tip': Lang.get_string("stock_queries/no_possible_key/input_tip"),
+                                'help_text': Lang.get_string("stock_queries/no_possible_key/help_text")
+                                },
                                 
             'one_possible_key': {'class': Information.__name__,
-                             'handler': 'None',
-                             'foreword': '',
-                             'question': 'Your song can be transposed in Sky with the following key: %s',
-                             'afterword': '',
-                             'input_tip': 'click OK to acknowledge'},                               
+                                 'handler': 'None',
+                                 'foreword': Lang.get_string("stock_queries/one_possible_key/foreword"),
+                                 'question': Lang.get_string("stock_queries/one_possible_key/question"),
+                                 'afterword': Lang.get_string("stock_queries/one_possible_key/afterword"),
+                                 'input_tip': Lang.get_string("stock_queries/one_possible_key/input_tip"),
+                                 'help_text': Lang.get_string("stock_queries/one_possible_key/help_text")
+                                 },
                                  
             'possible_keys': {'class': QueryChoice.__name__,
-                             'handler': 'None',
-                             'foreword': 'Your song can be transposed in Sky with the following keys: %s.',
-                             'question': 'Please choose your musical key',
-                             'afterword': '',
-                             'help_text': 'Sky\'s musical system does not include sharps # and flats b. Hence you cannot play any song from the outside world.'
-                                          ' We detected that your song can be played with several notes as the song key. Please choose the one that is most convenient for you.',
-                             'input_tip': 'Choice number (integer between 0 and n-1)',
-                             'reply_type': ReplyType.NOTE,
-                             'limits': []},
+                              'handler': 'None',
+                              'foreword': Lang.get_string("stock_queries/possible_keys/foreword"),
+                              'question': Lang.get_string("stock_queries/possible_keys/question"),
+                              'afterword': Lang.get_string("stock_queries/possible_keys/afterword"),
+                              'input_tip': Lang.get_string("stock_queries/possible_keys/input_tip"),
+                              'help_text': Lang.get_string("stock_queries/possible_keys/help_text"),
+                              'reply_type': ReplyType.NOTE,
+                              'limits': []
+                              },
                             
             'recommended_key': {'class': QueryOpen.__name__,
-                             'handler': 'None',
-                             'foreword': 'Your musical notation uses relative pitch.',
-                             'question': 'What is the recommended key to play in Sky (default is C)',
-                             'afterword': '',
-                             'help_text': 'You have used a musical notation that does allow to determine the exact pitch of your notes.'
-                                          ' Hence the visual sheet will sound differently in different places in Sky.',
-                             'input_tip': 'leave blank, or type a note name (e.g. C in English notation)',
-                             'reply_type': ReplyType.NOTE,
-                             'limits': None},
+                              'handler': 'None',
+                              'foreword': Lang.get_string("stock_queries/recommended_key/foreword"),
+                              'question': Lang.get_string("stock_queries/recommended_key/question"),
+                              'afterword': Lang.get_string("stock_queries/recommended_key/afterword"),
+                              'input_tip': Lang.get_string("stock_queries/recommended_key/input_tip"),
+                              'help_text': Lang.get_string("stock_queries/recommended_key/help_text"),
+                              'reply_type': ReplyType.NOTE,
+                              'limits': None
+                              },
                             
             'octave_shift': {'class': QueryOpen.__name__,
                              'handler': 'None',
-                             'foreword': 'Do you want to shift the pitch of your notes?',
-                             'question': 'Octave shift (leave blank or type 0 to skip)',
-                             'afterword': '',
-                             'help_text': 'A musical note is identified by its name and an octave number. Sky\'s music system spans less than 3 octaves.'
-                                          ' If you do not specify an octave number after a note, we will assume it is the first octave of Sky, so your notes will essential by played near the bass.'
-                                          ' You can shift your notes to a higher pitch by setting a positive number in this field.'
-                                          ' If you have specified an octave number and it is too high to be played within Sky\'s system, you can downshift the pitch by entering a negative integer',
-                             'input_tip': 'octave shift as an integer between -6 and +6',
+                             'foreword': Lang.get_string("stock_queries/octave_shift/foreword"),
+                             'question': Lang.get_string("stock_queries/octave_shift/question"),
+                             'afterword': Lang.get_string("stock_queries/octave_shift/afterword"),
+                             'input_tip': Lang.get_string("stock_queries/octave_shift/input_tip"),
+                             'help_text': Lang.get_string("stock_queries/octave_shift/help_text"),
                              'reply_type': ReplyType.INTEGER,
-                             'limits': [-6,6]},
+                             'limits': [-6,6]
+                             },
                              
             'one_song_file': {'class': Information.__name__,
-                             'handler': 'None',
-                             'foreword': '-'*40,
-                             'question': 'Your %s is located at: %s',
-                             'afterword': '',
-                             'input_tip': 'click OK to acknowledge'},
+                              'handler': 'None',
+                              'foreword': Lang.get_string("stock_queries/one_song_file/foreword"),
+                              'question': Lang.get_string("stock_queries/one_song_file/question"),
+                              'afterword': Lang.get_string("stock_queries/one_song_file/afterword"),
+                              'input_tip': Lang.get_string("stock_queries/one_song_file/input_tip"),
+                              'help_text': Lang.get_string("stock_queries/one_song_file/help_text")
+                              },
                                           
             'several_song_files': {'class': Information.__name__,
                              'handler': 'None',
-                             'foreword': '-'*40,
-                             'question': 'Your %s is located at: %s',
-                             'afterword': 'Your song has been split into %s files between "%s" and "%s"',
-                             'input_tip': 'click OK to acknowledge'},
+                             'foreword': Lang.get_string("stock_queries/several_song_files/foreword"),
+                             'question': Lang.get_string("stock_queries/several_song_files/question"),
+                             'afterword': Lang.get_string("stock_queries/several_song_files/afterword"),
+                             'input_tip': Lang.get_string("stock_queries/several_song_files/input_tip"),
+                             'help_text': Lang.get_string("stock_queries/several_song_files/help_text")
+                             },
                              
             'no_song_file': {'class': Information.__name__,
                              'handler': 'None',
-                             'foreword': '-'*40,
-                             'question': 'Your %s was not saved to file.',
-                             'afterword': '',
-                             'input_tip': 'click OK to acknowledge'},
+                             'foreword': Lang.get_string("stock_queries/no_song_file/foreword"),
+                             'question': Lang.get_string("stock_queries/no_song_file/question"),
+                             'afterword': Lang.get_string("stock_queries/no_song_file/afterword"),
+                             'input_tip': Lang.get_string("stock_queries/no_song_file/input_tip"),
+                             'help_text': Lang.get_string("stock_queries/no_song_file/help_text")
+                             },
                              
             'few_errors': {'class': Information.__name__,
                              'handler': 'None',
-                             'foreword': '',
-                             'question': 'Song successfully read with a few errors.',
-                             'afterword': '',
-                             'input_tip': 'click OK to acknowledge'},                                                                                    
+                             'foreword': Lang.get_string("stock_queries/few_errors/foreword"),
+                             'question': Lang.get_string("stock_queries/few_errors/question"),
+                             'afterword': Lang.get_string("stock_queries/few_errors/afterword"),
+                             'input_tip': Lang.get_string("stock_queries/few_errors/input_tip"),
+                             'help_text': Lang.get_string("stock_queries/few_errors/help_text")
+                             },
                                                                                                                                            
             'many_errors': {'class': Information.__name__,
                              'handler': 'None',
-                             'foreword': '',
-                             'question': '**WARNING**: Your song contains many errors.',
-                             'afterword': 'Please check the following:'
-                                          '\n- All your notes are within octaves 4 and 6. If not, try again with an octave shift.'
-                                          '\n- Your song is free of typos. Please check this website for full instructions: '
-                                          'https://sky.bloomexperiment.com/t/summary-of-input-modes/403',
-                             'input_tip': 'click OK to acknowledge'}                                                                                                                                                                                                                                                                                                                   
+                             'foreword': Lang.get_string("stock_queries/many_errors/foreword"),
+                             'question': Lang.get_string("stock_queries/many_errors/question"),
+                             'afterword': Lang.get_string("stock_queries/many_errors/afterword"),
+                             'input_tip': Lang.get_string("stock_queries/many_errors/input_tip"),
+                             'help_text': Lang.get_string("stock_queries/many_errors/help_text")
+                             },
         }
 
     def __str__(self):
