@@ -499,7 +499,7 @@ class Query:
 
                     try:
                         buffers, render_modes = answers[0]
-                    except ValueError:
+                    except (TypeError, ValueError):
                         is_reply_valid = False
                     else:
                         if isinstance(buffers[0],(io.BytesIO, io.StringIO)) and isinstance(render_modes[0], RenderMode):

@@ -70,7 +70,7 @@ class Communicator:
                             'question': 'create_song',
                             'reply_type': ReplyType.BUFFERS
                             },
-            
+                            
             # Generic Query
             'information': {'class': Information.__name__,
                             'handler': 'None',
@@ -86,10 +86,11 @@ class Communicator:
                                          '\nUse "%s" for a silence (rest).'
                                          '\nUse "%s" to link notes within an icon, for triplets, quavers... (e.g. %s)'
                                          '\nAdd "%s" after a chord to indicate repetition.'
-                                         '\nSharps # and flats b (semitones) are supported for Western and Jianpu notations.',
+                                         '\nSharps # and flats b (semitones) are supported for Western and Jianpu notations.'
+                                         '\nType \'?\' to get help for a particular question',
                              'afterword': '='*30},
-                                        
-            'instructions': {'class': Information.__name__,
+
+           'instructions_website': {'class': Information.__name__,
                              'handler': 'None',
                              'foreword': '',
                              'question': 'Accepted music notes formats:%s'
@@ -101,6 +102,20 @@ class Communicator:
                                          '\nSharps # and flats b (semitones) are supported for Western and Jianpu notations.',
                              'afterword': '',
                              'input_tip': 'click OK to acknowledge'},
+                                        
+            'instructions_botcog': {'class': Information.__name__,
+                             'handler': 'None',
+                             'foreword': '',
+                             'question': 'Accepted music notes formats:%s'
+                                         '\nNotes composing a chord must be glued together (e.g. A1B1C1).'
+                                         '\nSeparate chords with %s'
+                                         '\nUse "%s" for a silence (rest).'
+                                         '\nUse "%s" to link notes within an icon, for triplets, quavers... (e.g. %s)'
+                                         '\nAdd "%s" after a chord to indicate repetition.'
+                                         '\nSharps # and flats b (semitones) are supported for Western and Jianpu notations.'
+                                         '\nType \'?\' to get help for a particular question',
+                             'afterword': '',
+                             'input_tip': ''},
 
             'render_modes': {'class': QueryMultipleChoices.__name__,
                              'handler': 'None',
