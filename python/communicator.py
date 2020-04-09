@@ -1,6 +1,7 @@
+import io
 from modes import InputMode, RenderMode, ReplyType
 from communication import QueryOpen, QueryChoice, QueryMultipleChoices, QueryBoolean, QueryMemory, Information
-import io
+import Lang
 
 """
 Classes to ask and answer questions called Query and Reply between the bot and the music sheet maker
@@ -77,18 +78,25 @@ class Communicator:
                             'question': '',
                             'reply_type': ReplyType.TEXT},
                                                         
+#            'instructions_stdout': {'class': Information.__name__,
+#                             'handler': 'None',
+#                             'foreword': '===== VISUAL MUSIC SHEETS FOR SKY:CHILDREN OF THE LIGHT =====\n',
+#                             'question': 'Accepted music notes formats:%s'
+#                                         '\nNotes composing a chord must be glued together (e.g. A1B1C1).'
+#                                         '\nSeparate chords with %s'
+#                                         '\nUse "%s" for a silence (rest).'
+#                                         '\nUse "%s" to link notes within an icon, for triplets, quavers... (e.g. %s)'
+#                                         '\nAdd "%s" after a chord to indicate repetition.'
+#                                         '\nSharps # and flats b (semitones) are supported for Western and Jianpu notations.'
+#                                         '\nType \'?\' to get help for a particular question',
+#                             'afterword': '='*30},
+
             'instructions_stdout': {'class': Information.__name__,
                              'handler': 'None',
-                             'foreword': '===== VISUAL MUSIC SHEETS FOR SKY:CHILDREN OF THE LIGHT =====\n',
-                             'question': 'Accepted music notes formats:%s'
-                                         '\nNotes composing a chord must be glued together (e.g. A1B1C1).'
-                                         '\nSeparate chords with %s'
-                                         '\nUse "%s" for a silence (rest).'
-                                         '\nUse "%s" to link notes within an icon, for triplets, quavers... (e.g. %s)'
-                                         '\nAdd "%s" after a chord to indicate repetition.'
-                                         '\nSharps # and flats b (semitones) are supported for Western and Jianpu notations.'
-                                         '\nType \'?\' to get help for a particular question',
-                             'afterword': '='*30},
+                             'foreword': Lang.get_string("stock_queries/instructions_stdout/foreword"),
+                             'question': Lang.get_string("stock_queries/instructions_stdout/question"),
+                             'afterword': Lang.get_string("stock_queries/instructions_stdout/afterword")},
+
 
            'instructions_website': {'class': Information.__name__,
                              'handler': 'None',

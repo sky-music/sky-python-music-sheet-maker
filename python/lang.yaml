@@ -1,0 +1,21 @@
+stock_queries:
+  instructions_stdout:
+    foreword: ===== VISUAL MUSIC SHEETS FOR SKY:CHILDREN OF THE LIGHT =====\n
+    question: |
+      Accepted music notes formats:%s
+      
+      Notes composing a chord must be glued together (e.g. A1B1C1).
+      
+      Separate chords with %s
+      
+      Use "%s" for a silence (rest).
+      
+      Use "%s" to link notes within an icon, for triplets, quavers... (e.g. %s)
+      
+      Add "%s" after a chord to indicate repetition.
+      
+      Sharps # and flats b (semitones) are supported for Western and Jianpu notations.
+      
+      Type '?' to get help for a particular question
+    afterword: =======================================
+  song_title: |

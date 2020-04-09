@@ -1,4 +1,6 @@
 #import os
+import sys
+sys.path.append('..')
 from modes import InputMode, ReplyType
 from communication import QueryOpen, QueryChoice, QueryMultipleChoices, QueryBoolean, QueryMemory
 

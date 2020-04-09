@@ -242,7 +242,7 @@ class MusicSheetMaker:
                         self.get_song_parser().get_quaver_delimiter(), self.get_song_parser().get_quaver_delimiter().join(['A1','B1','C1']),
                         self.get_song_parser().get_repeat_indicator()+'2')
                 
-        if self.is_commandline(recipient):        
+        if self.is_commandline(recipient):      
             i_instr = self.communicator.send_stock_query('instructions_stdout', recipient=recipient, question_rep=question_rep, prerequisites=prerequisites)
         elif self.is_website(recipient):
             i_instr = self.communicator.send_stock_query('instructions_website', recipient=recipient, question_rep=question_rep, prerequisites=prerequisites)

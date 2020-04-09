@@ -1,5 +1,6 @@
 import asyncio
 import sys
+sys.path.append('..')
 from concurrent.futures import ThreadPoolExecutor
 from command_line_player import CommandLinePlayer
 from music_sheet_maker import MusicSheetMaker
