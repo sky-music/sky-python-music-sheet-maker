@@ -1,4 +1,6 @@
 import yaml
+import os
+
 
 LANG = dict()
 locales = ['en_US', 'ja_JP', 'fr_FR']
@@ -34,9 +36,10 @@ def get_string(key, **kwargs):
             obj = obj[i]
 '''
 
+
 def load(locale):
     global LANG, loaded
-    with open("langs/%s.yaml"%locale) as file:
+    with open(os.path.join("python", "langs", "%s.yaml"%locale)) as file:
         LANG[locale] = yaml.safe_load(file)
     loaded[locale] = True
 
@@ -45,9 +48,9 @@ def get_string(key, locale=None, **kwargs):
     global locales, warn_count
     if locale not in locales:
         if not loaded[locales[0]]:
-            print('\n***WARNING: bad locale %s for key %s. Reverting to %s\n'%(locale, str(key), locales[0]))
+            print('\n***WARNING: bad locale %s for key %s. Reverting to %s\n' % (locale, str(key), locales[0]))
         locale = locales[0]
-    
+
     if not loaded[locale]:
         load(locale)
 
@@ -56,17 +59,12 @@ def get_string(key, locale=None, **kwargs):
     for i in key_list:
         if i not in obj:
             if warn_count < 10:
-                print('\n***WARNING: could not find lang key %s for locale %s\n'%(str(i), locale))
+                print('\n***WARNING: could not find lang key %s for locale %s\n' % (str(i), locale))
                 warn_count += 1
             return ''
-            #raise KeyError(f"Unknown lang key: {i}")
+            # raise KeyError(f"Unknown lang key: {i}")
 
         if isinstance(obj[i], str):
             return obj[i].format(**kwargs)
         elif isinstance(obj[i], dict):
             obj = obj[i]
-
-            
-            
-            
-            
