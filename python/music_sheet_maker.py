@@ -17,9 +17,14 @@ class MusicSheetMakerError(Exception):
 
 class MusicSheetMaker:
 
-    def __init__(self, songs_in='test_songs', songs_out='songs_out'):
+    def __init__(self, locale='en_US', songs_in='test_songs', songs_out='songs_out'):
         self.name = 'music-sheet-maker'
-        self.communicator = Communicator(owner=self)
+        try:
+            self.locale = locale.split('.')[0]
+        except AttributeError:
+            print('**WARNING: bad locale %s passed to music-maker'%locale)
+            self.locale = locale        
+        self.communicator = Communicator(owner=self, locale=self.locale)
         self.song = None
         self.song_parser = None
         self.directory_base = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)),'..'))
@@ -47,6 +52,10 @@ class MusicSheetMaker:
 
     def get_name(self):
         return self.name
+    
+    def get_locale(self):
+        
+        return self.locale
 
     def is_botcog(self, recipient):
         try:
@@ -238,9 +247,11 @@ class MusicSheetMaker:
    
     def ask_instructions(self, recipient, prerequisites=None, execute=True):
         
-        question_rep = ('\n'.join(['\n* ' + input_mode.long_desc for input_mode in InputMode]), self.get_song_parser().get_icon_delimiter(), self.get_song_parser().get_pause(),
+        question_rep = ('\n'.join(['\n* ' + input_mode.get_long_desc() for input_mode in InputMode]),
+                        self.get_song_parser().get_icon_delimiter(), self.get_song_parser().get_pause(),
                         self.get_song_parser().get_quaver_delimiter(), self.get_song_parser().get_quaver_delimiter().join(['A1','B1','C1']),
-                        self.get_song_parser().get_repeat_indicator()+'2')
+                        self.get_song_parser().get_repeat_indicator()+'2'
+                        )
                 
         if self.is_commandline(recipient):      
             i_instr = self.communicator.send_stock_query('instructions_stdout', recipient=recipient, question_rep=question_rep, prerequisites=prerequisites)
@@ -307,7 +318,7 @@ class MusicSheetMaker:
     
     def ask_file(self, recipient, prerequisites=None, execute=True):
                    
-        q_file = self.communicator.send_stock_query('file', recipient=recipient, question_rep=(os.path.relpath(os.path.normpath(self.song_dir_in))),
+        q_file = self.communicator.send_stock_query('file', recipient=recipient, question_rep=(os.path.relpath(os.path.normpath(self.song_dir_in)),),
                                                     prerequisites=prerequisites, limits=(os.path.normpath(self.song_dir_in)))
         
         if execute:
@@ -349,7 +360,7 @@ class MusicSheetMaker:
         
         else:
                             
-            q_notes = self.communicator.send_stock_query('notes_file', question_rep=(os.path.relpath(os.path.normpath(self.song_dir_in))),
+            q_notes = self.communicator.send_stock_query('notes_file', question_rep=(os.path.relpath(os.path.normpath(self.song_dir_in)),),
                                                          recipient=recipient, prerequisites=prerequisites)
             
             if not execute:            
@@ -466,8 +477,8 @@ class MusicSheetMaker:
             limits=all_input_modes, prerequisites=prerequisites)
             
         elif len(possible_modes) == 1:
-            q_mode = self.communicator.send_stock_query('one_input_mode', recipient=recipient,
-                                                        question_rep=(possible_modes[0].short_desc), prerequisites=prerequisites)
+            q_mode = self.communicator.send_stock_query('one_input_mode', recipient=recipient, 
+                                                        question_rep=(possible_modes[0].get_short_desc(),), prerequisites=prerequisites)
             
         else:
             q_mode = self.communicator.send_stock_query('musical_notation', recipient=recipient, limits=possible_modes, prerequisites=prerequisites)
@@ -534,11 +545,11 @@ class MusicSheetMaker:
         elif len(possible_keys) == 1:
             #Sends information that there is only 1 possible key
             q_key = self.communicator.send_stock_query('one_possible_key', recipient=recipient,
-                                                       question_rep=(str(possible_keys[0])), prerequisites=prerequisites)
+                                                       question_rep=(str(possible_keys[0]),), prerequisites=prerequisites)
         else:
             #Asks to choose a key within a list
             q_key = self.communicator.send_stock_query('possible_keys', recipient=recipient,
-                                                       foreword_rep=(', '.join(possible_keys)), limits=possible_keys, prerequisites=prerequisites)
+                                                       foreword_rep=(', '.join(possible_keys),), limits=possible_keys, prerequisites=prerequisites)
 
         if execute:
             
@@ -773,17 +784,17 @@ class MusicSheetMaker:
             
                 if numfiles == 1:
                     
-                    question_rep = (render_mode.short_desc, str(os.path.relpath(file_paths[0])))
+                    question_rep = (render_mode.get_short_desc(), str(os.path.relpath(file_paths[0])))
                     
                     i_song_files = self.communicator.send_stock_query('one_song_file', recipient=recipient, question_rep=question_rep, prerequisites=prerequisites)
                     
                 elif numfiles > 1 and i == 0:
                     
-                    question_rep = (render_mode.short_desc, str(os.path.relpath(self.song_dir_out)))
+                    question_rep = (render_mode.get_short_desc(), str(os.path.relpath(self.song_dir_out)))
                     afterword_rep = (str(numfiles), str(os.path.split(file_paths[0])[1]), str(os.path.split(file_paths[-1])[1]))
                     i_song_files = self.communicator.send_stock_query('several_song_files', recipient=recipient, question_rep=question_rep, afterword_rep=afterword_rep, prerequisites=prerequisites)
             else:
-                question_rep = (render_mode.short_desc)
+                question_rep = (render_mode.get_short_desc(),)
                 i_song_files = self.communicator.send_stock_query('no_song_file', recipient=recipient, question_rep=question_rep, prerequisites=prerequisites)
         
         if execute:

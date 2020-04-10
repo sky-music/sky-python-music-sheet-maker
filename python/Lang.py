@@ -1,52 +1,37 @@
 import yaml
-
+import os
+import re
 LANG = dict()
 locales = ['en_US', 'ja_JP', 'fr_FR']
+substitutes = {'fr': 'fr_FR', 'en': 'en_US'}
 loaded = dict((locale, False) for locale in locales)
 warn_count = 0
-'''
-def get_by_path(root, items):
-    """Access a nested object in root by item sequence."""
-    return reduce(operator.getitem, items, root)
-'''
-'''
-def load():
-    global LANG, loaded
-    with open("lang.yaml") as file:
-        LANG = yaml.safe_load(file)
-    loaded = True
-    
-def get_string(key, **kwargs):
-    if not loaded:
-        load()
-
-    key_list = key.split("/")
-    obj = LANG
-    for i in key_list:
-        if i not in obj:
-            print('\n***WARNING: could not find lang key {%s}\n'%str(i))
-            return ''
-            #raise KeyError(f"Unknown lang key: {i}")
-
-        if isinstance(obj[i], str):
-            return obj[i].format(**kwargs)
-        elif isinstance(obj[i], dict):
-            obj = obj[i]
-'''
 
 def load(locale):
     global LANG, loaded
-    with open("langs/%s.yaml"%locale) as file:
+    with open(os.path.normpath(os.path.join(os.path.dirname(__file__), "langs/%s.yaml"%locale))) as file:
         LANG[locale] = yaml.safe_load(file)
     loaded[locale] = True
 
+def find_substitute(locale):
+    global substitutes
+    locale_radix = locale.split('_')[0]
+    try:
+        return substitutes[locale_radix]
+    except KeyError:
+        for locale in locales:
+            if re.match(locale_radix, locale) is not None:
+                substitutes.update({locale_radix: locale})
+                return substitutes[locale_radix]
+        return locales[0]  
 
-def get_string(key, locale=None, **kwargs):
+def get_string(key, locale=None, replacements=()):
     global locales, warn_count
     if locale not in locales:
-        if not loaded[locales[0]]:
-            print('\n***WARNING: bad locale %s for key %s. Reverting to %s\n'%(locale, str(key), locales[0]))
-        locale = locales[0]
+        substitute = find_substitute(locale)
+        if not loaded[substitute]:
+            print('\n***WARNING: bad locale %s for key %s. Reverting to %s\n'%(locale, str(key), substitute))
+        locale = substitute
     
     if not loaded[locale]:
         load(locale)
@@ -62,7 +47,10 @@ def get_string(key, locale=None, **kwargs):
             #raise KeyError(f"Unknown lang key: {i}")
 
         if isinstance(obj[i], str):
-            return obj[i].format(**kwargs)
+            if len(replacements) != 0:
+                return obj[i].format(*replacements)
+            else:
+                return obj[i]
         elif isinstance(obj[i], dict):
             obj = obj[i]
 

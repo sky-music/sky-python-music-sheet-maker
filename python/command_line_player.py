@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from music_sheet_maker import MusicSheetMaker
 from communicator import Communicator, QueriesExecutionAbort
-
+import os
 
 class CommandLinePlayer:
 
@@ -15,9 +15,9 @@ class CommandLinePlayer:
     to call methods from communicator directly from the puppet.
     """
 
-    def __init__(self):
+    def __init__(self, locale='en_US'):
         self.name = 'command-line'
-        self.communicator = Communicator(owner=self)
+        self.communicator = Communicator(owner=self, locale=locale)
         
     def __getattr__(self, attr_name):
         """
@@ -58,7 +58,7 @@ class CommandLinePlayer:
                 reply_valid = True #to be sure to break the loop
                 if q.get_expect_reply():                  
                     #print('%%%DEBUG. PLAYER, YOU ARE BEING PROMPTED%%%') #FIXME: for debugging only                    
-                    answer = input('\n%s: '%question)   
+                    answer = input('%s: '%question)   
                     q.reply_to(answer)
                     reply_valid = q.get_reply_validity()
                 else:                  
@@ -70,9 +70,9 @@ class CommandLinePlayer:
 
 try:
 
-    player = CommandLinePlayer()
+    player = CommandLinePlayer(locale=os.getenv('LANG'))
 
-    maker = MusicSheetMaker()
+    maker = MusicSheetMaker(locale=os.getenv('LANG'))
 
     q = player.communicator.send_stock_query('create_song', recipient=maker)
 

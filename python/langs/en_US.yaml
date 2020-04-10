@@ -43,13 +43,13 @@ stock_queries:
   instructions_stdout:
     foreword: "===== VISUAL MUSIC SHEETS FOR SKY:CHILDREN OF THE LIGHT =====\n"
     question: |
-      Accepted music notes formats:%s
+      Accepted music notes formats:{0}
       
       - Notes composing a chord must be glued together (e.g. A1B1C1).
-      - Separate chords with %s
-      - Use "%s" for a silence (rest).
-      - Use "%s" to link notes within an icon, for triplets, quavers... (e.g. %s)
-      - Add "%s" after a chord to indicate repetition.
+      - Separate chords with {1}
+      - Use "{2}" for a silence (rest).
+      - Use "{3}" to link notes within an icon, for triplets, quavers... (e.g. {4})
+      - Add "{5}" after a chord to indicate repetition.
       - Sharps # and flats b (semitones) are supported for Western and Jianpu notations.
       
       Type '?' to get help for a particular question
@@ -59,13 +59,13 @@ stock_queries:
   instructions_website:
     foreword:
     question: |
-      Accepted music notes formats:%s
+      Accepted music notes formats:{0}
       
       - Notes composing a chord must be glued together (e.g. A1B1C1).
-      - Separate chords with %s
-      - Use "%s" for a silence (rest).
-      - Use "%s" to link notes within an icon, for triplets, quavers... (e.g. %s)
-      - Add "%s" after a chord to indicate repetition.
+      - Separate chords with {1}
+      - Use "{2}" for a silence (rest).
+      - Use "{3}" to link notes within an icon, for triplets, quavers... (e.g. {4})
+      - Add "{5}" after a chord to indicate repetition.
       - Sharps # and flats b (semitones) are supported for Western and Jianpu notations.
     afterword:
     input_tip: click OK to acknowledge
@@ -73,13 +73,13 @@ stock_queries:
   instructions_botcog:
     foreword:
     question: |
-      Accepted music notes formats:%s
+      Accepted music notes formats:{0}
       
       - Notes composing a chord must be glued together (e.g. A1B1C1).
-      - Separate chords with %s
-      - Use "%s" for a silence (rest).
-      - Use "%s" to link notes within an icon, for triplets, quavers... (e.g. %s)
-      - Add "%s" after a chord to indicate repetition.
+      - Separate chords with {1}
+      - Use "{2}" for a silence (rest).
+      - Use "{3}" to link notes within an icon, for triplets, quavers... (e.g. {4})
+      - Add "{5}" after a chord to indicate repetition.
       - Sharps # and flats b (semitones) are supported for Western and Jianpu notations.
       
       Type '?' to get help for a particular question
@@ -114,7 +114,7 @@ stock_queries:
     help_text: 'The transcript writer is the person who found the notes you typed earlier. It could be yourself!'
   notes_file:
     foreword:
-    question: 'Type or copy-paste notes, or enter file name (in %s/)'
+    question: 'Type or copy-paste notes, or enter file name (in {0}/)'
     afterword:
     input_tip: a string of notes such as C1 D1F1, or a file name such as song.txt
     help_text: |
@@ -122,21 +122,22 @@ stock_queries:
       You can also enter the path to a a text file containing the notes.
   file:
     foreword:
-    question: 'Enter file name (in %s/)'
+    question: 'Enter file name (in {0}/)'
     afterword:
     input_tip: any text with one or several musical notes
     help_text:
   notes:
     foreword:
-    question: Please type or copy-paste notes
+    question: Please type or copy-paste notes (leave blank to skip)
     afterword:
-    input_tip: any text with one or several musical notes
+    input_tip: any text with one or several musical notes (leave blank to skip)
     help_text: |
       Type one or several notes in your favorite format, for instance C D E F G.
-      For chords (notes played together) glue the notes together (eg C1D1)
+      For chords (notes played together) glue the notes together (eg C1D1).
+      Leave the field blank and press enter if you are finished.
   one_input_mode:
     foreword:
-    question: "We detected that you use the following notation: %s."
+    question: "We detected that you use the following notation: {0}."
     afterword:
     input_tip: click OK to acknowledge
     help_text:
@@ -158,12 +159,12 @@ stock_queries:
     help_text:
   one_possible_key:
     foreword:
-    question: 'Your song can be transposed in Sky with the following key: %s'
+    question: 'Your song can be transposed in Sky with the following key: {0}'
     afterword:
     input_tip: click OK to acknowledge
     help_text:
   possible_keys:
-    foreword: 'Your song can be transposed in Sky with the following keys: %s.'
+    foreword: 'Your song can be transposed in Sky with the following keys: {0}.'
     question: Please choose your musical key
     afterword:
     input_tip: Choice number (integer between 0 and n-1)
@@ -190,20 +191,20 @@ stock_queries:
       If you have specified an octave number and it is too high to be played within Sky\''s system, you can downshift the pitch by entering a negative integer'
   no_song_file:
     foreword: ---------------------------------------
-    question: 'Your %s was not saved to file.'
+    question: 'Your {0} was not saved to file.'
     afterword:
     input_tip: click OK to acknowledge
     help_text:
   one_song_file:
     foreword: ---------------------------------------
-    question: 'Your %s is located at: %s'
+    question: 'Your {0} is located at: {1}'
     afterword:
     input_tip: click OK to acknowledge
     help_text:
   several_song_files:
     foreword: ---------------------------------------
-    question: 'Your %s is located at: %s'
-    afterword: 'Your song has been split into %s files between "%s" and "%s"'
+    question: 'Your {0} is located at: {1}'
+    afterword: 'Your song has been split into {0} files between "{1}" and "{2}"'
     input_tip: click OK to acknowledge
     help_text:
   few_errors:

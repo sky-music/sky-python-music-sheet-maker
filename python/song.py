@@ -31,11 +31,16 @@ class Song():
             self.music_key = 'C'
 
         self.maker = maker
+        try:
+            self.locale = self.maker.get_locale()
+        except AttributeError:
+            print('**WARNING: Song self.maker has no locale. Reverting to en_US')
+            self.locale = 'en_US'
         self.directory_base = self.maker.get_directory_base()
         self.directory_fonts = os.path.normpath(os.path.join(self.directory_base,'fonts'))
         self.lines = []        
-        self.meta = {'title': [Lang.get_string("song_meta/title")+':', 'Untitled'], 'artist': [Lang.get_string("song_meta/artist")+':', ''],
-                    'transcript': [Lang.get_string("song_meta/transcript")+':', ''], 'song_key': [Lang.get_string("song_meta/musical_key")+':', '']}
+        self.meta = {'title': [Lang.get_string("song_meta/title", self.locale)+':', 'Untitled'], 'artist': [Lang.get_string("song_meta/artist", self.locale)+':', ''],
+                    'transcript': [Lang.get_string("song_meta/transcript", self.locale)+':', ''], 'song_key': [Lang.get_string("song_meta/musical_key", self.locale)+':', '']}
         #self.title = self.meta['title'][1]
         self.maxIconsPerLine = 10
         self.maxLinesPerFile = 10
@@ -274,7 +279,7 @@ class Song():
 
         ascii_buffer = io.StringIO()
 
-        note_parser = render_mode.note_parser_method()
+        note_parser = render_mode.get_note_parser()
         
         ascii_buffer.write('#' + self.meta['title'][1] + '\n')
 

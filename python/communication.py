@@ -3,6 +3,7 @@ from modes import ReplyType, InputMode, RenderMode
 from datetime import datetime
 import hashlib
 import io
+import Lang
 
 class QueryError(Exception):
     def __init__(self, explanation):
@@ -694,7 +695,7 @@ class QueryChoice(Query):
         if self.reply_type == ReplyType.NOTE:
             result[-1] += ' among ' + ', '.join(list(self.get_limits()))
         elif self.reply_type in [ReplyType.INPUTMODE, ReplyType.RENDERMODES]:
-            choices = [str(i) + ') '+ str(choice.short_desc) for i, choice in enumerate(self.get_limits())]
+            choices = [str(i) + ') '+ str(choice.get_short_desc()) for i, choice in enumerate(self.get_limits())]
             result[-1] += ' among:\n\n' + '\n'.join(choices)
         else:
             choices = [str(i) + ') '+ str(choice) for i, choice in enumerate(self.get_limits())]

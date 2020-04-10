@@ -31,6 +31,11 @@ class SongParser:
         self.repeat_indicator = '*'
         self.maker = maker
         self.directory_base = self.maker.get_directory_base()
+        try:
+            self.locale = self.maker.get_locale()
+        except AttributeError:
+            print('**WARNING: SongParser self.maker has no locale. Reverting to en_US')
+            self.locale = 'en_US'
 
     def set_delimiters(self, icon_delimiter=' ', pause='.', quaver_delimiter='-', comment_delimiter='#', repeat_indicator='*'):
 
@@ -81,9 +86,9 @@ class SongParser:
             for delim in delims:
                 if (parser.not_note_name_regex.match(delim) is None or parser.not_octave_regex.match(
                         delim) is None) and delim != self.comment_delimiter:
-                    print('You chose an invalid delimiter for notation ' + self.input_mode.short_desc + ': ' + delim)
+                    print('You chose an invalid delimiter for notation ' + self.input_mode.get_short_desc() + ': ' + delim)
                 if delims.count(delim) > 1:
-                    print('You chose twice the same delimiter for notation ' + self.input_mode.short_desc + ': ' + delim)
+                    print('You chose twice the same delimiter for notation ' + self.input_mode.get_short_desc() + ': ' + delim)
 
     def get_possible_modes(self, song_lines=None):
 
@@ -116,7 +121,7 @@ class SongParser:
         if input_mode is None:
             input_mode = self.input_mode
         
-        note_parser = input_mode.note_parser_method()
+        note_parser = input_mode.get_note_parser()
 
         return note_parser
 
