@@ -1,11 +1,13 @@
 import yaml
 import os
 import re
+
 LANG = dict()
 locales = ['en_US', 'ja_JP', 'fr_FR']
 substitutes = {'fr': 'fr_FR', 'en': 'en_US'}
 loaded = dict((locale, False) for locale in locales)
 warn_count = 0
+
 
 def load(locale):
     global LANG, loaded
@@ -15,7 +17,12 @@ def load(locale):
 
 def find_substitute(locale):
     global substitutes
-    locale_radix = locale.split('_')[0]
+    
+    try:
+        locale_radix = locale.split('_')[0]
+    except AttributeError:
+        return locales[0]
+        
     try:
         return substitutes[locale_radix]
     except KeyError:
@@ -41,10 +48,10 @@ def get_string(key, locale=None, replacements=()):
     for i in key_list:
         if i not in obj:
             if warn_count < 10:
-                print('\n***WARNING: could not find lang key %s for locale %s\n'%(str(i), locale))
+                print('\n***WARNING: could not find lang key %s for locale %s\n' % (str(i), locale))
                 warn_count += 1
             return ''
-            #raise KeyError(f"Unknown lang key: {i}")
+            # raise KeyError(f"Unknown lang key: {i}")
 
         if isinstance(obj[i], str):
             if len(replacements) != 0:
@@ -53,8 +60,3 @@ def get_string(key, locale=None, replacements=()):
                 return obj[i]
         elif isinstance(obj[i], dict):
             obj = obj[i]
-
-            
-            
-            
-            

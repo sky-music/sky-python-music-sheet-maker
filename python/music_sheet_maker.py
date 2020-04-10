@@ -21,9 +21,11 @@ class MusicSheetMaker:
         self.name = 'music-sheet-maker'
         try:
             self.locale = locale.split('.')[0]
+            if len(self.locale) < 2:
+                raise AttributeError
         except AttributeError:
-            print('**WARNING: bad locale %s passed to music-maker'%locale)
-            self.locale = locale        
+            print("**WARNING: bad locale %s passed to music-maker. Reverting to 'en_US'"%locale)
+            self.locale = 'en_US'        
         self.communicator = Communicator(owner=self, locale=self.locale)
         self.song = None
         self.song_parser = None
