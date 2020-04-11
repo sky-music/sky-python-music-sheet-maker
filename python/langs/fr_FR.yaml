@@ -35,15 +35,15 @@ render_mode:
     doremiascii:
         short_desc: song in do-re-mi notation
 song_meta:
-   title: Title
-   artist: Original artist(s)
-   transcript: Transcript writer
-   musical_key: Musical key
+   title: Titre
+   artist: Artiste(s) d'origine
+   transcript: Transcripteur
+   musical_key: Clef musicale
 stock_queries:
   instructions_stdout:
     foreword: "===== PORTEES VISUELLES POUR SKY:CHILDREN OF THE LIGHT ===\n"
     question: |
-      Accepted music notes formats:{0}
+      Formats de notes acceptés :{0}
       
       - Notes composing a chord must be glued together (e.g. A1B1C1).
       - Separate chords with {1}
@@ -59,7 +59,7 @@ stock_queries:
   instructions_website:
     foreword:
     question: |
-      Accepted music notes formats:{0}
+      Formats de notes acceptés :{0}
       
       - Notes composing a chord must be glued together (e.g. A1B1C1).
       - Separate chords with {1}
@@ -68,12 +68,12 @@ stock_queries:
       - Add "{5}" after a chord to indicate repetition.
       - Sharps # and flats b (semitones) are supported for Western and Jianpu notations.
     afterword:
-    input_tip: click OK to acknowledge
+    input_tip: cliquez sur OK pour passer
     help_text:
   instructions_botcog:
     foreword:
     question: |
-      Accepted music notes formats:{0}
+      Formats de notes acceptés :{0}
       
       - Notes composing a chord must be glued together (e.g. A1B1C1).
       - Separate chords with {1}
@@ -96,19 +96,19 @@ stock_queries:
       Please select the ones you want to generate (or deselect some).
   song_title:
     foreword:
-    question: What is the song title?
+    question: Quel est le titre de la chanson ?
     afterword:
     input_tip: 'any text. Leave blank to use "untitled"'
     help_text: 
   original_artist:
     foreword:
-    question: What is(are) the Original artist(s)?
+    question: Qui sont les artistes d'origine de la chanson ?
     afterword:
     input_tip: any text, including blank
     help_text: Original artists include the composer, musician, singer, etc.
   transcript_writer:
     foreword:
-    question: What is the transcript writer?
+    question: Qui est le transcripteur ?
     afterword:
     input_tip: any text, including blank
     help_text: 'The transcript writer is the person who found the notes you typed earlier. It could be yourself!'
@@ -138,7 +138,7 @@ stock_queries:
     foreword:
     question: "We detected that you use the following notation: {0}."
     afterword:
-    input_tip: click OK to acknowledge
+    input_tip: cliquez sur OK pour passer
     help_text:
   musical_notation:
     foreword: Despite our efforts, we could not guess what musical notation you are using.
@@ -154,13 +154,13 @@ stock_queries:
       Your song cannot be transposed exactly in Sky.
       Default key will be set to C.
     afterword:
-    input_tip: click OK to acknowledge
+    input_tip: cliquez sur OK pour passer
     help_text:
   one_possible_key:
     foreword:
     question: 'Your song can be transposed in Sky with the following key: {0}'
     afterword:
-    input_tip: click OK to acknowledge
+    input_tip: cliquez sur OK pour passer
     help_text:
   possible_keys:
     foreword: 'Your song can be transposed in Sky with the following keys: {0}.'
@@ -192,25 +192,25 @@ stock_queries:
     foreword: ---------------------------------------
     question: 'Your {0} was not saved to file.'
     afterword:
-    input_tip: click OK to acknowledge
+    input_tip: cliquez sur OK pour passer
     help_text:
   one_song_file:
     foreword: ---------------------------------------
     question: 'Your {0} is located at: {1}'
     afterword:
-    input_tip: click OK to acknowledge
+    input_tip: cliquez sur OK pour passer
     help_text:
   several_song_files:
     foreword: ---------------------------------------
     question: 'Your {0} is located at: {1}'
     afterword: 'Your song has been split into {0} files between "{1}" and "{2}"'
-    input_tip: click OK to acknowledge
+    input_tip: cliquez sur OK pour passer
     help_text:
   few_errors:
     foreword:
     question: 'Song successfully read with a few errors.'
     afterword:
-    input_tip: click OK to acknowledge
+    input_tip: cliquez sur OK pour passer
     help_text:
   many_errors:
     foreword:
@@ -222,5 +222,5 @@ stock_queries:
       - Your song is free of typos. Please check this website for full instructions: 
       
       https://sky.bloomexperiment.com/t/summary-of-input-modes/403'
-    input_tip: click OK to acknowledge
+    input_tip: cliquez sur OK pour passer
     help_text:

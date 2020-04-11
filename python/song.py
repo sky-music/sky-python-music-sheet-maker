@@ -33,9 +33,9 @@ class Song():
         self.maker = maker
         try:
             self.locale = self.maker.get_locale()
-        except AttributeError:
-            print('**WARNING: Song self.maker has no locale. Reverting to en_US')
-            self.locale = 'en_US'
+        except AttributeError: #Should never happen
+            self.locale = Lang.guess_locale()
+            print('**WARNING: Song self.maker has no locale. Reverting to: %s'%self.locale)
         self.directory_base = self.maker.get_directory_base()
         self.directory_fonts = os.path.normpath(os.path.join(self.directory_base,'fonts'))
         self.lines = []        

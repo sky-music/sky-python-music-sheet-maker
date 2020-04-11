@@ -4,10 +4,29 @@ import re
 import locale as localepy
 
 LANG = dict()
-locales_str = ['en_US', 'ja_JP', 'fr_FR', 'vi_VN']
+locales = ['en_US', 'ja_JP', 'fr_FR', 'vi_VN']
 substitutes = {'fr': 'fr_FR', 'en': 'en_US', 'vn': 'vi_VN'}
-loaded = dict((locale, False) for locale in locales_str)
+loaded = dict((locale, False) for locale in locales)
 warn_count = 0
+
+
+
+def check_locale(locale):
+       
+    try:
+        locale = locale.split('.')[0]
+        if len(locale) < 2:
+            return None
+    except AttributeError:
+        return None
+    
+    if locale not in locales:
+        substitute = find_substitute(locale)
+        if not loaded[substitute]: 
+            print("\n***WARNING: locale '%s' not found. Will replace with '%s'\n"%(locale, substitute))
+        return substitute
+    
+    return locale
 
 
 def guess_locale():
@@ -20,9 +39,9 @@ def guess_locale():
     except:
         locale = localepy.getdefaultlocale()[0]
         if locale is None:
-            return locales_str[0] 
+            return locales[0] 
         elif len(locale) < 2:
-            return locales_str[0]
+            return locales[0]
         
     return locale
 
@@ -40,24 +59,24 @@ def find_substitute(locale):
     try:
         locale_radix = locale.split('_')[0]
     except AttributeError:
-        return locales_str[0]
+        return locales[0]
 
     try:
         return substitutes[locale_radix]
     except KeyError:
-        for locale in locales_str:
+        for locale in locales:
             if re.match(locale_radix, locale) is not None:
                 substitutes.update({locale_radix: locale})
                 return substitutes[locale_radix]
-        return locales_str[0]
+        return locales[0]
 
 
 def get_string(key, locale=None, replacements=()):
-    global locales_str, warn_count
-    if locale not in locales_str:
+    global locales, warn_count
+    if locale not in locales:
         substitute = find_substitute(locale)
         if not loaded[substitute]:
-            print('\n***WARNING: bad locale %s for key %s. Reverting to %s\n' % (locale, str(key), substitute))
+            print("\n***WARNING: missing locale '%s' for key '%s'. Replacing with %s\n" % (locale, str(key), substitute))
         locale = substitute
 
     if not loaded[locale]:
@@ -65,10 +84,11 @@ def get_string(key, locale=None, replacements=()):
 
     key_list = key.split("/")
     obj = LANG[locale]
+    
     for i in key_list:
         if i not in obj:
             if warn_count < 10:
-                print('\n***WARNING: could not find lang key %s for locale %s\n' % (str(i), locale))
+                print("\n***WARNING: could not find lang key '%s' for locale '%s'\n" % (str(i), locale))
                 warn_count += 1
             return ''
             # raise KeyError(f"Unknown lang key: {i}")

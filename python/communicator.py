@@ -62,7 +62,7 @@ class Communicator:
         self.owner = owner
         self.memory = QueryMemory(self.owner)
         self.name = self.owner.get_name()
-        self.set_locale(locale)
+        self.locale=self.set_locale(locale)
         # A dictionary of standard queries arguments
         # The key must be lower case without blanks, use _ instead
         # TODO: create generic (quasi-empty) stock queries, such as Information to output dome text
@@ -319,27 +319,26 @@ class Communicator:
 
     def get_name(self):
         return self.name
+    
+    def get_locale(self):        
+        return self.locale
+
 
     def set_locale(self, locale):
         
-        try:
-            locale = locale.split('.')[0]
-            if len(locale) < 2:
-                raise AttributeError
-            else:
-                self.locale = locale
-        except AttributeError:
+        self.locale = Lang.check_locale(locale)
+        
+        if self.locale is None: 
             try:
-                locale = self.owner.get_locale()
-                if len(locale) < 2:
-                    raise AttributeError
-                else:
-                    self.locale = locale
-            except AttributeError:
+                self.locale = Lang.check_locale(self.owner.get_locale())
+            except:
+                pass
+            if self.locale is None: 
                 self.locale = Lang.guess_locale()
-                print("**WARNING: bad locale %s passed to Communicator. Reverting to %s"%(locale, self.locale))
+                print("**WARNING: bad locale type %s passed to Communicator. Reverting to %s"%(locale, self.locale))
                 
-		return self.locale
+        return self.locale
+
 
     def send_stock_query(self, stock_query_name, recipient, foreword_rep=(), question_rep=(), afterword_rep=(),
                          helptext_rep=(), **kwargs):

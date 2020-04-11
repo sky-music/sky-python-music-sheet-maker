@@ -20,7 +20,7 @@ class MusicSheetMaker:
 
     def __init__(self, locale='en_US', songs_in='test_songs', songs_out='songs_out'):
         self.name = 'music-sheet-maker'
-        self.set_locale(locale)
+        self.locale=self.set_locale(locale)
         self.communicator = Communicator(owner=self, locale=self.locale)
         self.song = None
         self.song_parser = None
@@ -50,23 +50,18 @@ class MusicSheetMaker:
     def get_name(self):
         return self.name
     
-    def get_locale(self):
-        
+    def get_locale(self):        
         return self.locale
     
     def set_locale(self, locale):
         
-        try:
-            locale = locale.split('.')[0]
-            if len(locale) < 2:
-                raise AttributeError
-            else:
-                self.locale = locale
-        except AttributeError:
+        self.locale = Lang.check_locale(locale)
+        if self.locale is None:
             self.locale = Lang.guess_locale()
-            print("**WARNING: bad locale %s passed to music-maker. Reverting to %s"%(locale, self.locale))
-    
-    	return self.locale
+            print("**WARNING: bad locale type %s passed to MusicSheetMaker. Reverting to %s"%(locale, self.locale))
+            
+        return self.locale
+
     
     def is_botcog(self, recipient):
         try:
@@ -78,6 +73,7 @@ class MusicSheetMaker:
             except AttributeError:
                 is_bot = False
         return is_bot
+
 
     def is_website(self, recipient):
         try:
@@ -258,7 +254,7 @@ class MusicSheetMaker:
    
     def ask_instructions(self, recipient, prerequisites=None, execute=True):
         
-        question_rep = ('\n'.join(['\n* ' + input_mode.get_long_desc() for input_mode in InputMode]),
+        question_rep = ('\n'.join(['\n* ' + input_mode.get_long_desc(self.locale) for input_mode in InputMode]),
                         self.get_song_parser().get_icon_delimiter(), self.get_song_parser().get_pause(),
                         self.get_song_parser().get_quaver_delimiter(), self.get_song_parser().get_quaver_delimiter().join(['A1','B1','C1']),
                         self.get_song_parser().get_repeat_indicator()+'2'
@@ -489,7 +485,7 @@ class MusicSheetMaker:
             
         elif len(possible_modes) == 1:
             q_mode = self.communicator.send_stock_query('one_input_mode', recipient=recipient, 
-                                                        question_rep=(possible_modes[0].get_short_desc(),), prerequisites=prerequisites)
+                                                        question_rep=(possible_modes[0].get_short_desc(self.locale),), prerequisites=prerequisites)
             
         else:
             q_mode = self.communicator.send_stock_query('musical_notation', recipient=recipient, limits=possible_modes, prerequisites=prerequisites)
@@ -795,17 +791,17 @@ class MusicSheetMaker:
             
                 if numfiles == 1:
                     
-                    question_rep = (render_mode.get_short_desc(), str(os.path.relpath(file_paths[0])))
+                    question_rep = (render_mode.get_short_desc(self.locale), str(os.path.relpath(file_paths[0])))
                     
                     i_song_files = self.communicator.send_stock_query('one_song_file', recipient=recipient, question_rep=question_rep, prerequisites=prerequisites)
                     
                 elif numfiles > 1 and i == 0:
                     
-                    question_rep = (render_mode.get_short_desc(), str(os.path.relpath(self.song_dir_out)))
+                    question_rep = (render_mode.get_short_desc(self.locale), str(os.path.relpath(self.song_dir_out)))
                     afterword_rep = (str(numfiles), str(os.path.split(file_paths[0])[1]), str(os.path.split(file_paths[-1])[1]))
                     i_song_files = self.communicator.send_stock_query('several_song_files', recipient=recipient, question_rep=question_rep, afterword_rep=afterword_rep, prerequisites=prerequisites)
             else:
-                question_rep = (render_mode.get_short_desc(),)
+                question_rep = (render_mode.get_short_desc(self.locale),)
                 i_song_files = self.communicator.send_stock_query('no_song_file', recipient=recipient, question_rep=question_rep, prerequisites=prerequisites)
         
         if execute:

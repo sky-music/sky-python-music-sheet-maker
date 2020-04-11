@@ -9,6 +9,7 @@ class CommandLinePlayer:
     A puppet to work with the Music Sheet Maker.
     CAUTION: All puppets must have the following methods:
         - get_name(), returning a name among the authorized locutors list of communication.py
+        - get_locale(), returning a language code string 'xx.YY'
         - execute_queries()
         - a Communicator to handle Queries
     It is recommended to have a receive() method or to a __getattr__ method to
@@ -17,6 +18,7 @@ class CommandLinePlayer:
 
     def __init__(self, locale='en_US'):
         self.name = 'command-line'
+        self.locale = self.set_locale(locale)
         self.communicator = Communicator(owner=self, locale=locale)
         
     def __getattr__(self, attr_name):
@@ -30,9 +32,23 @@ class CommandLinePlayer:
 
     def get_name(self):
         return self.name
+        
+    def get_locale(self):        
+        return self.locale
 
+    def set_locale(self, locale):
+        
+        self.locale = Lang.check_locale(locale)
+        if self.locale is None:
+            self.locale = Lang.find_substitute(locale)
+            print("**WARNING: bad locale type %s passed to CommandLinePlayer. Reverting to %s"%(locale, self.locale))
+            
+        return self.locale
+
+    
     def receive(self, *args, **kwargs):
         self.communicator.receive(*args, **kwargs)
+
 
     def execute_queries(self, queries=None):
 

@@ -208,6 +208,20 @@ class Query:
     def get_recipient(self):
         return self.recipient
 
+    def get_sender_locale(self):
+        
+        try:
+            return self.get_sender().get_locale()
+        except AttributeError:
+            pass
+
+    def get_recipient_locale(self):
+        
+        try:
+            return self.get_sender().get_locale()
+        except AttributeError:
+            pass
+
     def get_question(self):
         if self.question is None:
             return ''
@@ -695,7 +709,7 @@ class QueryChoice(Query):
         if self.reply_type == ReplyType.NOTE:
             result[-1] += ' among ' + ', '.join(list(self.get_limits()))
         elif self.reply_type in [ReplyType.INPUTMODE, ReplyType.RENDERMODES]:
-            choices = [str(i) + ') '+ str(choice.get_short_desc()) for i, choice in enumerate(self.get_limits())]
+            choices = [str(i) + ') '+ str(choice.get_short_desc(self.get_recipient_locale())) for i, choice in enumerate(self.get_limits())]
             result[-1] += ' among:\n\n' + '\n'.join(choices)
         else:
             choices = [str(i) + ') '+ str(choice) for i, choice in enumerate(self.get_limits())]
