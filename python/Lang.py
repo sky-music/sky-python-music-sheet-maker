@@ -20,6 +20,8 @@ def check_locale(locale):
     except AttributeError:
         return None
     
+    locale = locale.replace('-','_') # In case the locale is a IETF language tag
+    
     if locale not in locales:
         substitute = find_substitute(locale)
         if not loaded[substitute]: 

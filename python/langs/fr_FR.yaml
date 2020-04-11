@@ -19,33 +19,34 @@ input_mode:
         long_desc: "Abbreviated English chord name (e.g. C, F, Dm, Bdim, A+, Csus2, Dsus4, C6, Cmaj7, Dm11)"
 render_mode:
     html:
-        short_desc: HTML visual sheet
+        short_desc: partition graphique en HTML
     svg:
-        short_desc: SVG visual sheet
+        short_desc: partition graphique en SVG
     png:
-        short_desc: PNG visual sheet
+        short_desc: partition graphique en PNG
     midi:
-        short_desc: Midi song file
+        short_desc: Fichier son en MIDI
     skyascii:
-        short_desc: song in Sky notation
+        short_desc: Transcription en notation Sky
     englishascii:
-        short_desc: song in English notation
+        short_desc: Transcription en notation anglo-saxone
     jianpuascii:
-        short_desc: song in Jianpu notation
+        short_desc: Transcription en Jianpu
     doremiascii:
-        short_desc: song in do-re-mi notation
+        short_desc: Transcription en format traditionnel
 song_meta:
    title: Titre
    artist: Artiste(s) d'origine
    transcript: Transcripteur
    musical_key: Clef musicale
+   untitled: Sans titre
 stock_queries:
   instructions_stdout:
     foreword: "===== PORTEES VISUELLES POUR SKY:CHILDREN OF THE LIGHT ===\n"
     question: |
       Formats de notes acceptés :{0}
       
-      - Notes composing a chord must be glued together (e.g. A1B1C1).
+      - Les notes composant un accord doivent être attachées (e.g. A1B1C1).
       - Separate chords with {1}
       - Use "{2}" for a silence (rest).
       - Use "{3}" to link notes within an icon, for triplets, quavers... (e.g. {4})
@@ -90,7 +91,7 @@ stock_queries:
     foreword:
     question: Please choose one or several output rendering formats
     afterword:
-    input_tip: check one or several boxes
+    input_tip: cochez ou décochez les différents choix
     help_text: |
       The visual sheet can be rendered in several file formats.
       Please select the ones you want to generate (or deselect some).
@@ -98,7 +99,7 @@ stock_queries:
     foreword:
     question: Quel est le titre de la chanson ?
     afterword:
-    input_tip: 'any text. Leave blank to use "untitled"'
+    input_tip: 'text. Laisser vide pour utiliser "Sans titre"'
     help_text: 
   original_artist:
     foreword:
@@ -114,7 +115,7 @@ stock_queries:
     help_text: 'The transcript writer is the person who found the notes you typed earlier. It could be yourself!'
   notes_file:
     foreword:
-    question: 'Type or copy-paste notes, or enter file name (in {0}/)'
+    question: 'Tapez vos notes ici, ou bien un nom de fichier (dans {0}/)'
     afterword:
     input_tip: a string of notes such as C1 D1F1, or a file name such as song.txt
     help_text: |
@@ -122,7 +123,7 @@ stock_queries:
       You can also enter the path to a a text file containing the notes.
   file:
     foreword:
-    question: 'Enter file name (in {0}/)'
+    question: 'Entrez un nom de fichier (dans {0}/)'
     afterword:
     input_tip: any text with one or several musical notes
     help_text:

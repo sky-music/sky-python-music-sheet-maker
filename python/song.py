@@ -39,7 +39,7 @@ class Song():
         self.directory_base = self.maker.get_directory_base()
         self.directory_fonts = os.path.normpath(os.path.join(self.directory_base,'fonts'))
         self.lines = []        
-        self.meta = {'title': [Lang.get_string("song_meta/title", self.locale)+':', 'Untitled'], 'artist': [Lang.get_string("song_meta/artist", self.locale)+':', ''],
+        self.meta = {'title': [Lang.get_string("song_meta/title", self.locale)+':', Lang.get_string("song_meta/untitled", self.locale)], 'artist': [Lang.get_string("song_meta/artist", self.locale)+':', ''],
                     'transcript': [Lang.get_string("song_meta/transcript", self.locale)+':', ''], 'song_key': [Lang.get_string("song_meta/musical_key", self.locale)+':', '']}
         #self.title = self.meta['title'][1]
         self.maxIconsPerLine = 10

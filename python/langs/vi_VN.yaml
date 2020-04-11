@@ -40,6 +40,7 @@ song_meta:
    artist: Nghệ sĩ gốc
    transcript: Người dịch
    musical_key: Phím nhạc
+   untitle: Untitled
 stock_queries:
   instructions_stdout:
     foreword: "===== BẢNG NHẠC TRỰC QUAN CHO TỰA GAME: SKY: CHILDREN OF THE LIGHT =====\n"
