@@ -2,6 +2,7 @@ import os, io, re
 from modes import InputMode, CSSMode, RenderMode, ReplyType
 from communicator import Communicator, QueriesExecutionAbort
 from songparser import SongParser
+import Lang
 #from song import Song
 
 
@@ -19,13 +20,7 @@ class MusicSheetMaker:
 
     def __init__(self, locale='en_US', songs_in='test_songs', songs_out='songs_out'):
         self.name = 'music-sheet-maker'
-        try:
-            self.locale = locale.split('.')[0]
-            if len(self.locale) < 2:
-                raise AttributeError
-        except AttributeError:
-            print("**WARNING: bad locale %s passed to music-maker. Reverting to 'en_US'"%locale)
-            self.locale = 'en_US'        
+        self.set_locale(locale)
         self.communicator = Communicator(owner=self, locale=self.locale)
         self.song = None
         self.song_parser = None
@@ -58,7 +53,21 @@ class MusicSheetMaker:
     def get_locale(self):
         
         return self.locale
-
+    
+    def set_locale(self, locale):
+        
+        try:
+            locale = locale.split('.')[0]
+            if len(locale) < 2:
+                raise AttributeError
+            else:
+                self.locale = locale
+        except AttributeError:
+            self.locale = Lang.guess_locale()
+            print("**WARNING: bad locale %s passed to music-maker. Reverting to %s"%(locale, self.locale))
+    
+    	return self.locale
+    
     def is_botcog(self, recipient):
         try:
             is_bot = recipient.get_name() == "music-cog"

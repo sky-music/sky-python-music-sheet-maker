@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from music_sheet_maker import MusicSheetMaker
 from communicator import Communicator, QueriesExecutionAbort
-import os
+import Lang
 
 class CommandLinePlayer:
 
@@ -44,7 +44,7 @@ class CommandLinePlayer:
                 queries = [queries]
         #FIXME: 2 lines for debugging:
         #print('\n%%%%DEBUG. I AM PLAYER, THE UNSATISFIED QUERIES ARE:%%%%')
-        #self.communicator.memory.print_out(filters=('unsatisfied'))
+        #self.communicator.memory.print_out(filters=('unsatisfied'))x
         """
         The following part is exclusive to the command line.
         The executing code must be rewritten for discord, typically using:
@@ -70,9 +70,9 @@ class CommandLinePlayer:
 
 try:
 
-    player = CommandLinePlayer(locale=os.getenv('LANG'))
+    player = CommandLinePlayer(locale=Lang.guess_locale())
 
-    maker = MusicSheetMaker(locale=os.getenv('LANG'))
+    maker = MusicSheetMaker(locale=Lang.guess_locale())
 
     q = player.communicator.send_stock_query('create_song', recipient=maker)
 

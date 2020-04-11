@@ -1,12 +1,30 @@
 import yaml
 import os
 import re
+import locale as localepy
 
 LANG = dict()
-locales = ['en_US', 'ja_JP', 'fr_FR', 'vi_VN']
+locales_str = ['en_US', 'ja_JP', 'fr_FR', 'vi_VN']
 substitutes = {'fr': 'fr_FR', 'en': 'en_US', 'vn': 'vi_VN'}
-loaded = dict((locale, False) for locale in locales)
+loaded = dict((locale, False) for locale in locales_str)
 warn_count = 0
+
+
+def guess_locale():
+    
+    try:
+        import ctypes
+        windll = ctypes.windll.kernel32
+        windll.GetUserDefaultUILanguage()
+        locale = localepy.windows_locale[windll.GetUserDefaultUILanguage()]
+    except:
+        locale = localepy.getdefaultlocale()[0]
+        if locale is None:
+            return locales_str[0] 
+        elif len(locale) < 2:
+            return locales_str[0]
+        
+    return locale
 
 
 def load(locale):
@@ -22,21 +40,21 @@ def find_substitute(locale):
     try:
         locale_radix = locale.split('_')[0]
     except AttributeError:
-        return locales[0]
+        return locales_str[0]
 
     try:
         return substitutes[locale_radix]
     except KeyError:
-        for locale in locales:
+        for locale in locales_str:
             if re.match(locale_radix, locale) is not None:
                 substitutes.update({locale_radix: locale})
                 return substitutes[locale_radix]
-        return locales[0]
+        return locales_str[0]
 
 
 def get_string(key, locale=None, replacements=()):
-    global locales, warn_count
-    if locale not in locales:
+    global locales_str, warn_count
+    if locale not in locales_str:
         substitute = find_substitute(locale)
         if not loaded[substitute]:
             print('\n***WARNING: bad locale %s for key %s. Reverting to %s\n' % (locale, str(key), substitute))
