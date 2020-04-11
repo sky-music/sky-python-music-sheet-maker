@@ -11,18 +11,19 @@ warn_count = 0
 
 def load(locale):
     global LANG, loaded
-    with open(os.path.normpath(os.path.join(os.path.dirname(__file__), "langs/%s.yaml"%locale))) as file:
+    with open(os.path.normpath(os.path.join(os.path.dirname(__file__), "langs", "%s.yaml" % locale))) as file:
         LANG[locale] = yaml.safe_load(file)
     loaded[locale] = True
 
+
 def find_substitute(locale):
     global substitutes
-    
+
     try:
         locale_radix = locale.split('_')[0]
     except AttributeError:
         return locales[0]
-        
+
     try:
         return substitutes[locale_radix]
     except KeyError:
@@ -30,16 +31,17 @@ def find_substitute(locale):
             if re.match(locale_radix, locale) is not None:
                 substitutes.update({locale_radix: locale})
                 return substitutes[locale_radix]
-        return locales[0]  
+        return locales[0]
+
 
 def get_string(key, locale=None, replacements=()):
     global locales, warn_count
     if locale not in locales:
         substitute = find_substitute(locale)
         if not loaded[substitute]:
-            print('\n***WARNING: bad locale %s for key %s. Reverting to %s\n'%(locale, str(key), substitute))
+            print('\n***WARNING: bad locale %s for key %s. Reverting to %s\n' % (locale, str(key), substitute))
         locale = substitute
-    
+
     if not loaded[locale]:
         load(locale)
 
