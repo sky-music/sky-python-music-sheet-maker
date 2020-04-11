@@ -3,8 +3,8 @@ import os
 import re
 
 LANG = dict()
-locales = ['en_US', 'ja_JP', 'fr_FR']
-substitutes = {'fr': 'fr_FR', 'en': 'en_US'}
+locales = ['en_US', 'ja_JP', 'fr_FR', 'vi_VN']
+substitutes = {'fr': 'fr_FR', 'en': 'en_US', 'vn': 'vi_VN'}
 loaded = dict((locale, False) for locale in locales)
 warn_count = 0
 
