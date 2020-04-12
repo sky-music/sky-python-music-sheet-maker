@@ -10,29 +10,26 @@ loaded = dict((locale, False) for locale in locales)
 warn_count = 0
 
 
-
 def check_locale(locale):
-       
     try:
         locale = locale.split('.')[0]
         if len(locale) < 2:
             return None
     except AttributeError:
         return None
-    
-    locale = locale.replace('-','_') # In case the locale is a IETF language tag
-    
+
+    locale = locale.replace('-', '_')  # In case the locale is a IETF language tag
+
     if locale not in locales:
         substitute = find_substitute(locale)
-        if not loaded[substitute]: 
-            print("\n***WARNING: locale '%s' not found. Will replace with '%s'\n"%(locale, substitute))
+        if not loaded[substitute]:
+            print("\n***WARNING: locale '%s' not found. Will replace with '%s'\n" % (locale, substitute))
         return substitute
-    
+
     return locale
 
 
 def guess_locale():
-    
     try:
         import ctypes
         windll = ctypes.windll.kernel32
@@ -41,10 +38,10 @@ def guess_locale():
     except:
         locale = localepy.getdefaultlocale()[0]
         if locale is None:
-            return locales[0] 
+            return locales[0]
         elif len(locale) < 2:
             return locales[0]
-        
+
     return locale
 
 
@@ -78,7 +75,8 @@ def get_string(key, locale=None, replacements=()):
     if locale not in locales:
         substitute = find_substitute(locale)
         if not loaded[substitute]:
-            print("\n***WARNING: missing locale '%s' for key '%s'. Replacing with %s\n" % (locale, str(key), substitute))
+            print(
+                "\n***WARNING: missing locale '%s' for key '%s'. Replacing with %s\n" % (locale, str(key), substitute))
         locale = substitute
 
     if not loaded[locale]:
@@ -86,7 +84,7 @@ def get_string(key, locale=None, replacements=()):
 
     key_list = key.split("/")
     obj = LANG[locale]
-    
+
     for i in key_list:
         if i not in obj:
             if warn_count < 10:

@@ -1,5 +1,5 @@
 import re
-from noteparsers import doremi
+from . import doremi
 
 
 class DoremiJP(doremi.Doremi):

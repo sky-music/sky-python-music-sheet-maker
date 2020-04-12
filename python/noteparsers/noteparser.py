@@ -4,8 +4,8 @@ import math
 
 class NoteParser:
     """
-    A generic NoteParser for parsing notes of a major scale, and turning them into the corresponding coordinate on
-    Sky's 3*5 piano.
+    A generic NoteParser for parsing notes of a chromatic/major scale, and turning them into the corresponding
+    coordinate on Sky's 3*5 piano.
     """
 
     def __init__(self):
