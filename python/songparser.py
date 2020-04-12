@@ -7,6 +7,7 @@ import noteparsers
 from song import Song
 import Lang
 
+
 class SongParserError(Exception):
     def __init__(self, explanation):
         self.explanation = explanation
@@ -15,6 +16,7 @@ class SongParserError(Exception):
         return str(self.explanation)
 
     pass
+
 
 class SongParser:
     """
@@ -34,11 +36,12 @@ class SongParser:
         self.directory_base = self.maker.get_directory_base()
         try:
             self.locale = self.maker.get_locale()
-        except AttributeError: #Should never happen
+        except AttributeError:  # Should never happen
             self.locale = Lang.guess_locale()
-            print('**WARNING: SongParser self.maker has no locale. Reverting to %s'%self.locale)            
+            print('**WARNING: SongParser self.maker has no locale. Reverting to %s' % self.locale)
 
-    def set_delimiters(self, icon_delimiter=' ', pause='.', quaver_delimiter='-', comment_delimiter='#', repeat_indicator='*'):
+    def set_delimiters(self, icon_delimiter=' ', pause='.', quaver_delimiter='-', comment_delimiter='#',
+                       repeat_indicator='*'):
 
         self.icon_delimiter = icon_delimiter
         self.pause = pause
@@ -87,17 +90,19 @@ class SongParser:
             for delim in delims:
                 if (parser.not_note_name_regex.match(delim) is None or parser.not_octave_regex.match(
                         delim) is None) and delim != self.comment_delimiter:
-                    print('You chose an invalid delimiter for notation ' + self.input_mode.get_short_desc(self.locale) + ': ' + delim)
+                    print('You chose an invalid delimiter for notation ' + self.input_mode.get_short_desc(
+                        self.locale) + ': ' + delim)
                 if delims.count(delim) > 1:
-                    print('You chose twice the same delimiter for notation ' + self.input_mode.get_short_desc(self.locale) + ': ' + delim)
+                    print('You chose twice the same delimiter for notation ' + self.input_mode.get_short_desc(
+                        self.locale) + ': ' + delim)
 
     def get_possible_modes(self, song_lines=None):
 
         if self.input_mode is not None:
             return [self.input_mode]
         else:
-            if isinstance(song_lines,str): #Break newlines and make sure the result is a List
-                song_lines = song_lines.split(os.linesep)            
+            if isinstance(song_lines, str):  # Break newlines and make sure the result is a List
+                song_lines = song_lines.split(os.linesep)
             return self.detect_input_mode(song_lines)
 
     def set_input_mode(self, input_mode):
@@ -108,20 +113,19 @@ class SongParser:
             self.check_delimiters()
         else:
             raise SongParserError('Cannot set input_mode: invalid input_mode')
-                
 
     def get_input_mode(self):
 
         return self.input_mode
 
     def get_note_parser(self, input_mode=None):
-        
+
         if self.note_parser is not None:
             return self.note_parser
 
         if input_mode is None:
             input_mode = self.input_mode
-        
+
         note_parser = input_mode.get_note_parser()
 
         return note_parser
@@ -130,7 +134,7 @@ class SongParser:
 
         if input_mode is None:
             input_mode = self.input_mode
-            
+
         if input_mode is None:
             raise SongParserError('cannot set NoteParser: Invalid input_mode')
         else:
@@ -229,14 +233,28 @@ class SongParser:
         results = [chord_skygrid, harp_broken, harp_silent, repeat]
         return results
 
+    def sanitize_line(self, line):
+
+        """
+        Strip leading spaces and replace surnumerous spaces
+        :param line:
+        :return:
+        """
+
+        # Remove surnumerous spaces from line
+        line = line.strip()
+        line = re.sub(re.escape(self.icon_delimiter) + '{2,' + str(max(2, len(line))) + '}', self.icon_delimiter,
+                      line)  # removes surnumerous spaces
+
+        return line
+
     def parse_line(self, line, song_key='C', note_shift=0):
         """
         Returns instrument_line: a list of chord 'skygrid' (1 chord = 1 dict)
         """
         instrument_line = []
-        line = line.strip()
-        line = re.sub(re.escape(self.icon_delimiter) + '{2,' + str(max(2, len(line))) + '}', self.icon_delimiter,
-                      line)  # removes surnumerous spaces
+        line = self.sanitize_line(line)
+
         if len(line) > 0:
             if line[0] == self.comment_delimiter:
                 lyrics = line.split(self.comment_delimiter)
@@ -262,29 +280,28 @@ class SongParser:
         return instrument_line
 
     def parse_song(self, song_lines, song_key, octave_shift):
-        
-        if isinstance(song_lines,str): #Break newlines and make sure the result is a List
+
+        if isinstance(song_lines, str):  # Break newlines and make sure the result is a List
             song_lines = song_lines.split(os.linesep)
-                
+
         english_song_key = self.english_note_name(song_key)
-                
+
         note_shift = self.get_note_parser().get_base_of_western_major_scale() * octave_shift
 
         # Parses song line by line
         song = Song(maker=self.get_maker(), music_key=english_song_key)  # The song key must be in English format
         for song_line in song_lines:
             instrument_line = self.parse_line(song_line, song_key,
-                                                           note_shift)  # The song key must be in the original format
+                                              note_shift)  # The song key must be in the original format
             song.add_line(instrument_line)
 
         return song
 
-
     def find_key(self, song_lines):
-        
-        if isinstance(song_lines,str): #Break newlines and make sure the result is a List
+
+        if isinstance(song_lines, str):  # Break newlines and make sure the result is a List
             song_lines = song_lines.split(os.linesep)
-       
+
         if self.note_parser is None:
             self.set_note_parser()
         # print('note parser is:')
@@ -330,9 +347,9 @@ class SongParser:
         """
         Attempts to detect input musical notation
         """
-        if isinstance(song_lines,str): #Break newlines and make sure the result is a List
+        if isinstance(song_lines, str):  # Break newlines and make sure the result is a List
             song_lines = song_lines.split(os.linesep)
-        
+
         possible_modes = [mode for mode in InputMode]
         possible_parsers = [self.get_note_parser(mode) for mode in possible_modes]
         # position_maps = [self.get_note_parser(mode).position_map for mode in possible_modes]
@@ -345,9 +362,7 @@ class SongParser:
         octave_span = 0
 
         for line in song_lines:
-            line = line.strip()
-            line = re.sub(re.escape(self.icon_delimiter) + '{2,' + str(max(2, len(line))) + '}', self.icon_delimiter,
-                          line)  # removes surnumerous spaces
+            line = self.sanitize_line(line)
             if len(line) > 0:
                 if line[0] != self.comment_delimiter:
                     icons = line.split(self.icon_delimiter)
@@ -443,4 +458,3 @@ class SongParser:
             return items
         else:
             return sorted_items
-
