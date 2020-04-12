@@ -2,6 +2,7 @@ import re
 
 from . import noteparser
 
+
 class English(noteparser.NoteParser):
 
     def __init__(self):

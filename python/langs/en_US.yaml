@@ -17,6 +17,9 @@ input_mode:
     englishchords:
         short_desc: Chords CDEFGABmaj
         long_desc: "Abbreviated English chord name (e.g. C, F, Dm, Bdim, A+, Csus2, Dsus4, C6, Cmaj7, Dm11)"
+    doremijp:
+        short_desc: 日本語イタリアドレミ
+        long_desc: "Japanese do re mi ド、ド#／レb、レ、レ#／ミb、ミ、ファ、ファ#／ソb、ソ、ソ#／ラb、ラ、ラ#／シb、シ"
 render_mode:
     html:
         short_desc: HTML visual sheet
