@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
-import re, os
+import os
+import re
 from operator import truediv, itemgetter
-from modes import InputMode
-import instruments
-from song import Song
+
 import Lang
+import instruments
 import parsers.noteparsers
+from modes import InputMode
+from song import Song
 
 
 class SongParserError(Exception):
