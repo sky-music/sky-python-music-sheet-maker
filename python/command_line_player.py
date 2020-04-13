@@ -3,6 +3,12 @@ from music_sheet_maker import MusicSheetMaker
 from communicator import Communicator, QueriesExecutionAbort
 import Lang
 
+try:
+    import readline
+except ModuleNotFoundError:
+    pass  # probably Windows
+
+
 class CommandLinePlayer:
 
     """
