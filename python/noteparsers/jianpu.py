@@ -1,6 +1,6 @@
 import re
 
-import noteparser
+from . import noteparser
 
 
 class Jianpu(noteparser.NoteParser):

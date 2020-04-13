@@ -225,7 +225,7 @@ class Note:
         try:
             root_pitch = self.midi_pitches[music_key]
         except KeyError:
-            print('Warning: Invalid music key passed to the MIDI renderer: assuming C instead.')
+            print('***Warning: Invalid music key passed to the MIDI renderer: assuming C instead.')
             root_pitch = self.midi_pitches['C']
         note_pitch = root_pitch + octave * 12 + semi
 

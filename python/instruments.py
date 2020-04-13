@@ -20,17 +20,17 @@ except (ImportError, ModuleNotFoundError):
 
 class Instrument:
 
-    def __init__(self, responder):
+    def __init__(self, maker):
         self.type = 'undefined'
         self.chord_skygrid = {}
         self.repeat = 1
         self.index = 0
         self.is_silent = True
         self.is_broken = False
-        self.responder = responder
-        self.directory_base = self.responder.get_directory_base()
-        self.directory_elements = 'elements'
-        self.directory_fonts = 'fonts'
+        self.maker = maker
+        self.directory_base = self.maker.get_directory_base()
+        self.directory_elements = os.path.join(self.directory_base, 'elements')
+        self.directory_fonts = os.path.join(self.directory_base, 'fonts')
         self.empty_chord_png = os.path.normpath(os.path.join(self.directory_elements, 'empty-chord.png'))  # blank harp
         self.unhighlighted_chord_png = os.path.normpath(os.path.join(self.directory_elements,
                                                                      'unhighlighted-chord.png'))  # harp with unhighlighted notes
@@ -48,9 +48,9 @@ class Instrument:
         self.midi_pause_relduration = 1  # Spacing between midi notes, as a ratio of note duration
         self.midi_quaver_relspacing = 0.5
 
-    def get_responder(self):
+    def get_maker(self):
 
-        return self.responder
+        return self.maker
 
     def set_chord_skygrid(self, chord_skygrid):
         self.chord_skygrid = chord_skygrid
@@ -68,6 +68,15 @@ class Instrument:
     def get_type(self):
         return self.type
 
+    def get_directory_base(self):
+        return self.directory_base
+        
+    def get_directory_elements(self):
+        return self.directory_elements
+        
+    def get_directory_font(self):
+        return self.directory_fonts
+        
     def set_repeat(self, repeat):
         self.repeat = repeat
 
@@ -124,23 +133,11 @@ class Instrument:
 
         return repeat_im
 
-    def get_directory_base(self):
-
-        return self.directory_base
-
-    def get_directory_fonts(self):
-
-        return os.path.join(self.get_directory_base(), self.directory_fonts)
-
-    def get_directory_elements(self):
-
-        return os.path.join(self.get_directory_base(), self.directory_elements)
-
 
 class Voice(Instrument):  # Lyrics or comments
 
-    def __init__(self, responder):
-        super().__init__(responder)
+    def __init__(self, maker):
+        super().__init__(maker)
         self.type = 'voice'
         self.lyric = ''
         # self.text_bkg = (255, 255, 255, 0)#Uncomment to make it different from the inherited class
@@ -217,8 +214,8 @@ class Voice(Instrument):  # Lyrics or comments
 
 class Harp(Instrument):
 
-    def __init__(self, responder):
-        super().__init__(responder)
+    def __init__(self, maker):
+        super().__init__(maker)
         self.type = 'harp'
         self.column_count = 5
         self.row_count = 3
@@ -252,8 +249,7 @@ class Harp(Instrument):
         if note_index % 7 == 0:  # the 7 comes from the heptatonic scale of Sky's music (no semitones)
             # Note is a root note
             return notes.NoteRoot(self, pos)  # very important: the chord creating the note is passed as a parameter
-        elif (
-                note_index % self.get_column_count() == 0 or note_index % self.get_column_count() == 2) or note_index % self.get_column_count() == 4:
+        elif note_index % self.get_column_count() % 2 == 0:
             # Note is in an odd column, so it is a circle
             return notes.NoteCircle(self, pos)
         else:
@@ -453,3 +449,4 @@ class Harp(Instrument):
                                 t = durations[i]
 
         return harp_render
+

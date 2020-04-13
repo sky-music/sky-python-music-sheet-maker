@@ -1,11 +1,11 @@
-import re
+# import re
 import math
 
 
 class NoteParser:
     """
-    A generic NoteParser for parsing notes of a major scale, and turning them into the corresponding coordinate on
-    Sky's 3*5 piano.
+    A generic NoteParser for parsing notes of a chromatic/major scale, and turning them into the corresponding
+    coordinate on Sky's 3*5 piano.
     """
 
     def __init__(self):
@@ -102,7 +102,7 @@ class NoteParser:
         else:
             return False
 
-    def english_note_name(self, note_name, reverse=False):
+    def english_note_name(self, notes_string, reverse=False):
         from noteparsers import english
         if reverse:
             native_parser = english.English()
@@ -111,11 +111,12 @@ class NoteParser:
             native_parser = self
             foreign_parser = english.English()
 
-        note_name = native_parser.note_name_regex.match(str(note_name))
+        note_name = native_parser.note_name_regex.match(str(notes_string))
+
         if note_name is not None:
             note_name = native_parser.sanitize_note_name(note_name.group(0))
         else:
-            return None
+            return notes_string
 
         try:
             chromatic_value = native_parser.get_chromatic_scale_dict()[note_name]

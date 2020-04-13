@@ -1,0 +1,227 @@
+input_mode:
+    skykeyboard:
+        short_desc: Sky keyboard
+        long_desc: "Tapez sur votre clavier comme vous le feriez dans Sky:\n   QWERT\n   ASDFG\n   ZXCVB"
+    sky:
+        short_desc: 'Sky ABC1-5'
+        long_desc: "Sky column/row notation:\n   A1 A2 A3 A4 A5\n   B1 B2 B3 B4 B5\n   C1 C2 C3 C4 C5"
+    english:
+        short_desc: English CDEFGAB
+        long_desc: "English (note name in C D E F G A B + alteration b/# + octave number, e.g. Cb4 D#4 E5 ...)"
+    doremi:
+        short_desc: French doremi
+        long_desc: "Doremi (note name in do re mi fa sol la si/ti + alteration b/# + octave number, e.g. dob4 re#4 mi5 ...)"
+    jianpu:
+        short_desc: 'Jianpu 1234567+-'
+        long_desc: "Jianpu (note name in 1 2 3 4 5 6 7, followed by alteration b/# and several + or - for octave shift)"
+    englishchords:
+        short_desc: Chords CDEFGABmaj
+        long_desc: "Abbreviated English chord name (e.g. C, F, Dm, Bdim, A+, Csus2, Dsus4, C6, Cmaj7, Dm11)"
+render_mode:
+    html:
+        short_desc: partition graphique en HTML
+    svg:
+        short_desc: partition graphique en SVG
+    png:
+        short_desc: partition graphique en PNG
+    midi:
+        short_desc: Fichier son en MIDI
+    skyascii:
+        short_desc: Transcription en notation Sky
+    englishascii:
+        short_desc: Transcription en notation anglo-saxone
+    jianpuascii:
+        short_desc: Transcription en Jianpu
+    doremiascii:
+        short_desc: Transcription en format traditionnel
+song_meta:
+   title: Titre
+   artist: Artiste(s) d'origine
+   transcript: Transcripteur
+   musical_key: Clef musicale
+   untitled: Sans titre
+stock_queries:
+  instructions_stdout:
+    foreword: "===== PORTEES VISUELLES POUR SKY:CHILDREN OF THE LIGHT ===\n"
+    question: |
+      Formats de notes acceptés :{0}
+      
+      - Les notes composant un accord doivent être attachées (e.g. A1B1C1).
+      - Separate chords with {1}
+      - Use "{2}" for a silence (rest).
+      - Use "{3}" to link notes within an icon, for triplets, quavers... (e.g. {4})
+      - Add "{5}" after a chord to indicate repetition.
+      - Sharps # and flats b (semitones) are supported for Western and Jianpu notations.
+      
+      Type '?' to get help for a particular question
+    afterword: =======================================
+    input_tip:
+    help_text:
+  instructions_website:
+    foreword:
+    question: |
+      Formats de notes acceptés :{0}
+      
+      - Notes composing a chord must be glued together (e.g. A1B1C1).
+      - Separate chords with {1}
+      - Use "{2}" for a silence (rest).
+      - Use "{3}" to link notes within an icon, for triplets, quavers... (e.g. {4})
+      - Add "{5}" after a chord to indicate repetition.
+      - Sharps # and flats b (semitones) are supported for Western and Jianpu notations.
+    afterword:
+    input_tip: cliquez sur OK pour passer
+    help_text:
+  instructions_botcog:
+    foreword:
+    question: |
+      Formats de notes acceptés :{0}
+      
+      - Notes composing a chord must be glued together (e.g. A1B1C1).
+      - Separate chords with {1}
+      - Use "{2}" for a silence (rest).
+      - Use "{3}" to link notes within an icon, for triplets, quavers... (e.g. {4})
+      - Add "{5}" after a chord to indicate repetition.
+      - Sharps # and flats b (semitones) are supported for Western and Jianpu notations.
+      
+      Type '?' to get help for a particular question
+    afterword:
+    input_tip:
+    help_text:
+  render_modes:
+    foreword:
+    question: Please choose one or several output rendering formats
+    afterword:
+    input_tip: cochez ou décochez les différents choix
+    help_text: |
+      The visual sheet can be rendered in several file formats.
+      Please select the ones you want to generate (or deselect some).
+  song_title:
+    foreword:
+    question: Quel est le titre de la chanson ?
+    afterword:
+    input_tip: 'text. Laisser vide pour utiliser "Sans titre"'
+    help_text: 
+  original_artist:
+    foreword:
+    question: Qui sont les artistes d'origine de la chanson ?
+    afterword:
+    input_tip: any text, including blank
+    help_text: Original artists include the composer, musician, singer, etc.
+  transcript_writer:
+    foreword:
+    question: Qui est le transcripteur ?
+    afterword:
+    input_tip: any text, including blank
+    help_text: 'The transcript writer is the person who found the notes you typed earlier. It could be yourself!'
+  notes_file:
+    foreword:
+    question: 'Tapez vos notes ici, ou bien un nom de fichier (dans {0}/)'
+    afterword:
+    input_tip: a string of notes such as C1 D1F1, or a file name such as song.txt
+    help_text: |
+      You can type or copy-paste notes directly in this field.
+      You can also enter the path to a a text file containing the notes.
+  file:
+    foreword:
+    question: 'Entrez un nom de fichier (dans {0}/)'
+    afterword:
+    input_tip: any text with one or several musical notes
+    help_text:
+  notes:
+    foreword:
+    question: Please type or copy-paste notes
+    afterword:
+    input_tip: any text with one or several musical notes
+    help_text: |
+      Type one or several notes in your favorite format, for instance C D E F G.
+      For chords (notes played together) glue the notes together (eg C1D1)
+  one_input_mode:
+    foreword:
+    question: "We detected that you use the following notation: {0}."
+    afterword:
+    input_tip: cliquez sur OK pour passer
+    help_text:
+  musical_notation:
+    foreword: Despite our efforts, we could not guess what musical notation you are using.
+    question: Please help us by choosing your format in the list below
+    afterword:
+    input_tip: Choice number (integer between 0 and n-1)
+    help_text: |
+      In the previous question, you have typed your song notes. We tried to automatically guess which notation you are using.
+      Despite our best efforts, there is still an ambiguity. Please select the right one in the list.
+  no_possible_key:
+    foreword:
+    question: |
+      Your song cannot be transposed exactly in Sky.
+      Default key will be set to C.
+    afterword:
+    input_tip: cliquez sur OK pour passer
+    help_text:
+  one_possible_key:
+    foreword:
+    question: 'Your song can be transposed in Sky with the following key: {0}'
+    afterword:
+    input_tip: cliquez sur OK pour passer
+    help_text:
+  possible_keys:
+    foreword: 'Your song can be transposed in Sky with the following keys: {0}.'
+    question: Please choose your musical key
+    afterword:
+    input_tip: Choice number (integer between 0 and n-1)
+    help_text: |
+      'Sky''s musical system does not include sharps # and flats b. Hence you cannot play any song from the outside world.
+      We detected that your song can be played with several notes as the song key. Please choose the one that is most convenient for you.'
+  recommended_key:
+    foreword: Your musical notation uses relative pitch.
+    question: What is the recommended key to play in Sky (default is C)
+    afterword:
+    input_tip: leave blank, or type a note name (e.g. C in English notation)
+    help_text: |
+      You have used a musical notation that does allow to determine the exact pitch of your notes.
+      Hence the visual sheet will sound differently in different places in Sky.
+  octave_shift:
+    foreword: Do you want to shift the pitch of your notes?
+    question: Octave shift (leave blank or type 0 to skip)
+    afterword:
+    input_tip: octave shift as an integer between -6 and +6
+    help_text: |
+      'A musical note is identified by its name and an octave number. Sky\''s music system spans less than 3 octaves.
+      If you do not specify an octave number after a note, we will assume it is the first octave of Sky, so your notes will essential by played near the bass.
+      You can shift your notes to a higher pitch by setting a positive number in this field.
+      If you have specified an octave number and it is too high to be played within Sky\''s system, you can downshift the pitch by entering a negative integer'
+  no_song_file:
+    foreword: ---------------------------------------
+    question: 'Your {0} was not saved to file.'
+    afterword:
+    input_tip: cliquez sur OK pour passer
+    help_text:
+  one_song_file:
+    foreword: ---------------------------------------
+    question: 'Your {0} is located at: {1}'
+    afterword:
+    input_tip: cliquez sur OK pour passer
+    help_text:
+  several_song_files:
+    foreword: ---------------------------------------
+    question: 'Your {0} is located at: {1}'
+    afterword: 'Your song has been split into {0} files between "{1}" and "{2}"'
+    input_tip: cliquez sur OK pour passer
+    help_text:
+  few_errors:
+    foreword:
+    question: 'Song successfully read with a few errors.'
+    afterword:
+    input_tip: cliquez sur OK pour passer
+    help_text:
+  many_errors:
+    foreword:
+    question: '*WARNING*: Your song contains many errors.'
+    afterword: |
+      'Please check the following:
+      
+      - All your notes are within octaves 4 and 6. If not, try again with an octave shift.
+      - Your song is free of typos. Please check this website for full instructions: 
+      
+      https://sky.bloomexperiment.com/t/summary-of-input-modes/403'
+    input_tip: cliquez sur OK pour passer
+    help_text:

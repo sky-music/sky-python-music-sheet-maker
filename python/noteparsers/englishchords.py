@@ -1,7 +1,6 @@
-import re
+#import re
 
-import english
-
+from . import english
 
 class EnglishChords(english.English):
 
