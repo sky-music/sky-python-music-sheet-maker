@@ -16,5 +16,5 @@ class DoremiJP(doremi.Doremi):
         self.note_name_regex = re.compile(r'([ドレミフソラシ][ァ]?[b#]?)')
         self.single_note_name_regex = re.compile(r'\b[ドレミフソラシ][ァ]?[b#]?\d?\b')
         self.note_octave_regex = re.compile(r'\d')
-        self.not_note_name_regex = re.compile(r'[^DRMFSLTOEIAdrmfsltoeiab#]+')
+        self.not_note_name_regex = re.compile(r'[^ドレミフソラシァb#]+')
         self.not_octave_regex = re.compile(r'[^\d]+')
