@@ -70,13 +70,13 @@ class Instrument:
 
     def get_directory_base(self):
         return self.directory_base
-        
+
     def get_directory_elements(self):
         return self.directory_elements
-        
+
     def get_directory_font(self):
         return self.directory_fonts
-        
+
     def set_repeat(self, repeat):
         self.repeat = repeat
 
@@ -195,16 +195,17 @@ class Voice(Instrument):  # Lyrics or comments
         chord_size = self.get_png_chord_size()
         fnt = ImageFont.truetype(self.font, int(self.font_size))
         lyric_width = fnt.getsize(self.lyric)[0]
-        
-        lyric_im = Image.new('RGBA', (int(max(chord_size[0],lyric_width)), int(self.get_lyric_height())), color=self.text_bkg)
+
+        lyric_im = Image.new('RGBA', (int(max(chord_size[0], lyric_width)), int(self.get_lyric_height())),
+                             color=self.text_bkg)
         draw = ImageDraw.Draw(lyric_im)
-        
+
         if lyric_width < chord_size[0]:
-            #Draws centered text
-           draw.text((int((chord_size[0] - lyric_width) / 2.0), 0), self.lyric, font=fnt, fill=self.font_color)
+            # Draws centered text
+            draw.text((int((chord_size[0] - lyric_width) / 2.0), 0), self.lyric, font=fnt, fill=self.font_color)
         else:
-            #Draws left-aligned text that spilles over the next icon
-           draw.text((0, 0), self.lyric, font=fnt, fill=self.font_color)
+            # Draws left-aligned text that spilles over the next icon
+            draw.text((0, 0), self.lyric, font=fnt, fill=self.font_color)
 
         if rescale != 1:
             lyric_im = lyric_im.resize((int(lyric_im.size[0] * rescale), int(lyric_im.size[1] * rescale)),
@@ -449,4 +450,3 @@ class Harp(Instrument):
                                 t = durations[i]
 
         return harp_render
-

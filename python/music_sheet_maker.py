@@ -1,7 +1,7 @@
 import os, io, re
 from modes import InputMode, CSSMode, RenderMode, ReplyType
 from communicator import Communicator, QueriesExecutionAbort
-from songparser import SongParser
+from parsers.song_parser import SongParser
 import Lang
 #from song import Song
 

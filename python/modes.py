@@ -1,18 +1,17 @@
 from enum import Enum
-import noteparsers
 import Lang
-
+import parsers.noteparsers
 
 class InputMode(Enum):
     SKYKEYBOARD = (
-    1, "input_mode/skykeyboard/short_desc", "input_mode/skykeyboard/long_desc", noteparsers.skykeyboard.SkyKeyboard)
-    SKY = (2, "input_mode/sky/short_desc", "input_mode/sky/long_desc", noteparsers.skyabc15.SkyABC15)
-    ENGLISH = (3, "input_mode/english/short_desc", "input_mode/english/long_desc", noteparsers.english.English)
-    DOREMI = (4, "input_mode/doremi/short_desc", "input_mode/doremi/long_desc", noteparsers.doremi.Doremi)
-    JIANPU = (5, "input_mode/jianpu/short_desc", "input_mode/jianpu/long_desc", noteparsers.jianpu.Jianpu)
+        1, "input_mode/skykeyboard/short_desc", "input_mode/skykeyboard/long_desc", parsers.noteparsers.skykeyboard.SkyKeyboard)
+    SKY = (2, "input_mode/sky/short_desc", "input_mode/sky/long_desc", parsers.noteparsers.skyabc15.SkyABC15)
+    ENGLISH = (3, "input_mode/english/short_desc", "input_mode/english/long_desc", parsers.noteparsers.english.English)
+    DOREMI = (4, "input_mode/doremi/short_desc", "input_mode/doremi/long_desc", parsers.noteparsers.doremi.Doremi)
+    JIANPU = (5, "input_mode/jianpu/short_desc", "input_mode/jianpu/long_desc", parsers.noteparsers.jianpu.Jianpu)
     ENGLISHCHORDS = (6, "input_mode/englishchords/short_desc", "input_mode/englishchords/long_desc",
-                     noteparsers.englishchords.EnglishChords)
-    DOREMIJP = (7, "input_mode/doremijp/short_desc", "input_mode/doremijp/long_desc", noteparsers.doremi_jp.DoremiJP)
+                     parsers.noteparsers.englishchords.EnglishChords)
+    DOREMIJP = (7, "input_mode/doremijp/short_desc", "input_mode/doremijp/long_desc", parsers.noteparsers.doremi_jp.DoremiJP)
 
     def __init__(self, number, short_desc, long_desc, note_parser_method):
         self.number = number
@@ -34,14 +33,14 @@ class InputMode(Enum):
 
 
 class RenderMode(Enum):
-    HTML = (1, "render_mode/html/short_desc", 'text/html', '.html', noteparsers.skyabc15.SkyABC15)
-    SVG = (2, "render_mode/svg/short_desc", 'image/svg+xml', '.svg', noteparsers.skyabc15.SkyABC15)
-    PNG = (3, "render_mode/png/short_desc", 'image/png', '.png', noteparsers.skyabc15.SkyABC15)
-    MIDI = (4, "render_mode/midi/short_desc", 'audio/midi', '.mid', noteparsers.skyabc15.SkyABC15)
-    SKYASCII = (5, "render_mode/skyascii/short_desc", 'text/plain', '_sky.txt', noteparsers.skyabc15.SkyABC15)
-    ENGLISHASCII = (6, "render_mode/englishascii/short_desc", 'text/plain', '_english.txt', noteparsers.english.English)
-    JIANPUASCII = (7, "render_mode/jianpuascii/short_desc", 'text/plain', '_jianpu.txt', noteparsers.jianpu.Jianpu)
-    DOREMIASCII = (8, "render_mode/doremiascii/short_desc", 'text/plain', '_doremi.txt', noteparsers.doremi.Doremi)
+    HTML = (1, "render_mode/html/short_desc", 'text/html', '.html', parsers.noteparsers.skyabc15.SkyABC15)
+    SVG = (2, "render_mode/svg/short_desc", 'image/svg+xml', '.svg', parsers.noteparsers.skyabc15.SkyABC15)
+    PNG = (3, "render_mode/png/short_desc", 'image/png', '.png', parsers.noteparsers.skyabc15.SkyABC15)
+    MIDI = (4, "render_mode/midi/short_desc", 'audio/midi', '.mid', parsers.noteparsers.skyabc15.SkyABC15)
+    SKYASCII = (5, "render_mode/skyascii/short_desc", 'text/plain', '_sky.txt', parsers.noteparsers.skyabc15.SkyABC15)
+    ENGLISHASCII = (6, "render_mode/englishascii/short_desc", 'text/plain', '_english.txt', parsers.noteparsers.english.English)
+    JIANPUASCII = (7, "render_mode/jianpuascii/short_desc", 'text/plain', '_jianpu.txt', parsers.noteparsers.jianpu.Jianpu)
+    DOREMIASCII = (8, "render_mode/doremiascii/short_desc", 'text/plain', '_doremi.txt', parsers.noteparsers.doremi.Doremi)
 
     def __init__(self, number, short_desc, mime_type, extension, note_parser_method):
         self.number = number

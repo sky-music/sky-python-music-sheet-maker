@@ -3,9 +3,9 @@ import re, os
 from operator import truediv, itemgetter
 from modes import InputMode
 import instruments
-import noteparsers
 from song import Song
 import Lang
+import parsers.noteparsers
 
 
 class SongParserError(Exception):
@@ -75,7 +75,7 @@ class SongParser:
 
     def check_delimiters(self):
 
-        if self.input_mode == InputMode.JIANPU or isinstance(self.note_parser, noteparsers.jianpu.Jianpu):
+        if self.input_mode == InputMode.JIANPU or isinstance(self.note_parser, parsers.noteparsers.jianpu.Jianpu):
             if self.pause != '0':
                 print('Jianpu notation is used: setting 0 as the pause character instead of ' + self.pause)
                 self.pause = '0'
@@ -203,7 +203,7 @@ class SongParser:
             # TODO: this line is useless since we don't use position maps anymore.
             # chord = re.sub(re.escape(self.pause), '.', chord) #Replaces the pause character by the default
 
-            if isinstance(self.note_parser, noteparsers.englishchords.EnglishChords):
+            if isinstance(self.note_parser, parsers.noteparsers.englishchords.EnglishChords):
                 chord = self.note_parser.decode_chord(chord)
 
             repeat, chord = self.split_chord(chord)

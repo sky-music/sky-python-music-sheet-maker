@@ -12,7 +12,7 @@ import os
 import re
 import math
 from responder import Responder
-from songparser import SongParser
+from parsers.song_parser import SongParser
 from modes import InputMode, ResponseMode
 
 def set_dodecas(mode):
