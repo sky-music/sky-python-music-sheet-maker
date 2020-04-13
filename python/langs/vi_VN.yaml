@@ -48,7 +48,7 @@ stock_queries:
       Dạng nốt nhạc được chấp nhận: {0}
       
       - Khi viết hợp âm phải dính các phím lại với nhau (VD: A1B1C1).
-      - Tách các hợp âm bằng: {1}
+      - Tách các hợp âm bằng: "{1}".
       - Sử dụng "{2}" để ngắt quãng (nghỉ).
       - Sử dụng "{3}" để nối nốt trong một biểu tượng (liên ba, láy rền/hát rung,...) (VD: {4})
       - Thêm "{5}" sau một hợp âm để biểu thị sự lập lại (repetition).
@@ -64,7 +64,7 @@ stock_queries:
       Dạng nốt nhạc được chấp nhận: {0}
       
       - Khi viết hợp âm phải dính các phím lại với nhau (VD: A1B1C1).
-      - Tách các hợp âm bằng: {1}
+      - Tách các hợp âm bằng: "{1}".
       - Sử dụng "{2}" để ngắt quãng (nghỉ).
       - Sử dụng "{3}" để nối nốt trong một biểu tượng (liên ba, láy rền/hát rung,...) (VD: {4})
       - Thêm "{5}" sau một hợp âm để biểu thị sự lập lại (repetition).
@@ -78,7 +78,7 @@ stock_queries:
       Dạng nốt nhạc được chấp nhận: {0}
 
       - Khi viết hợp âm phải dính các phím lại với nhau (VD: A1B1C1).
-      - Tách các hợp âm bằng: {1}
+      - Tách các hợp âm bằng: "{1}".
       - Sử dụng "{2}" để ngắt quãng (nghỉ).
       - Sử dụng "{3}" để nối nốt trong một biểu tượng (liên ba, láy rền/hát rung,...) (VD: {4})
       - Thêm "{5}" sau một hợp âm để biểu thị sự lập lại (repetition).

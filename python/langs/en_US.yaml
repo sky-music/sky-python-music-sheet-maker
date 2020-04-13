@@ -50,7 +50,7 @@ stock_queries:
       Accepted music notes formats:{0}
       
       - Notes composing a chord must be glued together (e.g. A1B1C1).
-      - Separate chords with {1}
+      - Separate chords with "{1}".
       - Use "{2}" for a silence (rest).
       - Use "{3}" to link notes within an icon, for triplets, quavers... (e.g. {4})
       - Add "{5}" after a chord to indicate repetition.
@@ -66,7 +66,7 @@ stock_queries:
       Accepted music notes formats:{0}
       
       - Notes composing a chord must be glued together (e.g. A1B1C1).
-      - Separate chords with {1}
+      - Separate chords with "{1}".
       - Use "{2}" for a silence (rest).
       - Use "{3}" to link notes within an icon, for triplets, quavers... (e.g. {4})
       - Add "{5}" after a chord to indicate repetition.
@@ -78,14 +78,14 @@ stock_queries:
     foreword:
     question: |
       Accepted music notes formats:{0}
-      
+
       - Notes composing a chord must be glued together (e.g. A1B1C1).
-      - Separate chords with {1}
+      - Separate chords with "{1}".
       - Use "{2}" for a silence (rest).
       - Use "{3}" to link notes within an icon, for triplets, quavers... (e.g. {4})
       - Add "{5}" after a chord to indicate repetition.
       - Sharps # and flats b (semitones) are supported for Western and Jianpu notations.
-      
+
       Type '?' to get help for a particular question
     afterword:
     input_tip:
