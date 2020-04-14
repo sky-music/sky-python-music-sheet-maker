@@ -4,14 +4,13 @@
 Created on Fri Nov 22 20:39:43 2019
 A dev file to transpose in the chromatic scale
 @author: jmmelko
-KNOWN BUGS: repeat is imported but not exported
+THIS SCRIPTS IS COMPLETELY OBSOLETE AND SHOULD BE REWRITTEN
 """
 import sys
 sys.path.append('..')
 import os
 import re
 import math
-from responder import Responder
 from parsers.song_parser import SongParser
 from modes import InputMode, ResponseMode
 
@@ -123,14 +122,12 @@ def render_transposed_song(song_lines):
 
 
 # ========== MAIN SCRIPT================
-os.chdir(os.getcwd())
 
 print('===== TRANSPOSITION TOOL IN THE CHROMATIC SCALE =====')
 
-song_responder = Responder()
-song_responder.set_response_mode(ResponseMode.COMMAND_LINE)
+maker = MusicSheetMaker()
 
-first_line = song_responder.ask_first_line()
+first_line = maker.ask_first_line()
 
 fp = song_responder.load_file(song_responder.get_song_dir_in(), first_line)  # loads file or asks for next line
 
