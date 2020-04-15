@@ -4,19 +4,19 @@ input_mode:
         long_desc: "Tapez sur votre clavier comme vous le feriez dans Sky:\n   QWERT\n   ASDFG\n   ZXCVB"
     sky:
         short_desc: 'Sky ABC1-5'
-        long_desc: "Sky column/row notation:\n   A1 A2 A3 A4 A5\n   B1 B2 B3 B4 B5\n   C1 C2 C3 C4 C5"
+        long_desc: "Notation ligne/colonne:\n   A1 A2 A3 A4 A5\n   B1 B2 B3 B4 B5\n   C1 C2 C3 C4 C5"
     english:
         short_desc: English CDEFGAB
-        long_desc: "English (note name in C D E F G A B + alteration b/# + octave number, e.g. Cb4 D#4 E5 ...)"
+        long_desc: "Notation anglaise (note C D E F G A B + altération b/# + numéro d'octave, par exemple Cb4 D#4 E5 ...)"
     doremi:
         short_desc: French doremi
-        long_desc: "Doremi (note name in do re mi fa sol la si/ti + alteration b/# + octave number, e.g. dob4 re#4 mi5 ...)"
+        long_desc: "Notation traditionelle (nom de la note do re mi fa sol la si + altération b/# + numéro d'octave, par ex dob1 re#1 mi2 ...)"
     jianpu:
         short_desc: 'Jianpu 1234567+-'
-        long_desc: "Jianpu (note name in 1 2 3 4 5 6 7, followed by alteration b/# and several + or - for octave shift)"
+        long_desc: "Jianpu (notes 1 2 3 4 5 6 7, suivi de l'altération b/# et d'un ou plusieurs + or - pour changer d'octave)"
     englishchords:
         short_desc: Chords CDEFGABmaj
-        long_desc: "Abbreviated English chord name (e.g. C, F, Dm, Bdim, A+, Csus2, Dsus4, C6, Cmaj7, Dm11)"
+        long_desc: "Nom d'accord anglais (par exemple C, F, Dm, Bdim, A+, Csus2, Dsus4, C6, Cmaj7, Dm11)"
 render_mode:
     html:
         short_desc: partition graphique en HTML
@@ -93,97 +93,97 @@ stock_queries:
     afterword:
     input_tip: cochez ou décochez les différents choix
     help_text: |
-      The visual sheet can be rendered in several file formats.
-      Please select the ones you want to generate (or deselect some).
+      La portée visuelle peut être savegardée sous différents formats.
+      Cochez ceux que vous souhaitez garder.
   song_title:
     foreword:
     question: Quel est le titre de la chanson ?
     afterword:
-    input_tip: 'text. Laisser vide pour utiliser "Sans titre"'
+    input_tip: 'texte. Laisser vide pour utiliser "Sans titre"'
     help_text: 
   original_artist:
     foreword:
     question: Qui sont les artistes d'origine de la chanson ?
     afterword:
-    input_tip: any text, including blank
+    input_tip: texte facultatif (espace)
     help_text: Original artists include the composer, musician, singer, etc.
   transcript_writer:
     foreword:
     question: Qui est le transcripteur ?
     afterword:
-    input_tip: any text, including blank
-    help_text: 'The transcript writer is the person who found the notes you typed earlier. It could be yourself!'
+    input_tip: texte facultatif (espace)
+    help_text: 'Le transcripteur est la personne qui a déchiffré la chanson. C''est peut-être vous!'
   notes_file:
     foreword:
-    question: 'Tapez vos notes ici, ou bien un nom de fichier (dans {0}/)'
+    question: 'Tapez vos notes ici, ou bien un nom de fichier (à placer dans {0}/)'
     afterword:
-    input_tip: a string of notes such as C1 D1F1, or a file name such as song.txt
+    input_tip: du texte contenant des notes telles que C1 D1F1, do re mi, ou un nom de fichier comme song.txt
     help_text: |
-      You can type or copy-paste notes directly in this field.
-      You can also enter the path to a a text file containing the notes.
+      Vous pouvez taper les notes directement ici, ou les copier-coller.
+      Vous pouve aussi taper le nom d'un fichier texte contenant les notes'.
   file:
     foreword:
     question: 'Entrez un nom de fichier (dans {0}/)'
     afterword:
-    input_tip: any text with one or several musical notes
+    input_tip: du texte contenant des notes de musique
     help_text:
   notes:
     foreword:
-    question: Please type or copy-paste notes
+    question: Merci de taper ou de coller vos notes de musique
     afterword:
-    input_tip: any text with one or several musical notes
+    input_tip: du texte contenant des notes de musique
     help_text: |
-      Type one or several notes in your favorite format, for instance C D E F G.
-      For chords (notes played together) glue the notes together (eg C1D1)
+      Tapez des notes de musiques avec votre notation habituelle, par exemple do re mi fa sol.
+      Pour les accords (notes juées simultanément) laissez les notes collées (par ex. domi)
   one_input_mode:
     foreword:
-    question: "We detected that you use the following notation: {0}."
+    question: "Nous avons détecté que vous utilisez la notation suivante: {0}."
     afterword:
     input_tip: cliquez sur OK pour passer
     help_text:
   musical_notation:
-    foreword: Despite our efforts, we could not guess what musical notation you are using.
-    question: Please help us by choosing your format in the list below
+    foreword: Malgré nos efforts, nous n'avons pas pu détecter votre format de notes.
+    question: Merci de nous aider en choissant le bon dans la liste ci-contre
     afterword:
-    input_tip: Choice number (integer between 0 and n-1)
+    input_tip: Numéro de votre choix (entier entre 0 and choix_max)
     help_text: |
-      In the previous question, you have typed your song notes. We tried to automatically guess which notation you are using.
-      Despite our best efforts, there is still an ambiguity. Please select the right one in the list.
+      A la question précédente, vous avez tapé des notes de musiques. Nous avons essayé de détecter quelle notation vous avez utilisé.
+      Toutefois, il reste une ambiguité. Merci de choisir votre notation dans la liste ci-contre.
   no_possible_key:
     foreword:
     question: |
-      Your song cannot be transposed exactly in Sky.
-      Default key will be set to C.
+      Votre chanson contient des notes non transposables dans le jeu Sky.
+      La clef musicale sera mise à C (do) par défaut.
     afterword:
     input_tip: cliquez sur OK pour passer
     help_text:
   one_possible_key:
     foreword:
-    question: 'Your song can be transposed in Sky with the following key: {0}'
+    question: "Votre chanson peut être transposée dans le jeu Sky à condition d'utiliser la clef suivante: {0}"
     afterword:
     input_tip: cliquez sur OK pour passer
     help_text:
   possible_keys:
-    foreword: 'Your song can be transposed in Sky with the following keys: {0}.'
-    question: Please choose your musical key
+    foreword: "Votre chanson peut être transposée dans le jeu Sky avec les clefs suivantes: {0}."
+    question: Merci de choisir votre clef
     afterword:
-    input_tip: Choice number (integer between 0 and n-1)
+    input_tip: nom de la clef
     help_text: |
-      'Sky''s musical system does not include sharps # and flats b. Hence you cannot play any song from the outside world.
-      We detected that your song can be played with several notes as the song key. Please choose the one that is most convenient for you.'
+      Le jeu Sky ne permet pas de jouer les dièses # et les bémols b. Vous devrez donc souvent transposer votre chanson dans une clef différente pour pouvoir la jouer.
+      Heureusement, nous avons trouvé plusieurs clefs permettant de jouer votre chanson. Merci de choisir celle qui vous convient le mieux.
   recommended_key:
-    foreword: Your musical notation uses relative pitch.
-    question: What is the recommended key to play in Sky (default is C)
+    foreword: "Votre notation musicale n'utilise pas la notion d'octave."
+    question: Quelle clef recommenderiez vous pour jouer dans Sky ? (do par défaut)
     afterword:
-    input_tip: leave blank, or type a note name (e.g. C in English notation)
+    input_tip: laisser blanc pour garder do, ou tapez un nom de clef
     help_text: |
-      You have used a musical notation that does allow to determine the exact pitch of your notes.
-      Hence the visual sheet will sound differently in different places in Sky.
+      Votre notation musicale n'utilise pas la notion d'octave : la hauteur de vos notes est donc indéterminée.
+      Votre partition risque de sonner différement à différents endroits du jeu. Indiquez une clef pour obliger les joueurs à respecter votre chanson.
   octave_shift:
-    foreword: Do you want to shift the pitch of your notes?
-    question: Octave shift (leave blank or type 0 to skip)
+    foreword: Voulez-vous transposer vos notes ?
+    question: Décalage d'octave (laisser blanc ou taper 0 pour ne rien faire)
     afterword:
-    input_tip: octave shift as an integer between -6 and +6
+    input_tip: décalage d'octave vers le haut ou le bas entre -6 et +6
     help_text: |
       'A musical note is identified by its name and an octave number. Sky\''s music system spans less than 3 octaves.
       If you do not specify an octave number after a note, we will assume it is the first octave of Sky, so your notes will essential by played near the bass.
@@ -191,31 +191,31 @@ stock_queries:
       If you have specified an octave number and it is too high to be played within Sky\''s system, you can downshift the pitch by entering a negative integer'
   no_song_file:
     foreword: ---------------------------------------
-    question: 'Your {0} was not saved to file.'
+    question: "Votre {0} n'a pas été sauvegardée."
     afterword:
     input_tip: cliquez sur OK pour passer
     help_text:
   one_song_file:
     foreword: ---------------------------------------
-    question: 'Your {0} is located at: {1}'
+    question: 'Votre {0} est enregistrée ici: {1}'
     afterword:
     input_tip: cliquez sur OK pour passer
     help_text:
   several_song_files:
     foreword: ---------------------------------------
-    question: 'Your {0} is located at: {1}'
-    afterword: 'Your song has been split into {0} files between "{1}" and "{2}"'
+    question: 'Votre {0} est enregistrée ici: {1}'
+    afterword: 'Votre chanson a été découpée en {0} fichiers entre "{1}" et "{2}"'
     input_tip: cliquez sur OK pour passer
     help_text:
   few_errors:
     foreword:
-    question: 'Song successfully read with a few errors.'
+    question: "Chanson décodée avec peu d'erreurs"
     afterword:
     input_tip: cliquez sur OK pour passer
     help_text:
   many_errors:
     foreword:
-    question: '*WARNING*: Your song contains many errors.'
+    question: "*ATTENTION*: Le décodage de votre chanson a généré beaucoup d'erreurs."
     afterword: |
       'Please check the following:
       

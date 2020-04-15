@@ -171,7 +171,7 @@ stock_queries:
     foreword: 'Your song can be transposed in Sky with the following keys: {0}.'
     question: Please choose your musical key
     afterword:
-    input_tip: Choice number (integer between 0 and n-1)
+    input_tip: Type the key name
     help_text: |
       'Sky''s musical system does not include sharps # and flats b. Hence you cannot play any song from the outside world.
       We detected that your song can be played with several notes as the song key. Please choose the one that is most convenient for you.'
