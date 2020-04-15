@@ -1,9 +1,9 @@
 import re, os
-from modes import ReplyType, InputMode, RenderMode
+from src.skymusic.modes import ReplyType, InputMode, RenderMode
 from datetime import datetime
 import hashlib
 import io
-import Lang
+
 
 class QueryError(Exception):
     def __init__(self, explanation):

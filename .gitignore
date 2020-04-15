@@ -1,7 +1,5 @@
 *.html
 *.pyc
-*.png
-*.svg
 /songs_out
 /songs
 /venv

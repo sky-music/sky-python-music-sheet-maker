@@ -47,7 +47,7 @@ def guess_locale():
 
 def load(locale):
     global LANG, loaded
-    with open(os.path.normpath(os.path.join(os.path.dirname(__file__), "../langs", "%s.yaml" % locale)), mode='r', encoding='utf-8', errors='ignore') as file:
+    with open(os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "langs", "%s.yaml" % locale)), mode='r', encoding='utf-8', errors='ignore') as file:
         LANG[locale] = yaml.safe_load(file)
     loaded[locale] = True
 

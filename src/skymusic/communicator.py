@@ -1,7 +1,7 @@
 import io
-from modes import InputMode, RenderMode, ReplyType
-from communication import QueryOpen, QueryChoice, QueryMultipleChoices, QueryBoolean, QueryMemory, Information
-import Lang
+from src.skymusic.modes import InputMode, RenderMode, ReplyType
+from src.skymusic.communication import QueryOpen, QueryChoice, QueryMultipleChoices, QueryMemory, Information
+from src.skymusic import Lang
 
 """
 Classes to ask and answer questions called Query and Reply between the bot and the music sheet maker

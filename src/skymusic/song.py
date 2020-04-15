@@ -1,7 +1,7 @@
 import os, re, io
-from modes import RenderMode, CSSMode
-import instruments
-import Lang
+from src.skymusic.modes import RenderMode, CSSMode
+from src.skymusic import instruments, Lang
+
 #import noteparsers
 
 
@@ -36,11 +36,14 @@ class Song():
         except AttributeError: #Should never happen
             self.locale = Lang.guess_locale()
             print('**WARNING: Song self.maker has no locale. Reverting to: %s'%self.locale)
+        # TODO: replace with importlib
         self.directory_base = self.maker.get_directory_base()
-        self.directory_fonts = os.path.normpath(os.path.join(self.directory_base,'fonts'))
+        self.directory_fonts = os.path.normpath(os.path.join(self.directory_base, 'src', 'skymusic', 'resources', 'fonts'))
         self.lines = []        
-        self.meta = {'title': [Lang.get_string("song_meta/title", self.locale)+':', Lang.get_string("song_meta/untitled", self.locale)], 'artist': [Lang.get_string("song_meta/artist", self.locale)+':', ''],
-                    'transcript': [Lang.get_string("song_meta/transcript", self.locale)+':', ''], 'song_key': [Lang.get_string("song_meta/musical_key", self.locale)+':', '']}
+        self.meta = {'title': [Lang.get_string("song_meta/title", self.locale) + ':', Lang.get_string("song_meta/untitled", self.locale)], 'artist': [
+            Lang.get_string("song_meta/artist", self.locale) + ':', ''],
+                    'transcript': [Lang.get_string("song_meta/transcript", self.locale) + ':', ''], 'song_key': [
+                Lang.get_string("song_meta/musical_key", self.locale) + ':', '']}
         #self.title = self.meta['title'][1]
         self.maxIconsPerLine = 10
         self.maxLinesPerFile = 10
@@ -226,7 +229,8 @@ class Song():
             try:
                 with open(css_path, 'r', encoding='utf-8', errors='ignore') as css_file:
                     css_file = css_file.read()
-            except:
+            except FileNotFoundError as e:
+                print(e)
                 print('\n***Warning: could not open CSS file to embed it in HTML.\n')
                 css_file = ''
             html_buffer.write('\n<style type=\"text/css\">\n')

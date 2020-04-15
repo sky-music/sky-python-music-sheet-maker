@@ -1,8 +1,8 @@
 #import os
 import sys
 sys.path.append('..')
-from modes import InputMode, ReplyType
-from communication import QueryOpen, QueryChoice, QueryMultipleChoices, QueryBoolean, QueryMemory
+from src.skymusic.modes import InputMode, ReplyType
+from src.skymusic.communication import QueryOpen, QueryChoice, QueryBoolean, QueryMemory
 
 # song_dir_in = 'test_songs'
 # song_dir_out = 'songs_out'

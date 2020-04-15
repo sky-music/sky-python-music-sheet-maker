@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-from music_sheet_maker import MusicSheetMaker
-from communicator import Communicator, QueriesExecutionAbort
-import Lang
+from src.skymusic.music_sheet_maker import MusicSheetMaker
+from src.skymusic.communicator import Communicator, QueriesExecutionAbort
+from src.skymusic import Lang
 
 try:
     import readline

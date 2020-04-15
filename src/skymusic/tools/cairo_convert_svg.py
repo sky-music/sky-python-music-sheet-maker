@@ -20,7 +20,7 @@ from PIL import Image
 transparency = True  # If yes, then PNG have an alpha channel
 max_num_notes = 7  # Maximum number of note images in triplets and quavers, starting from 1
 
-os.chdir("../../elements")
+os.chdir("../resources/elements")
 
 if iscairo:
     for file_path in os.listdir():

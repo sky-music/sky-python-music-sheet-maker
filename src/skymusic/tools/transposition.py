@@ -11,6 +11,8 @@ sys.path.append('..')
 import os
 import re
 import math
+from src.skymusic.parsers.song_parser import SongParser
+from src.skymusic.modes import InputMode, ResponseMode
 from parsers.song_parser import SongParser
 from modes import InputMode, ResponseMode
 
@@ -93,10 +95,10 @@ def parse_line(line, note_shift=0, song_key='C'):
 
 
 def render_transposed_song(song_lines):
-    
+
     if isinstance(song_lines,str): #Break newlines and make sure the result is a List
         song_lines = song_lines.split(os.linesep)
-    
+
     song = ''
     for song_line in song_lines:
         if song_line[0] != '':

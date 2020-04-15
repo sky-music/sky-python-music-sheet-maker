@@ -103,7 +103,7 @@ class NoteParser:
             return False
 
     def english_note_name(self, notes_string, reverse=False):
-        from parsers.noteparsers import english
+        from src.skymusic.parsers.noteparsers import english
         if reverse:
             native_parser = english.English()
             foreign_parser = self
