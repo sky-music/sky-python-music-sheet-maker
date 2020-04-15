@@ -28,9 +28,10 @@ class Instrument:
         self.is_silent = True
         self.is_broken = False
         self.maker = maker
+        # TODO: use importlib
         self.directory_base = self.maker.get_directory_base()
-        self.directory_elements = os.path.join(self.directory_base, 'elements')
-        self.directory_fonts = os.path.join(self.directory_base, 'fonts')
+        self.directory_elements = os.path.join(self.directory_base, 'src', 'skymusic', 'resources', 'elements')
+        self.directory_fonts = os.path.join(self.directory_base, 'src', 'skymusic', 'resources', 'fonts')
         self.empty_chord_png = os.path.normpath(os.path.join(self.directory_elements, 'empty-chord.png'))  # blank harp
         self.unhighlighted_chord_png = os.path.normpath(os.path.join(self.directory_elements,
                                                                      'unhighlighted-chord.png'))  # harp with unhighlighted notes

@@ -36,8 +36,9 @@ class Song():
         except AttributeError: #Should never happen
             self.locale = Lang.guess_locale()
             print('**WARNING: Song self.maker has no locale. Reverting to: %s'%self.locale)
+        # TODO: replace with importlib
         self.directory_base = self.maker.get_directory_base()
-        self.directory_fonts = os.path.normpath(os.path.join(self.directory_base,'fonts'))
+        self.directory_fonts = os.path.normpath(os.path.join(self.directory_base, 'src', 'skymusic', 'resources', 'fonts'))
         self.lines = []        
         self.meta = {'title': [Lang.get_string("song_meta/title", self.locale) + ':', Lang.get_string("song_meta/untitled", self.locale)], 'artist': [
             Lang.get_string("song_meta/artist", self.locale) + ':', ''],
@@ -228,7 +229,8 @@ class Song():
             try:
                 with open(css_path, 'r', encoding='utf-8', errors='ignore') as css_file:
                     css_file = css_file.read()
-            except:
+            except FileNotFoundError as e:
+                print(e)
                 print('\n***Warning: could not open CSS file to embed it in HTML.\n')
                 css_file = ''
             html_buffer.write('\n<style type=\"text/css\">\n')
