@@ -499,8 +499,24 @@ class Communicator:
         Returns a text that can be sent to a Discord utils.Question model
         TODO: send just a text or a dictionary of arguments?
         '''
-        utils_question = query.get_result()
-        return utils_question
+        result = {}
+        
+        limits = query.get_limits()
+        if query.help_required:
+            question_text = '\n'.join([query.get_help_text().strip(), query.get_foreword().strip(), query.get_question().strip()])
+        else:
+            question_text = '\n'.join([query.get_foreword().strip(), query.get_question().strip()])
+            
+        result.update({'question': question_text})
+
+        # options keyword arguments dictionary
+        if isinstance(query, (QueryMultipleChoices, QueryChoice)) and query.get_reply_type() is not ReplyType.NOTE:
+            result.update({'options': [{'number': i, 'text': str(limit).strip()} for i, limit in enumerate(limits)]})
+
+        result.update({'result': query.get_result()})
+
+        return result
+    
 
     def discord_to_query(self, utils_question):
 
