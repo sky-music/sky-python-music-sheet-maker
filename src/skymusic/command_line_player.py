@@ -1,4 +1,11 @@
 #!/usr/bin/env python3
+if __name__ == '__main__':    
+    import os, sys
+    project_path = os.path.normpath(os.path.join(os.path.dirname(__file__), '../../'))
+    if project_path not in sys.path:
+        sys.path.append(project_path)
+
+
 from src.skymusic.music_sheet_maker import MusicSheetMaker
 from src.skymusic.communicator import Communicator, QueriesExecutionAbort
 from src.skymusic import Lang
@@ -34,7 +41,7 @@ class CommandLinePlayer:
         if 'communicator' in self.__dict__.keys():
             return getattr(self.communicator, attr_name)
         else:
-            raise AttributeError("type object " + repr(type(self).__name__) + " has no attribute 'communicator")
+            raise AttributeError(f"type object '{type(self).__name__}' has no attribute 'communicator'")
 
     def get_name(self):
         return self.name
@@ -47,7 +54,7 @@ class CommandLinePlayer:
         self.locale = Lang.check_locale(locale)
         if self.locale is None:
             self.locale = Lang.find_substitute(locale)
-            print("**WARNING: bad locale type %s passed to CommandLinePlayer. Reverting to %s"%(locale, self.locale))
+            print(f"**WARNING: bad locale type passed to CommandLinePlayer: {locale}. Reverting to {self.locale}")
             
         return self.locale
 
@@ -64,14 +71,8 @@ class CommandLinePlayer:
         else:
             if not isinstance(queries, (list, set)):
                 queries = [queries]
-        #FIXME: 2 lines for debugging:
-        #print('\n%%%%DEBUG. I AM PLAYER, THE UNSATISFIED QUERIES ARE:%%%%')
-        #self.communicator.memory.print_out(filters=('unsatisfied'))x
         """
         The following part is exclusive to the command line.
-        The executing code must be rewritten for discord, typically using:
-            question = self.communicator.query_to_discord(q)
-            await Questions.ask_text(self.bot, channel, ctx.author, question...)
         """
         for q in queries:
             reply_valid = False
@@ -79,16 +80,13 @@ class CommandLinePlayer:
                 question = self.communicator.query_to_stdout(q)
                 reply_valid = True #to be sure to break the loop
                 if q.get_expect_reply():                  
-                    #print('%%%DEBUG. PLAYER, YOU ARE BEING PROMPTED%%%') #FIXME: for debugging only                    
                     answer = input('%s: '%question)   
                     q.reply_to(answer)
                     reply_valid = q.get_reply_validity()
                 else:                  
-                    #print('%%%DEBUG. PLAYER, YOU ARE BEING TOLD%%%') #FIXME: for debugging only
                     print(question)
                     q.reply_to('ok')
                     reply_valid = q.get_reply_validity()
-
 
 try:
 
@@ -103,12 +101,3 @@ try:
 except QueriesExecutionAbort as qExecAbort:
     print(repr(qExecAbort))
     
-    
-'''
-# for debugging only
-print('\n%%%DEBUG. MAIN script has ended%%%')
-print('\n\n%%%DEBUG. Player memory:')
-player.communicator.memory.print_out()
-print('\n%%%DEBUG. Maker memory:')
-maker.communicator.memory.print_out()
-'''

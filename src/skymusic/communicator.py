@@ -5,7 +5,6 @@ from src.skymusic import Lang
 
 """
 Classes to ask and answer questions called Query and Reply between the bot and the music sheet maker
-TODO: list of mandatory questions to implement
 a) asked by the cog:
 - notes, OPEN
 - musical notation (if several are found), CHOICE
@@ -46,9 +45,8 @@ class QueriesExecutionAbort(Exception):
         self.explanations = explanations
 
     def __repr__(self):
-        queries_str = ''
-        queries_str = ','.join([str(query) for query in self.queries])
-        return '<%s, queries="%s", explanations="%s">' % (self.__class__.__name__, queries_str, str(self.explanations))
+        queries_str = ', '.join([str(query) for query in self.queries])
+        return f"{self.__class__.__name__}, queries={queries_str}, explanations={self.explanations}"
 
     def __str__(self):
         return str(self.queries)
@@ -305,8 +303,7 @@ class Communicator:
 
     def __str__(self):
 
-        return '<' + self.__class__.__name__ + ' of ' + repr(self.owner.get_name()) + ' with ' + str(
-            len(self.memory)) + ' stored queries>'
+        return f"<{self.__class__.__name__} of '{self.owner.get_name()}' with {len(self.memory)} stored queries>"
 
     def __getattr__(self, attr_name):
         """
@@ -315,7 +312,7 @@ class Communicator:
         if 'memory' in self.__dict__.keys():
             return getattr(self.memory, attr_name)
         else:
-            raise AttributeError("type object " + repr(type(self).__name__) + " has no attribute 'memory")
+            raise AttributeError(f"type object {repr(type(self).__name__)} has no attribute 'memory'")
 
     def get_name(self):
         return self.name
@@ -335,7 +332,7 @@ class Communicator:
                 pass
             if self.locale is None: 
                 self.locale = Lang.guess_locale()
-                print("**WARNING: bad locale type %s passed to Communicator. Reverting to %s"%(locale, self.locale))
+                print(f"**WARNING: bad locale type {locale} passed to Communicator. Reverting to {self.locale}")
                 
         return self.locale
 
@@ -349,7 +346,7 @@ class Communicator:
             stock_query_name = stock_query_name.lower().replace(' ', '_')
             stock_query = self.query_stock[stock_query_name]
         except KeyError:
-            raise CommunicatorError(str(stock_query_name) + ' is not a standard query')
+            raise CommunicatorError(f"{stock_query_name} is not a standard query")
 
         method_args = stock_query.copy()
         method_args.pop('class')  # The class was used and is not an argument for Query
@@ -401,9 +398,9 @@ class Communicator:
                 # TODO: check for duplicates before storing?
 
     def query_to_stdout(self, query):
-        '''
+        """
         Returns a text that can be printed in the standard output
-        '''
+        """
         question = str(query.get_result())
         return question
 
@@ -421,8 +418,7 @@ class Communicator:
             try:
                 buffers[0]
             except (TypeError, KeyError):
-                raise CommunicatorError(
-                    'Song buffers are not wrapped in a list, but a single object of type ' + str(type(buffers)))
+                raise CommunicatorError("Song buffers are not wrapped in a list, but a single object of type %s" % str(type(buffers)))
             else:
                 if isinstance(buffers[0], (io.BytesIO, io.StringIO)):
                     results_dicts.append({
@@ -433,10 +429,10 @@ class Communicator:
                                  in enumerate(buffers)]
                     })
                 elif buffers[0] is None:
-                    print('A None buffer was passed to WebsitePlayer.')
+                    print("A None buffer was passed to WebsitePlayer.")
                     pass
                 else:
-                    raise CommunicatorError('Cannot process ' + str(type(buffers[0])))
+                    raise CommunicatorError(f"Cannot process {type(buffers[0])}")
 
         return results_dicts
 
@@ -495,10 +491,10 @@ class Communicator:
         return queries_kwargs  # List of queries dictionaries
 
     def query_to_discord(self, query):
-        '''
+        """
         Returns a text that can be sent to a Discord utils.Question model
         TODO: send just a text or a dictionary of arguments?
-        '''
+        """
         result = {}
         
         limits = query.get_limits()

@@ -23,7 +23,7 @@ def check_locale(locale):
     if locale not in locales:
         substitute = find_substitute(locale)
         if not loaded[substitute]:
-            print("\n***WARNING: locale '%s' not found. Will replace with '%s'\n" % (locale, substitute))
+            print(f"\n***WARNING: locale '{locale}' not found. Will replace with '{substitute}'\n")
         return substitute
 
     return locale
@@ -75,8 +75,7 @@ def get_string(key, locale=None, replacements=()):
     if locale not in locales:
         substitute = find_substitute(locale)
         if not loaded[substitute]:
-            print(
-                "\n***WARNING: missing locale '%s' for key '%s'. Replacing with %s\n" % (locale, str(key), substitute))
+            print(f"\n***WARNING: missing locale '{locale}' for key '{key}'. Replacing with {substitute}\n")
         locale = substitute
 
     if not loaded[locale]:
@@ -88,7 +87,7 @@ def get_string(key, locale=None, replacements=()):
     for i in key_list:
         if i not in obj:
             if warn_count < 10:
-                print("\n***WARNING: could not find lang key '%s' for locale '%s'\n" % (str(i), locale))
+                print("\n***WARNING: could not find lang key '{i}' for locale '{locale}'\n")
                 warn_count += 1
             return ''
             # raise KeyError(f"Unknown lang key: {i}")

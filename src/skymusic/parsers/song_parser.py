@@ -39,7 +39,7 @@ class SongParser:
             self.locale = self.maker.get_locale()
         except AttributeError:  # Should never happen
             self.locale = Lang.guess_locale()
-            print('**WARNING: SongParser self.maker has no locale. Reverting to %s' % self.locale)
+            print(f"**WARNING: SongParser self.maker has no locale. Reverting to {self.locale}")
 
     def set_delimiters(self, icon_delimiter=' ', pause='.', quaver_delimiter='-', comment_delimiter='#',
                        repeat_indicator='*'):
@@ -78,10 +78,10 @@ class SongParser:
 
         if self.input_mode == InputMode.JIANPU or isinstance(self.note_parser, src.skymusic.parsers.noteparsers.jianpu.Jianpu):
             if self.pause != '0':
-                print('Jianpu notation is used: setting 0 as the pause character instead of ' + self.pause)
+                print(f"Jianpu notation is used: setting 0 as the pause character instead of {self.pause}")
                 self.pause = '0'
             if self.quaver_delimiter == '-':
-                print('Jianpu notation is used: setting ^ as the quaver delimiter instead of ' + self.quaver_delimiter)
+                print(f"Jianpu notation is used: setting ^ as the quaver delimiter instead of {self.quaver_delimiter}")
                 self.quaver_delimiter = '^'
 
         delims = [self.icon_delimiter, self.pause, self.quaver_delimiter, self.comment_delimiter, self.repeat_indicator]
@@ -91,11 +91,9 @@ class SongParser:
             for delim in delims:
                 if (parser.not_note_name_regex.match(delim) is None or parser.not_octave_regex.match(
                         delim) is None) and delim != self.comment_delimiter:
-                    print('You chose an invalid delimiter for notation ' + self.input_mode.get_short_desc(
-                        self.locale) + ': ' + delim)
+                    print(f"You chose an invalid delimiter for notation {self.input_mode.get_short_desc(self.locale)}: {delim}")
                 if delims.count(delim) > 1:
-                    print('You chose twice the same delimiter for notation ' + self.input_mode.get_short_desc(
-                        self.locale) + ': ' + delim)
+                    print(f"You chose twice the same delimiter for notation {self.input_mode.get_short_desc(self.locale)}: {delim}")
 
     def get_possible_modes(self, song_lines=None):
 
@@ -113,7 +111,7 @@ class SongParser:
             self.set_note_parser(self.input_mode)
             self.check_delimiters()
         else:
-            raise SongParserError('Cannot set input_mode: invalid input_mode')
+            raise SongParserError(f"Cannot set input_mode: invalid input_mode: {input_mode}")
 
     def get_input_mode(self):
 
@@ -137,13 +135,13 @@ class SongParser:
             input_mode = self.input_mode
 
         if input_mode is None:
-            raise SongParserError('cannot set NoteParser: Invalid input_mode')
+            raise SongParserError("cannot set NoteParser: Invalid input_mode {input_mode}")
         else:
             self.note_parser = self.get_note_parser(input_mode)
 
     def english_note_name(self, note_name, reverse=False):
         if self.note_parser is None:
-            print('***Warning: no note parser defined.\n')
+            print("***Warning: no note parser defined.\n")
             return ''
         else:
             return self.note_parser.english_note_name(note_name, reverse)
@@ -197,10 +195,10 @@ class SongParser:
             self.set_note_parser()
 
         for chord_idx, chord in enumerate(chords):
-            '''
+            """
             Creates a skygrid from the harp's chord notes
             # For each chord, sets the highlighted state of each note accordingly (True or False)
-            '''
+            """
             # TODO: this line is useless since we don't use position maps anymore.
             # chord = re.sub(re.escape(self.pause), '.', chord) #Replaces the pause character by the default
 

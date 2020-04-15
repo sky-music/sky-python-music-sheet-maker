@@ -49,7 +49,7 @@ class MusicSheetMaker:
         if 'communicator' in self.__dict__.keys():
             return getattr(self.communicator, attr_name)
         else:
-            raise AttributeError("type object " + repr(type(self).__name__) + " has no attribute 'communicator")
+            raise AttributeError(f"type object '{type(self).__name__}' has no attribute 'communicator'")
 
     def get_name(self):
         return self.name
@@ -62,7 +62,7 @@ class MusicSheetMaker:
         self.locale = Lang.check_locale(locale)
         if self.locale is None:
             self.locale = Lang.guess_locale()
-            print("**WARNING: bad locale type %s passed to MusicSheetMaker. Reverting to %s" % (locale, self.locale))
+            print(f"**WARNING: bad locale type {locale} passed to MusicSheetMaker. Reverting to {self.locale}")
 
         return self.locale
 
@@ -124,10 +124,6 @@ class MusicSheetMaker:
         else:
             if not isinstance(queries, (list, set)):
                 queries = [queries]
-        # 2 lines for debugging:
-        # print('\n%%%%I AM MAKER, THE UNSATISFIED QUERIES ARE:%%%%')
-        # self.communicator.memory.print_out(filters=('unsatisfied'))
-
         """
         The query statisfaction loop:
         runs until all queries are satisfied
@@ -141,11 +137,10 @@ class MusicSheetMaker:
                 try:
                     stock_query = self.communicator.query_stock[query_name]
                     handler_args = ', '.join(('sender=q.get_sender()', 'query=q'))
-                    expression = 'self.' + str(stock_query['handler']) + '(' + handler_args + ')'
+                    expression = f"self.{stock_query['handler']}({handler_args})"
                 except KeyError as err:
                     # TODO: handle non-stock queries???
-                    raise MusicSheetMakerError(
-                        'Cannot create stock query ' + repr(query_name) + ', because of ' + repr(err))
+                    raise MusicSheetMakerError(f"Cannot create stock query '{query_name}', because of {repr(err)}")
                     pass
                 # Actual evaluation of the stock query
                 try:
@@ -300,7 +295,8 @@ class MusicSheetMaker:
 
     def retrieve_song_metadata(self, recipient):
         """
-        Experimental
+        Retrieves song meta data from previous answered queries.
+        Should work, but not fully tested
         """
         (title, artist, transcript) = (None, None, None)
 
@@ -351,7 +347,7 @@ class MusicSheetMaker:
         isfile = os.path.isfile(file_path)
 
         if not isfile:
-            MusicSheetMakerError('File does not exist: ' + os.path.abspath(file_path))
+            MusicSheetMakerError("File does not exist: %s" % os.path.abspath(file_path))
         else:
             # load file
             try:
@@ -375,8 +371,7 @@ class MusicSheetMaker:
 
         else:
 
-            q_notes = self.communicator.send_stock_query('notes_file', question_rep=(
-            os.path.relpath(os.path.normpath(self.song_dir_in)),),
+            q_notes = self.communicator.send_stock_query('notes_file', question_rep=(os.path.relpath(os.path.normpath(self.song_dir_in)),),
                                                          recipient=recipient, prerequisites=prerequisites)
 
             if not execute:
@@ -405,7 +400,7 @@ class MusicSheetMaker:
 
                 if isfile and self.is_commandline(recipient):
                     notes = self.read_file(file_path)
-                    print('(Song imported from %s)' % os.path.abspath(file_path))
+                    print("(Song imported from %s)" % os.path.abspath(file_path))
                 else:
                     notes = result.split(os.linesep)  # Returns a list of strings in any case
 
@@ -425,7 +420,8 @@ class MusicSheetMaker:
 
     def retrieve_notes(self, recipient):
         """
-        Experimental
+        Retrieves notes from previous answered queries.
+        Should work, but not fully tested
         """
         q_notes_file = self.communicator.recall_by_recipient(recipient, criterion="file|notes_file",
                                                              filters=["valid_reply"], sort_by="date")
@@ -517,7 +513,8 @@ class MusicSheetMaker:
 
     def retrieve_input_mode(self, recipient, notes=None):
         """
-        Experimental
+        Retrieves input mode (musical notation) from previous answered queries.
+        Should work, but not fully tested
         """
         if notes is None:
             notes = self.retrieve_notes(recipient)
@@ -585,7 +582,7 @@ class MusicSheetMaker:
             elif len(possible_keys) > 1:
                 song_key = q_key.get_reply().get_result()
             else:
-                raise MusicSheetMakerError('Possible keys is an empty list.')
+                raise MusicSheetMakerError("Possible keys is an empty list.")
 
             return q_key, song_key
 
@@ -602,7 +599,8 @@ class MusicSheetMaker:
 
     def retrieve_song_key(self, recipient, notes=None, input_mode=None):
         """
-        Experimental
+        Retrieves song key from previous answered queries.
+        Should work, but not fully tested
         """
         if notes is None:
             notes = self.retrieve_notes(recipient)
@@ -653,7 +651,8 @@ class MusicSheetMaker:
 
     def retrieve_octave_shift(self, recipient):
         """
-        Experimental
+        Retrieves desired octave shift from previous answered queries.
+        Should work, but not fully tested
         """
         q_shift = self.communicator.recall_by_recipient(recipient, criterion="octave_shift", filters=["valid_reply"],
                                                         sort_by="date")
@@ -663,12 +662,6 @@ class MusicSheetMaker:
             octave_shift = q_shift[-1].get_reply().get_result()
         return octave_shift
 
-    def send_buffers_to_botcog(self, buffers, recipient, prerequisites=None, execute=True):
-        """
-        Discord only
-        TODO: fill this method, or if very short, put it inside create_song directly, or delete it if unused
-        """
-        return buffers
 
     def display_error_ratio(self, recipient, prerequisites=None, execute=True):
 
@@ -728,6 +721,7 @@ class MusicSheetMaker:
         return
 
     '''
+    TODO
     def retrieve_render_modes(self, recipient):
         
         q_render = self.communicator.recall_by_recipient(recipient, criterion="render_modes", filters=["valid_reply"], sort_by="date")
@@ -783,7 +777,7 @@ class MusicSheetMaker:
             os.mkdir(self.song_dir_out)
 
         if len(buffers) != len(file_paths):
-            raise MusicSheetMakerError('inconsistent lengths of buffers and file_paths')
+            raise MusicSheetMakerError("inconsistent lengths of buffers and file_paths")
 
         (file_base, file_ext) = os.path.splitext(file_paths[0])
 
@@ -796,7 +790,7 @@ class MusicSheetMaker:
             elif buffer is None:
                 pass
             else:
-                raise MusicSheetMakerError('Unknown buffer type in ' + str(self))
+                raise MusicSheetMakerError(f"Unknown buffer type in {self}")
 
             if buffer is not None:
                 output_file.write(buffer.getvalue())

@@ -27,7 +27,7 @@ class Song():
         if isinstance(music_key, str):
             self.music_key = music_key
         else:
-            print('\n***Warning: Invalid song key: using C instead\n')
+            print("\n***Warning: Invalid song key: using C instead\n")
             self.music_key = 'C'
 
         self.maker = maker
@@ -35,15 +35,15 @@ class Song():
             self.locale = self.maker.get_locale()
         except AttributeError: #Should never happen
             self.locale = Lang.guess_locale()
-            print('**WARNING: Song self.maker has no locale. Reverting to: %s'%self.locale)
+            print(f"**WARNING: Song self.maker has no locale. Reverting to: {self.locale}")
         # TODO: replace with importlib
         self.directory_base = self.maker.get_directory_base()
         self.directory_fonts = os.path.normpath(os.path.join(self.directory_base, 'src', 'skymusic', 'resources', 'fonts'))
         self.lines = []        
         self.meta = {'title': [Lang.get_string("song_meta/title", self.locale) + ':', Lang.get_string("song_meta/untitled", self.locale)], 'artist': [
-            Lang.get_string("song_meta/artist", self.locale) + ':', ''],
-                    'transcript': [Lang.get_string("song_meta/transcript", self.locale) + ':', ''], 'song_key': [
-                Lang.get_string("song_meta/musical_key", self.locale) + ':', '']}
+            Lang.get_string("song_meta/artist", self.locale) + ': ', ''],
+                    'transcript': [Lang.get_string("song_meta/transcript", self.locale) + ': ', ''], 'song_key': [
+                Lang.get_string("song_meta/musical_key", self.locale) + ': ', '']}
         #self.title = self.meta['title'][1]
         self.maxIconsPerLine = 10
         self.maxLinesPerFile = 10
@@ -100,7 +100,7 @@ class Song():
             try:
                 self.midi_key = re.sub(r'#', '#m', self.music_key)  # For mido sharped keys are minor
             except:
-                print('\n***Warning: Invalid music key passed to the MIDI renderer: using C instead\n')
+                print("\n***Warning: Invalid music key passed to the MIDI renderer: using C instead\n")
                 self.midi_key = 'C'
 
     def get_maker(self):
@@ -148,8 +148,8 @@ class Song():
         return self.get_num_instruments()
 
     def __str__(self):
-        return '<Song \'' + self.get_title() + '\', ' + str(self.get_num_lines()) + ' lines, ' \
-               + str(self.get_num_instruments()) + ' instruments, ' + str(self.get_num_broken()) + ' errors>'
+        return f"<Song '{self.get_title()}', {self.get_num_lines()} lines, {self.get_num_instruments()} instruments, {self.get_num_broken()} errors>"
+
 
     def get_num_instruments(self):
         """Returns the number of instruments in the Song"""
@@ -222,8 +222,8 @@ class Song():
         html_buffer = io.StringIO()
 
         html_buffer.write('<!DOCTYPE html>'
-                          '\n<html xmlns:svg=\"http://www.w3.org/2000/svg\">')
-        html_buffer.write('\n<head>\n<title>' + self.meta['title'][1] + '</title>')
+                          '\n<html xmlns:svg="http://www.w3.org/2000/svg">')
+        html_buffer.write(f"\n<head>\n<title>{self.meta['title'][1]}</title>")
 
         if css_mode == CSSMode.EMBED:
             try:
@@ -231,24 +231,23 @@ class Song():
                     css_file = css_file.read()
             except FileNotFoundError as e:
                 print(e)
-                print('\n***Warning: could not open CSS file to embed it in HTML.\n')
+                print("\n***Warning: could not open CSS file to embed it in HTML.\n")
                 css_file = ''
-            html_buffer.write('\n<style type=\"text/css\">\n')
+            html_buffer.write('\n<style type="text/css">\n')
             html_buffer.write(css_file)
             html_buffer.write('\n</style>')
         elif css_mode == CSSMode.IMPORT:
-            html_buffer.write('\n<style type=\"text/css\">')
-            html_buffer.write(
-                "@import url(\'" + rel_css_path.replace('\\','/') + "\');</style>")
+            html_buffer.write('\n<style type="text/css">')
+            html_buffer.write("@import url(\'%s\');</style>" % rel_css_path.replace('\\','/'))
         elif css_mode == CSSMode.XML:
-            html_buffer.write('\n<link href=\"' + rel_css_path + '\" rel=\"stylesheet\" />')
+            html_buffer.write(f'\n<link href="{rel_css_path}" rel="stylesheet" />')
 
         html_buffer.write('\n<meta charset="utf-8"/></head>\n<body>')
-        html_buffer.write('\n<h1> ' + self.meta['title'][1] + ' </h1>')
+        html_buffer.write(f"\n<h1>{self.meta['title'][1]}</h1>")
 
         for k in self.meta:
             if k != 'title':
-                html_buffer.write('\n<p> <b>' + self.meta[k][0] + '</b> ' + self.meta[k][1] + ' </p>')
+                html_buffer.write(f"\n<p> <b>{self.meta[k][0]}</b>{self.meta[k][1]}</p>")
 
         html_buffer.write('\n<div id="transcript">\n')
 
@@ -285,11 +284,11 @@ class Song():
 
         note_parser = render_mode.get_note_parser()
         
-        ascii_buffer.write('#' + self.meta['title'][1] + '\n')
+        ascii_buffer.write('#%s\n' % self.meta['title'][1])
 
         for k in self.meta:
             if k != 'title':
-                ascii_buffer.write('#' + self.meta[k][0] + ' ' + self.meta[k][1] + '\n')
+                ascii_buffer.write('#%s %s\n' % (self.meta[k][0], self.meta[k][1]))
 
         song_render = '\n'
         instrument_index = 0
@@ -311,71 +310,68 @@ class Song():
         if buffer_list is None:
             buffer_list = []
         if len(buffer_list) > self.maxFiles:
-            print('\nYour song is too long. Stopping at ' + str(self.maxFiles) + ' files.')
+            print(f"\nYour song is too long. Stopping at {self.maxFiles} files.")
             return buffer_list
 
         svg_buffer = io.StringIO()
         filenum = len(buffer_list)
 
         # SVG/XML headers
-        svg_buffer.write('<?xml version=\"1.0\" encoding=\"utf-8\" ?>')
+        svg_buffer.write('<?xml version="1.0" encoding="utf-8" ?>')
 
         if css_mode == CSSMode.HREF:
-            svg_buffer.write('\n<?xml-stylesheet href=\"' + rel_css_path + '\" type=\"text/css\" alternate=\"no\" media=\"all\"?>')
+            svg_buffer.write(f'\n<?xml-stylesheet href="{rel_css_path}" type="text/css" alternate="no" media="all"?>')
 
-        svg_buffer.write(
-            '\n<svg baseProfile=\"full\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:ev=\"http://www.w3.org/2001/xml-events\" xmlns:xlink=\"http://www.w3.org/1999/xlink\"'
-            ' width=\"100%\" height=\"100%\"'
-            ' viewBox=\"' + ' '.join((str(self.SVG_viewPort[0]), str(self.SVG_viewPort[1]), str(self.SVG_viewPort[2]),
-                                      str(self.SVG_viewPort[3]))) + '\" preserveAspectRatio=\"xMinYMin\">')
+        SVG_viewPort_str = ' '.join((str(self.SVG_viewPort[0]), str(self.SVG_viewPort[1]), str(self.SVG_viewPort[2]),str(self.SVG_viewPort[3])))
+        svg_buffer.write(f'\n<svg baseProfile="full" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xlink="http://www.w3.org/1999/xlink"'
+                         f' width="100%" height="100%"'
+                         f' viewBox="{SVG_viewPort_str}" preserveAspectRatio="xMinYMin">')
 
         if css_mode == CSSMode.EMBED:
             try:
                 with open(css_path, 'r', encoding='utf-8', errors='ignore') as css_file:
                     css_file = css_file.read()
             except:
-                print('\n***Warning: could not open CSS file to embed it in SVG.\n')
+                print("\n***Warning: could not open CSS file to embed it in SVG.\n")
                 css_file = ''
                 pass
-            svg_buffer.write('\n<defs><style type=\"text/css\"><![CDATA[\n')
+            svg_buffer.write('\n<defs><style type="text/css"><![CDATA[\n')
             svg_buffer.write(css_file)
             svg_buffer.write('\n]]></style></defs>')
         elif css_mode == CSSMode.IMPORT:
-            svg_buffer.write('\n<defs><style type=\"text/css\">')
-            svg_buffer.write(
-                "@import url(\'" + rel_css_path.replace('\\','/') + "\');</style></defs>")
+            svg_buffer.write('\n<defs><style type="text/css">')
+            svg_buffer.write("@import url(\'%s\');</style></defs>" % rel_css_path.replace('\\','/'))
         else:
             svg_buffer.write('\n<defs></defs>')
 
-        svg_buffer.write('\n<title>' + self.meta['title'][1] + '-' + str(filenum) + '</title>')
+        svg_buffer.write(f"\n<title>{self.meta['title'][1]}-{filenum}</title>")
 
         # Header SVG container
-        song_header = ('\n<svg x=\"' + '%.2f' % self.SVG_viewPortMargins[0] + '\" y=\"' + '%.2f' %
-                       self.SVG_viewPortMargins[1] +
-                       '\" width=\"' + '%.2f' % self.SVG_line_width + '\" height=\"' + '%.2f' % (
-                               self.SVG_viewPort[3] - self.SVG_viewPortMargins[1]) + '\">')
+        song_header = (f'\n<svg x="{self.SVG_viewPortMargins[0] : .2f}" y="{self.SVG_viewPortMargins[1] : .2f}"'
+                       f' width="{self.SVG_line_width : .2f}" height="{(self.SVG_viewPort[3] - self.SVG_viewPortMargins[1]) : .2f}">'
+                       )
 
         x = 0
         y = self.SVG_text_height  # Because the origin of text elements of the bottom-left corner
 
         if filenum == 0:
-            song_header += '\n<text x=\"' + str(x) + '\" y=\"' + str(y) + '\" class=\"title\">' + self.meta['title'][1] + '</text>'
+            song_header += f"\n<text x=\"{x}\" y=\"{y}\" class=\"title\">{self.meta['title'][1]}</text>"           
+            
             for k in self.meta:
                 if k != 'title':
                     y += 2 * self.SVG_text_height
-                    song_header += '\n<text x=\"' + str(x) + '\" y=\"' + str(y) + '\" class=\"headers\">' + self.meta[k][0] + ' ' + self.meta[k][1] + '</text>'
+                    song_header += f'\n<text x="{x}" y="{y}" class="headers">{self.meta[k][0]} {self.meta[k][1]}</text>'
+                    
         else:
-            song_header += '\n<text x=\"' + str(x) + '\" y=\"' + str(
-                y) + '\" class=\"title\">' + self.meta['title'][1] + ' (page ' + str(filenum + 1) + ')</text>'
+            song_header += f"\n<text x=\"{x}\" y=\"{y}\" class=\"title\">{self.meta['title'][1]} (page {(filenum + 1)})</text>"
 
         # Dividing line
         y += self.SVG_text_height
-        song_header += (
-                '\n<svg x=\"0" y=\"' + '%.2f' % y + '\" width=\"' + '%.2f' % self.SVG_line_width + '\" height=\"' + '%.2f' % (
-                self.SVG_harp_spacings[1] / 2.0) + '\">'
-                                                   '\n<line x1=\"0\" y1=\"50%\" x2=\"100%\" y2=\"50%\" '
-                                                   'class=\"divide\"/> '
-                                                   '\n</svg>')
+                
+        song_header += (f'\n<svg x="0" y="{y : .2f}" width="{self.SVG_line_width : .2f}" height="{(self.SVG_harp_spacings[1] / 2.0) : .2f}">'
+                        f'\n<line x1="0" y1="50%" x2="100%" y2="50%" class="divide"/> '
+                        f'\n</svg>')
+                
         y += self.SVG_text_height
 
         song_header += '\n</svg>'
@@ -384,9 +380,10 @@ class Song():
 
         # Song SVG container
         ysong = y
-        song_render = '\n<svg x=\"' + '%.2f' % self.SVG_viewPortMargins[
-            0] + '\" y=\"' + '%.2f' % y + '\" width=\"' + '%.2f' % self.SVG_line_width + '\" height=\"' + '%.2f' % (
-                              self.SVG_viewPort[3] - y) + '\" class=\"song\">'
+
+        song_render = (f'\n<svg x="{self.SVG_viewPortMargins[0] : .2f}" y="{y : .2f}"'
+                       f' width="{self.SVG_line_width : .2f}" height="{(self.SVG_viewPort[3] - y) : .2f}" class="song">'
+                      )
         y = 0  # Because we are nested in a new SVG
         x = 0
 
@@ -417,21 +414,27 @@ class Song():
 
             # Line SVG container
             if linetype == 'voice':
-                song_render += '\n<svg x=\"0" y=\"' + '%.2f' % y + '\" width=\"' + '%.2f' % self.SVG_line_width + '\" height=\"' + '%.2f' % self.SVG_text_height + '\" class=\"instrument-line line-' + str(
-                    row) + '\">'
+                
+                song_render += (f'\n<svg x="0" y="{y : .2f}" width="{self.SVG_line_width : .2f}" height="{self.SVG_text_height : .2f}"'
+                                f' class="instrument-line line-{row}">'
+                               )
                 y += self.SVG_text_height + self.SVG_harp_spacings[1] / 2.0
+                
             else:
                 # Dividing line
                 y += self.SVG_harp_spacings[1] / 4.0
-                song_render += '\n<svg x=\"0" y=\"' + '%.2f' % y + '\" width=\"' + '%.2f' % self.SVG_line_width + '\" height=\"' + '%.2f' % (
-                        self.SVG_harp_spacings[1] / 2.0) + '\">'
-                song_render += '\n<line x1=\"0\" y1=\"50%\" x2=\"100%\" y2=\"50%\" class=\"divide\"/>'
-                song_render += '\n</svg>'
+                song_render += (f'\n<svg x="0" y="{y : .2f}" width="{self.SVG_line_width : .2f}" height="{(self.SVG_harp_spacings[1] / 2.0) : .2f}">'
+                                f'\n<line x1="0" y1="50%" x2="100%" y2="50%" class="divide"/>'
+                                f'\n</svg>'
+                               )
                 y += self.SVG_harp_spacings[1] / 4.0
 
                 y += self.SVG_harp_spacings[1] / 2.0
-                song_render += '\n<svg x=\"0" y=\"' + '%.2f' % y + '\" width=\"' + '%.2f' % self.SVG_line_width + '\" height=\"' + '%.2f' % \
-                               self.SVG_harp_size[1] + '\" class=\"instrument-line line-' + str(row) + '\">'
+
+                song_render += (f'\n<svg x="0" y="{y : .2f}" width="{self.SVG_line_width : .2f}" height="{self.SVG_harp_size[1] : .2f}"'
+                                f' class="instrument-line line-{row}">'
+                                )
+
                 y += self.SVG_harp_size[1] + self.SVG_harp_spacings[1] / 2.0
 
             for col in range(ncols):
@@ -447,28 +450,31 @@ class Song():
                     # print('max reached at row=' + str(row) + ' col=' + str(col))
                     # New Line SVG placeholder
                     if linetype == 'voice':
-                        line_render += '\n<svg x=\"0" y=\"' + '%.2f' % y + '\" width=\"' + '%.2f' % self.SVG_line_width + '\" height=\"' + '%.2f' % self.SVG_text_height + '\" class=\"instrument-line line-' + str(
-                            row) + '-' + str(sub_line) + '\">'
+                        line_render += (f'\n<svg x="0" y="{y : .2f}" width="{self.SVG_line_width : .2f}" height="{self.SVG_text_height : .2f}"'
+                                        f' class="instrument-line line-{row}-{sub_line}">'
+                                        )
                         y += self.SVG_text_height + self.SVG_harp_spacings[1] / 2.0
                     else:
                         y += self.SVG_harp_spacings[1] / 2.0
-                        line_render += '\n<svg x=\"0" y=\"' + '%.2f' % y + '\" width=\"' + '%.2f' % self.SVG_line_width + '\" height=\"' + '%.2f' % \
-                                       self.SVG_harp_size[1] + '\" class=\"instrument-line line-' + str(
-                            row) + '-' + str(sub_line) + '\">'
+
+                        line_render += (f'\n<svg x="0" y="{y : .2f}" width="{self.SVG_line_width : .2f}" height="{self.SVG_harp_size[1] : .2f}"'
+                                        f' class="instrument-line line-{row}-{sub_line}">'
+                                        )
+
                         y += self.SVG_harp_size[1] + self.SVG_harp_spacings[1] / 2.0
 
                 # INSTRUMENT RENDER
-                instrument_render = instrument.render_in_svg(x, '%.2f' % (
-                        100.0 * self.SVG_harp_size[0] / self.SVG_line_width) + '%', '100%', self.harp_AspectRatio)
+                instrument_render = instrument.render_in_svg(x, f"{(100.0 * self.SVG_harp_size[0] / self.SVG_line_width)}%", "100%", self.harp_AspectRatio)
 
                 # REPEAT
                 if instrument.get_repeat() > 1:
-                    instrument_render += '\n<svg x=\"' + '%.2f' % (
-                            x + self.SVG_harp_size[0]) + '\" y=\"0%\" class=\"repeat\" width=\"' + '%.2f' % (
-                                                 100.0 * self.SVG_harp_size[
-                                             0] / self.SVG_line_width) + '%' + '\" height=\"100%\">'
-                    instrument_render += '\n<text x=\"2%\" y=\"98%\" class=\"repeat\">x' + str(
-                        instrument.get_repeat()) + '</text></svg>'
+
+                    instrument_render += (f'\n<svg x="{(x + self.SVG_harp_size[0]) : .2f}" y="0%" class="repeat"'
+                                          f' width="{(100.0 * self.SVG_harp_size[0] / self.SVG_line_width) : .2f}% height="100%">'
+                                         )
+                    instrument_render += f'\n<text x="2%" y="98%" class="repeat">x{instrument.get_repeat()} </text></svg>'
+
+
                     x += self.SVG_harp_spacings[0]
 
                 line_render += instrument_render
@@ -497,7 +503,7 @@ class Song():
         global no_PIL_module
 
         if no_PIL_module:
-            print('\n***WARNING: PNG was not rendered because PIL module was not found. ***\n')
+            print("\n***WARNING: PNG was not rendered because PIL module was not found. ***\n")
             return None
 
         def trans_paste(bg, fg, box=(0, 0)):
@@ -515,7 +521,7 @@ class Song():
 
         filenum = len(buffer_list)
         if len(buffer_list) > self.maxFiles:
-            print('\nYour song is too long. Stopping at ' + str(self.maxFiles) + ' files.')
+            print(f"\nYour song is too long. Stopping at {self.maxFiles} files.")
             return buffer_list
 
         # Determines png size as a function of the numer of chords per line
@@ -672,7 +678,7 @@ class Song():
         global no_mido_module
 
         if no_mido_module:
-            print('\n***WARNING: MIDI was not created because mido module was not found. ***\n')
+            print("\n***WARNING: MIDI was not created because mido module was not found. ***\n")
             return None
 
         mid = mido.MidiFile(type=0)
@@ -683,7 +689,7 @@ class Song():
             tempo = mido.bpm2tempo(self.midi_bpm)
             track.append(mido.MetaMessage('set_tempo', tempo=tempo))
         except ValueError:
-            print('\n***Warning: invalid tempo passed to MIDI renderer. Using 120 bpm instead.\n')
+            print("\n***Warning: invalid tempo passed to MIDI renderer. Using 120 bpm instead.\n")
             tempo = mido.bpm2tempo(120)
             track.append(mido.MetaMessage('set_tempo', tempo=tempo))
 
@@ -693,12 +699,12 @@ class Song():
         try:
             track.append(mido.MetaMessage('key_signature', key=self.midi_key))
         except ValueError:
-            print('\n***Warning: invalid key passed to MIDI renderer. Using C instead.\n')
+            print("\n***Warning: invalid key passed to MIDI renderer. Using C instead.\n")
             track.append(mido.MetaMessage('key_signature', key='C'))
         try:
             track.append(mido.Message('program_change', program=self.midi_instrument, time=0))
         except ValueError:
-            print('\n***Warning: invalid instrument passed to MIDI renderer. Using piano instead.\n')
+            print("\n***Warning: invalid instrument passed to MIDI renderer. Using piano instead.\n")
             track.append(mido.Message('program_change', program=1, time=0))
 
         for line in self.lines:

@@ -29,8 +29,7 @@ class QueryMemoryError(QueryError):
 
 class InvalidQueryTypeError(InvalidQueryError):
     def __init__(self, explanation, obj_in, type_expect):
-        self.explanation = explanation + ': ' + str(type_expect.__name__) + ' expected, ' + str(
-            type(obj_in).__name__) + ' given.'
+        self.explanation = f"{explanation}: {type_expect.__name__} expected, {type(obj_in).__name__} given."
         super().__init__(self.explanation)
 
     pass
@@ -53,27 +52,24 @@ class Reply:
         self.is_valid = None
 
         if not isinstance(query, Query):
-            raise InvalidReplyError('this reply does not follow any query')
+            raise InvalidReplyError("this reply does not follow any query")
             
         self.sanitize_answer()
 
     def __repr__(self):
         try:
-            sender_name = str(self.query.get_sender().get_name())
-            recipient_name = str(self.query.get_recipient().get_name())
+            sender_name = self.query.get_sender().get_name()
+            recipient_name = self.query.get_recipient().get_name()
         except AttributeError:
-            sender_name = str(self.query.get_sender())
-            recipient_name = str(self.query.get_recipient())
+            sender_name = self.query.get_sender()
+            recipient_name = self.query.get_recipient()
             
-        string = '<' + self.__class__.__name__ + ' from ' + sender_name + ' to ' + recipient_name + ': '
         if isinstance(self.get_result(), str):
-            string += repr(self.get_result())
+            result_string = repr(self.get_result())
         else:
-            string += str(self.get_result())
-        string += ', valid=' + str(self.get_validity())
-        string += '>'
-
-        return string
+            result_string = str(self.get_result())
+ 
+        return f"<{self.__class__.__name__} from {sender_name} to {recipient_name}: {result_string}, valid={self.get_validity()}>"
 
     def get_answer(self):
         return self.answer
@@ -172,30 +168,31 @@ class Query:
         
     def __repr__(self):
         try:
-            sender_name = self.sender.get_name()
+            sender_name = str(self.sender.get_name())
         except AttributeError:
             sender_name = None
         try:
-            recipient_name = self.recipient.get_name()
+            recipient_name = str(self.recipient.get_name())
         except AttributeError:
-            recipient_name = None
-        string = '<' + self.__class__.__name__ + ' ' + str(self.get_identifier()) + ' from ' + str(sender_name) + ' to ' + str(recipient_name) + ': ' + repr(self.question)[:20] + '..., ' + str(self.reply_type) + ' expected'
-        
+            recipient_name = "None"
+                
         try:
             limits = self.get_limits()
             limits[0]
-            string += ', within ' + str(limits)
+            limits_string = ", within %s" % str(limits)
         except (TypeError, IndexError):
-            pass
-        string += ', answer='
+            limits_string = ''
+
         is_valid = self.get_reply_validity()
-        if is_valid is True:
-            string += 'valid'
-        elif is_valid is None:
-            string += 'None'
+        if is_valid is None:
+            answer_string = "None"
+        elif is_valid:
+            answer_string = "valid"
         else:
-            string += 'invalid'
-        string += '>'
+            answer_string = "invalid"
+        
+        string = f"<{self.__class__.__name__} {self.get_identifier()} from {sender_name} to {recipient_name}: \
+                  {repr(self.question)[:20]}..., {self.reply_type} expected{limits_string}, answer={answer_string}>"
 
         return string
 
@@ -315,9 +312,9 @@ class Query:
                 return [self.prerequisites]
     
     def get_locutor_name(self, locutor):
-        '''
+        """
         Try really hard to find a name for the locutor
-        '''
+        """
         if isinstance(locutor, str):
             locutor_name = locutor
         else:
@@ -354,21 +351,19 @@ class Query:
 
             if locutor_name not in self.valid_locutors_names:
                 locutor_ok = False
-                print('locutor is not in internal validation list')
+                print("locutor is not in internal validation list")
 
         if allowed != 'all':
             allowed = get_list_and_sanitize(allowed)
             if (locutor not in allowed) and (locutor_name not in allowed):
                 locutor_ok = False
-                raise InvalidQueryError('locutor not allowed for Query ID=' + str(self.get_identifier()) + \
-                                        ': ' + repr(str(locutor)) + '. It must be among ' + str(allowed))
+                raise InvalidQueryError(f"locutor not allowed for Query ID={self.get_identifier()}: '{locutor}'. It must be among '{allowed}'")
 
         if forbidden is not None:
             forbidden = get_list_and_sanitize(forbidden)
             if (locutor in forbidden) or locutor_name in forbidden:
                 locutor_ok = False
-                raise InvalidQueryError('locutor forbidden for Query ID=' + str(self.get_identifier()) + \
-                                        ': ' + repr(str(locutor)) + '. It must not be among ' + str(forbidden))
+                raise InvalidQueryError(f"locutor forbidden for Query ID={self.get_identifier()}: '{locutor}'. It must not be among '{forbidden}'")
 
         return locutor_ok
 
@@ -377,9 +372,7 @@ class Query:
         sender_ok = self.check_locutor(self.sender, allowed, forbidden)
 
         if not sender_ok:
-            raise InvalidQueryError('invalid sender for Query ID=' + str(self.get_identifier()) + \
-                                    ': ' + repr(str(self.sender)) + '. It must be among ' + str(
-                self.valid_locutors_names))
+            raise InvalidQueryError(f"invalid sender for Query ID={self.get_identifier()}: '{self.sender}'. It must be among '{self.valid_locutors_names}'")
 
         return sender_ok
 
@@ -388,12 +381,10 @@ class Query:
         recipient_ok = self.check_locutor(self.recipient, allowed, forbidden)
 
         if not recipient_ok:
-            raise InvalidQueryError('invalid recipient for Query ID=' + str(self.get_identifier()) + \
-                                    ': ' + repr(str(self.sender)) + '. It must be among ' + str(
-                self.valid_locutors_names))
-
+            raise InvalidQueryError(f"invalid recipient for Query ID={self.get_identifier()}: '{self.sender}'. It must be among '{self.valid_locutors_names}'")
+            
         if self.recipient == self.sender:
-            raise InvalidQueryError('sender cannot ask a question to itself')
+            raise InvalidQueryError("sender cannot ask a question to itself")
 
         return recipient_ok
 
@@ -403,7 +394,7 @@ class Query:
         if isinstance(self.get_question(), str):
             return True
         else:
-            raise InvalidQueryError('only string (str) questions are allowed at the moment')
+            raise InvalidQueryError("only string (str) questions are allowed at the moment")
 
         return False
 
@@ -421,19 +412,19 @@ class Query:
             
         #From now on limits is an non empty list or a non-None object
         if self.reply_type in [ReplyType.TEXT, ReplyType.NOTE, ReplyType.FILEPATH] and not isinstance(limits[0], str):
-            raise InvalidQueryTypeError('incorrect limits type', limits[0], str)
+            raise InvalidQueryTypeError("incorrect limits type", limits[0], str)
 
         if self.reply_type == ReplyType.INTEGER:
             try:
                 int(limits[0])
             except:
-                raise InvalidQueryTypeError('incorrect limits type', limits[0], int)
+                raise InvalidQueryTypeError("incorrect limits type", limits[0], int)
 
         if self.reply_type == ReplyType.INPUTMODE and not isinstance(limits[0], InputMode):
-            raise InvalidQueryTypeError('incorrect limits type', limits[0], InputMode)
+            raise InvalidQueryTypeError("incorrect limits type", limits[0], InputMode)
 
         if self.reply_type == ReplyType.RENDERMODES and not isinstance(limits[0], RenderMode):
-            raise InvalidQueryTypeError('incorrect limits type', limits[0], RenderMode)
+            raise InvalidQueryTypeError("incorrect limits type", limits[0], RenderMode)
 
         if self.reply_type == ReplyType.FILEPATH:
             if os.path.isdir(limits[0]):
@@ -442,10 +433,10 @@ class Query:
                 #limits is an extension
                 pass
             else: #Limits is neither an extension or a directory
-                InvalidQueryError('limit is neither a directory or an extension')
+                InvalidQueryError("limit is neither a directory or an extension")
 
         if any([type(limit) != type(limits[0]) for limit in limits]):
-            raise InvalidQueryError('limits are not all of the same type')
+            raise InvalidQueryError("limits are not all of the same type")
 
         # Smart guess of some common types
         if self.reply_type is None:
@@ -526,9 +517,9 @@ class Query:
                     is_reply_valid = True
 
                 if self.reply_type == ReplyType.FILEPATH and limits is not None:
-                    '''
+                    """
                     Checks if the file exist in the directories and with the extensions specified in limits
-                    '''
+                    """
                     directories = [lim for lim in limits if os.path.isdir(lim)]
                     extensions = [lim for lim in limits if not os.path.isdir(lim) and len(lim) >= 2 and len(lim) <= 5]
                     extensions = ['.'+ext.split('.')[-1] for ext in extensions]
@@ -583,9 +574,7 @@ class Query:
         result = []
         if self.help_required:
             result += [self.get_help_text()+'\n']
-        result += [self.get_foreword()]
-        result += [self.get_question()]
-        result += [self.get_afterword()]
+        result += [self.get_foreword(), self.get_question(), self.get_afterword()]
  
         try:
             result = '\n'.join(filter(None, result))
@@ -643,7 +632,7 @@ class Query:
         there is someone to listen, that your question is meaningful (or allowed) and then you can send your query
         """
         if self.is_replied and self.get_reply_validity():
-            raise QueryRepliedError('this question has already been correctly answered, you don''t need to send it twice.')
+            raise QueryRepliedError("this question has already been correctly answered, you don't need to send it twice.")
         #self.check_and_pack() I dunno if an additional checking is necessary
         self.stamp()
         self.is_sent = True
@@ -677,7 +666,7 @@ class Query:
         reply.get_validity()
         pre_satisfied = self.check_prerequisites()
         if not pre_satisfied:
-            raise InvalidReplyError('This Query requires other queries to be satisfied first.')
+            raise InvalidReplyError("This Query requires other queries to be satisfied first.")
         # TODO: decide if is_replied must be set to False if the reply is invalid.
         return reply
 
@@ -693,7 +682,7 @@ class QueryChoice(Query):
         try:
             kwargs['limits'][0]
         except (TypeError, IndexError, KeyError):
-            raise InvalidQueryError('QueryChoice called with no choices')
+            raise InvalidQueryError("QueryChoice called with no choices")
 
         super().__init__(*args, **kwargs)
 
@@ -703,17 +692,16 @@ class QueryChoice(Query):
         result = []
         if self.help_required:
             result += [self.get_help_text()]
-        result += [self.get_foreword()]
-        result += [self.get_question()]
+        result += [self.get_foreword(), self.get_question()]
         
         if self.reply_type == ReplyType.NOTE:
-            result[-1] += ' among ' + ', '.join(list(self.get_limits()))
+            result[-1] += " among %s" % ', '.join(list(self.get_limits()))
         elif self.reply_type in [ReplyType.INPUTMODE, ReplyType.RENDERMODES]:
-            choices = [str(i) + ') '+ str(choice.get_short_desc(self.get_recipient_locale())) for i, choice in enumerate(self.get_limits())]
-            result[-1] += ' among:\n\n' + '\n'.join(choices)
+            choices = ["{i:d}) {choice_str}".format(i=i, choice_str=choice.get_short_desc(self.get_recipient_locale())) for i, choice in enumerate(self.get_limits())]
+            result[-1] += " among:\n\n{choices_str}".format(choices_str='\n'.join(choices))
         else:
-            choices = [str(i) + ') '+ str(choice) for i, choice in enumerate(self.get_limits())]
-            result[-1] += ' among:\n\n' + '\n'.join(choices)
+            choices = ["{i:d}) {choices_str}".format(i=i, choices_str=str(choice)) for i, choice in enumerate(self.get_limits())]
+            result[-1] += " among:\n\n{choices_str}".format(choices_str='\n'.join(choices))
        
         result += [self.get_afterword()]
 
@@ -846,8 +834,7 @@ class QueryBoolean(QueryChoice):
         if self.help_required:
             result += [self.get_help_text()]
         result += [self.get_foreword()]
-        result += [self.get_question() + ' (' + (self.get_limits()[0] +
-                                                 '/' + self.get_limits()[1]) + ')']
+        result += [f"{self.get_question()} ({self.get_limits()[0]}/{self.get_limits()[1]})"]
         result += [self.get_afterword()]
         result = '\n'.join(filter(None, result))
         self.result = result
@@ -931,12 +918,12 @@ class QueryMemory:
 
     def __repr__(self):
 
-        string = '<' + self.__class__.__name__
         if self.topic is not None:
-            string += ' about ' + repr(self.topic)
-        string += ' with ' + str(
-            len(self.queries)) + ' stored queries>'
-        return string
+            topic_str = " about %s" % repr(self.topic)
+        else:
+            topic_str = ""
+
+        return f"<{self.__class__.__name__}{topic_str} with {len(self.queries)} stored queries>"
     
 
     def __len__(self):
@@ -953,9 +940,9 @@ class QueryMemory:
         else:
             print(self)
             for i, q in enumerate(queries):
-                print('----query#' + str(i) + '----')
+                print("----query#%d----"%i)
                 print(q)
-                print('---------------')
+                print("---------------")
 
 
     def recall_filtered(self, filters=None, sort_by=None):
@@ -1156,7 +1143,7 @@ class QueryMemory:
             for q in query:
                 self.queries.append(q)
         else:
-            raise InvalidQueryError('cannot store ' + str(type(query)) + ' in memory, only ' + str(Query.__name__) + ' are supported')
+            raise InvalidQueryError(f"cannot store {type(query)} in memory, only {Query.__name__} are supported")
 
         return True
     
@@ -1224,7 +1211,7 @@ class QueryMemory:
                 edgeless_nodes.add((i, q))
 
         if len(edgeless_nodes) == 0:
-            raise QueryMemoryError('Queries have a circular dependency')
+            raise QueryMemoryError("Queries have a circular dependency")
         
         
         sorted_nodes = list()  # L
@@ -1251,7 +1238,7 @@ class QueryMemory:
             self.queries = [self.queries[node[0]] for node in sorted_nodes]
             return self.queries
         else:
-            raise QueryMemoryError('Topological sort has failed at i=' + str(i))
+            raise QueryMemoryError("Topological sort has failed at i=%d" % i)
             return None
 
 

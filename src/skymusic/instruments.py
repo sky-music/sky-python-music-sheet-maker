@@ -16,8 +16,6 @@ except (ImportError, ModuleNotFoundError):
     no_mido_module = True
 
 
-# ## Instrument classes
-
 class Instrument:
 
     def __init__(self, maker):
@@ -33,8 +31,7 @@ class Instrument:
         self.directory_elements = os.path.join(self.directory_base, 'src', 'skymusic', 'resources', 'elements')
         self.directory_fonts = os.path.join(self.directory_base, 'src', 'skymusic', 'resources', 'fonts')
         self.empty_chord_png = os.path.normpath(os.path.join(self.directory_elements, 'empty-chord.png'))  # blank harp
-        self.unhighlighted_chord_png = os.path.normpath(os.path.join(self.directory_elements,
-                                                                     'unhighlighted-chord.png'))  # harp with unhighlighted notes
+        self.unhighlighted_chord_png = os.path.normpath(os.path.join(self.directory_elements, 'unhighlighted-chord.png'))  # harp with unhighlighted notes
         self.broken_png = os.path.normpath(os.path.join(self.directory_elements, 'broken-symbol.png'))
         self.silent_png = os.path.normpath(os.path.join(self.directory_elements, 'silent-symbol.png'))
         self.png_chord_size = None
@@ -57,12 +54,13 @@ class Instrument:
         self.chord_skygrid = chord_skygrid
 
     def get_chord_skygrid(self):
-        """Returns the dictionary for the chord:
-            where each key is the note position (tuple of row/index),
-            the value is a dictionary with key=frame, value=True/False,
-            where True/False means whether the note is played or not.
-            Inactive notes are actually not in the dictionary at all.
-            Example: {(0,0):{0:True}, (1,1):{0:True}}
+        """
+        Returns the dictionary for the chord:
+        where each key is the note position (tuple of row/index),
+        the value is a dictionary with key=frame, value=True/False,
+        where True/False means whether the note is played or not.
+        Inactive notes are actually not in the dictionary at all.
+        Example: {(0,0):{0:True}, (1,1):{0:True}}
         """
         return self.chord_skygrid
 
@@ -150,13 +148,7 @@ class Voice(Instrument):  # Lyrics or comments
 
     def render_in_html(self, note_width):
         """Renders the lyrics text in HTML inside an invisible table"""
-        chord_render = '<table class=\"voice\">'
-        chord_render += '<tr>'
-        chord_render += '<td>'
-        chord_render += self.lyric
-        chord_render += '</td>'
-        chord_render += '</tr>'
-        chord_render += '</table>'
+        chord_render = f'<table class="voice"><tr><td>{self.lyric}</td></tr></table>'
         return chord_render
 
     def get_lyric(self):
@@ -169,27 +161,26 @@ class Voice(Instrument):  # Lyrics or comments
         return len(self.lyric)
 
     def __str__(self):
-        return '<' + self.type + '-' + str(self.index) + ', ' + str(len(self)) + ' chars, repeat=' + str(
-            self.repeat) + '>'
-
+        return f'<{self.type}-{self.index}, {len(self)} chars, repeat={self.repeat}>'
+                
     def render_in_ascii(self, render_mode):
-        chord_render = '#' + self.lyric + ' '  # Lyrics marked as comments in output text files
+        chord_render = "#%s "%self.lyric  # Lyrics marked as comments in output text files
         return chord_render
 
     def get_lyric_height(self):
         """Calculates the height of the lyrics based on a standard text and the font size"""
         if self.lyric_height is None:
             fnt = ImageFont.truetype(self.font, self.font_size)
-        return fnt.getsize('HQfgjyp')[1]
+        return fnt.getsize('HQfgjyp')[1] #Uppercase H and characters with tails
 
-    def render_in_svg(self, x, width, height, aspect_ratio):
+    def render_in_svg(self, x, width: str, height: str, aspect_ratio):
         """Renders the lyrics text in SVG"""
-        voice_render = '\n<svg x=\"' + '%.2f' % x + '\" y=\"0\" width=\"100%\" height=\"' + height + '\" class=\"voice voice-' + str(
-            self.get_index()) + '\">'
-        voice_render += '\n<text x=\"0%\" y=\"50%\" class=\"voice voice-' + str(
-            self.get_index()) + '\">' + self.lyric + '</text>'
-        voice_render += '\n</svg>'
+        voice_render = (f'\n<svg x="{x : .2f}" y="0" width="100%" height="{height}" class="voice voice-{self.get_index()}">'
+                        f'\n<text x="0%" y="50%" class="voice voice-{self.get_index()}">{self.lyric}</text>'
+                        f'\n</svg>')
+
         return voice_render
+    
 
     def render_in_png(self, rescale=1.0):
         """Renders the lyrics text in PNG"""
@@ -240,8 +231,8 @@ class Harp(Instrument):
         return self.column_count * self.row_count
 
     def __str__(self):
-        return '<' + self.type + '-' + str(self.index) + ', ' + str(len(self)) + ' notes, ' + \
-               str(self.get_num_highlighted()) + ' highlighted, repeat=' + str(self.repeat) + '>'
+        return f'<{self.type}-{self.index}, {len(self)} notes, {self.get_num_highlighted()} highlighted, repeat={self.repeat}>'
+        
 
     def get_note_from_position(self, pos):
         """Returns the note type Root, Diamond, Circle from the position in Sky grid"""
@@ -275,66 +266,59 @@ class Harp(Instrument):
         return ascii_chord
 
     def render_in_html(self, note_width):
-
+        """
+        Renders the Instrument in HTML
+        """
         harp_silent = self.get_is_silent()
         harp_broken = self.get_is_broken()
 
         if harp_broken:
-            class_suffix = 'broken'
+            class_suffix = "broken"
         elif harp_silent:
-            class_suffix = 'silent'
+            class_suffix = "silent"
         else:
             class_suffix = ''
 
-        harp_render = '<table class=\"harp harp-' + str(self.get_index()) + ' ' + class_suffix + '">'
+        harp_render = f'<table class="harp harp-{self.get_index()} {class_suffix}">'
 
         for row in range(self.get_row_count()):
 
             harp_render += '<tr>'
-
             for col in range(self.get_column_count()):
-                harp_render += '<td>'
-
                 note = self.get_note_from_position((row, col))
-
-                note_render = note.render_in_html(note_width)
-                harp_render += note_render
-                harp_render += '</td>'
-
+                note_render = note.render_in_html(note_width)                
+                harp_render += f'<td>{note_render}</td>'
             harp_render += '</tr>'
 
         harp_render += '</table>'
 
         if self.get_repeat() > 1:
-            harp_render += '<table class=\"harp-' + str(self.get_index()) + ' repeat\">'
-            harp_render += '<tr>'
-            harp_render += '<td>'
-            harp_render += 'x' + str(self.get_repeat())
-            harp_render += '</td>'
-            harp_render += '</tr>'
-            harp_render += '</table>'
+            harp_render += (f'<table class="harp-{self.get_index()} repeat">'
+                            f'<tr><td>x{self.get_repeat()}</td></tr>'
+                            f'</table>')
 
         return harp_render
 
-    def render_in_svg(self, x, harp_width, harp_height, aspect_ratio):
 
+    def render_in_svg(self, x, harp_width, harp_height, aspect_ratio):
+        """
+        Renders the Instrument in SVG
+        """
         harp_silent = self.get_is_silent()
         harp_broken = self.get_is_broken()
 
         if harp_broken:
-            class_suffix = 'broken'
+            class_suffix = "broken"
         elif harp_silent:
-            class_suffix = 'silent'
+            class_suffix = "silent"
         else:
             class_suffix = ''
 
         # The chord SVG container
-        harp_render = '\n<svg x=\"' + '%.2f' % x + '\" y=\"0\" width=\"' + harp_width + '\" height=\"' + harp_height + '\" class=\"instrument-harp harp-' + str(
-            self.get_index()) + ' ' + class_suffix + '\">'
+        harp_render = f'\n<svg x="{x : .2f}" y="0" width="{harp_width}" height="{harp_height}" class="instrument-harp harp-{self.get_index()} {class_suffix}">'
 
         # The chord rectangle with rounded edges
-        harp_render += '\n<rect x=\"0.7%\" y=\"0.7%\" width=\"98.6%\" height=\"98.6%\" rx=\"7.5%\" ry=\"' + '%.2f' % (
-                7.5 * aspect_ratio) + '%\" class=\"harp harp-' + str(self.get_index()) + '\"/>'
+        harp_render += f'\n<rect x="0.7%" y="0.7%" width="98.6%" height="98.6%" rx="7.5%" ry="{7.5 * aspect_ratio : .2f}%" class="harp harp-{self.get_index()}"/>'
 
         for row in range(self.get_row_count()):
             for col in range(self.get_column_count()):
@@ -346,10 +330,7 @@ class Harp(Instrument):
                 yn = 0.15 + row * (1 - 2 * 0.16) / (self.get_row_count() - 1) - note_width / 2.0
 
                 # NOTE RENDER
-                note_render = note.render_in_svg('%.2f' % (100 * note_width) + '%', '%.2f' % (100 * xn) + '%',
-                                                 '%.2f' % (100 * yn) + '%')
-
-                harp_render += note_render
+                harp_render += note.render_in_svg(f"{100*note_width : .2f}%", f"{100*xn : .2f}%", f"{100*yn : .2f}%")
 
         harp_render += '</svg>'
 
