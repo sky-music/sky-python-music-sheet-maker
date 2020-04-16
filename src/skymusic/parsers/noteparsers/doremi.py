@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import re
 
 from . import noteparser
@@ -28,11 +29,11 @@ class Doremi(noteparser.NoteParser):
         }
 
         # Compile regexes for notes to save before using
-        self.note_name_with_octave_regex = re.compile(r'([DRMFSLTdrmfslt][OEIAoeia][Ll]?[b#]?\d)')
-        self.note_name_regex = re.compile(r'([DRMFSLTdrmfslt][OEIAoeia][Ll]?[b#]?)')
-        self.single_note_name_regex = re.compile(r'\b[DRMFSLTdrmfslt][OEIAoeia][Ll]?[b#]?\d?\b')
+        self.note_name_with_octave_regex = re.compile(r'([DRMFSLTdrmfslt][OEIAoeia][Ll]?[b#♭♯]?\d)')
+        self.note_name_regex = re.compile(r'([DRMFSLTdrmfslt][OEIAoeia][Ll]?[b#♭♯]?)')
+        self.single_note_name_regex = re.compile(r'\b[DRMFSLTdrmfslt][OEIAoeia][Ll]?[b#♭♯]?\d?\b')
         self.note_octave_regex = re.compile(r'\d')
-        self.not_note_name_regex = re.compile(r'[^DRMFSLTOEIAdrmfsltoeiab#]+')
+        self.not_note_name_regex = re.compile(r'[^DRMFSLTOEIAdrmfsltoeiab#♭♯]+')
         self.not_octave_regex = re.compile(r'[^\d]+')
 
     def sanitize_note_name(self, note_name):

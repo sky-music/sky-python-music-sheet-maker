@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import re
 
 from . import noteparser
@@ -13,11 +14,11 @@ class Jianpu(noteparser.NoteParser):
                                      '5b': 6, '5': 7, '5#': 8, '6b': 8, '6': 9, '6#': 10, '7b': 10, '7': 11}
 
         # Compile regexes for notes to save before using
-        self.note_name_with_octave_regex = re.compile(r'([1234567][b#]?[\\+\\-]+)')
-        self.note_name_regex = re.compile(r'([1234567][b#]?)')
-        self.single_note_name_regex = re.compile(r'\b[1234567][b#]?[\\+\\-]?\b')
+        self.note_name_with_octave_regex = re.compile(r'([1234567][b#♭♯]?[\\+\\-]+)')
+        self.note_name_regex = re.compile(r'([1234567][b#♭♯]?)')
+        self.single_note_name_regex = re.compile(r'\b[1234567][b#♭♯]?[\\+\\-]?\b')
         self.note_octave_regex = re.compile(r'[\\+\\-]+')
-        self.not_note_name_regex = re.compile(r'[^1234567b#]+')
+        self.not_note_name_regex = re.compile(r'[^1234567b#♭♯]+')
         self.not_octave_regex = re.compile(r'[^\\+\\-]+')
 
         self.inverse_position_map = {

@@ -252,10 +252,10 @@ class SongParser:
         # Remove surnumerous spaces from line
         line = line.strip()
         
-        if self.icon_delimiter == '\s':
-            line = re.sub(self.icon_delimiter + '{2,' + str(max(2, len(line))) + '}', self.icon_delimiter, line)
-        else:
-            line = re.sub(re.escape(self.icon_delimiter) + '{2,' + str(max(2, len(line))) + '}', self.icon_delimiter,
+#        if self.icon_delimiter == '\s':
+#            line = re.sub(self.icon_delimiter + '{2,' + str(max(2, len(line))) + '}', self.icon_delimiter, line)
+#        else:
+        line = re.sub(re.escape(self.icon_delimiter) + '{2,' + str(max(2, len(line))) + '}', re.escape(self.icon_delimiter),
                       line)  # removes surnumerous spaces
         
         return line

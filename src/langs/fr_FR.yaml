@@ -17,6 +17,9 @@ input_mode:
     englishchords:
         short_desc: Chords CDEFGABmaj
         long_desc: "Nom d'accord anglais (par exemple C, F, Dm, Bdim, A+, Csus2, Dsus4, C6, Cmaj7, Dm11)"
+    doremijp:
+        short_desc: 日本語イタリアドレミ
+        long_desc: "do re mi en japonais: ド、ド#／レb、レ、レ#／ミb、ミ、ファ、ファ#／ソb、ソ、ソ#／ラb、ラ、ラ#／シb、シ"
 render_mode:
     html:
         short_desc: partition graphique en HTML
@@ -40,6 +43,8 @@ song_meta:
    transcript: Transcripteur
    musical_key: Clef musicale
    untitled: Sans titre
+open_file: |
+    (Fichier de notes ouvert depuis {0})
 stock_queries:
   instructions_stdout:
     foreword: "===== PORTEES VISUELLES POUR SKY:CHILDREN OF THE LIGHT ===\n"
@@ -89,7 +94,7 @@ stock_queries:
     help_text:
   render_modes:
     foreword:
-    question: Please choose one or several output rendering formats
+    question: Merci de choisir les formats d'exportation de la chanson
     afterword:
     input_tip: cochez ou décochez les différents choix
     help_text: |
@@ -137,7 +142,8 @@ stock_queries:
       Pour les accords (notes juées simultanément) laissez les notes collées (par ex. domi)
   one_input_mode:
     foreword:
-    question: "Nous avons détecté que vous utilisez la notation suivante: {0}."
+    question: |
+        Nous avons détecté que vous utilisez la notation suivante: '{0}'.
     afterword:
     input_tip: cliquez sur OK pour passer
     help_text:

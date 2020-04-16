@@ -18,6 +18,9 @@ input_mode:
     englishchords:
         short_desc: Hợp âm Tiếng Anh CDEFGABmaj
         long_desc: "Nốt có hợp âm Tiếng Anh ngắn (VD: C, F, Dm, Bdim, A+, Csus2, Dsus4, C6, Cmaj7, Dm11)"
+    doremijp:
+        short_desc: 日本語イタリアドレミ
+        long_desc: "Japanese do re mi: ド、ド#／レb、レ、レ#／ミb、ミ、ファ、ファ#／ソb、ソ、ソ#／ラb、ラ、ラ#／シb、シ"
 render_mode:
     html:
         short_desc: bảng nhạc trực quan HTML 
@@ -41,6 +44,8 @@ song_meta:
    transcript: Người dịch
    musical_key: Phím nhạc
    untitle: Untitled
+open_file: |
+    (Notes imported from {0})
 stock_queries:
   instructions_stdout:
     foreword: "===== BẢNG NHẠC TRỰC QUAN CHO TỰA GAME: SKY: CHILDREN OF THE LIGHT =====\n"
@@ -116,7 +121,7 @@ stock_queries:
     help_text: 'Người dịch là người viết bài nhạc này, nó cũng có thể là bạn!'
   notes_file:
     foreword:
-    question: 'Nhập, hoặc dán nốt vào, hoặc nhập tên tệp (trong thư mục %s/)'
+    question: 'Nhập, hoặc dán nốt vào, hoặc nhập tên tệp (trong thư mục {0}/)'
     afterword:
     input_tip: Tên nốt như dạng C1 D1F1, hoặc tên tệp như song.txt
     help_text: |
@@ -124,7 +129,7 @@ stock_queries:
       Bạn cũng có thể nhập đường dẫn đến một tệp bao gồm các nốt.
   file:
     foreword:
-    question: 'Nhập tên tệp (trong %s/)'
+    question: 'Nhập tên tệp (trong {0}/)'
     afterword:
     input_tip: Bất kì tên tệp chứa nốt nhạc.
     help_text:
@@ -138,7 +143,8 @@ stock_queries:
       Đối với hợp âm (nốt được chơi cùng nhau), dính chúng lại với nhau (VD: C1D1)
   one_input_mode:
     foreword:
-    question: "Nhận dạng là bạn đang sử dụng hệ kí tự: %s."
+    question: |
+        Nhận dạng là bạn đang sử dụng hệ kí tự: '{0}'.
     afterword:
     input_tip: Bấm OK để tiếp tục
     help_text:
@@ -160,12 +166,12 @@ stock_queries:
     help_text:
   one_possible_key:
     foreword:
-    question: 'Bài hát của bạn có thể chuyển đúng sang Sky với phím: %s'
+    question: 'Bài hát của bạn có thể chuyển đúng sang Sky với phím: {0}'
     afterword:
     input_tip: Bấm OK để tiếp tục
     help_text:
   possible_keys:
-    foreword: 'Bài hát của bạn có thể chuyển đúng sang Sky với những phím sau: %s.'
+    foreword: 'Bài hát của bạn có thể chuyển đúng sang Sky với những phím sau: {0}.'
     question: Hãy chọn phím nhạc bạn muốn sử dụng
     afterword:
     input_tip: Nhập số (giữa 0 và n-1)
@@ -192,20 +198,20 @@ stock_queries:
       Nếu bạn đã ghi rõ số quãng tám và nó quá cao để có thể chơi trong hệ thống nhạc của Sky, bạn có thể giảm xuống bằng cách nhập số âm.'  
   no_song_file:
     foreword: ---------------------------------------
-    question: 'Bài hát %s của bạn không được lưu vào tệp.'
+    question: 'Bài hát {0} của bạn không được lưu vào tệp.'
     afterword:
     input_tip: Bấm OK để tiếp tục
     help_text:
   one_song_file:
     foreword: ---------------------------------------
-    question: 'Bài hát %s của bạn được lưu vào: %s'
+    question: 'Bài hát {0} của bạn được lưu vào: {1}'
     afterword:
     input_tip: Bấm OK để tiếp tục
     help_text:
   several_song_files:
     foreword: ---------------------------------------
-    question: 'Bài hát %s của bạn được lưu vào: %s'
-    afterword: 'Bài hát của bạn được chia thành %s tệp giữa"%s" và "%s"'
+    question: 'Bài hát {0} của bạn được lưu vào: {1}'
+    afterword: 'Bài hát của bạn được chia thành {0} tệp giữa"{1}" và "{2}"'
     input_tip: Bấm OK để tiếp tục
     help_text:
   few_errors:

@@ -87,7 +87,7 @@ def get_string(key, locale=None, replacements=()):
     for i in key_list:
         if i not in obj:
             if warn_count < 10:
-                print("\n***WARNING: could not find lang key '{i}' for locale '{locale}'\n")
+                print(f"\n***WARNING: could not find lang key '{i}' for locale '{locale}'\n")
                 warn_count += 1
             return ''
             # raise KeyError(f"Unknown lang key: {i}")

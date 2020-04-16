@@ -400,7 +400,7 @@ class MusicSheetMaker:
 
                 if isfile and self.is_commandline(recipient):
                     notes = self.read_file(file_path)
-                    print("(Song imported from %s)" % os.path.abspath(file_path))
+                    print(Lang.get_string("open_file", self.locale).format(os.path.abspath(file_path)))
                 else:
                     notes = result.split(os.linesep)  # Returns a list of strings in any case
 

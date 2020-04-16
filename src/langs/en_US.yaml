@@ -43,6 +43,8 @@ song_meta:
    transcript: Transcript writer
    musical_key: Musical key
    untitled: Untitled
+open_file: |
+    (Notes imported from {0})
 stock_queries:
   instructions_stdout:
     foreword: "===== VISUAL MUSIC SHEETS FOR SKY:CHILDREN OF THE LIGHT =====\n"
@@ -141,7 +143,8 @@ stock_queries:
       Leave the field blank and press enter if you are finished.
   one_input_mode:
     foreword:
-    question: "We detected that you use the following notation: {0}."
+    question: |
+        We detected that you use the following notation: '{0}'.
     afterword:
     input_tip: click OK to acknowledge
     help_text:

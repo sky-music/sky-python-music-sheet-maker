@@ -1,5 +1,3 @@
-#import re
-
 from . import english
 
 class EnglishChords(english.English):
