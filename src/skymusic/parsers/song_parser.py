@@ -26,9 +26,11 @@ class SongParser:
 
     def __init__(self, maker):
 
+        #Delimiters must be character or strings
+        # Only one regex is supported: '\s' 
         self.input_mode = None
         self.note_parser = None
-        self.icon_delimiter = ' '
+        self.icon_delimiter = '\s'
         self.pause = '.'
         self.quaver_delimiter = '-'
         self.comment_delimiter = '#'
@@ -86,14 +88,19 @@ class SongParser:
 
         delims = [self.icon_delimiter, self.pause, self.quaver_delimiter, self.comment_delimiter, self.repeat_indicator]
 
+        if self.comment_delimiter == '\s' or re.match('\s', self.comment_delimiter):
+            print("***WARNING: You cannot use a blank delimiter to indicate comments")
+        if self.comment_delimiter == '\s' or re.match('\s', self.repeat_indicator):
+            print("***WARNING: You cannot use a blank delimiter to indicate repetition")
+
         parser = self.get_note_parser()
         if parser is not None:
             for delim in delims:
                 if (parser.not_note_name_regex.match(delim) is None or parser.not_octave_regex.match(
                         delim) is None) and delim != self.comment_delimiter:
-                    print(f"You chose an invalid delimiter for notation {self.input_mode.get_short_desc(self.locale)}: {delim}")
+                    print(f"***WARNING: You chose an invalid delimiter for notation {self.input_mode.get_short_desc(self.locale)}: {delim}")
                 if delims.count(delim) > 1:
-                    print(f"You chose twice the same delimiter for notation {self.input_mode.get_short_desc(self.locale)}: {delim}")
+                    print("***WARNING: You used the same delimiter for different purposes.")
 
     def get_possible_modes(self, song_lines=None):
 
@@ -150,12 +157,14 @@ class SongParser:
 
         """
         An icon is a collection of chords assembled with '-': ['A1C2-F3D4', 'C#4B4-Gb3A2']
-        This method splits an icon into alist of chords:  ['A1C2', 'F3D4', 'C#4B4', 'Gb3A2']
+        This method splits an icon into a list of chords:  ['A1C2', 'F3D4', 'C#4B4', 'Gb3A2']
         """
-
         if delimiter is None:
             delimiter = self.quaver_delimiter
-        return icon.split(delimiter)
+            if delimiter == '\s':
+                return re.compile(delimiter).split(icon)
+            else:
+                return icon.split(delimiter)
 
     def split_chord(self, chord, note_parser=None):
         """
@@ -242,9 +251,13 @@ class SongParser:
 
         # Remove surnumerous spaces from line
         line = line.strip()
-        line = re.sub(re.escape(self.icon_delimiter) + '{2,' + str(max(2, len(line))) + '}', self.icon_delimiter,
+        
+        if self.icon_delimiter == '\s':
+            line = re.sub(self.icon_delimiter + '{2,' + str(max(2, len(line))) + '}', self.icon_delimiter, line)
+        else:
+            line = re.sub(re.escape(self.icon_delimiter) + '{2,' + str(max(2, len(line))) + '}', self.icon_delimiter,
                       line)  # removes surnumerous spaces
-
+        
         return line
 
     def parse_line(self, line, song_key='C', note_shift=0):
@@ -263,7 +276,11 @@ class SongParser:
                         voice.set_lyric(lyric.strip())
                         instrument_line.append(voice)
             else:
-                icons = line.split(self.icon_delimiter)
+                if self.icon_delimiter == '\s':
+                    icons = re.compile(self.icon_delimiter).split(line)
+                else:
+                    icons = line.split(self.icon_delimiter)            
+                
                 for icon in icons:
                     chords = self.split_icon(icon)
                     # From here, real chords are still glued, quavers have been split in different list slots
