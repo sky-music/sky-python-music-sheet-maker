@@ -253,9 +253,9 @@ class MusicSheetMaker:
     def ask_instructions(self, recipient, prerequisites=None, execute=True):
 
         question_rep = ('\n'.join(['\n* ' + input_mode.get_long_desc(self.locale) for input_mode in InputMode]),
-                        self.get_song_parser().get_icon_delimiter(), self.get_song_parser().get_pause(),
-                        self.get_song_parser().get_quaver_delimiter(),
-                        self.get_song_parser().get_quaver_delimiter().join(['A1', 'B1', 'C1']),
+                        self.get_song_parser().get_icon_delimiter().replace('\s','<space>'), self.get_song_parser().get_pause().replace('\s','<space>'),
+                        self.get_song_parser().get_quaver_delimiter().replace('\s','<space>'),
+                        self.get_song_parser().get_quaver_delimiter().replace('\s','<space>').join(['A1', 'B1', 'C1']),
                         self.get_song_parser().get_repeat_indicator() + '2'
                         )
 
