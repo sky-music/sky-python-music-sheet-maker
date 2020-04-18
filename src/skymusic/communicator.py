@@ -422,7 +422,6 @@ class Communicator:
             else:
                 if isinstance(buffers[0], (io.BytesIO, io.StringIO)):
                     results_dicts.append({
-                        'result': {'result_type': type(buffers[0])},
                         'song_files': [{'file_type': render_modes[i].mime_type, 'base_name': 'file_', 'number': i,
                                         'ext': render_modes[i].extension} for i, buffer in enumerate(buffers)],
                         'save': [{'name': 'file_' + str(i) + render_modes[i].extension, 'buffer': buffer} for i, buffer
