@@ -87,5 +87,4 @@ class ReplyType(Enum):
     INPUTMODE = 4  # modes.InputMode
     RENDERMODES = 5
     FILEPATH = 6  # A file path
-    BUFFERS = 7
-    OTHER = 8
+    OTHER = 7

@@ -69,7 +69,7 @@ class Communicator:
             'create_song': {'class': QueryOpen.__name__,
                             'handler': 'create_song',  # The name of the method that must be executed by the recipient
                             'question': 'create_song',
-                            'reply_type': ReplyType.BUFFERS
+                            'reply_type': ReplyType.OTHER
                             },
 
             # Generic Query
@@ -406,34 +406,31 @@ class Communicator:
 
     def reply_to_website_result(self, reply):
 
-        results = reply.get_result()  # Should be a list of IOString or IOBytes buffers and a list of RenderModes
+        song_bundle = reply.get_result()  # Should be a SongBundle object
 
-        if not isinstance(results, list):
-            results = [results]
+        result_dict = {}
+        
+        result_dict.update({'song_meta': song_bundle.get_meta()})
+        result_dict.update({'song_files': []})
+        result_dict.update({'saves': []})
 
-        results_dicts = []
+        for render_mode, buffers in song_bundle.get_all_renders().items():
 
-        for (buffers, render_modes) in results:
+            if not isinstance(render_mode, RenderMode):
+                raise CommunicatorError(f"Unexpected type for song_bundle key:{type(render_mode)}")
+            if not isinstance(buffers, (list, tuple)):
+                raise CommunicatorError(f"Unexpected type for song_bundle value:{type(buffers)}")            
+            if not isinstance(buffers[0], (io.BytesIO, io.StringIO)):
+                raise CommunicatorError(f"Unexpected type for song_bundle value:{type(buffers[0])}")
+            
+            result_dict['song_files'] += [{'file_type': render_mode.mime_type, 'base_name': 'file_', 'number': i,
+                                'ext': render_mode.extension} for i, buffer in enumerate(buffers)]
+            
+            result_dict['saves'] += [{'name': 'file_' + str(i) + render_mode.extension, 'buffer': buffer} for i, buffer
+                         in enumerate(buffers)]
+            
+        return result_dict
 
-            try:
-                buffers[0]
-            except (TypeError, KeyError):
-                raise CommunicatorError("Song buffers are not wrapped in a list, but a single object of type %s" % str(type(buffers)))
-            else:
-                if isinstance(buffers[0], (io.BytesIO, io.StringIO)):
-                    results_dicts.append({
-                        'song_files': [{'file_type': render_modes[i].mime_type, 'base_name': 'file_', 'number': i,
-                                        'ext': render_modes[i].extension} for i, buffer in enumerate(buffers)],
-                        'save': [{'name': 'file_' + str(i) + render_modes[i].extension, 'buffer': buffer} for i, buffer
-                                 in enumerate(buffers)]
-                    })
-                elif buffers[0] is None:
-                    print("A None buffer was passed to WebsitePlayer.")
-                    pass
-                else:
-                    raise CommunicatorError(f"Cannot process {type(buffers[0])}")
-
-        return results_dicts
 
     def queries_to_website_questions(self, queries):
         '''

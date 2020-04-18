@@ -501,17 +501,6 @@ class Query:
                 elif self.reply_type == ReplyType.RENDERMODES:
                     if isinstance(answers[0], RenderMode) or isinstance(answers[0], (str,int)):
                         is_reply_valid = True #A render mode can be chosen using its order number in a list or its string description
-                elif self.reply_type == ReplyType.BUFFERS:
-
-                    try:
-                        buffers, render_modes = answers[0]
-                    except (TypeError, ValueError):
-                        is_reply_valid = False
-                    else:
-                        if isinstance(buffers[0],(io.BytesIO, io.StringIO)) and isinstance(render_modes[0], RenderMode):
-                            is_reply_valid = True
-                        else:
-                            is_reply_valid = False
 
                 else:
                     is_reply_valid = True

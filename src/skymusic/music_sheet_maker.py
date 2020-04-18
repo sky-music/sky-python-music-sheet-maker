@@ -18,6 +18,71 @@ class MusicSheetMakerError(Exception):
     pass
 
 
+
+class SongBundle:
+    """
+    An object containing a song rendered in several formats
+    """
+    def __init__(self):
+        
+        self.meta = {}
+        self.renders = {} #{render_mode: [buffers]}
+
+    def __len__(self):
+        
+        return len(self.renders.keys())
+     
+    def get_size(self):
+        
+       return ( len(self.renders.keys()), sum([len(buffers) for buffers in self.renders.values()]) )     
+        
+    def __repr__(self):
+        
+        size = self.get_size()
+        return f'<SongBundle, {size[0]} render modes, {size[1]} buffers total>'
+        
+    def set_meta(self, meta: dict):
+        
+        self.meta.update(meta)
+
+    def get_song_title(self):
+        
+        try:
+            return self.meta['title']
+        except KeyError:
+            return ''
+        
+    def get_meta(self):
+        
+        return self.meta
+    
+    def add_render(self, render_mode, buffers):
+        
+        if render_mode not in RenderMode:
+            raise MusicSheetMakerError(f'{render_mode} passed to SongBundle is not a valid RenderMode')
+
+        if not isinstance(buffers, (list, tuple, set)):
+            buffers = [buffers]
+
+        if any([not isinstance(buffer, (io.StringIO, io.BytesIO)) for buffer in buffers]):
+            raise MusicSheetMakerError('An invalid buffer type was passed to SongBundle')
+        
+        self.renders.update({render_mode: buffers})
+
+
+    def get_render(self, render_mode):
+        
+        if render_mode in self.renders:
+            return self.renders[render_mode]
+        else:
+            return None
+
+    def get_all_renders(self):
+        
+        return self.renders
+
+
+
 class MusicSheetMaker:
 
     def __init__(self, locale='en_US', songs_in='test_songs', songs_out='songs_out'):
@@ -740,25 +805,32 @@ class MusicSheetMaker:
             else:
                 render_modes = self.render_modes_enabled
 
+
+        song_bundle = SongBundle()
+        song_bundle.set_meta(self.get_song().get_meta())
+
         if self.is_commandline(recipient):
 
             print("=" * 40)
-            song_bundle = []
+#            song_bundle = []
             for render_mode in render_modes:
                 buffers = self.write_song_to_buffers(render_mode)  # A list of IOString or IOBytes buffers
                 file_paths = self.build_file_paths(render_mode, len(buffers))
                 self.send_buffers_to_files(render_mode, buffers, file_paths, recipient=recipient)
-                song_bundle.append((buffers, [render_mode] * len(buffers)))
+#                song_bundle.append((buffers, [render_mode] * len(buffers)))
+                song_bundle.add_render(render_mode, buffers)
 
         else:  # website or botcog or...
 
             self.css_mode = CSSMode.EMBED  # Prevent the HTML/SVG from depending on an auxiliary .css file
-            song_bundle = []  # A list of tuples
+            #song_bundle = []  # A list of tuples
             for render_mode in render_modes:
                 buffers = self.write_song_to_buffers(render_mode)  # A list of IOString or IOBytes buffers
-                song_bundle.append((buffers, [render_mode] * len(buffers)))
+#                song_bundle.append((buffers, [render_mode] * len(buffers)))
+                song_bundle.add_render(render_mode, buffers)
 
         return song_bundle
+
 
     def send_buffers_to_files(self, render_mode, buffers, file_paths, recipient, prerequisites=None, execute=True):
         """

@@ -175,6 +175,12 @@ class Song():
             return max(list(map(len, self.lines)))
         else:
             return 0
+     
+    
+    def get_meta(self):
+        
+        return self.meta
+        
         
     def set_meta(self, **kwargs):
                 
