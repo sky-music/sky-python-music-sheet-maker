@@ -1,4 +1,4 @@
-import io
+import io, re
 from src.skymusic.modes import InputMode, RenderMode, ReplyType
 from src.skymusic.communication import QueryOpen, QueryChoice, QueryMultipleChoices, QueryMemory, Information
 from src.skymusic import Lang
@@ -414,6 +414,10 @@ class Communicator:
         result_dict.update({'song_files': []})
         result_dict.update({'saves': []})
 
+        sanitized_title = re.sub(r'[\\/:"*?<>|]', '', re.escape(song_bundle.get_meta()['title'])).strip()
+        if len(sanitized_title) == 0:
+            sanitized_title = 'Untitled'
+
         for render_mode, buffers in song_bundle.get_all_renders().items():
 
             if not isinstance(render_mode, RenderMode):
@@ -423,10 +427,10 @@ class Communicator:
             if not isinstance(buffers[0], (io.BytesIO, io.StringIO)):
                 raise CommunicatorError(f"Unexpected type for song_bundle value:{type(buffers[0])}")
             
-            result_dict['song_files'] += [{'file_type': render_mode.mime_type, 'base_name': 'file_', 'number': i,
+            result_dict['song_files'] += [{'file_type': render_mode.mime_type, 'base_name': sanitized_title+'_', 'number': i,
                                 'ext': render_mode.extension} for i, buffer in enumerate(buffers)]
             
-            result_dict['saves'] += [{'name': 'file_' + str(i) + render_mode.extension, 'buffer': buffer} for i, buffer
+            result_dict['saves'] += [{'name': sanitized_title + '_' + str(i) + render_mode.extension, 'buffer': buffer} for i, buffer
                          in enumerate(buffers)]
             
         return result_dict

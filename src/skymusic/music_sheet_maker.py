@@ -41,7 +41,11 @@ class SongBundle:
         size = self.get_size()
         return f'<SongBundle, {size[0]} render modes, {size[1]} buffers total>'
         
-    def set_meta(self, meta: dict):
+    def set_meta(self, song_meta: dict):
+        
+        meta = {}
+        for k in song_meta:
+            meta.update({k: song_meta[k][1]})
         
         self.meta.update(meta)
 
@@ -932,8 +936,12 @@ class MusicSheetMaker:
         # TODO: move this method in Renderer???
         if numfiles == 0:
             return None
-
-        file_base = os.path.join(self.song_dir_out, self.get_song().get_title())
+        
+        sanitized_title = re.sub(r'[\\/:"*?<>|]', '', re.escape(self.get_song().get_title())).strip()
+        if len(sanitized_title) == 0:
+            sanitized_title = 'Untitled'
+        
+        file_base = os.path.join(self.song_dir_out, sanitized_title)
         file_ext = render_mode.extension
 
         file_paths = []

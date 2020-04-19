@@ -501,7 +501,13 @@ class Query:
                 elif self.reply_type == ReplyType.RENDERMODES:
                     if isinstance(answers[0], RenderMode) or isinstance(answers[0], (str,int)):
                         is_reply_valid = True #A render mode can be chosen using its order number in a list or its string description
-
+                elif self.reply_type == ReplyType.OTHER:
+                    if all([answer is None for answer in answers]):
+                        is_reply_valid = False
+                    elif all([answer == '' for answer in answers]):
+                        is_reply_valid = False
+                    else:
+                        is_reply_valid = True
                 else:
                     is_reply_valid = True
 
