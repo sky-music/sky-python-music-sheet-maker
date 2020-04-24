@@ -304,7 +304,8 @@ class SongParser:
         note_shift = self.get_note_parser().get_base_of_western_major_scale() * octave_shift
 
         # Parses song line by line
-        song = Song(maker=self.get_maker(), music_key=english_song_key)  # The song key must be in English format
+        #song = Song(maker=self.get_maker(), music_key=english_song_key)  # The song key must be in English format
+        song = Song(locale=self.locale, music_key=english_song_key)
         for song_line in song_lines:
             instrument_line = self.parse_line(song_line, song_key,
                                               note_shift)  # The song key must be in the original format

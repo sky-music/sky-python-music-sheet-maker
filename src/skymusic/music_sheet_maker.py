@@ -4,7 +4,7 @@ from src.skymusic.communicator import Communicator, QueriesExecutionAbort
 from src.skymusic.parsers.song_parser import SongParser
 from src.skymusic import Lang
 from src.skymusic.resources import Resources
-
+from src.skymusic.renderers.song_renderers import SongRenderer
 # from song import Song
 
 
@@ -279,7 +279,7 @@ class MusicSheetMaker:
         (q_render, render_modes) = self.ask_render_modes(recipient=recipient)
 
         #2.c
-        #(q_aspect, aspect_ratio) = self.ask_aspect_ratio(recipient=recipient, prerequisites=[i_instr])
+        (q_aspect, aspect_ratio) = self.ask_aspect_ratio(recipient=recipient, prerequisites=[i_instr])
 
         # 3. Ask for notes
         # TODO: allow the player to enter the notes using several messages??? or maybe not
@@ -315,10 +315,11 @@ class MusicSheetMaker:
         # self.set_song_metadata(recipient=recipient) #TODO EXPERIMENTAL
 
         # 11. Renders Song
-        song_bundle = self.render_song(recipient, render_modes)
+        song_bundle = self.render_song(recipient, render_modes, aspect_ratio)
 
         # 12. Sends result back (required for website)
         return song_bundle
+
 
     def ask_instructions(self, recipient, prerequisites=None, execute=True):
 
@@ -743,6 +744,19 @@ class MusicSheetMaker:
             octave_shift = q_shift[-1].get_reply().get_result()
         return octave_shift
 
+    def retrieve_aspect_ratio(self, recipient):
+        """
+        Retrieves desired aspect ratio from previous answered queries.
+        Should work, but not fully tested
+        """
+        q_aspect = self.communicator.recall_by_recipient(recipient, criterion="aspect_ratio", filters=["valid_reply"],
+                                                        sort_by="date")
+        if len(q_aspect) == 0:
+            aspect_ratio = 16/9.0
+        else:
+            aspect_ratio = q_aspect[-1].get_reply().get_result()
+        return aspect_ratio
+
 
     def display_error_ratio(self, recipient, prerequisites=None, execute=True):
 
@@ -813,7 +827,7 @@ class MusicSheetMaker:
             return render_modes
     '''
 
-    def render_song(self, recipient, render_modes=None):
+    def render_song(self, recipient, render_modes=None, aspect_ratio=16/9.0):
 
         if render_modes is None:
             if self.is_botcog(recipient):
@@ -831,7 +845,7 @@ class MusicSheetMaker:
             print("=" * 40)
 #            song_bundle = []
             for render_mode in render_modes:
-                buffers = self.write_song_to_buffers(render_mode)  # A list of IOString or IOBytes buffers
+                buffers = self.write_song_to_buffers(render_mode, aspect_ratio)  # A list of IOString or IOBytes buffers
                 file_paths = self.build_file_paths(render_mode, len(buffers))
                 self.send_buffers_to_files(render_mode, buffers, file_paths, recipient=recipient)
 #                song_bundle.append((buffers, [render_mode] * len(buffers)))
@@ -842,7 +856,7 @@ class MusicSheetMaker:
             self.css_mode = CSSMode.EMBED  # Prevent the HTML/SVG from depending on an auxiliary .css file
             #song_bundle = []  # A list of tuples
             for render_mode in render_modes:
-                buffers = self.write_song_to_buffers(render_mode)  # A list of IOString or IOBytes buffers
+                buffers = self.write_song_to_buffers(render_mode, aspect_ratio)  # A list of IOString or IOBytes buffers
 #                song_bundle.append((buffers, [render_mode] * len(buffers)))
                 song_bundle.add_render(render_mode, buffers)
 
@@ -914,25 +928,14 @@ class MusicSheetMaker:
         else:
             return i_song_files, None
 
-    def write_song_to_buffers(self, render_mode):
+    def write_song_to_buffers(self, render_mode, aspect_ratio=16/9.0):
         """
         Writes the song to files with different formats as defined in RenderMode
         Returns a list [], even if it has only 1 element
         """
-        # TODO: Move this method to Renderer?
         if render_mode in self.get_render_modes_enabled():
-
-            if render_mode == RenderMode.HTML:
-                buffers = [self.get_song().write_html(self.css_mode, self.css_path, self.rel_css_path)]
-            elif render_mode == RenderMode.SVG:
-                buffers = self.get_song().write_svg(self.css_mode, self.css_path, self.rel_css_path)
-            elif render_mode == RenderMode.PNG:
-                buffers = self.get_song().write_png()
-            elif render_mode == RenderMode.MIDI:
-                buffers = [self.get_song().write_midi()]
-            else:  # Ascii
-                buffers = [self.get_song().write_ascii(render_mode)]
-
+            buffers = SongRenderer(self.locale).write_buffers(self.get_song(), render_mode=render_mode, aspect_ratio=aspect_ratio, css_mode=self.css_mode, rel_css_path=self.rel_css_path)
+            
         else:
             buffers = []
 

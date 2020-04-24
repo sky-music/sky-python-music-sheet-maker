@@ -2,8 +2,6 @@ import re, io
 from src.skymusic.modes import RenderMode, CSSMode
 from src.skymusic import instruments, Lang
 from src.skymusic.resources import Resources
-#import noteparsers
-
 
 try:
     from PIL import Image, ImageDraw, ImageFont
@@ -20,116 +18,51 @@ except (ImportError, ModuleNotFoundError):
     no_mido_module = True
 
 
-class SongRenderer():
 
-    def __init__(self, locale=None, aspect_ratio=16.0/9):
+class SongRenderer():
+    
+    def __init__(self, locale=None):
         
         if locale is None:
             self.locale = Lang.guess_locale()
             print(f"**WARNING: Song self.maker has no locale. Reverting to: {self.locale}")
         else:
             self.locale = locale
+        
+        
+    def write_buffers(self, song, render_mode: RenderMode, **kwargs):
+        
+        if render_mode == RenderMode.HTML:
+            buffers = SongHTMLRenderer(self.locale).write_buffers(song=song, css_mode=kwargs['css_mode'], rel_css_path=kwargs['rel_css_path'])
+        elif render_mode == RenderMode.SVG:
+            buffers = SongSVGRenderer(self.locale, kwargs['aspect_ratio']).write_buffers(song=song, css_mode=kwargs['css_mode'], rel_css_path=kwargs['rel_css_path'])
+        elif render_mode == RenderMode.PNG:
+            buffers = SongPNGRenderer(self.locale, kwargs['aspect_ratio']).write_buffers(song=song)
+        elif render_mode == RenderMode.MIDI:
+            buffers = SongMIDIRenderer(self.locale).write_buffers(song=song)
+        else:  # Ascii
+            buffers = SongASCIIRenderer(self.locale).write_buffers(song=song)
 
-        self.aspect_ratio = aspect_ratio
-        self.maxIconsPerLine = 10
-        self.maxLinesPerFile = 10
-        self.maxFiles = 10
-        self.harp_AspectRatio = 1.455
-        self.harp_relspacings = (
-            0.13, 0.1)  # Fraction of the harp width that will be allocated to the spacing between harps
+        return buffers
 
+
+class SongHTMLRenderer(SongRenderer):
+
+    def __init__(self, locale=None):
+        
+        super().__init__(locale)
         self.HTML_note_width = '1em'
 
-        self.SVG_viewPort = (0.0, 0.0, 750*self.aspect_ratio, 750.0)
-        minDim = self.SVG_viewPort[2] * 0.01
-        self.SVG_viewPortMargins = (13.0, 7.5)
-        self.pt2px = 96.0 / 72
-        self.fontpt = 12
-        self.SVG_text_height = self.fontpt * self.pt2px  # In principle this should be in em
-        self.SVG_line_width = self.SVG_viewPort[2] - self.SVG_viewPortMargins[0]
-        SVG_harp_width = max(minDim, (self.SVG_viewPort[2] - self.SVG_viewPortMargins[0]) / (
-                1.0 * self.maxIconsPerLine * (1 + self.harp_relspacings[0])))
-        self.SVG_harp_size = (SVG_harp_width, max(minDim, SVG_harp_width / self.harp_AspectRatio))
-        self.SVG_harp_spacings = (
-            self.harp_relspacings[0] * SVG_harp_width,
-            self.harp_relspacings[1] * SVG_harp_width / self.harp_AspectRatio)
-
-        if not no_PIL_module:
-            self.png_size = (round(self.aspect_ratio*750 * 2), 750 * 2)  # must be an integer tuple
-            self.png_margins = (13, 7)
-            self.png_harp_size0 = instruments.Harp().render_in_png().size  # A tuple
-            self.png_harp_spacings0 = (int(self.harp_relspacings[0] * self.png_harp_size0[0]),
-                                       int(self.harp_relspacings[1] * self.png_harp_size0[1]))
-            self.png_harp_size = None
-            self.png_harp_spacings = None
-            self.png_line_width = int(self.png_size[0] - self.png_margins[
-                0])  # self.png_lyric_relheight = instruments.Voice().lyric_relheight
-            self.png_lyric_size0 = (self.png_harp_size0[0], instruments.Voice().get_lyric_height())
-            self.png_lyric_size = None
-            self.png_dpi = (96 * 2, 96 * 2)
-            self.png_compress = 6
-            self.font_color = (0, 0, 0)
-            self.png_color = (255, 255, 255)
-            # self.font_color = (0, 0, 0)   #Discord colors
-            # self.png_color = (54, 57, 63)    #Discord colors
-            self.png_font_size = 36
-            self.png_title_font_size = 48
-            self.png_font = Resources.font_path
-
-        if not no_mido_module:
-            # WARNING: instrument codes correspond to General Midi codes (see Wikipedia) minus 1
-            # Instrument will sound very strange if played outside its natural pitch range
-            midi_instruments = {'piano': 0, 'guitar': 24, 'flute': 73, 'pan': 75}
-            self.midi_note_duration = 0.3  # note duration is seconds for 120 bpm
-            self.midi_bpm = 120  # Beats per minute
-            self.midi_instrument = midi_instruments['piano']
-            try:
-                self.midi_key = re.sub(r'#', '#m', self.music_key)  # For mido sharped keys are minor
-            except:
-                print("\n***Warning: Invalid music key passed to the MIDI renderer: using C instead\n")
-                self.midi_key = 'C'
-
-
-    def get_voice_SVG_height(self):
-        """Tries to predict the height of the lyrics text when rendered in SVG"""
-        return self.fontpt * self.pt2px
-
-    def set_png_harp_size(self, max_instruments_per_line):
-        """Shrinks the Harp image, so that the longest line fits up to max_instruments_per_line instruments"""
-        if self.png_harp_size is None or self.png_harp_spacings is None:
-            Nmax = max(1, min(self.maxIconsPerLine, max_instruments_per_line))
-            new_harp_width = min(self.png_harp_size0[0],
-                                 (self.png_size[0] - self.png_margins[0]) / (Nmax * (1.0 + self.harp_relspacings[0])))
-            self.png_harp_size = (new_harp_width, new_harp_width / self.harp_AspectRatio)
-            self.png_harp_spacings = (
-                self.harp_relspacings[0] * self.png_harp_size[0], self.harp_relspacings[1] * self.png_harp_size[1])
-            self.png_lyric_size = (self.png_harp_size[0], (self.png_harp_size[1] / self.png_harp_size0[1]))
-
-    def set_png_voice_size(self):
-        self.png_lyric_size = (
-            self.png_lyric_size0[0] * self.get_png_harp_rescale(),
-            self.png_lyric_size0[1] * self.get_png_harp_rescale())
-
-    def get_png_harp_rescale(self):
-        """Gets the rescale factor to from the original .png Harp image"""
-        if self.png_harp_size[0] is not None:
-            return 1.0 * self.png_harp_size[0] / self.png_harp_size0[0]
-        else:
-            return 1.0
-
-    def get_png_text_height(self, fnt):
-        """Calculates the text height in PNG for a standard text depending on the input font size"""
-        return fnt.getsize('HQfgjyp')[1]
-
-    def write_html(self, song, css_mode=CSSMode.EMBED, css_path='css/main.css', rel_css_path='../css/main.css'):
+    def write_buffers(self, song, css_mode=CSSMode.EMBED, rel_css_path='css/main.css'):
 
         meta = song.get_meta()
+        css_path = Resources.css_path
         
         html_buffer = io.StringIO()
 
-        html_buffer.write('<!DOCTYPE html>'
-                          '\n<html xmlns:svg="http://www.w3.org/2000/svg">')
-        html_buffer.write(f"\n<head>\n<title>{meta['title'][1]}</title>")
+        html_buffer.write(f'<!DOCTYPE html>'
+                          f'\n<html xmlns:svg="http://www.w3.org/2000/svg">'
+                          f"\n<head>\n<title>{meta['title'][1]}</title>")
 
         if css_mode == CSSMode.EMBED:
             try:
@@ -183,37 +116,43 @@ class SongRenderer():
                           '\n</body>'
                           '\n</html>')
 
-        return html_buffer
+        return [html_buffer]
 
-    def write_ascii(self, song, render_mode=RenderMode.SKYASCII):
+ 
 
-        meta = song.get_meta()
-        ascii_buffer = io.StringIO()
+class SongSVGRenderer(SongRenderer):
 
-        note_parser = render_mode.get_note_parser()
+    def __init__(self, locale=None, aspect_ratio=16/9.0):
         
-        ascii_buffer.write('#%s\n' % meta['title'][1])
+        super().__init__(locale)
 
-        for k in meta:
-            if k != 'title':
-                ascii_buffer.write('#%s %s\n' % (meta[k][0], meta[k][1]))
+        self.harp_AspectRatio = 1.455
+        self.harp_relspacings = (0.13, 0.1)  # Fraction of the harp width that will be allocated to the spacing between harps
 
-        song_render = '\n'
-        instrument_index = 0
-        for line in self.lines:
-            line_render = ''
-            for instrument in line:
-                instrument.set_index(instrument_index)
-                instrument_render = instrument.render_in_ascii(note_parser)
-                instrument_index += 1
-                line_render += instrument_render + ' '
-            song_render += '\n' + line_render
+        self.aspect_ratio = aspect_ratio
+        self.maxIconsPerLine = round(10*aspect_ratio/(16/9.0))
+        self.maxLinesPerFile = 10
+        self.maxFiles = 10
 
-        ascii_buffer.write(song_render)
+        self.SVG_viewPort = (0.0, 0.0, 750*self.aspect_ratio, 750.0)
+        minDim = self.SVG_viewPort[2] * 0.01
+        self.SVG_viewPortMargins = (13.0, 7.5)
+        self.pt2px = 96.0 / 72
+        self.fontpt = 12
+        self.SVG_text_height = self.fontpt * self.pt2px  # In principle this should be in em
+        self.SVG_line_width = self.SVG_viewPort[2] - self.SVG_viewPortMargins[0]
+        SVG_harp_width = max(minDim, (self.SVG_viewPort[2] - self.SVG_viewPortMargins[0]) / (
+                1.0 * self.maxIconsPerLine * (1 + self.harp_relspacings[0])))
+        self.SVG_harp_size = (SVG_harp_width, max(minDim, SVG_harp_width / self.harp_AspectRatio))
+        self.SVG_harp_spacings = (
+            self.harp_relspacings[0] * SVG_harp_width,
+            self.harp_relspacings[1] * SVG_harp_width / self.harp_AspectRatio)
 
-        return ascii_buffer
+    def get_voice_SVG_height(self):
+        """Tries to predict the height of the lyrics text when rendered in SVG"""
+        return self.fontpt * self.pt2px
 
-    def write_svg(self, song, css_mode=CSSMode.EMBED, css_path='css/main.css', rel_css_path='../css/main.css', start_row=0, buffer_list=None):
+    def write_buffers(self, song, css_mode=CSSMode.EMBED, rel_css_path='css/main.css', start_row=0, buffer_list=None):
 
         if buffer_list is None:
             buffer_list = []
@@ -221,6 +160,7 @@ class SongRenderer():
             print(f"\nYour song is too long. Stopping at {self.maxFiles} files.")
             return buffer_list
 
+        css_path = Resources.css_path
         meta = song.get_meta()
         svg_buffer = io.StringIO()
         filenum = len(buffer_list)
@@ -298,7 +238,7 @@ class SongRenderer():
 
         instrument_index = 0
         # end_row = min(start_row+self.maxLinesPerFile,len(self.lines))
-        end_row = len(self.lines)
+        end_row = song.get_num_lines()
         for row in range(start_row, end_row):
 
             line = song.get_line(row)
@@ -401,12 +341,77 @@ class SongRenderer():
         buffer_list.append(svg_buffer)
 
         # Open new file
-        if end_row < len(self.lines):
-            buffer_list = self.write_svg(css_mode, css_path, rel_css_path, end_row, buffer_list)
+        if end_row < song.get_num_lines():
+            buffer_list = self.write_buffers(song, css_mode, rel_css_path, end_row, buffer_list)
 
         return buffer_list
 
-    def write_png(self, song, start_row=0, buffer_list=None):
+
+class SongPNGRenderer(SongRenderer):
+
+    def __init__(self, locale=None, aspect_ratio=16.0/9):
+        
+        super().__init__(locale)
+        
+        self.harp_AspectRatio = 1.455
+        self.harp_relspacings = (0.13, 0.1)  # Fraction of the harp width that will be allocated to the spacing between harps
+
+        self.aspect_ratio = aspect_ratio
+        self.maxIconsPerLine = round(10*aspect_ratio/(16/9.0))
+        self.maxFiles = 10
+
+        if not no_PIL_module:
+            self.png_size = (round(self.aspect_ratio*750 * 2), 750 * 2)  # must be an integer tuple
+            self.png_margins = (13, 7)
+            self.png_harp_size0 = instruments.Harp().render_in_png().size  # A tuple
+            self.png_harp_spacings0 = (int(self.harp_relspacings[0] * self.png_harp_size0[0]),
+                                       int(self.harp_relspacings[1] * self.png_harp_size0[1]))
+            self.png_harp_size = None
+            self.png_harp_spacings = None
+            self.png_line_width = int(self.png_size[0] - self.png_margins[
+                0])  # self.png_lyric_relheight = instruments.Voice().lyric_relheight
+            self.png_lyric_size0 = (self.png_harp_size0[0], instruments.Voice().get_lyric_height())
+            self.png_lyric_size = None
+            self.png_dpi = (96 * 2, 96 * 2)
+            self.png_compress = 6
+            self.font_color = (0, 0, 0)
+            self.png_color = (255, 255, 255)
+            # self.font_color = (0, 0, 0)   #Discord colors
+            # self.png_color = (54, 57, 63)    #Discord colors
+            self.png_font_size = 36
+            self.png_title_font_size = 48
+            self.png_font = Resources.font_path
+
+
+    def set_png_harp_size(self, max_instruments_per_line):
+        """Shrinks the Harp image, so that the longest line fits up to max_instruments_per_line instruments"""
+        if self.png_harp_size is None or self.png_harp_spacings is None:
+            Nmax = max(1, min(self.maxIconsPerLine, max_instruments_per_line))
+            new_harp_width = min(self.png_harp_size0[0],
+                                 (self.png_size[0] - self.png_margins[0]) / (Nmax * (1.0 + self.harp_relspacings[0])))
+            self.png_harp_size = (new_harp_width, new_harp_width / self.harp_AspectRatio)
+            self.png_harp_spacings = (
+                self.harp_relspacings[0] * self.png_harp_size[0], self.harp_relspacings[1] * self.png_harp_size[1])
+            self.png_lyric_size = (self.png_harp_size[0], (self.png_harp_size[1] / self.png_harp_size0[1]))
+
+    def set_png_voice_size(self):
+        self.png_lyric_size = (
+            self.png_lyric_size0[0] * self.get_png_harp_rescale(),
+            self.png_lyric_size0[1] * self.get_png_harp_rescale())
+
+    def get_png_harp_rescale(self):
+        """Gets the rescale factor to from the original .png Harp image"""
+        if self.png_harp_size[0] is not None:
+            return 1.0 * self.png_harp_size[0] / self.png_harp_size0[0]
+        else:
+            return 1.0
+
+    def get_png_text_height(self, fnt):
+        """Calculates the text height in PNG for a standard text depending on the input font size"""
+        return fnt.getsize('HQfgjyp')[1]
+
+
+    def write_buffers(self, song, start_row=0, buffer_list=None):
         
         if buffer_list is None:
             buffer_list = []
@@ -491,7 +496,7 @@ class SongRenderer():
 
         ysong = y_in_png
         instrument_index = 0
-        end_row = len(self.lines)
+        end_row = song.get_num_lines()
 
         # Creating a new song image, located at x_in_song, yline_in_song
         xline_in_song = x_in_png
@@ -581,17 +586,41 @@ class SongRenderer():
         buffer_list.append(song_buffer)
 
         # Open new file
-        if end_row < len(self.lines):
-            buffer_list = self.write_png(end_row, buffer_list)
+        if end_row < song.get_num_lines():
+            buffer_list = self.write_buffers(song, end_row, buffer_list)
 
         return buffer_list
 
-    def write_midi(self, song):
+
+class SongMIDIRenderer(SongRenderer):
+
+    def __init__(self, locale=None):
+        
+        super().__init__(locale)
+        
+        if not no_mido_module:
+            # WARNING: instrument codes correspond to General Midi codes (see Wikipedia) minus 1
+            # Instrument will sound very strange if played outside its natural pitch range
+            midi_instruments = {'piano': 0, 'guitar': 24, 'flute': 73, 'pan': 75}
+            self.midi_note_duration = 0.3  # note duration is seconds for 120 bpm
+            self.midi_bpm = 120  # Beats per minute
+            self.midi_instrument = midi_instruments['piano']
+            self.midi_key = None
+
+
+    def write_buffers(self, song):
         global no_mido_module
 
         if no_mido_module:
             print("\n***WARNING: MIDI was not created because mido module was not found. ***\n")
             return None
+    
+        try:
+            self.midi_key = re.sub(r'#', '#m', song.get_music_key())  # For mido sharped keys are minor
+        except TypeError:
+            print("\n***Warning: Invalid music key passed to the MIDI renderer: using C instead\n")
+            self.midi_key = 'C'
+
 
         mid = mido.MidiFile(type=0)
         track = mido.MidiTrack()
@@ -627,7 +656,7 @@ class SongRenderer():
                     for instrument in line:
                         instrument.set_index(instrument_index)
                         instrument_render = instrument.render_in_midi(note_duration=note_ticks,
-                                                                      music_key=self.music_key)
+                                                                      music_key=song.get_music_key())
                         for i in range(0, instrument.get_repeat()):
                             for note_render in instrument_render:
                                 track.append(note_render)
@@ -635,5 +664,40 @@ class SongRenderer():
         midi_buffer = io.BytesIO()
         mid.save(file=midi_buffer)
 
-        return midi_buffer
+        return [midi_buffer]
 
+
+
+class SongASCIIRenderer(SongRenderer):
+
+    def __init__(self, locale=None):
+        
+        super().__init__(locale)    
+
+    def write_buffers(self, song, render_mode=RenderMode.SKYASCII):
+
+        meta = song.get_meta()
+        ascii_buffer = io.StringIO()
+
+        note_parser = render_mode.get_note_parser()
+        
+        ascii_buffer.write('#%s\n' % meta['title'][1])
+
+        for k in meta:
+            if k != 'title':
+                ascii_buffer.write('#%s %s\n' % (meta[k][0], meta[k][1]))
+
+        song_render = '\n'
+        instrument_index = 0
+        for line in song.get_lines():
+            line_render = ''
+            for instrument in line:
+                instrument.set_index(instrument_index)
+                instrument_render = instrument.render_in_ascii(note_parser)
+                instrument_index += 1
+                line_render += instrument_render + ' '
+            song_render += '\n' + line_render
+
+        ascii_buffer.write(song_render)
+
+        return [ascii_buffer]
