@@ -1,5 +1,8 @@
-import os
+#import os
+#import io
 from src.skymusic import notes
+from src.skymusic.resources import Resources
+
 
 try:
     from PIL import Image, ImageDraw, ImageFont
@@ -18,27 +21,25 @@ except (ImportError, ModuleNotFoundError):
 
 class Instrument:
 
-    def __init__(self, maker):
+    def __init__(self):
         self.type = 'undefined'
         self.chord_skygrid = {}
         self.repeat = 1
         self.index = 0
         self.is_silent = True
         self.is_broken = False
-        self.maker = maker
-        # TODO: use importlib
-        self.directory_base = self.maker.get_directory_base()
-        self.directory_elements = os.path.join(self.directory_base, 'src', 'skymusic', 'resources', 'elements')
-        self.directory_fonts = os.path.join(self.directory_base, 'src', 'skymusic', 'resources', 'fonts')
-        self.empty_chord_png = os.path.normpath(os.path.join(self.directory_elements, 'empty-chord.png'))  # blank harp
-        self.unhighlighted_chord_png = os.path.normpath(os.path.join(self.directory_elements, 'unhighlighted-chord.png'))  # harp with unhighlighted notes
-        self.broken_png = os.path.normpath(os.path.join(self.directory_elements, 'broken-symbol.png'))
-        self.silent_png = os.path.normpath(os.path.join(self.directory_elements, 'silent-symbol.png'))
+
+        self.empty_chord_png = Resources.empty_chord_png
+        self.unhighlighted_chord_png = Resources.unhighlighted_chord_png
+        self.broken_png = Resources.broken_png
+        self.silent_png = Resources.silent_png
+
         self.png_chord_size = None
         self.text_bkg = (255, 255, 255, 0)  # Transparent white
         self.song_bkg = (255, 255, 255)  # White paper sheet
         self.font_color = (0, 0, 0)
-        self.font = os.path.normpath(os.path.join(self.directory_fonts, 'NotoSansCJKjp-Regular.otf'))
+        
+        self.font = Resources.font_path
         self.font_size = 38
         self.repeat_height = None
 
@@ -46,9 +47,6 @@ class Instrument:
         self.midi_pause_relduration = 1  # Spacing between midi notes, as a ratio of note duration
         self.midi_quaver_relspacing = 0.5
 
-    def get_maker(self):
-
-        return self.maker
 
     def set_chord_skygrid(self, chord_skygrid):
         self.chord_skygrid = chord_skygrid
@@ -66,15 +64,6 @@ class Instrument:
 
     def get_type(self):
         return self.type
-
-    def get_directory_base(self):
-        return self.directory_base
-
-    def get_directory_elements(self):
-        return self.directory_elements
-
-    def get_directory_font(self):
-        return self.directory_fonts
 
     def set_repeat(self, repeat):
         self.repeat = repeat
@@ -135,8 +124,8 @@ class Instrument:
 
 class Voice(Instrument):  # Lyrics or comments
 
-    def __init__(self, maker):
-        super().__init__(maker)
+    def __init__(self):
+        super().__init__()
         self.type = 'voice'
         self.lyric = ''
         # self.text_bkg = (255, 255, 255, 0)#Uncomment to make it different from the inherited class
@@ -175,7 +164,7 @@ class Voice(Instrument):  # Lyrics or comments
 
     def render_in_svg(self, x, width: str, height: str, aspect_ratio):
         """Renders the lyrics text in SVG"""
-        voice_render = (f'\n<svg x="{x : .2f}" y="0" width="100%" height="{height}" class="voice voice-{self.get_index()}">'
+        voice_render = (f'\n<svg x="{x :.2f}" y="0" width="100%" height="{height}" class="voice voice-{self.get_index()}">'
                         f'\n<text x="0%" y="50%" class="voice voice-{self.get_index()}">{self.lyric}</text>'
                         f'\n</svg>')
 
@@ -207,8 +196,8 @@ class Voice(Instrument):  # Lyrics or comments
 
 class Harp(Instrument):
 
-    def __init__(self, maker):
-        super().__init__(maker)
+    def __init__(self):
+        super().__init__()
         self.type = 'harp'
         self.column_count = 5
         self.row_count = 3
@@ -315,10 +304,10 @@ class Harp(Instrument):
             class_suffix = ''
 
         # The chord SVG container
-        harp_render = f'\n<svg x="{x : .2f}" y="0" width="{harp_width}" height="{harp_height}" class="instrument-harp harp-{self.get_index()} {class_suffix}">'
+        harp_render = f'\n<svg x="{x :.2f}" y="0" width="{harp_width}" height="{harp_height}" class="instrument-harp harp-{self.get_index()} {class_suffix}">'
 
         # The chord rectangle with rounded edges
-        harp_render += f'\n<rect x="0.7%" y="0.7%" width="98.6%" height="98.6%" rx="7.5%" ry="{7.5 * aspect_ratio : .2f}%" class="harp harp-{self.get_index()}"/>'
+        harp_render += f'\n<rect x="0.7%" y="0.7%" width="98.6%" height="98.6%" rx="7.5%" ry="{7.5 * aspect_ratio :.2f}%" class="harp harp-{self.get_index()}"/>'
 
         for row in range(self.get_row_count()):
             for col in range(self.get_column_count()):
@@ -330,7 +319,7 @@ class Harp(Instrument):
                 yn = 0.15 + row * (1 - 2 * 0.16) / (self.get_row_count() - 1) - note_width / 2.0
 
                 # NOTE RENDER
-                harp_render += note.render_in_svg(f"{100*note_width : .2f}%", f"{100*xn : .2f}%", f"{100*yn : .2f}%")
+                harp_render += note.render_in_svg(f"{100*note_width :.2f}%", f"{100*xn :.2f}%", f"{100*yn :.2f}%")
 
         harp_render += '</svg>'
 

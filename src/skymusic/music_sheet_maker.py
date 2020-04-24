@@ -3,7 +3,7 @@ from src.skymusic.modes import InputMode, CSSMode, RenderMode, ReplyType
 from src.skymusic.communicator import Communicator, QueriesExecutionAbort
 from src.skymusic.parsers.song_parser import SongParser
 from src.skymusic import Lang
-
+from src.skymusic.resources import Resources
 
 # from song import Song
 
@@ -98,9 +98,7 @@ class MusicSheetMaker:
         self.directory_base = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'))
         self.song_dir_in = os.path.join(self.directory_base, songs_in)
         self.song_dir_out = os.path.join(self.directory_base, songs_out)
-        #TODO: replace with importlib
-        self.css_path = os.path.normpath(
-            os.path.join(self.directory_base, "src", "skymusic", "resources", "css", "main.css"))  # TODO: move that into Renderer
+        self.css_path = Resources.css_path  # TODO: move that into Renderer
         self.rel_css_path = os.path.relpath(self.css_path, start=self.song_dir_out)
         self.css_mode = CSSMode.EMBED  # TODO: move that into Renderer
         self.render_modes_enabled = [mode for mode in RenderMode]

@@ -36,7 +36,6 @@ class SongParser:
         self.comment_delimiter = '#'
         self.repeat_indicator = '*'
         self.maker = maker
-        self.directory_base = self.maker.get_directory_base()
         try:
             self.locale = self.maker.get_locale()
         except AttributeError:  # Should never happen
@@ -272,7 +271,7 @@ class SongParser:
                 lyrics = line.split(self.comment_delimiter)
                 for lyric in lyrics:
                     if len(lyric) > 0:
-                        voice = instruments.Voice(self.get_maker())
+                        voice = instruments.Voice()
                         voice.set_lyric(lyric.strip())
                         instrument_line.append(voice)
             else:
@@ -285,7 +284,7 @@ class SongParser:
                     chords = self.split_icon(icon)
                     # From here, real chords are still glued, quavers have been split in different list slots
                     chord_skygrid, harp_broken, harp_silent, repeat = self.parse_chords(chords, song_key, note_shift)
-                    harp = instruments.Harp(self.get_maker())
+                    harp = instruments.Harp()
                     harp.set_repeat(repeat)
                     harp.set_is_silent(harp_silent)
                     harp.set_is_broken(harp_broken)
