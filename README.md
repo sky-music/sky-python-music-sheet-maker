@@ -1,5 +1,11 @@
 # sky-python-music-sheet-maker
 
+## NOTICE:
+
+This program is not being actively maintained by Tracey. Feel free to take the code/ideas and build upon it.
+
+***
+
 See here for how to download and use. This currently requires a Desktop computer and is a work-in-progress.
 
 **Instructions:** https://sky.bloomexperiment.com/t/sky-python-music-sheet-maker/102#how-to-download
