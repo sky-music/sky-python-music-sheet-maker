@@ -280,6 +280,9 @@ class MusicSheetMaker:
         # 2.b Ask for render modes (query created for website only)
         (q_render, render_modes) = self.ask_render_modes(recipient=recipient)
 
+        #2.c
+        #(q_aspect, aspect_ratio) = self.ask_aspect_ratio(recipient=recipient, prerequisites=[i_instr])
+
         # 3. Ask for notes
         # TODO: allow the player to enter the notes using several messages??? or maybe not
         (q_notes, notes) = self.ask_notes_or_file(recipient=recipient, prerequisites=[i_instr])
@@ -344,6 +347,17 @@ class MusicSheetMaker:
             return i_instr, instructions
         else:
             return i_instr, None
+
+    def ask_aspect_ratio(self, recipient, prerequisites=None, execute=True):
+
+        q_aspect = self.communicator.send_stock_query('aspect_ratio', recipient=recipient, prerequisites=prerequisites)
+
+        if execute:
+            recipient.execute_queries(q_aspect)
+            aspect_ratio = q_aspect.get_reply().get_result()
+            return q_aspect, aspect_ratio
+        else:
+            return q_aspect, None
 
     def ask_song_metadata(self, recipient, prerequisites=None, execute=True):
 
@@ -785,7 +799,9 @@ class MusicSheetMaker:
         if song_key is None:
             song_key = self.retrieve_song_key(recipient, notes=notes)
 
-        self.set_song(self.get_song_parser().parse_song(song_lines=notes, song_key=song_key, octave_shift=octave_shift))
+        song = self.get_song_parser().parse_song(song_lines=notes, song_key=song_key, octave_shift=octave_shift)
+        
+        self.set_song(song)
 
         return
 
@@ -808,7 +824,6 @@ class MusicSheetMaker:
                 render_modes = self.website_render_modes
             else:
                 render_modes = self.render_modes_enabled
-
 
         song_bundle = SongBundle()
         song_bundle.set_meta(self.get_song().get_meta())

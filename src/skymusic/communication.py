@@ -79,7 +79,7 @@ class Reply:
         answer = self.answer
         if isinstance(answer, str):
             answer = answer.strip()
-        if self.query.get_reply_type() == ReplyType.INTEGER:
+        if self.query.get_reply_type() == ReplyType.NUMBER:
             if answer == '':
                 answer = '0'
         
@@ -99,18 +99,20 @@ class Reply:
             self.result = None
             return self.result
 
+        limits = self.query.get_limits()
+
         if isinstance(self.query, QueryBoolean):
             self.result = (self.query.get_answer_index() % 2 == 0)
         elif isinstance(self.query, QueryMultipleChoices):
             indices = self.query.get_answer_indices() #Must be checked before QueryChoice because it is a subclass
-            self.result = [self.query.get_limits()[index] for index in indices]
+            self.result = [limits[index] for index in indices]
         elif isinstance(self.query, QueryChoice):
             index = self.query.get_answer_index() #QueryChoices always have limits
-            self.result = self.query.get_limits()[index]
+            self.result = limits[index]
         else:#QueryOpen
             self.result = self.answer
-            if self.query.reply_type == ReplyType.INTEGER:
-                self.result = int(self.answer)
+            if self.query.reply_type == ReplyType.NUMBER:
+                self.result = eval(self.answer)
 
         return self.result
 
@@ -414,10 +416,8 @@ class Query:
         if self.reply_type in [ReplyType.TEXT, ReplyType.NOTE, ReplyType.FILEPATH] and not isinstance(limits[0], str):
             raise InvalidQueryTypeError("incorrect limits type", limits[0], str)
 
-        if self.reply_type == ReplyType.INTEGER:
-            try:
-                int(limits[0])
-            except:
+        if self.reply_type == ReplyType.NUMBER:
+            if not isinstance(limits[0],(int, float)):
                 raise InvalidQueryTypeError("incorrect limits type", limits[0], int)
 
         if self.reply_type == ReplyType.INPUTMODE and not isinstance(limits[0], InputMode):
@@ -442,8 +442,8 @@ class Query:
         if self.reply_type is None:
             if isinstance(limits[0], str):
                 try:
-                    int(limits[0])
-                    self.reply_type = ReplyType.INTEGER
+                    float(eval(limits[0]))
+                    self.reply_type = ReplyType.NUMBER
                 except:
                     self.reply_type == ReplyType.TEXT
             elif isinstance(limits[0], InputMode):
@@ -489,9 +489,9 @@ class Query:
                 if self.reply_type in [ReplyType.TEXT, ReplyType.NOTE, ReplyType.FILEPATH]:
                     if isinstance(answers[0], str):
                         is_reply_valid = True
-                elif self.reply_type == ReplyType.INTEGER:
+                elif self.reply_type == ReplyType.NUMBER:
                     try:
-                        int(answers[0])
+                        float(eval(answers[0]))
                         is_reply_valid = True
                     except:
                         is_reply_valid = False
@@ -531,17 +531,19 @@ class Query:
                         is_reply_valid = False
                 
                 #Maybe limits is an integer range
-                if self.reply_type == ReplyType.INTEGER and limits is not None and is_reply_valid is True:
+                if self.reply_type == ReplyType.NUMBER and limits is not None and is_reply_valid is True:
+                    
                     try:
-                        num = int(answers[0])
+                        num = float(eval(answers[0]))
                         low_lim = min(limits)
                         high_lim = max(limits)
-                        if low_lim <= num <= high_lim:
-                            is_reply_valid = True
-                        else:
+                        
+                        if not (low_lim <= num <= high_lim):
+                            is_reply_valid = False
+                        if all([isinstance(limit, int) for limit in limits]) and int(num) != num:
                             is_reply_valid = False
                     except (ValueError, TypeError):
-                        pass
+                        is_reply_valid = False
 
         return is_reply_valid
     

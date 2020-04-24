@@ -117,6 +117,17 @@ class Communicator:
                              'limits': []
                              },
 
+                'aspect_ratio': {'class': QueryOpen.__name__,
+                             'handler': 'None',
+                             'foreword': Lang.get_string("stock_queries/aspect_ratio/foreword", self.locale),
+                             'question': Lang.get_string("stock_queries/aspect_ratio/question", self.locale),
+                             'afterword': Lang.get_string("stock_queries/aspect_ratio/afterword", self.locale),
+                             'input_tip': Lang.get_string("stock_queries/aspect_ratio/input_tip", self.locale),
+                             'help_text': Lang.get_string("stock_queries/aspect_ratio/help_text", self.locale),
+                             'reply_type': ReplyType.NUMBER,
+                             'limits': [0.1, 10.0]
+                             },
+
             'song_title': {'class': QueryOpen.__name__,
                            'handler': 'None',
                            'foreword': Lang.get_string("stock_queries/song_title/foreword", self.locale),
@@ -250,7 +261,7 @@ class Communicator:
                              'afterword': Lang.get_string("stock_queries/octave_shift/afterword", self.locale),
                              'input_tip': Lang.get_string("stock_queries/octave_shift/input_tip", self.locale),
                              'help_text': Lang.get_string("stock_queries/octave_shift/help_text", self.locale),
-                             'reply_type': ReplyType.INTEGER,
+                             'reply_type': ReplyType.NUMBER,
                              'limits': [-6, 6]
                              },
 

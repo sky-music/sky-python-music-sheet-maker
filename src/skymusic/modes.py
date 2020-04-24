@@ -82,7 +82,7 @@ class ResponseMode(Enum):
 
 class ReplyType(Enum):
     TEXT = 1  # str
-    INTEGER = 2  # int
+    NUMBER = 2  # int
     NOTE = 3  # str, with possible additional checks
     INPUTMODE = 4  # modes.InputMode
     RENDERMODES = 5

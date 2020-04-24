@@ -22,7 +22,7 @@ except (ImportError, ModuleNotFoundError):
 
 class Song():
 
-    def __init__(self, maker, music_key='C'):
+    def __init__(self, maker, music_key='C', aspect_ratio=16.0/9):
 
         if isinstance(music_key, str):
             self.music_key = music_key
@@ -44,7 +44,7 @@ class Song():
             Lang.get_string("song_meta/artist", self.locale) + ': ', ''],
                     'transcript': [Lang.get_string("song_meta/transcript", self.locale) + ': ', ''], 'song_key': [
                 Lang.get_string("song_meta/musical_key", self.locale) + ': ', '']}
-        #self.title = self.meta['title'][1]
+        self.aspect_ratio = aspect_ratio
         self.maxIconsPerLine = 10
         self.maxLinesPerFile = 10
         self.maxFiles = 10
@@ -54,7 +54,7 @@ class Song():
 
         self.HTML_note_width = '1em'
 
-        self.SVG_viewPort = (0.0, 0.0, 1334.0, 750.0)
+        self.SVG_viewPort = (0.0, 0.0, 750*self.aspect_ratio, 750.0)
         minDim = self.SVG_viewPort[2] * 0.01
         self.SVG_viewPortMargins = (13.0, 7.5)
         self.pt2px = 96.0 / 72
@@ -69,7 +69,7 @@ class Song():
             self.harp_relspacings[1] * SVG_harp_width / self.harp_AspectRatio)
 
         if not no_PIL_module:
-            self.png_size = (1334 * 2, 750 * 2)  # must be an integer tuple
+            self.png_size = (round(self.aspect_ratio*750 * 2), 750 * 2)  # must be an integer tuple
             self.png_margins = (13, 7)
             self.png_harp_size0 = instruments.Harp(self.get_maker()).render_in_png().size  # A tuple
             self.png_harp_spacings0 = (int(self.harp_relspacings[0] * self.png_harp_size0[0]),

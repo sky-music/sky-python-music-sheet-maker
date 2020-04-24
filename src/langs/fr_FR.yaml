@@ -100,6 +100,13 @@ stock_queries:
     help_text: |
       La portée visuelle peut être savegardée sous différents formats.
       Cochez ceux que vous souhaitez garder.
+  aspect_ratio:
+    foreword: By default the visual sheet is a 16:9 image in landscape orientation.
+    question: Please choose a different aspect ratio, or leave blank to skip
+    afterword:
+    input_tip: a positive number or a fraction (eg 4/3) between 0.1 and 10. Leave blank or 0 to skip.
+    help_text: |
+      By default the visual sheet is a 16:9 image in landscape orientation. Please choose a different aspect ratio if you like. Only numbers between 1/10 (0.1) and 10 are accepted.      
   song_title:
     foreword:
     question: Quel est le titre de la chanson ?
