@@ -1,4 +1,6 @@
 from src.skymusic import instruments, Lang
+from src.skymusic.renderers import song_renderers
+from src.skymusic.modes import RenderMode
 
 class Song():
 
@@ -97,4 +99,21 @@ class Song():
                 if kwargs[k].lower().strip() != '':
                     self.meta[k.lower().strip()][1] = kwargs[k]
             except KeyError:
-                pass         
+                pass
+            
+    def render(self, render_mode, **kwargs):
+
+        if render_mode == RenderMode.HTML:
+            buffers = song_renderers.SongHTMLRenderer(self.locale).write_buffers(song=self, css_mode=kwargs['css_mode'], rel_css_path=kwargs['rel_css_path'])
+        elif render_mode == RenderMode.SVG:
+            buffers = song_renderers.SongSVGRenderer(self.locale, kwargs['aspect_ratio']).write_buffers(song=self, css_mode=kwargs['css_mode'], rel_css_path=kwargs['rel_css_path'])
+        elif render_mode == RenderMode.PNG:
+            buffers = song_renderers.SongPNGRenderer(self.locale, kwargs['aspect_ratio']).write_buffers(song=self)
+        elif render_mode == RenderMode.MIDI:
+            buffers = song_renderers.SongMIDIRenderer(self.locale).write_buffers(song=self)
+        else:  # Ascii
+            buffers = song_renderers.SongASCIIRenderer(self.locale).write_buffers(song=self)
+
+        return buffers
+       
+        

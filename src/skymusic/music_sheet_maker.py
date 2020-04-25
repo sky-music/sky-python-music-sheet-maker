@@ -4,8 +4,8 @@ from src.skymusic.communicator import Communicator, QueriesExecutionAbort
 from src.skymusic.parsers.song_parser import SongParser
 from src.skymusic import Lang
 from src.skymusic.resources import Resources
-from src.skymusic.renderers.song_renderers import SongRenderer
-# from song import Song
+#from src.skymusic.renderers.song_renderers import SongRenderer
+#from song import Song
 
 
 class MusicSheetMakerError(Exception):
@@ -98,7 +98,7 @@ class MusicSheetMaker:
         self.directory_base = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'))
         self.song_dir_in = os.path.join(self.directory_base, songs_in)
         self.song_dir_out = os.path.join(self.directory_base, songs_out)
-        self.css_path = Resources.css_path  # TODO: move that into Renderer
+        self.css_path = Resources.css_path
         self.rel_css_path = os.path.relpath(self.css_path, start=self.song_dir_out)
         self.css_mode = CSSMode.EMBED  # TODO: move that into Renderer
         self.render_modes_enabled = [mode for mode in RenderMode]
@@ -934,7 +934,8 @@ class MusicSheetMaker:
         Returns a list [], even if it has only 1 element
         """
         if render_mode in self.get_render_modes_enabled():
-            buffers = SongRenderer(self.locale).write_buffers(self.get_song(), render_mode=render_mode, aspect_ratio=aspect_ratio, css_mode=self.css_mode, rel_css_path=self.rel_css_path)
+            buffers = self.get_song().render(render_mode=render_mode, aspect_ratio=aspect_ratio, css_mode=self.css_mode, rel_css_path=self.rel_css_path)
+            #buffers = SongRenderer(self.locale).write_buffers(self.get_song(), render_mode=render_mode, aspect_ratio=aspect_ratio, css_mode=self.css_mode, rel_css_path=self.rel_css_path)
             
         else:
             buffers = []

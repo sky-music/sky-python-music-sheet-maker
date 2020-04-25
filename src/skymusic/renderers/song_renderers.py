@@ -1,7 +1,9 @@
 import re, io
 from src.skymusic.modes import RenderMode, CSSMode
-from src.skymusic import instruments, Lang
+from src.skymusic import Lang
 from src.skymusic.resources import Resources
+from src.skymusic.renderers.instrument_renderers import InstrumentHTMLRenderer,\
+InstrumentSVGRenderer, InstrumentPNGRenderer, InstrumentMIDIRenderer, InstrumentASCIIRenderer
 
 try:
     from PIL import Image, ImageDraw, ImageFont
@@ -28,22 +30,11 @@ class SongRenderer():
             print(f"**WARNING: Song self.maker has no locale. Reverting to: {self.locale}")
         else:
             self.locale = locale
-        
-        
-    def write_buffers(self, song, render_mode: RenderMode, **kwargs):
-        
-        if render_mode == RenderMode.HTML:
-            buffers = SongHTMLRenderer(self.locale).write_buffers(song=song, css_mode=kwargs['css_mode'], rel_css_path=kwargs['rel_css_path'])
-        elif render_mode == RenderMode.SVG:
-            buffers = SongSVGRenderer(self.locale, kwargs['aspect_ratio']).write_buffers(song=song, css_mode=kwargs['css_mode'], rel_css_path=kwargs['rel_css_path'])
-        elif render_mode == RenderMode.PNG:
-            buffers = SongPNGRenderer(self.locale, kwargs['aspect_ratio']).write_buffers(song=song)
-        elif render_mode == RenderMode.MIDI:
-            buffers = SongMIDIRenderer(self.locale).write_buffers(song=song)
-        else:  # Ascii
-            buffers = SongASCIIRenderer(self.locale).write_buffers(song=song)
 
-        return buffers
+
+    def write_buffers(self, song, **kwargs):
+        
+        return
 
 
 class SongHTMLRenderer(SongRenderer):
@@ -54,7 +45,7 @@ class SongHTMLRenderer(SongRenderer):
         self.HTML_note_width = '1em'
 
     def write_buffers(self, song, css_mode=CSSMode.EMBED, rel_css_path='css/main.css'):
-
+                
         meta = song.get_meta()
         css_path = Resources.css_path
         
@@ -93,6 +84,8 @@ class SongHTMLRenderer(SongRenderer):
         song_render = ''
         instrument_index = 0
         song_lines = song.get_lines()
+        instrument_renderer = InstrumentHTMLRenderer(self.locale)
+        
         for line in song_lines:
             if len(line) > 0:
                 if line[0].get_type() == 'voice':
@@ -103,7 +96,8 @@ class SongHTMLRenderer(SongRenderer):
                 line_render = '\n'
                 for instrument in line:
                     instrument.set_index(instrument_index)
-                    instrument_render = instrument.render_in_html(self.HTML_note_width)
+                    #instrument_render = instrument.render_in_html(self.HTML_note_width)
+                    instrument_render = instrument_renderer.render(instrument, self.HTML_note_width)
                     instrument_render += ' '
                     instrument_index += 1
                     line_render += instrument_render
@@ -160,6 +154,7 @@ class SongSVGRenderer(SongRenderer):
             print(f"\nYour song is too long. Stopping at {self.maxFiles} files.")
             return buffer_list
 
+        instrument_renderer = InstrumentSVGRenderer(self.locale)
         css_path = Resources.css_path
         meta = song.get_meta()
         svg_buffer = io.StringIO()
@@ -313,7 +308,8 @@ class SongSVGRenderer(SongRenderer):
                         y += self.SVG_harp_size[1] + self.SVG_harp_spacings[1] / 2.0
 
                 # INSTRUMENT RENDER
-                instrument_render = instrument.render_in_svg(x, f"{(100.0 * self.SVG_harp_size[0] / self.SVG_line_width)}%", "100%", self.harp_AspectRatio)
+#                instrument_render = instrument.render_in_svg(x, f"{(100.0 * self.SVG_harp_size[0] / self.SVG_line_width)}%", "100%", self.harp_AspectRatio)
+                instrument_render = instrument_renderer.render(instrument, x, f"{(100.0 * self.SVG_harp_size[0] / self.SVG_line_width)}%", "100%", self.harp_AspectRatio)
 
                 # REPEAT
                 if instrument.get_repeat() > 1:
@@ -363,14 +359,13 @@ class SongPNGRenderer(SongRenderer):
         if not no_PIL_module:
             self.png_size = (round(self.aspect_ratio*750 * 2), 750 * 2)  # must be an integer tuple
             self.png_margins = (13, 7)
-            self.png_harp_size0 = instruments.Harp().render_in_png().size  # A tuple
+            self.png_harp_size0 = InstrumentPNGRenderer(self.locale).get_png_chord_size()  # A tuple
             self.png_harp_spacings0 = (int(self.harp_relspacings[0] * self.png_harp_size0[0]),
                                        int(self.harp_relspacings[1] * self.png_harp_size0[1]))
             self.png_harp_size = None
             self.png_harp_spacings = None
-            self.png_line_width = int(self.png_size[0] - self.png_margins[
-                0])  # self.png_lyric_relheight = instruments.Voice().lyric_relheight
-            self.png_lyric_size0 = (self.png_harp_size0[0], instruments.Voice().get_lyric_height())
+            self.png_line_width = int(self.png_size[0] - self.png_margins[0])  # self.png_lyric_relheight = instruments.Voice().lyric_relheight
+            self.png_lyric_size0 = (self.png_harp_size0[0], InstrumentPNGRenderer(self.locale).get_lyric_height())
             self.png_lyric_size = None
             self.png_dpi = (96 * 2, 96 * 2)
             self.png_compress = 6
@@ -440,6 +435,7 @@ class SongPNGRenderer(SongRenderer):
             return buffer_list
         
         meta = song.get_meta()
+        instrument_renderer = InstrumentPNGRenderer(self.locale)
         
         # Determines png size as a function of the numer of chords per line
         self.set_png_harp_size(song.get_max_instruments_per_line())
@@ -558,7 +554,8 @@ class SongPNGRenderer(SongRenderer):
                                                 self.png_color)
 
                 # INSTRUMENT RENDER
-                instrument_render = instrument.render_in_png(harp_rescale)
+                #instrument_render = instrument.render_in_png(harp_rescale)
+                instrument_render = instrument_renderer.render(instrument, harp_rescale)
                 line_render = trans_paste(line_render, instrument_render, (int(x), int(y)))
 
                 x += max(self.png_harp_size[0], instrument_render.size[0])
@@ -648,6 +645,7 @@ class SongMIDIRenderer(SongRenderer):
             print("\n***Warning: invalid instrument passed to MIDI renderer. Using piano instead.\n")
             track.append(mido.Message('program_change', program=1, time=0))
 
+        instrument_renderer = InstrumentMIDIRenderer(self.locale)
         song_lines = song.get_lines()
         for line in song_lines:
             if len(line) > 0:
@@ -655,7 +653,9 @@ class SongMIDIRenderer(SongRenderer):
                     instrument_index = 0
                     for instrument in line:
                         instrument.set_index(instrument_index)
-                        instrument_render = instrument.render_in_midi(note_duration=note_ticks,
+                        #instrument_render = instrument.render_in_midi(note_duration=note_ticks,
+                        #                                              music_key=song.get_music_key())
+                        instrument_render = instrument_renderer.render(instrument, note_duration=note_ticks,
                                                                       music_key=song.get_music_key())
                         for i in range(0, instrument.get_repeat()):
                             for note_render in instrument_render:
@@ -680,6 +680,7 @@ class SongASCIIRenderer(SongRenderer):
         ascii_buffer = io.StringIO()
 
         note_parser = render_mode.get_note_parser()
+        instrument_renderer = InstrumentASCIIRenderer(self.locale)
         
         ascii_buffer.write('#%s\n' % meta['title'][1])
 
@@ -687,13 +688,15 @@ class SongASCIIRenderer(SongRenderer):
             if k != 'title':
                 ascii_buffer.write('#%s %s\n' % (meta[k][0], meta[k][1]))
 
+        
         song_render = '\n'
         instrument_index = 0
         for line in song.get_lines():
             line_render = ''
             for instrument in line:
                 instrument.set_index(instrument_index)
-                instrument_render = instrument.render_in_ascii(note_parser)
+                #instrument_render = instrument.render_in_ascii(note_parser)
+                instrument_render = instrument_renderer.render(instrument, note_parser)
                 instrument_index += 1
                 line_render += instrument_render + ' '
             song_render += '\n' + line_render
