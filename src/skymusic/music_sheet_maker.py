@@ -323,7 +323,7 @@ class MusicSheetMaker:
 
     def ask_instructions(self, recipient, prerequisites=None, execute=True):
 
-        question_rep = ('\n'.join(['\n* ' + input_mode.get_long_desc(self.locale) for input_mode in InputMode]),
+        rep = ('\n'.join(['\n* ' + input_mode.get_long_desc(self.locale) for input_mode in InputMode]),
                         self.get_song_parser().get_icon_delimiter().replace('\s','<space>'), self.get_song_parser().get_pause().replace('\s','<space>'),
                         self.get_song_parser().get_quaver_delimiter().replace('\s','<space>'),
                         self.get_song_parser().get_quaver_delimiter().replace('\s','<space>').join(['A1', 'B1', 'C1']),
@@ -332,13 +332,13 @@ class MusicSheetMaker:
 
         if self.is_commandline(recipient):
             i_instr = self.communicator.send_stock_query('instructions_stdout', recipient=recipient,
-                                                         question_rep=question_rep, prerequisites=prerequisites)
+                                                         question_rep=rep, prerequisites=prerequisites)
         elif self.is_website(recipient):
             i_instr = self.communicator.send_stock_query('instructions_website', recipient=recipient,
-                                                         question_rep=question_rep, prerequisites=prerequisites)
+                                                         question_rep=rep, prerequisites=prerequisites)
         else:
             i_instr = self.communicator.send_stock_query('instructions_botcog', recipient=recipient,
-                                                         question_rep=question_rep, prerequisites=prerequisites)
+                                                         helptext_rep=rep, prerequisites=prerequisites)
 
         if execute:
             recipient.execute_queries(i_instr)

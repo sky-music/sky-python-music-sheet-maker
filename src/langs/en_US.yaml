@@ -79,19 +79,21 @@ stock_queries:
   instructions_botcog:
     foreword:
     question: |
-      Accepted music notes formats:{0}
-
+      Welcome to the Visual Song Sheet creator!
+      I am going to ask you several questions to build your song sheet.
+      Type '?' to get help for a particular question.
+    afterword:
+    input_tip:
+    help_text: |
+      I accept the following music notes formats:{0}
+      
+      Pay attention to these special characters:
       - Notes composing a chord must be glued together (e.g. A1B1C1).
       - Separate chords with "{1}".
       - Use "{2}" for a silence (rest).
       - Use "{3}" to link notes within an icon, for triplets, quavers... (e.g. {4})
       - Add "{5}" after a chord to indicate repetition.
       - Sharps # and flats b (semitones) are supported for Western and Jianpu notations.
-
-      Type '?' to get help for a particular question
-    afterword:
-    input_tip:
-    help_text:
   render_modes:
     foreword:
     question: Please choose one or several output rendering formats

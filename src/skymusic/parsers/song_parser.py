@@ -102,7 +102,9 @@ class SongParser:
                     print("***WARNING: You used the same delimiter for different purposes.")
 
     def get_possible_modes(self, song_lines=None):
-
+        """
+        Returns all the possible InputMode for the textual song 'song_lines'
+        """
         if self.input_mode is not None:
             return [self.input_mode]
         else:
@@ -153,7 +155,6 @@ class SongParser:
             return self.note_parser.english_note_name(note_name, reverse)
 
     def split_icon(self, icon, delimiter=None):
-
         """
         An icon is a collection of chords assembled with '-': ['A1C2-F3D4', 'C#4B4-Gb3A2']
         This method splits an icon into a list of chords:  ['A1C2', 'F3D4', 'C#4B4', 'Gb3A2']
@@ -173,7 +174,7 @@ class SongParser:
         try:
             repeat = int(re.split(re.escape(self.repeat_indicator), chord)[1])
             chord = re.split(re.escape(self.repeat_indicator), chord)[0]
-        except:
+        except (IndexError, ValueError):
             repeat = 1
 
         if note_parser is None:
@@ -187,6 +188,11 @@ class SongParser:
         return repeat, chord
 
     def parse_chords(self, chords, song_key='C', note_shift=0):
+        """
+        Creates a skygrid from the harp's chord notes
+        # For each chord, sets the highlighted state of each note accordingly (True or False)
+        """
+
         # Individual note is a single-element list: chords=['A5']
         # Real chord is a single element list: chords=['B1A1A3']
         # Triplets and quavers are a list of notes or chords: chords=['B2', 'B3B1', 'B4', 'B5', 'C1', 'C2']
@@ -203,12 +209,6 @@ class SongParser:
             self.set_note_parser()
 
         for chord_idx, chord in enumerate(chords):
-            """
-            Creates a skygrid from the harp's chord notes
-            # For each chord, sets the highlighted state of each note accordingly (True or False)
-            """
-            # TODO: this line is useless since we don't use position maps anymore.
-            # chord = re.sub(re.escape(self.pause), '.', chord) #Replaces the pause character by the default
 
             if isinstance(self.note_parser, src.skymusic.parsers.noteparsers.englishchords.EnglishChords):
                 chord = self.note_parser.decode_chord(chord)
@@ -219,7 +219,6 @@ class SongParser:
             harp_broken = False
             harp_silent = False
             for note in chord:  # Chord is a list of notes
-                # Except InvalidLetterException
                 try:
                     if note == self.pause:
                         highlighted_note_position = (-1, -1)
@@ -241,19 +240,13 @@ class SongParser:
         return results
 
     def sanitize_line(self, line):
-
         """
         Strip leading spaces and replace surnumerous spaces
         :param line:
         :return:
         """
-
         # Remove surnumerous spaces from line
-        line = line.strip()
-        
-#        if self.icon_delimiter == '\s':
-#            line = re.sub(self.icon_delimiter + '{2,' + str(max(2, len(line))) + '}', self.icon_delimiter, line)
-#        else:
+        line = line.strip()        
         line = re.sub(re.escape(self.icon_delimiter) + '{2,' + str(max(2, len(line))) + '}', re.escape(self.icon_delimiter),
                       line)  # removes surnumerous spaces
         
@@ -295,7 +288,10 @@ class SongParser:
         return instrument_line
 
     def parse_song(self, song_lines, song_key, octave_shift):
-
+        """
+        Create a Song object from the textual song in 'song_lines'
+        Requires knowledge of the input mode and the song key.
+        """
         if isinstance(song_lines, str):  # Break newlines and make sure the result is a List
             song_lines = song_lines.split(os.linesep)
 
@@ -304,7 +300,6 @@ class SongParser:
         note_shift = self.get_note_parser().get_base_of_western_major_scale() * octave_shift
 
         # Parses song line by line
-        #song = Song(maker=self.get_maker(), music_key=english_song_key)  # The song key must be in English format
         song = Song(locale=self.locale, music_key=english_song_key)
         for song_line in song_lines:
             instrument_line = self.parse_line(song_line, song_key,
@@ -313,62 +308,16 @@ class SongParser:
 
         return song
 
-    def find_key(self, song_lines):
-
-        if isinstance(song_lines, str):  # Break newlines and make sure the result is a List
-            song_lines = song_lines.split(os.linesep)
-
-        if self.note_parser is None:
-            self.set_note_parser()
-        # print('note parser is:')
-        # print(self.note_parser)
-
-        try:
-            possible_keys = [k for k in self.note_parser.CHROMATIC_SCALE_DICT.keys()]
-            is_note_regex = self.note_parser.note_name_regex
-            not_note_regex = self.note_parser.not_note_name_regex
-            # print(possible_keys)
-        except AttributeError:
-            # Parsers not having a chromatic scale keys should return None, eg Sky and Skykeyboard
-            return None
-        # print(possible_keys)
-        scores = [0] * len(possible_keys)
-        num_notes = [0] * len(possible_keys)
-        for line in song_lines:
-            if len(line) > 0:
-                if line[0] != self.comment_delimiter:
-                    notes = is_note_regex.sub(' \\1',
-                                              not_note_regex.sub('', line)).split()  # Clean-up, adds space and split
-                    for i, k in enumerate(possible_keys):
-                        for note in notes:
-                            num_notes[i] += 1
-                            try:
-                                # TODO: Support for Jianpu which uses a different octave indexing system
-                                self.note_parser.calculate_coordinate_for_note(note, k, note_shift=0,
-                                                                               is_finding_key=True)
-                            except KeyError:
-                                scores[i] += 1
-                            except SyntaxError:  # Wrongly formatted notes are ignored
-                                num_notes[i] -= 1
-
-        num_notes = [1 if x == 0 else x for x in num_notes]
-        # Removes zeros to avoid division by zero
-        scores = list(map(truediv, scores, num_notes))
-        scores = [(1 - score) for score in scores]
-
-        # duplicates_dict = self.CHROMATIC_SCALE_DICT
-        return self.most_likely(scores, possible_keys, 0.9, self.note_parser.CHROMATIC_SCALE_DICT)
 
     def detect_input_mode(self, song_lines):
         """
-        Attempts to detect input musical notation
+        Attempts to detect input musical notation for the textual song in 'song_lines'
         """
         if isinstance(song_lines, str):  # Break newlines and make sure the result is a List
             song_lines = song_lines.split(os.linesep)
 
         possible_modes = [mode for mode in InputMode]
         possible_parsers = [self.get_note_parser(mode) for mode in possible_modes]
-        # position_maps = [self.get_note_parser(mode).position_map for mode in possible_modes]
         possible_regex = [parser.single_note_name_regex for parser in possible_parsers]
 
         good_notes = [0] * len(possible_modes)
@@ -423,12 +372,59 @@ class SongParser:
         if ((qwrt_notes == 0) or (qwrt_notes < 0.01 and octave_span <= 1)) and (
                 num_notes[possible_modes.index(InputMode.SKYKEYBOARD)] > 5):
             scores[possible_modes.index(InputMode.SKYKEYBOARD)] *= 0.5
-        # print(scores)
 
         return self.most_likely(scores, possible_modes, 0.9)
 
-    def most_likely(self, scores, items, threshold=0.9, duplicates_dict=None):
+    def find_key(self, song_lines):
+        """
+        Attempts to find the musical key for the textual song in 'input_lines'.
+        Requires knoledge of the musical notation (input_mode) first.
+        """
+        if isinstance(song_lines, str):  # Break newlines and make sure the result is a List
+            song_lines = song_lines.split(os.linesep)
 
+        if self.note_parser is None:
+            self.set_note_parser()
+
+        try:
+            possible_keys = [k for k in self.note_parser.CHROMATIC_SCALE_DICT.keys()]
+            is_note_regex = self.note_parser.note_name_regex
+            not_note_regex = self.note_parser.not_note_name_regex
+        except AttributeError:
+            # Parsers not having a chromatic scale keys should return None, eg Sky and Skykeyboard
+            return None
+        scores = [0] * len(possible_keys)
+        num_notes = [0] * len(possible_keys)
+        for line in song_lines:
+            if len(line) > 0:
+                if line[0] != self.comment_delimiter:
+                    notes = is_note_regex.sub(' \\1',
+                                              not_note_regex.sub('', line)).split()  # Clean-up, adds space and split
+                    for i, k in enumerate(possible_keys):
+                        for note in notes:
+                            num_notes[i] += 1
+                            try:
+                                # TODO: Support for Jianpu which uses a different octave indexing system
+                                self.note_parser.calculate_coordinate_for_note(note, k, note_shift=0,
+                                                                               is_finding_key=True)
+                            except KeyError:
+                                scores[i] += 1
+                            except SyntaxError:  # Wrongly formatted notes are ignored
+                                num_notes[i] -= 1
+
+        num_notes = [1 if x == 0 else x for x in num_notes]
+        # Removes zeros to avoid division by zero
+        scores = list(map(truediv, scores, num_notes))
+        scores = [(1 - score) for score in scores]
+
+        return self.most_likely(scores, possible_keys, 0.9, self.note_parser.CHROMATIC_SCALE_DICT)
+
+
+    def most_likely(self, scores, items, threshold=0.9, duplicates_dict=None):
+        """
+        Returns the items with scores above threshold, removing duplicates defined in the dict       
+        
+        """
         if len(scores) == 0:
             return None
         if len(scores) == 1:
@@ -438,8 +434,6 @@ class SongParser:
             *sorted([(i, e) for i, e in enumerate(scores)], key=itemgetter(1), reverse=True))
 
         sorted_items = [items[i] for i in sorted_idx]
-        # print(sorted_scores)
-        # print(sorted_items)
 
         if sorted_scores[0] == 1 and sorted_scores[1] < 1:
             return [sorted_items[0]]
@@ -454,8 +448,6 @@ class SongParser:
             return [k for i, k in enumerate(sorted_items) if sorted_scores[i] == 1]
 
         if sorted_scores[0] < threshold:
-            # contrasts = [(score-min(sorted_scores))/(score+min(sorted_scores)) if score!=0 else 0 for score in
-            # sorted_scores ]
             sorted_items = [k for i, k in enumerate(sorted_items) if sorted_scores[i] > threshold / 2]
         else:
             sorted_scores = list(map(truediv, sorted_scores, [max(sorted_scores)] * len(sorted_scores)))

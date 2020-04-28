@@ -2,7 +2,7 @@ import re, os
 from src.skymusic.modes import ReplyType, InputMode, RenderMode
 from datetime import datetime
 import hashlib
-import io
+#import io
 
 
 class QueryError(Exception):

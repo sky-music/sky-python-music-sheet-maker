@@ -80,6 +80,12 @@ stock_queries:
   instructions_botcog:
     foreword:
     question: |
+      Welcome to the Visual Song Sheet creator!
+      I am going to ask you several questions to build your song sheet.
+      Nhập '?' để được trợ giúp cho câu hỏi cụ thể
+    afterword:
+    input_tip:
+    help_text: |
       Dạng nốt nhạc được chấp nhận: {0}
 
       - Khi viết hợp âm phải dính các phím lại với nhau (VD: A1B1C1).
@@ -88,11 +94,6 @@ stock_queries:
       - Sử dụng "{3}" để nối nốt trong một biểu tượng (liên ba, láy rền/hát rung,...) (VD: {4})
       - Thêm "{5}" sau một hợp âm để biểu thị sự lập lại (repetition).
       - Dấu thăng # và dấu giáng b (nửa cung) được hỗ trợ cho hệ kí tự Phương Tây và Jianpu.
-      
-      Nhập '?' để được trợ giúp cho câu hỏi cụ thể
-    afterword:
-    input_tip:
-    help_text:
   render_modes:
     foreword:
     question: Hãy chọn các định dạng xuất bản đầu ra (rendering formats) 
