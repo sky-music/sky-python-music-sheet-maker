@@ -57,7 +57,7 @@ stock_queries:
       - Sử dụng "{2}" để ngắt quãng (nghỉ).
       - Sử dụng "{3}" để nối nốt trong một biểu tượng (liên ba, láy rền/hát rung,...) (VD: {4})
       - Thêm "{5}" sau một hợp âm để biểu thị sự lập lại (repetition).
-      - Dấu thăng # và dấu giáng b (nửa cung) được hỗ trợ cho hệ kí tự Phương Tây và Jianpu.
+      - Dấu thăng "#" và dấu giáng "b" (nửa cung) được hỗ trợ cho hệ kí tự Phương Tây và Jianpu.
       
       Nhập '?' để được trợ giúp cho câu hỏi cụ thể
     afterword: =======================================
@@ -73,7 +73,7 @@ stock_queries:
       - Sử dụng "{2}" để ngắt quãng (nghỉ).
       - Sử dụng "{3}" để nối nốt trong một biểu tượng (liên ba, láy rền/hát rung,...) (VD: {4})
       - Thêm "{5}" sau một hợp âm để biểu thị sự lập lại (repetition).
-      - Dấu thăng # và dấu giáng b (nửa cung) được hỗ trợ cho hệ kí tự Phương Tây và Jianpu.
+      - Dấu thăng "#" và dấu giáng "b" (nửa cung) được hỗ trợ cho hệ kí tự Phương Tây và Jianpu.
     afterword:
     input_tip: Bấm OK để tiếp tục
     help_text:
@@ -93,7 +93,7 @@ stock_queries:
       - Sử dụng "{2}" để ngắt quãng (nghỉ).
       - Sử dụng "{3}" để nối nốt trong một biểu tượng (liên ba, láy rền/hát rung,...) (VD: {4})
       - Thêm "{5}" sau một hợp âm để biểu thị sự lập lại (repetition).
-      - Dấu thăng # và dấu giáng b (nửa cung) được hỗ trợ cho hệ kí tự Phương Tây và Jianpu.
+      - Dấu thăng "#" và dấu giáng "b" (nửa cung) được hỗ trợ cho hệ kí tự Phương Tây và Jianpu.
   render_modes:
     foreword:
     question: Hãy chọn các định dạng xuất bản đầu ra (rendering formats) 
@@ -133,13 +133,19 @@ stock_queries:
     afterword:
     input_tip: Tên nốt như dạng C1 D1F1, hoặc tên tệp như song.txt
     help_text: |
-      Bạn có thể nhập hoặc cắt-dán nốt trực tiếp trong vùng nhập này.
-      Bạn cũng có thể nhập đường dẫn đến một tệp bao gồm các nốt.
+      Dạng nốt nhạc được chấp nhận: {0}
+      
+      - Khi viết hợp âm phải dính các phím lại với nhau (VD: A1B1C1).
+      - Tách các hợp âm bằng: "{1}".
+      - Sử dụng "{2}" để ngắt quãng (nghỉ).
+      - Sử dụng "{3}" để nối nốt trong một biểu tượng (liên ba, láy rền/hát rung,...) (VD: {4})
+      - Thêm "{5}" sau một hợp âm để biểu thị sự lập lại (repetition).
+      - Dấu thăng "#" và dấu giáng "b" (nửa cung) được hỗ trợ cho hệ kí tự Phương Tây và Jianpu.
   file:
     foreword:
     question: 'Nhập tên tệp (trong {0}/)'
     afterword:
-    input_tip: Bất kì tên tệp chứa nốt nhạc.
+    input_tip: any text file containing one or several musical notes.
     help_text:
   notes:
     foreword:
@@ -147,8 +153,14 @@ stock_queries:
     afterword:
     input_tip: bất kì kí tự với một hoặc nhiều nốt nhạc 
     help_text: |
-      Nhập một hoặc nhiều nốt nhạc với định dạng bạn yêu thích, như là: C D E F G.
-      Đối với hợp âm (nốt được chơi cùng nhau), dính chúng lại với nhau (VD: C1D1)
+      Dạng nốt nhạc được chấp nhận: {0}
+      
+      - Khi viết hợp âm phải dính các phím lại với nhau (VD: A1B1C1).
+      - Tách các hợp âm bằng: "{1}".
+      - Sử dụng "{2}" để ngắt quãng (nghỉ).
+      - Sử dụng "{3}" để nối nốt trong một biểu tượng (liên ba, láy rền/hát rung,...) (VD: {4})
+      - Thêm "{5}" sau một hợp âm để biểu thị sự lập lại (repetition).
+      - Dấu thăng "#" và dấu giáng "b" (nửa cung) được hỗ trợ cho hệ kí tự Phương Tây và Jianpu.
   one_input_mode:
     foreword:
     question: |
@@ -234,7 +246,7 @@ stock_queries:
     afterword: |
       'Vui lòng kiểm tra những lỗi sau:
 
-      - Tất cả các nốt nhạc phải ở từ 4 đến 6 quãng tám. Nếu không, hãy thử lại với nốt quãng tám.
+      - Tất cả các nốt nhạc phải ở từ 1 đến 3 quãng tám. Nếu không, hãy thử lại với nốt quãng tám.
       - Bài hát của bạn không có lỗi chính tả. Vui lòng xem hướng dẫn đầy đủ ở trang web này: 
 
       https://sky.bloomexperiment.com/t/summary-of-input-modes/403 (tiếng Anh)'

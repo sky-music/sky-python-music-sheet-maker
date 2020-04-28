@@ -400,7 +400,14 @@ class MusicSheetMaker:
 
     def ask_notes(self, recipient, prerequisites=None, execute=True):
 
-        q_notes = self.communicator.send_stock_query('notes', recipient=recipient, prerequisites=prerequisites)
+        helptext_rep = ('\n'.join(['\n* ' + input_mode.get_long_desc(self.locale) for input_mode in InputMode]),
+                self.get_song_parser().get_icon_delimiter().replace('\s','<space>'), self.get_song_parser().get_pause().replace('\s','<space>'),
+                self.get_song_parser().get_quaver_delimiter().replace('\s','<space>'),
+                self.get_song_parser().get_quaver_delimiter().replace('\s','<space>').join(['A1', 'B1', 'C1']),
+                self.get_song_parser().get_repeat_indicator() + '2'
+                )
+        
+        q_notes = self.communicator.send_stock_query('notes', recipient=recipient, helptext_rep=helptext_rep, prerequisites=prerequisites)
 
         if execute:
             recipient.execute_queries(q_notes)
@@ -447,14 +454,21 @@ class MusicSheetMaker:
         If notes are detected, return the notes as a list of strings splitted by the OS line separator
         """
 
+        helptext_rep = ('\n'.join(['\n* ' + input_mode.get_long_desc(self.locale) for input_mode in InputMode]),
+                self.get_song_parser().get_icon_delimiter().replace('\s','<space>'), self.get_song_parser().get_pause().replace('\s','<space>'),
+                self.get_song_parser().get_quaver_delimiter().replace('\s','<space>'),
+                self.get_song_parser().get_quaver_delimiter().replace('\s','<space>').join(['A1', 'B1', 'C1']),
+                self.get_song_parser().get_repeat_indicator() + '2'
+                )
+
         if not self.is_commandline(recipient):
 
-            return self.ask_notes(recipient=recipient, prerequisites=prerequisites, execute=execute)
+            return self.ask_notes(recipient=recipient, prerequisites=prerequisites, helptext_rep=helptext_rep, execute=execute)
 
         else:
 
             q_notes = self.communicator.send_stock_query('notes_file', question_rep=(os.path.relpath(os.path.normpath(self.song_dir_in)),),
-                                                         recipient=recipient, prerequisites=prerequisites)
+                                                         recipient=recipient, helptext_rep=helptext_rep, prerequisites=prerequisites)
 
             if not execute:
                 return q_notes, None
@@ -486,19 +500,17 @@ class MusicSheetMaker:
                 else:
                     notes = result.split(os.linesep)  # Returns a list of strings in any case
 
-                    if self.is_commandline(
-                            recipient):  # Loop to ask for several lines in the standard input interface
+                    if self.is_commandline(recipient):  # Loop to ask for several lines in the standard input interface
                         while result:
-                            q_notes = self.communicator.send_stock_query('notes', recipient=recipient,
-                                                                         prerequisites=prerequisites)
-                            recipient.execute_queries(q_notes)
-                            result = q_notes.get_reply().get_result()
-
+                            
+                            (q_notes, result) = self.ask_notes(recipient=recipient, prerequisites=prerequisites, execute=execute)
+                            
                             result = result.split(os.linesep)
                             for result in result:
                                 notes.append(result)
 
                 return q_notes, notes
+
 
     def retrieve_notes(self, recipient):
         """

@@ -56,7 +56,7 @@ stock_queries:
       - Use "{2}" for a silence (rest).
       - Use "{3}" to link notes within an icon, for triplets, quavers... (e.g. {4})
       - Add "{5}" after a chord to indicate repetition.
-      - Sharps # and flats b (semitones) are supported for Western and Jianpu notations.
+      - Sharps "#" and flats "b" (semitones) are supported for Western and Jianpu notations.
       
       Type '?' to get help for a particular question
     afterword: =======================================
@@ -72,7 +72,7 @@ stock_queries:
       - Use "{2}" for a silence (rest).
       - Use "{3}" to link notes within an icon, for triplets, quavers... (e.g. {4})
       - Add "{5}" after a chord to indicate repetition.
-      - Sharps # and flats b (semitones) are supported for Western and Jianpu notations.
+      - Sharps "#" and flats "b" (semitones) are supported for Western and Jianpu notations.
     afterword:
     input_tip: click OK to acknowledge
     help_text:
@@ -93,7 +93,7 @@ stock_queries:
       - Use "{2}" for a silence (rest).
       - Use "{3}" to link notes within an icon, for triplets, quavers... (e.g. {4})
       - Add "{5}" after a chord to indicate repetition.
-      - Sharps # and flats b (semitones) are supported for Western and Jianpu notations.
+      - Sharps "#" and flats "b" (semitones) are supported for Western and Jianpu notations.
   render_modes:
     foreword:
     question: Please choose one or several output rendering formats
@@ -133,13 +133,20 @@ stock_queries:
     afterword:
     input_tip: a string of notes such as C1 D1F1, or a file name such as song.txt
     help_text: |
-      You can type or copy-paste notes directly in this field.
-      You can also enter the path to a a text file containing the notes.
+      I accept the following music notes formats:{0}
+      
+      Pay attention to these special characters:
+      - Notes composing a chord must be glued together (e.g. A1B1C1).
+      - Separate chords with "{1}".
+      - Use "{2}" for a silence (rest).
+      - Use "{3}" to link notes within an icon, for triplets, quavers... (e.g. {4})
+      - Add "{5}" after a chord to indicate repetition.
+      - Sharps "#" and flats "b" (semitones) are supported for Western and Jianpu notations.
   file:
     foreword:
-    question: 'Enter file name (in {0}/)'
+    question: 'Enter a vali file name (in {0}/)'
     afterword:
-    input_tip: any text with one or several musical notes
+    input_tip: any text file containing one or several musical notes
     help_text:
   notes:
     foreword:
@@ -147,9 +154,15 @@ stock_queries:
     afterword:
     input_tip: any text with one or several musical notes (leave blank to skip)
     help_text: |
-      Type one or several notes in your favorite format, for instance C D E F G.
-      For chords (notes played together) glue the notes together (eg C1D1).
-      Leave the field blank and press enter if you are finished.
+      I accept the following music notes formats:{0}
+      
+      Pay attention to these special characters:
+      - Notes composing a chord must be glued together (e.g. A1B1C1).
+      - Separate chords with "{1}".
+      - Use "{2}" for a silence (rest).
+      - Use "{3}" to link notes within an icon, for triplets, quavers... (e.g. {4})
+      - Add "{5}" after a chord to indicate repetition.
+      - Sharps "#" and flats "b" (semitones) are supported for Western and Jianpu notations.
   one_input_mode:
     foreword:
     question: |
@@ -185,7 +198,7 @@ stock_queries:
     afterword:
     input_tip: Type the key name
     help_text: |
-      'Sky''s musical system does not include sharps # and flats b. Hence you cannot play any song from the outside world.
+      'Sky''s musical system does not include Sharps "#" and flats "b". Hence you cannot play any song from the outside world.
       We detected that your song can be played with several notes as the song key. Please choose the one that is most convenient for you.'
   recommended_key:
     foreword: Your musical notation uses relative pitch.
@@ -235,7 +248,7 @@ stock_queries:
     afterword: |
       'Please check the following:
       
-      - All your notes are within octaves 4 and 6. If not, try again with an octave shift.
+      - If you have specified the octave number, it must be between 1 and 3. If not, try again with an octave shift.
       - Your song is free of typos. Please check this website for full instructions: 
       
       https://sky.bloomexperiment.com/t/summary-of-input-modes/403'

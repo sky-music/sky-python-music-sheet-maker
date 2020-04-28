@@ -13,7 +13,7 @@ input_mode:
         long_desc: "Notation traditionelle (nom de la note do re mi fa sol la si + altération b/# + numéro d'octave, par ex dob1 re#1 mi2 ...)"
     jianpu:
         short_desc: 'Jianpu 1234567+-'
-        long_desc: "Jianpu (notes 1 2 3 4 5 6 7, suivi de l'altération b/# et d'un ou plusieurs + or - pour changer d'octave)"
+        long_desc: "Jianpu (notes 1 2 3 4 5 6 7, suivies de l'altération b/# et d'un ou plusieurs + or - pour changer d'octave)"
     englishchords:
         short_desc: Chords CDEFGABmaj
         long_desc: "Nom d'accord anglais (par exemple C, F, Dm, Bdim, A+, Csus2, Dsus4, C6, Cmaj7, Dm11)"
@@ -53,12 +53,12 @@ stock_queries:
       
       - Les notes composant un accord doivent être attachées (e.g. A1B1C1).
       - Separate chords with {1}
-      - Use "{2}" for a silence (rest).
-      - Use "{3}" to link notes within an icon, for triplets, quavers... (e.g. {4})
-      - Add "{5}" after a chord to indicate repetition.
-      - Sharps # and flats b (semitones) are supported for Western and Jianpu notations.
+      - Tapez "{2}" pour marquer une pause (silence).
+      - Tapez "{3}" pour relier les notes entre elles, pour les triplets... (e.g. {4})
+      - Tapez "{5}" après un groupe de notes pour indiquer la répétition.
+      - Les dièses "#" et les bémoles "b" (demi-tons) sont possibles pour les notations autres que Sky ABC-15.
       
-      Type '?' to get help for a particular question
+      Tapez '?' pour obtenir de l'aide après une question
     afterword: =======================================
     input_tip:
     help_text:
@@ -67,33 +67,32 @@ stock_queries:
     question: |
       Formats de notes acceptés :{0}
       
-      - Notes composing a chord must be glued together (e.g. A1B1C1).
+      - Les notes composant un accord doivent être attachées (e.g. A1B1C1).
       - Separate chords with {1}
-      - Use "{2}" for a silence (rest).
-      - Use "{3}" to link notes within an icon, for triplets, quavers... (e.g. {4})
-      - Add "{5}" after a chord to indicate repetition.
-      - Sharps # and flats b (semitones) are supported for Western and Jianpu notations.
+      - Tapez "{2}" pour marquer une pause (silence).
+      - Tapez "{3}" pour relier les notes entre elles, pour les triplets... (e.g. {4})
+      - Tapez "{5}" après un groupe de notes pour indiquer la répétition.
+      - Les dièses "#" et les bémoles "b" (demi-tons) sont possibles pour les notations autres que Sky ABC-15.
     afterword:
     input_tip: cliquez sur OK pour passer
     help_text:
   instructions_botcog:
     foreword:
     question: |
-      Welcome to the Visual Song Sheet creator!
-      I am going to ask you several questions to build your song sheet.
-      Type '?' to get help for a particular question.
+      Bienvenue dans le créateur de portée visuelles pour Sky!
+      Je vais vous posez plusieurs questions afin de construire votre portée.
+      Tapez '?' après une question pour de l'aide supplémentaire.
     afterword:
     input_tip:
     help_text: |
-      I accept the following music notes formats:{0}
-        
-      Pay attention to these special characters:
-      - Notes composing a chord must be glued together (e.g. A1B1C1).
-      - Separate chords with "{1}".
-      - Use "{2}" for a silence (rest).
-      - Use "{3}" to link notes within an icon, for triplets, quavers... (e.g. {4})
-      - Add "{5}" after a chord to indicate repetition.
-      - Sharps # and flats b (semitones) are supported for Western and Jianpu notations.
+      Formats de notes acceptés :{0}
+      
+      - Les notes composant un accord doivent être attachées (e.g. A1B1C1).
+      - Separate chords with {1}
+      - Tapez "{2}" pour marquer une pause (silence).
+      - Tapez "{3}" pour relier les notes entre elles, pour les triplets... (e.g. {4})
+      - Tapez "{5}" après un groupe de notes pour indiquer la répétition.
+      - Les dièses "#" et les bémoles "b" (demi-tons) sont possibles pour les notations autres que Sky ABC-15.
   render_modes:
     foreword:
     question: Merci de choisir les formats d'exportation de la chanson
@@ -133,13 +132,19 @@ stock_queries:
     afterword:
     input_tip: du texte contenant des notes telles que C1 D1F1, do re mi, ou un nom de fichier comme song.txt
     help_text: |
-      Vous pouvez taper les notes directement ici, ou les copier-coller.
-      Vous pouve aussi taper le nom d'un fichier texte contenant les notes'.
+      Formats de notes acceptés :{0}
+      
+      - Les notes composant un accord doivent être attachées (e.g. A1B1C1).
+      - Separate chords with {1}
+      - Tapez "{2}" pour marquer une pause (silence).
+      - Tapez "{3}" pour relier les notes entre elles, pour les triplets... (e.g. {4})
+      - Tapez "{5}" après un groupe de notes pour indiquer la répétition.
+      - Les dièses "#" et les bémoles "b" (demi-tons) sont possibles pour les notations autres que Sky ABC-15.
   file:
     foreword:
-    question: 'Entrez un nom de fichier (dans {0}/)'
+    question: 'Entrez un nom de fichier valide (dans {0}/)'
     afterword:
-    input_tip: du texte contenant des notes de musique
+    input_tip: un fichier texte contenant des notes de musique
     help_text:
   notes:
     foreword:
@@ -147,8 +152,14 @@ stock_queries:
     afterword:
     input_tip: du texte contenant des notes de musique
     help_text: |
-      Tapez des notes de musiques avec votre notation habituelle, par exemple do re mi fa sol.
-      Pour les accords (notes juées simultanément) laissez les notes collées (par ex. domi)
+      Formats de notes acceptés :{0}
+      
+      - Les notes composant un accord doivent être attachées (e.g. A1B1C1).
+      - Separate chords with {1}
+      - Tapez "{2}" pour marquer une pause (silence).
+      - Tapez "{3}" pour relier les notes entre elles, pour les triplets... (e.g. {4})
+      - Tapez "{5}" après un groupe de notes pour indiquer la répétition.
+      - Les dièses "#" et les bémoles "b" (demi-tons) sont possibles pour les notations autres que Sky ABC-15.
   one_input_mode:
     foreword:
     question: |
@@ -232,10 +243,10 @@ stock_queries:
     foreword:
     question: "*ATTENTION*: Le décodage de votre chanson a généré beaucoup d'erreurs."
     afterword: |
-      'Please check the following:
+      'Veuillez vérifier les points suivants:
       
-      - All your notes are within octaves 4 and 6. If not, try again with an octave shift.
-      - Your song is free of typos. Please check this website for full instructions: 
+      - Si vous avez spécifié l'octave, il doit être entre 1 et 3. Sinon, recommencez en utilisant le décalage d'octave.
+      - Votre chanson ne contien pas d'erreur de frappe. Veuillez consulter ce site web pour plus d'infos: 
       
       https://sky.bloomexperiment.com/t/summary-of-input-modes/403'
     input_tip: cliquez sur OK pour passer
