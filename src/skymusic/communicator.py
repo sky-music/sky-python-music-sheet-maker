@@ -63,7 +63,24 @@ class Communicator:
         self.locale=self.set_locale(locale)
         # A dictionary of standard queries arguments
         # The key must be lower case without blanks, use _ instead
-        # TODO: create generic (quasi-empty) stock queries, such as Information to output dome text
+
+
+        '''
+        NOTE ABOUT LIMITS
+        
+        Limits must be an iterable (tuple, list, string)
+        For QueryChoice, it will be a list of choices
+        For QueryBoolean, it is a list of keywords grouped by pairs (yes, no, oui, non)
+        
+        If a ReplyType is specified in reply_type, limits must be of the same type
+        
+        For ReplyType.FILEPATH, it contains valid search directories and valid file extensions, in any order
+        
+        For ReplyType.NUMBER, it is a list of [min, max, default], default being optional
+        
+        For ReplyType.TEXT, limits can be a (compilable) regular expression
+        
+        '''
         self.query_stock = {
             # Queries asked by the Player / Music Cog
             'create_song': {'class': QueryOpen.__name__,
@@ -125,7 +142,7 @@ class Communicator:
                              'input_tip': Lang.get_string("stock_queries/aspect_ratio/input_tip", self.locale),
                              'help_text': Lang.get_string("stock_queries/aspect_ratio/help_text", self.locale),
                              'reply_type': ReplyType.NUMBER,
-                             'limits': [0.1, 10.0]
+                             'limits': [0.1, 10.0, 16/9.0]
                              },
 
             'song_title': {'class': QueryOpen.__name__,
@@ -262,7 +279,7 @@ class Communicator:
                              'input_tip': Lang.get_string("stock_queries/octave_shift/input_tip", self.locale),
                              'help_text': Lang.get_string("stock_queries/octave_shift/help_text", self.locale),
                              'reply_type': ReplyType.NUMBER,
-                             'limits': [-6, 6]
+                             'limits': [-6, 6, 0]
                              },
 
             'one_song_file': {'class': Information.__name__,

@@ -463,7 +463,7 @@ class MusicSheetMaker:
 
         if not self.is_commandline(recipient):
 
-            return self.ask_notes(recipient=recipient, prerequisites=prerequisites, helptext_rep=helptext_rep, execute=execute)
+            return self.ask_notes(recipient=recipient, prerequisites=prerequisites, execute=execute)
 
         else:
 

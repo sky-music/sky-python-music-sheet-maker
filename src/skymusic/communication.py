@@ -2,6 +2,7 @@ import re, os
 from src.skymusic.modes import ReplyType, InputMode, RenderMode
 from datetime import datetime
 import hashlib
+from fractions import Fraction
 #import io
 
 
@@ -79,8 +80,10 @@ class Reply:
         answer = self.answer
         if isinstance(answer, str):
             answer = answer.strip()
-        if self.query.get_reply_type() == ReplyType.NUMBER:
-            if answer == '':
+        if answer == '' and self.query.get_reply_type() == ReplyType.NUMBER:
+            try:
+                answer = str(self.query.get_limits()[2]) #Is a default value defined in limits?
+            except (TypeError, IndexError):
                 answer = '0'
         
         self.answer = answer
@@ -110,9 +113,11 @@ class Reply:
             index = self.query.get_answer_index() #QueryChoices always have limits
             self.result = limits[index]
         else:#QueryOpen
-            self.result = self.answer
-            if self.query.reply_type == ReplyType.NUMBER:
+            if self.query.get_reply_type() == ReplyType.NUMBER:
                 self.result = eval(self.answer)
+            else:
+                self.result = self.answer
+                
 
         return self.result
 
@@ -407,8 +412,7 @@ class Query:
             return True
         else:
             try:
-                if len(limits) == 0:
-                    return True
+                return len(limits) == 0
             except TypeError:
                 pass
             
@@ -442,10 +446,14 @@ class Query:
         if self.reply_type is None:
             if isinstance(limits[0], str):
                 try:
-                    float(eval(limits[0]))
+                    float(limits[0])
                     self.reply_type = ReplyType.NUMBER
-                except:
-                    self.reply_type == ReplyType.TEXT
+                except ValueError:
+                    try:
+                        Fraction(limits[0])
+                        self.reply_type = ReplyType.NUMBER
+                    except ValueError:
+                        self.reply_type == ReplyType.TEXT
             elif isinstance(limits[0], InputMode):
                 self.reply_type = ReplyType.INPUTMODE
             elif isinstance(limits[0], RenderMode):
@@ -473,77 +481,91 @@ class Query:
             answers = self.reply.get_answer() #answer exists because reply is a Reply object
             limits = self.get_limits()
                         
-            if answers is None:
+            if answers is None: #Even a non expect reply query expects an 'OK' answer                
                 return False
-            else:
-                               
-                if not self.expect_reply: # An answer is expected, whatever it is
-                    return True
-                
-                if not isinstance(answers, list):
-                    answers = [answers]
+             
+            if not self.expect_reply: # An answer is expected, whatever it is
+                return True
+            
+            if not isinstance(answers, list):
+                answers = [answers] #To call answers[0]
   
-                if any([type(answer) != type(answers[0]) for answer in answers]):
-                    return False
-                                
-                if self.reply_type in [ReplyType.TEXT, ReplyType.NOTE, ReplyType.FILEPATH]:
-                    if isinstance(answers[0], str):
-                        is_reply_valid = True
-                elif self.reply_type == ReplyType.NUMBER:
+            if any([type(answer) != type(answers[0]) for answer in answers]):
+                return False #All answers must be of the same type
+                   
+            # GENERAL CHECKING
+            if self.reply_type in [ReplyType.TEXT, ReplyType.NOTE, ReplyType.FILEPATH]:
+                if isinstance(answers[0], str):
+                    is_reply_valid = True
+                    
+            elif self.reply_type == ReplyType.NUMBER:
+                try:
+                    float(answers[0])
+                    is_reply_valid = True
+                except ValueError:
                     try:
-                        float(eval(answers[0]))
+                        Fraction(answers[0])
                         is_reply_valid = True
-                    except:
+                    except ValueError:
                         is_reply_valid = False
-                elif self.reply_type == ReplyType.INPUTMODE:
-                    if isinstance(answers[0], InputMode) or isinstance(answers[0], (str,int)):
-                        is_reply_valid = True #An input mode can be chosen using its order number in a list or its string description
-                elif self.reply_type == ReplyType.RENDERMODES:
-                    if isinstance(answers[0], RenderMode) or isinstance(answers[0], (str,int)):
-                        is_reply_valid = True #A render mode can be chosen using its order number in a list or its string description
-                elif self.reply_type == ReplyType.OTHER:
-                    if all([answer is None for answer in answers]):
-                        is_reply_valid = False
-                    elif all([answer == '' for answer in answers]):
-                        is_reply_valid = False
-                    else:
-                        is_reply_valid = True
+                        
+            elif self.reply_type == ReplyType.INPUTMODE:
+                if isinstance(answers[0], InputMode) or isinstance(answers[0], (str,int)):
+                    is_reply_valid = True #An input mode can be chosen using its order number in a list or its string description
+           
+            elif self.reply_type == ReplyType.RENDERMODES:
+                if isinstance(answers[0], RenderMode) or isinstance(answers[0], (str,int)):
+                    is_reply_valid = True #A render mode can be chosen using its order number in a list or its string description
+            
+            elif self.reply_type == ReplyType.OTHER:
+                if all([answer is None for answer in answers]):
+                    is_reply_valid = False
+                elif all([answer == '' for answer in answers]):
+                    is_reply_valid = False
                 else:
                     is_reply_valid = True
+            
+            else:
+                is_reply_valid = True
 
-                if self.reply_type == ReplyType.FILEPATH and limits is not None:
-                    """
-                    Checks if the file exist in the directories and with the extensions specified in limits
-                    """
-                    directories = [lim for lim in limits if os.path.isdir(lim)]
-                    extensions = [lim for lim in limits if not os.path.isdir(lim) and len(lim) >= 2 and len(lim) <= 5]
-                    extensions = ['.'+ext.split('.')[-1] for ext in extensions]
+            #CHECKING AGAINST LIMITS FOR FILEPATH
+            if self.reply_type == ReplyType.FILEPATH and limits is not None:
+                """
+                Checks if the file exist in the directories and with the extensions specified in limits
+                """
+                directories = [lim for lim in limits if os.path.isdir(lim)]
+                extensions = [lim for lim in limits if not os.path.isdir(lim) and len(lim) >= 2 and len(lim) <= 5]
+                extensions = ['.'+ext.split('.')[-1] for ext in extensions]                
+                directories += ['.']
+
+                if all([not os.path.isfile(os.path.normpath(os.path.join(directory, answers[0]))) for directory in directories]) and len(directories) != 0:
+
+                    is_reply_valid = False
+                                    
+                if all([re.search(ext,os.path.splitext(answers[0])[-1]) is None for ext in extensions]) and len(extensions) != 0:
+
+                    is_reply_valid = False
+            
+             
+            #CHECKING AGAINST LIMITS FOR NUMBERS
+            #In this case only answers[0] is checked
+            if self.reply_type == ReplyType.NUMBER and limits is not None and is_reply_valid is True:
+                try:
+                    num = float(answers[0])
+                except ValueError:
+                    num = float(Fraction(answers[0]))
                     
-                    directories += ['.']
-
-
-                    if all([not os.path.isfile(os.path.normpath(os.path.join(directory, answers[0]))) for directory in directories]) and len(directories) != 0:
-
-                        is_reply_valid = False
-                                        
-                    if all([re.search(ext,os.path.splitext(answers[0])[-1]) is None for ext in extensions]) and len(extensions) != 0:
-
-                        is_reply_valid = False
-                
-                #Maybe limits is an integer range
-                if self.reply_type == ReplyType.NUMBER and limits is not None and is_reply_valid is True:
-                    
-                    try:
-                        num = float(eval(answers[0]))
-                        low_lim = min(limits)
-                        high_lim = max(limits)
-                        
-                        if not (low_lim <= num <= high_lim):
-                            is_reply_valid = False
-                        if all([isinstance(limit, int) for limit in limits]) and int(num) != num:
-                            is_reply_valid = False
-                    except (ValueError, TypeError):
-                        is_reply_valid = False
+                try:                        
+                    low_lim = min(limits[:2])
+                    high_lim = max(limits[:2])
+                except (ValueError, TypeError):
+                    if len(limits) != 0:
+                        is_reply_valid = False #If limits is not None
+                else:
+                    if not (low_lim <= num <= high_lim):
+                        is_reply_valid = False                            
+                    if all([isinstance(limit, int) for limit in limits]) and int(num) != num:
+                        is_reply_valid = False #If limits are integers, answer must be an integer value
 
         return is_reply_valid
     
@@ -633,7 +655,6 @@ class Query:
         #self.check_and_pack() I dunno if an additional checking is necessary
         self.stamp()
         self.is_sent = True
-        # TODO: decide whether asking again resets the question to unreplied to (as here)
 
         self.is_replied = False
 
@@ -664,7 +685,6 @@ class Query:
         pre_satisfied = self.check_prerequisites()
         if not pre_satisfied:
             raise InvalidReplyError("This Query requires other queries to be satisfied first.")
-        # TODO: decide if is_replied must be set to False if the reply is invalid.
         return reply
 
 
