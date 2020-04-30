@@ -6,6 +6,11 @@ This program is not being actively maintained by Tracey. Feel free to take the c
 
 ***
 
+The script requires Python >= 3.6 and the following packages:
+* pillow (PIL)
+* import_resources (for Python < 3.7)
+* mido (optional: for generating midi output)
+
 See here for how to download and use. This currently requires a Desktop computer and is a work-in-progress.
 
 **Instructions:** https://sky.bloomexperiment.com/t/sky-python-music-sheet-maker/102#how-to-download
@@ -17,8 +22,10 @@ This program lets you make visual music sheets for Sky: Children of the Light. I
 As well as using QWERT ASDFG ZXCVB keys as the keyboard, there are other supported notations:
 
 - Sky notation (A1 A2 A3 A4 A5, B1 B2 B3 B4 B5, C1 C2 C3 C4 C5)
-- Western notation (C4, D4, E4, F4, G4, A4, B4)
+- English notation (C4, D4, E4, F4, G4, A4, B4)
 - Jianpu (1 2 3 4 5 6 7, followed by + or - for octaves)
+- French do ré mi
+- Japanese do ré mi
 
 You can type these in the command line, or save in a text file and import it. 
 
@@ -32,7 +39,8 @@ SVG icons are thanks to [madwurmz](http://madwurmz.com).
 
 **Translators:**
 
-- jdewfiez
+- jdewfiez (Vietnamese)
+- jmmelko (French)
 
 ***
 
