@@ -155,10 +155,12 @@ class Query:
         else:
             self.limits = limits # Choices, regexp...
         #Repairing prerequisites:
-        if not isinstance(prerequisites, (list,set,type(None))):
-            self.prerequisites = [prerequisites]
+        if prerequisites is None:
+            self.prerequisites = prerequisites
+        elif not isinstance(prerequisites, (list,set)):
+            self.prerequisites = list(filter(None, [prerequisites]))
         else:
-            self.prerequisites = prerequisites # Other Queries required to reply to this Query
+            self.prerequisites = list(filter(None, prerequisites)) # Other Queries required to reply to this Query
         self.identifier = None# An almost-unique ID based on the Query content, excluding the timestamp
         self.sent_time = None  # The timestamp at which the Query was sent()
         self.expect_reply = True # Currently used for Information queries

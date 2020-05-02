@@ -279,7 +279,7 @@ class MusicSheetMaker:
         (q_render, render_modes) = self.ask_render_modes(recipient=recipient)
 
         #2.c
-        (q_aspect, aspect_ratio) = self.ask_aspect_ratio(recipient=recipient, prerequisites=[i_instr])
+        (q_aspect, aspect_ratio) = self.ask_aspect_ratio(recipient=recipient, render_modes=render_modes, prerequisites=[q_render])
 
         # 3. Ask for notes
         # TODO: allow the player to enter the notes using several messages??? or maybe not
@@ -347,16 +347,23 @@ class MusicSheetMaker:
         else:
             return i_instr, None
 
-    def ask_aspect_ratio(self, recipient, prerequisites=None, execute=True):
+    def ask_aspect_ratio(self, recipient, render_modes=None, prerequisites=None, execute=True):
 
-        q_aspect = self.communicator.send_stock_query('aspect_ratio', recipient=recipient, prerequisites=prerequisites)
+        if render_modes is None:
+            render_modes = self.retrieve_render_modes()
 
-        if execute:
-            recipient.execute_queries(q_aspect)
-            aspect_ratio = q_aspect.get_reply().get_result()
-            return q_aspect, aspect_ratio
+        image_modes = [RenderMode.PNG, RenderMode.SVG]
+        if not any([mode in image_modes for mode in render_modes]):
+            return None, 16/9.0
         else:
-            return q_aspect, None
+            q_aspect = self.communicator.send_stock_query('aspect_ratio', recipient=recipient, prerequisites=prerequisites)
+    
+            if execute:
+                recipient.execute_queries(q_aspect)
+                aspect_ratio = q_aspect.get_reply().get_result()
+                return q_aspect, aspect_ratio
+            else:
+                return q_aspect, None
 
     def ask_song_metadata(self, recipient, prerequisites=None, execute=True):
 
@@ -517,6 +524,8 @@ class MusicSheetMaker:
         Retrieves notes from previous answered queries.
         Should work, but not fully tested
         """
+        notes = ''
+        
         q_notes_file = self.communicator.recall_by_recipient(recipient, criterion="file|notes_file",
                                                              filters=["valid_reply"], sort_by="date")
         if len(q_notes_file) != 0:
@@ -534,7 +543,8 @@ class MusicSheetMaker:
                                                         sort_by="date")
         if len(q_notes) != 0:
             notes = q_notes_file[-1].get_reply().get_result().split(os.linesep)
-            return notes
+            
+        return notes
 
     def ask_render_modes(self, recipient, prerequisites=None, execute=True):
         """
@@ -610,12 +620,14 @@ class MusicSheetMaker:
         Retrieves input mode (musical notation) from previous answered queries.
         Should work, but not fully tested
         """
+        input_mode = None
+        
         if notes is None:
             notes = self.retrieve_notes(recipient)
 
         try:
             input_mode = self.get_song_parser.get_input_mode()
-        except:
+        except AttributeError:
             input_mode = None
 
         if input_mode is None:
@@ -696,18 +708,20 @@ class MusicSheetMaker:
         Retrieves song key from previous answered queries.
         Should work, but not fully tested
         """
+        
+        song_key = 'C'
+        
         if notes is None:
             notes = self.retrieve_notes(recipient)
 
         if input_mode is None:
             input_mode = self.retrieve_input_mode(recipient, notes=notes)
 
-        song_key = None
-
         q_key = self.communicator.recall_by_recipient(recipient, criterion="possible_keys", filters=["valid_reply"],
                                                       sort_by="date")
         if len(q_key) != 0:
-            return q_key[-1].get_reply().get_result()
+            song_key = q_key[-1].get_reply().get_result()
+            return song_key
 
         q_key = self.communicator.recall_by_recipient(recipient, criterion="recommended_key", filters=["valid_reply"],
                                                       sort_by="date")
@@ -721,16 +735,19 @@ class MusicSheetMaker:
                                                       sort_by="date")
         if len(q_key) != 0:
             try:
-                return self.get_song_parser().find_key(notes)[0]
+                song_key = self.get_song_parser().find_key(notes)[0]
+                return song_key
             except TypeError:
-                return 'C'
+                song_key = 'C'
+                return song_key
 
-        q_key = self.communicator.recall_by_recipeint(recipient, criterion="no_possible_key", filters=["valid_reply"],
+        q_key = self.communicator.recall_by_recipient(recipient, criterion="no_possible_key", filters=["valid_reply"],
                                                       sort_by="date")
         if len(q_key) != 0:
-            return 'C'
+            song_key = 'C'
+            return song_key
 
-        return 'C'
+        return song_key
 
     def ask_octave_shift(self, recipient, prerequisites=None, execute=True):
 
@@ -748,12 +765,13 @@ class MusicSheetMaker:
         Retrieves desired octave shift from previous answered queries.
         Should work, but not fully tested
         """
+        octave_shift = 0
+        
         q_shift = self.communicator.recall_by_recipient(recipient, criterion="octave_shift", filters=["valid_reply"],
                                                         sort_by="date")
-        if len(q_shift) == 0:
-            octave_shift = 0
-        else:
+        if len(q_shift) != 0:
             octave_shift = q_shift[-1].get_reply().get_result()
+            
         return octave_shift
 
     def retrieve_aspect_ratio(self, recipient):
@@ -761,12 +779,14 @@ class MusicSheetMaker:
         Retrieves desired aspect ratio from previous answered queries.
         Should work, but not fully tested
         """
+        aspect_ratio = 16/9.0
+        
         q_aspect = self.communicator.recall_by_recipient(recipient, criterion="aspect_ratio", filters=["valid_reply"],
                                                         sort_by="date")
-        if len(q_aspect) == 0:
-            aspect_ratio = 16/9.0
-        else:
+        if len(q_aspect) != 0:
             aspect_ratio = q_aspect[-1].get_reply().get_result()
+            return aspect_ratio
+            
         return aspect_ratio
 
 
@@ -829,15 +849,33 @@ class MusicSheetMaker:
 
         return
 
-    '''
-    TODO
+
     def retrieve_render_modes(self, recipient):
         
-        q_render = self.communicator.recall_by_recipient(recipient, criterion="render_modes", filters=["valid_reply"], sort_by="date")
-        if len(q_render) != 0:  
-            render_modes = q_render.get_reply().get_result()
-            return render_modes
-    '''
+        render_modes = self.render_modes_enabled
+
+        if len(render_modes) == 1:
+            return None, render_modes
+
+        if self.is_commandline(recipient):
+
+            return None, render_modes
+
+        elif self.is_botcog(recipient):
+
+            return None, self.botcog_render_modes
+
+        else:
+        
+            q_render = self.communicator.recall_by_recipient(recipient, criterion="render_modes", filters=["valid_reply"], sort_by="date")
+            
+            if len(q_render) != 0:  
+                render_modes = q_render.get_reply().get_result()
+                return render_modes
+                
+                
+        return render_modes
+
 
     def render_song(self, recipient, render_modes=None, aspect_ratio=16/9.0):
 
