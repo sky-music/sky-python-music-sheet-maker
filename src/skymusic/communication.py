@@ -150,15 +150,17 @@ class Query:
         self.input_tip = input_tip
         self.reply_type = reply_type  # Expected type of the reply, among ReplyType
         #Repairing limits:
-        if not isinstance(limits, (list,tuple,set,type(None))):
+        if limits is None:
+            self.limits = limits
+        elif not isinstance(limits, (list,tuple,set)):
             self.limits = [limits]
         else:
-            self.limits = limits # Choices, regexp...
+            self.limits = list(filter(None, limits)) # Choices, regexp...
         #Repairing prerequisites:
         if prerequisites is None:
             self.prerequisites = prerequisites
         elif not isinstance(prerequisites, (list,set)):
-            self.prerequisites = list(filter(None, [prerequisites]))
+            self.prerequisites = [prerequisites]
         else:
             self.prerequisites = list(filter(None, prerequisites)) # Other Queries required to reply to this Query
         self.identifier = None# An almost-unique ID based on the Query content, excluding the timestamp

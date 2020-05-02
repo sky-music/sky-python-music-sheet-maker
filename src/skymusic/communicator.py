@@ -68,7 +68,7 @@ class Communicator:
         '''
         NOTE ABOUT LIMITS
         
-        Limits must be an iterable (tuple, list, string)
+        Limits should be a list (even though entering another iterable is possible)
         For QueryChoice, it will be a list of choices
         For QueryBoolean, it is a list of keywords grouped by pairs (yes, no, oui, non)
         
