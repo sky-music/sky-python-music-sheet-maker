@@ -80,14 +80,13 @@ class CommandLinePlayer:
                 question = self.communicator.query_to_stdout(q)
                 reply_valid = True #to be sure to break the loop
                 if q.get_expect_reply(): 
-                    if 'notes' in q.get_name().strip().lower():
+                    if q.expect_long_answer:
                         answer = ""
                         line = input('%s:\n\n'%question)
                         while True:
                             answer += '\n' + line
                             line = input()
                             if line == '':
-                                print(answer)
                                 break
                                 
                     else:

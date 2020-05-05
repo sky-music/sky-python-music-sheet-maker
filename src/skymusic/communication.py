@@ -129,7 +129,7 @@ class Reply:
 
 class Query:
 
-    def __init__(self, name=None, sender=None, recipient=None, question=None, foreword=None, afterword=None, help_text=None, input_tip=None, reply_type=ReplyType.OTHER, limits=None, prerequisites=None):
+    def __init__(self, name=None, sender=None, recipient=None, question=None, foreword=None, afterword=None, help_text=None, input_tip=None, reply_type=ReplyType.OTHER, expect_long_answer=False, limits=None, prerequisites=None):
         """
         The general Query class
 
@@ -166,6 +166,7 @@ class Query:
         self.identifier = None# An almost-unique ID based on the Query content, excluding the timestamp
         self.sent_time = None  # The timestamp at which the Query was sent()
         self.expect_reply = True # Currently used for Information queries
+        self.expect_long_answer = expect_long_answer
 
         self.valid_locutors_names = ['music-cog', 'music-sheet-maker', 'command-line', 'sky-music-website']  # A list of valid locutors for security purposes
 
@@ -716,13 +717,13 @@ class QueryChoice(Query):
         result += [self.get_foreword(), self.get_question()]
         
         if self.reply_type == ReplyType.NOTE:
-            result[-1] += " among %s" % ', '.join(list(self.get_limits()))
+            result[-1] += " %s" % ', '.join(list(self.get_limits()))
         elif self.reply_type in [ReplyType.INPUTMODE, ReplyType.RENDERMODES]:
             choices = ["{i:d}) {choice_str}".format(i=i, choice_str=choice.get_short_desc(self.get_recipient_locale())) for i, choice in enumerate(self.get_limits())]
-            result[-1] += " among:\n\n{choices_str}".format(choices_str='\n'.join(choices))
+            result[-1] += ":\n\n{choices_str}".format(choices_str='\n'.join(choices))
         else:
             choices = ["{i:d}) {choices_str}".format(i=i, choices_str=str(choice)) for i, choice in enumerate(self.get_limits())]
-            result[-1] += " among:\n\n{choices_str}".format(choices_str='\n'.join(choices))
+            result[-1] += ":\n\n{choices_str}".format(choices_str='\n'.join(choices))
        
         result += [self.get_afterword()]
 

@@ -186,6 +186,7 @@ class Communicator:
                            'input_tip': Lang.get_string("stock_queries/notes_file/input_tip", self.locale),
                            'help_text': Lang.get_string("stock_queries/notes_file/help_text", self.locale),
                            'reply_type': ReplyType.OTHER,
+                           'expect_long_answer': True,
                            'limits': None
                            },
 
@@ -208,6 +209,7 @@ class Communicator:
                       'input_tip': Lang.get_string("stock_queries/notes/input_tip", self.locale),
                       'help_text': Lang.get_string("stock_queries/notes/help_text", self.locale),
                       'reply_type': ReplyType.TEXT,
+                      'expect_long_answer': True,
                       'limits': None
                       },
 
@@ -508,7 +510,7 @@ class Communicator:
             except AttributeError:
                 answer_text = ''
 
-            if 'notes' in query.get_name().strip().lower():  # FIXME: this trick is a bit ugly (not very robust)
+            if query.expect_long_answer:  # FIXME: this trick is a bit ugly (not very robust)
                 answer_dict = {'answer_length': 'long', 'long_text': str(answer_text), 'short_text': ''}
             else:
                 answer_dict = {'answer_length': 'short', 'long_text': '', 'short_text': str(answer_text)}

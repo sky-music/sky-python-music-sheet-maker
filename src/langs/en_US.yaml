@@ -129,7 +129,7 @@ stock_queries:
     help_text: 'The transcript writer is the person who found the notes you typed earlier. It could be yourself!'
   notes_file:
     foreword:
-    question: 'Type or copy-paste notes, or enter file name (in {0}/)'
+    question: 'Type or copy-paste notes below, or enter file name (in {0}/)'
     afterword:
     input_tip: a string of notes such as C1 D1F1, or a file name such as song.txt
     help_text: |
