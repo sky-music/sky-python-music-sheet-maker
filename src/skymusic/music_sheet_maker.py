@@ -882,35 +882,25 @@ class MusicSheetMaker:
 
         if render_modes is None:
             if self.is_botcog(recipient):
+                self.css_mode = CSSMode.EMBED
                 render_modes = self.botcog_render_modes
             elif self.is_website(recipient):
+                self.css_mode = CSSMode.EMBED
                 render_modes = self.website_render_modes
             else:
+                print("=" * 40)
                 render_modes = self.render_modes_enabled
 
         song_bundle = SongBundle()
         song_bundle.set_meta(self.get_song().get_meta())
 
-        if self.is_commandline(recipient):
-
-            print("=" * 40)
-#            song_bundle = []
-            for render_mode in render_modes:
-                buffers = self.write_song_to_buffers(render_mode, aspect_ratio)  # A list of IOString or IOBytes buffers
+        for render_mode in render_modes:
+            buffers = self.get_song().render(render_mode=render_mode, aspect_ratio=aspect_ratio, css_mode=self.css_mode, rel_css_path=self.rel_css_path)  # A list of IOString or IOBytes buffers
+            song_bundle.add_render(render_mode, buffers)
+            if self.is_commandline(recipient):
                 file_paths = self.build_file_paths(render_mode, len(buffers))
                 self.send_buffers_to_files(render_mode, buffers, file_paths, recipient=recipient)
-#                song_bundle.append((buffers, [render_mode] * len(buffers)))
-                song_bundle.add_render(render_mode, buffers)
-
-        else:  # website or botcog or...
-
-            self.css_mode = CSSMode.EMBED  # Prevent the HTML/SVG from depending on an auxiliary .css file
-            #song_bundle = []  # A list of tuples
-            for render_mode in render_modes:
-                buffers = self.write_song_to_buffers(render_mode, aspect_ratio)  # A list of IOString or IOBytes buffers
-#                song_bundle.append((buffers, [render_mode] * len(buffers)))
-                song_bundle.add_render(render_mode, buffers)
-
+                        
         return song_bundle
 
 
@@ -979,23 +969,6 @@ class MusicSheetMaker:
         else:
             return i_song_files, None
 
-    def write_song_to_buffers(self, render_mode, aspect_ratio=16/9.0):
-        """
-        Writes the song to files with different formats as defined in RenderMode
-        Returns a list [], even if it has only 1 element
-        """
-        if render_mode in self.get_render_modes_enabled():
-            buffers = self.get_song().render(render_mode=render_mode, aspect_ratio=aspect_ratio, css_mode=self.css_mode, rel_css_path=self.rel_css_path)
-            #buffers = SongRenderer(self.locale).write_buffers(self.get_song(), render_mode=render_mode, aspect_ratio=aspect_ratio, css_mode=self.css_mode, rel_css_path=self.rel_css_path)
-            
-        else:
-            buffers = []
-
-        for buffer in buffers:
-            if buffer is not None:
-                buffer.seek(0)
-
-        return buffers
 
     def build_file_paths(self, render_mode, numfiles):
         """
