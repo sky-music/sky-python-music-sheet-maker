@@ -128,7 +128,7 @@ stock_queries:
     help_text: 'Le transcripteur est la personne qui a déchiffré la chanson. C''est peut-être vous!'
   notes_file:
     foreword:
-    question: 'Tapez vos notes ci-dessous, ou bien un nom de fichier (à placer dans {0}/)'
+    question: 'Tapez ou collez vos notes ci-dessous. Vous pouvez aussi entrer un nom de fichier texte contenant les notes (à placer dans {0}/)'
     afterword:
     input_tip: du texte contenant des notes telles que C1 D1F1, do re mi, ou un nom de fichier comme song.txt
     help_text: |
