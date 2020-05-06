@@ -1,4 +1,4 @@
-1#!/usr/bin/env python3
+#!/usr/bin/env python3
 if __name__ == '__main__':    
     import os, sys
     project_path = os.path.normpath(os.path.join(os.path.dirname(__file__), '../../'))
@@ -80,17 +80,7 @@ class CommandLinePlayer:
                 question = self.communicator.query_to_stdout(q)
                 reply_valid = True #to be sure to break the loop
                 if q.get_expect_reply(): 
-                    if q.expect_long_answer:
-                        answer = ""
-                        line = input('%s:\n\n'%question)
-                        while True:
-                            answer += '\n' + line
-                            line = input()
-                            if line == '':
-                                break
-                                
-                    else:
-                        answer = input('%s: '%question)   
+                    answer = input('%s: '%question)   
                     q.reply_to(answer)
                     reply_valid = q.get_reply_validity()
                 else:                  
