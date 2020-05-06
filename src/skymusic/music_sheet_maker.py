@@ -507,7 +507,6 @@ class MusicSheetMaker:
                 else:
                     notes = result.split(os.linesep)  # Returns a list of strings in any case
 
-                    '''
                     if self.is_commandline(recipient):  # Loop to ask for several lines in the standard input interface
                         while result:
                             
@@ -516,7 +515,7 @@ class MusicSheetMaker:
                             result = result.split(os.linesep)
                             for result in result:
                                 notes.append(result)
-                    '''
+
                 return q_notes, notes
 
 
