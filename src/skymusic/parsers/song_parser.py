@@ -27,7 +27,8 @@ class SongParser:
     def __init__(self, maker):
 
         #Delimiters must be character or strings
-        # Only one regex is supported: '\s' 
+        #The backslash character is forbidden
+        #Only regex with the following format are supported: \x, where x is [a-zA-Z]
         self.input_mode = None
         self.note_parser = None
         self.icon_delimiter = '\s'
@@ -161,7 +162,7 @@ class SongParser:
         """
         if delimiter is None:
             delimiter = self.quaver_delimiter
-            if delimiter == '\s':
+            if re.match('\\\\',re.escape(delimiter)):
                 return re.compile(delimiter).split(icon)
             else:
                 return icon.split(delimiter)
@@ -252,6 +253,21 @@ class SongParser:
         
         return line
 
+    
+    def split_line(self, line, delimiter=None):
+        
+        if delimiter is None:
+            if line[0] == self.comment_delimiter:
+                delimiter = self.comment_delimiter
+            else:
+                delimiter = self.icon_delimiter
+            
+        if re.match('\\\\',re.escape(delimiter)):
+            return re.compile(delimiter).split(line)
+        else:
+            return line.split(delimiter)        
+    
+
     def parse_line(self, line, song_key='C', note_shift=0):
         """
         Returns instrument_line: a list of chord 'skygrid' (1 chord = 1 dict)
@@ -261,17 +277,15 @@ class SongParser:
 
         if len(line) > 0:
             if line[0] == self.comment_delimiter:
-                lyrics = line.split(self.comment_delimiter)
+                #lyrics = line.split(self.comment_delimiter)
+                lyrics = self.split_line(line)
                 for lyric in lyrics:
                     if len(lyric) > 0:
                         voice = instruments.Voice()
                         voice.set_lyric(lyric.strip())
                         instrument_line.append(voice)
             else:
-                if self.icon_delimiter == '\s':
-                    icons = re.compile(self.icon_delimiter).split(line)
-                else:
-                    icons = line.split(self.icon_delimiter)            
+                icons = self.split_line(line)     
                 
                 for icon in icons:
                     chords = self.split_icon(icon)

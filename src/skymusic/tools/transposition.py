@@ -6,15 +6,16 @@ A dev file to transpose in the chromatic scale
 @author: jmmelko
 THIS SCRIPTS IS COMPLETELY OBSOLETE AND SHOULD BE REWRITTEN
 """
-import sys
-sys.path.append('..')
+if __name__ == '__main__':    
+    import os, sys
+    project_path = os.path.normpath(os.path.join(os.path.dirname(__file__), '../../../'))
+    if project_path not in sys.path:
+        sys.path.append(project_path)
 import os
-import re
 import math
 from src.skymusic.parsers.song_parser import SongParser
-from src.skymusic.modes import InputMode, ResponseMode
-from parsers.song_parser import SongParser
-from modes import InputMode, ResponseMode
+from src.skymusic.modes import InputMode
+
 
 def set_dodecas(mode):
     if mode==InputMode.DOREMI:
@@ -23,26 +24,29 @@ def set_dodecas(mode):
     elif mode==InputMode.JIANPU:
         dodeca_sharps = ['1', '1#', '2', '2#', '3', '4', '4#', '5', '5#', '6', '6#', '7']
         dodeca_flats = ['1', '2b', '2', '3b', '3', '4', '5b', '5', '6b', '6', '7b', '7']
+    elif mode==InputMode.DOREMIJP:
+        dodeca_sharps = ['ド', 'ド#', 'レ', 'レ#', 'ミ', 'ファ', 'ファ#', 'ソ', 'ソ#', 'ラ', 'ラ#', 'シ']
+        dodeca_flats = ['ド', 'レb', 'レ', 'ミb', 'ミ', 'ファ', 'ソb', 'ソ', 'ラb', 'ラ', 'シb', 'シ']
     else:
         dodeca_sharps = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
         dodeca_flats = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B']
     return (dodeca_sharps,dodeca_flats)
 
 QUAVER_DELIMITER = '-'  # Dash-separated list of chords
-ICON_DELIMITER = ' '  # Chords separation
+ICON_DELIMITER = '\s'  # Chords separation
 PAUSE = '.'
 COMMENT_DELIMITER = '#'  # Lyrics delimiter, can be used for comments
 REPEAT_INDICATOR = '*'
 
-def parse_chords(chords, note_shift=0, song_jet='C'):
+def parse_chords(song_parser, chords, note_shift=0, song_jet='C'):
     splitted_chords = []
     n = len(dodeca_sharps)
     for chord_idx, chord in enumerate(chords):
-        repeat, chord = skyparser.split_chord(chord)
+        repeat, chord = song_parser.split_chord(chord)
         for idx_in_chord, note in enumerate(chord):  # Chord is a list of notes
             if note_shift != 0:
                 try:
-                    (note_name, octave_number) = skyparser.get_note_parser().parse_note(note, song_key)
+                    (note_name, octave_number) = song_parser.get_note_parser().parse_note(note, song_key)
                     if note_name is not None:
                         if note_name in dodeca_sharps:
                             idx = dodeca_sharps.index(note_name)
@@ -66,28 +70,25 @@ def parse_chords(chords, note_shift=0, song_jet='C'):
     return splitted_chords
 
 
-def parse_line(line, note_shift=0, song_key='C'):
-    icon_delimiter = skyparser.icon_delimiter
-    comment_delimiter = skyparser.comment_delimiter
+def parse_line(song_parser, line, note_shift=0, song_key='C'):
+    comment_delimiter = song_parser.get_comment_delimiter()
 
-    line = line.strip()
-    re.sub(re.escape(icon_delimiter) + '{2,' + str(max(2, len(line))) + '}', icon_delimiter,
-           line)  # removes surnumerous spaces
-
+    line = song_parser.sanitize_line(line)
+    
     splitted_line = []
     if len(line) > 0:
         if line[0] == comment_delimiter:
-            lyrics = line.split(comment_delimiter)
+            lyrics = song_parser.split_line(line)
             for lyric in lyrics:
                 if len(lyric) > 0:
                     splitted_line.append('#' + lyric)
             # splitted_line.append(lyric_line)
         else:
-            icons = line.split(icon_delimiter)
-            #
+            icons = song_parser.split_line(line)
+
             for icon in icons:
-                chords = skyparser.split_icon(icon)
-                splitted_chords = parse_chords(chords, note_shift, song_key)
+                chords = song_parser.split_icon(icon)
+                splitted_chords = parse_chords(song_parser, chords, note_shift, song_key)
                 splitted_line.append(splitted_chords)
         return splitted_line
     else:
@@ -127,34 +128,45 @@ def render_transposed_song(song_lines):
 
 print('===== TRANSPOSITION TOOL IN THE CHROMATIC SCALE =====')
 
-maker = MusicSheetMaker()
+song_lines = []
 
-first_line = maker.ask_first_line()
+while True:
+    line = input("Type your notes here: ")
+    if line == '':
+        break
+    song_lines.append(line)
 
-fp = song_responder.load_file(song_responder.get_song_dir_in(), first_line)  # loads file or asks for next line
-
-song_lines = song_responder.read_lines(first_line, fp)
-
+"""
 try:
-    note_shift = int(input('Transposition ? (-12 ; +12): ').strip())
+    note_shift = int(input('Transpose by how many semitones? (-12 ; +12): ').strip())
 except ValueError:
     note_shift = 0
+"""
 
-skyparser = SongParser(song_responder)
-skyparser.set_delimiters(ICON_DELIMITER, PAUSE, QUAVER_DELIMITER, COMMENT_DELIMITER, REPEAT_INDICATOR)
-possible_modes = skyparser.get_possible_modes(song_lines)
+song_parser = SongParser(None)
+song_parser.set_delimiters(icon_delimiter=ICON_DELIMITER, pause=PAUSE, quaver_delimiter=QUAVER_DELIMITER,
+                           comment_delimiter=COMMENT_DELIMITER, repeat_indicator=REPEAT_INDICATOR)
+
+possible_modes = song_parser.get_possible_modes(song_lines=song_lines)
 
 if len(possible_modes) > 1:
     print('\nSeveral possible notations detected.')
-    song_notation = song_responder.ask_to_select_mode(possible_modes)
+    for i,mode in enumerate(possible_modes):
+        print(f'{i}: {mode.get_short_desc()}')
+    num = int(input('Choose your mode number:'))
+    song_notation = possible_modes[num]
 elif len(possible_modes) == 0:
     print('\nCould not detect your note format. Maybe your song contains typo errors?')
-    song_notation = song_responder.ask_to_select_mode(possible_modes)
+    possible_modes = [mode for mode in InputMode]
+    for i,mode in enumerate(possible_modes):
+        print(f'{i}: {mode.get_short_desc()}')
+    num = int(input('Choose your mode number:'))
+    song_notation = possible_modes[num]
 else:
     print('\nWe detected that you use the following notation: %s.'%possible_modes[0].get_short_desc())
     song_notation = possible_modes[0]
 
-skyparser.set_input_mode(song_notation)
+song_parser.set_input_mode(song_notation)
 
 if song_notation == InputMode.JIANPU and PAUSE != '0':
     print('\nWarning: pause in Jianpu has been reset to ''0''.\n')
@@ -163,8 +175,8 @@ if song_notation == InputMode.JIANPU and PAUSE != '0':
 # Attempts to detect key for input written in absolute musical scales (western, Jianpu)
 possible_keys = []
 song_key = None
-if song_notation in [InputMode.ENGLISH, InputMode.DOREMI, InputMode.JIANPU]:
-    possible_keys = skyparser.find_key(song_lines)
+if song_notation in [InputMode.ENGLISH, InputMode.DOREMI, InputMode.JIANPU, InputMode.DOREMIJP]:
+    possible_keys = song_parser.find_key(song_lines)
     if len(possible_keys) == 0:
         # print("\nYour song cannot be transposed exactly in Sky.")
         # trans = input('Enter a key or a number to transpose your song within the chromatic scale:')
@@ -184,13 +196,15 @@ else:
 
 dodeca_sharps, dodeca_flats = set_dodecas(song_notation)
 
-parsed_song = []
-for song_line in song_lines:
-    parsed_line = parse_line(song_line, note_shift)
-    parsed_song.append(parsed_line)
-
-print('\n==Original song:==')
+print('\n=== Original song ===')
 print(''.join(song_lines))
 
-print('\n==Transposed song:==')
-print(render_transposed_song(parsed_song))
+for note_shift in range(-12, 12):
+
+    parsed_song = []
+    for song_line in song_lines:
+        parsed_line = parse_line(song_parser, song_line, note_shift)
+        parsed_song.append(parsed_line)
+
+    print('\n=== Transposition by %+d ===' % note_shift)
+    print(render_transposed_song(parsed_song))
