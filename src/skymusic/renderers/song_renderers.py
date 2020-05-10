@@ -757,9 +757,11 @@ class SongSKYJSONRenderer(SongRenderer):
                 if line[0].get_type().lower().strip() != 'voice':
                     for instrument in line:
                         instrument.set_index(instrument_index)
-                        time += dt
-                        if not instrument.get_is_silent():
-                            json_dict['songNotes'] += instrument_renderer.render(instrument, time, dt)
+                        repeat = instrument.get_repeat()
+                        for r in range(repeat):
+                            time += dt
+                            if not instrument.get_is_silent():
+                                json_dict['songNotes'] += instrument_renderer.render(instrument, time)
   
                         instrument_index += 1
 

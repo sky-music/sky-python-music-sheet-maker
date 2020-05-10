@@ -80,7 +80,7 @@ class CommandLinePlayer:
                 question = self.communicator.query_to_stdout(q)
                 reply_valid = True #to be sure to break the loop
                 if q.get_expect_reply(): 
-                    answer = input('%s: '%question)   
+                    answer = input('\n%s: '%question)   
                     q.reply_to(answer)
                     reply_valid = q.get_reply_validity()
                 else:                  

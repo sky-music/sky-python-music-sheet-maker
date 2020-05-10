@@ -378,7 +378,7 @@ class InstrumentSKYJSONRenderer(InstrumentRenderer):
         super().__init__(locale)
         self.note_parser = SkyJson()
 
-    def render_harp(self, instrument, time=0, dt=60000/120):
+    def render_harp(self, instrument, time=0):
 
         json_chord = []
 
@@ -387,8 +387,8 @@ class InstrumentSKYJSONRenderer(InstrumentRenderer):
         elif instrument.get_is_silent():
             json_chord = [{'time':int(time), 'key':'.'}]
         else:
-            repeat = instrument.get_repeat()
             chord_skygrid = instrument.get_chord_skygrid()
+            dt = Resources.SKYJSON_CHORD_DELAY/instrument.get_num_highlighted()
             for k in chord_skygrid:  # Cycle over positions in a frame
                 for f in chord_skygrid[k]:  # Cycle over triplets & quavers
                     if chord_skygrid[k][f]:  # Button is highlighted
