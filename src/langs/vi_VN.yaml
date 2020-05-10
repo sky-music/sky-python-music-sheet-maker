@@ -21,6 +21,9 @@ input_mode:
     doremijp:
         short_desc: 日本語イタリアドレミ
         long_desc: "Japanese do re mi: ド、ド#／レb、レ、レ#／ミb、ミ、ファ、ファ#／ソb、ソ、ソ#／ラb、ラ、ラ#／シb、シ"
+    skyjson:
+        short_desc: 'SkyMusic JSON'
+        long_desc: "Dictionary with timeline [{'time': xxxx, 'key': KeyN}]"
 render_mode:
     html:
         short_desc: bảng nhạc trực quan HTML 
@@ -109,6 +112,13 @@ stock_queries:
     input_tip: a positive number or a fraction (eg 4/3) between 0.1 and 10. Leave blank or 0 to skip.
     help_text: |
       By default the visual sheet is a 16:9 image in landscape orientation. Please choose a different aspect ratio if you like. Only numbers between 1/10 (0.1) and 10 are accepted.
+  song_bpm:
+    foreword: One of the output formats needs timing information.
+    question: Please choose the song tempo (BPM, beats per minute), or leave blank to skip
+    afterword:
+    input_tip: a positive number between 12 and 1200. Leave blank or 0 to skip.
+    help_text: |
+      You have selected an output format (such as Midi) that requires to know how fast to play the song. This is usually expressed in terms of beats per minute. Please give a integer value between 12 and 1200.
   song_title:
     foreword:
     question: Tiêu đề bài hát là gì?

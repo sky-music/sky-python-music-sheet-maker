@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import os
 import re
+import json
 from operator import truediv, itemgetter
 
 from src.skymusic import instruments, Lang
@@ -36,6 +37,7 @@ class SongParser:
         self.quaver_delimiter = '-'
         self.comment_delimiter = '#'
         self.repeat_indicator = '*'
+        self.skyjson_chord_delay = 50 #Delay in ms below which 2 notes are considered a chord
         self.maker = maker
         try:
             self.locale = self.maker.get_locale()
@@ -248,25 +250,81 @@ class SongParser:
         """
         # Remove surnumerous spaces from line
         line = line.strip()        
-        line = re.sub(re.escape(self.icon_delimiter) + '{2,' + str(max(2, len(line))) + '}', re.escape(self.icon_delimiter),
-                      line)  # removes surnumerous spaces
+        line = re.sub(re.escape(self.icon_delimiter) + '{2,' + str(max(2, len(line))) + '}',
+                      re.escape(self.icon_delimiter), line)  # removes surnumerous spaces
         
         return line
 
+
+    def analyze_tempo(self, times):
+        
+        diffs = [times[i] - times[i-1] for i in range(1, len(times))]
+        
+        hbin = self.skyjson_chord_delay
+        num_slots = 1 + int(max(diffs) / hbin)
+        
+        counts = [0]*num_slots
+        slots = [i*hbin for i in range(num_slots)]
+        
+        for diff in diffs:   #Builds histogram          
+            i = int(diff/hbin)
+            counts[i] += 1
+        
+        print(slots)
+        print(counts)
+
+
+    def split_json(self, line):
+        
+        json_dict = json.loads(line)
+        notes = json_dict[0]['songNotes']
+
+        times = [note['time'] for note in notes]
+        keys = [note['key'] for note in notes]
+                
+        icons = [keys[0]]
+        icons_times = [times[0]]
+                
+        for i in range(1,len(times)):
+            if times[i] - times[i-1] < self.skyjson_chord_delay:
+                icons[i-1] += notes[i] # Notes belong to the same chord
+            else:
+                icons.append(keys[i])            
+                icons_times.append(times[i])
+
+        self.analyze_tempo(times)
+                
+        #print(icons_times)
+        #print(icons)        
+
+        return icons
+
+
     
     def split_line(self, line, delimiter=None):
-        
-        if delimiter is None:
-            if line[0] == self.comment_delimiter:
-                delimiter = self.comment_delimiter
-            else:
-                delimiter = self.icon_delimiter
+        """
+        Splits a song line into icons
+        An icon is a made of 1 note, several notes (chord), or several chords played rapidly (triplet, quaver)
+        Icons will be visually split in SkyGrid renders (aka Harps), possibly with pauses between them
+        """
+        if self.input_mode == InputMode.SKYJSON:
+       
+            return self.split_json(line)
             
-        if re.match('\\\\',re.escape(delimiter)):
-            return re.compile(delimiter).split(line)
         else:
-            return line.split(delimiter)        
-    
+            
+            if delimiter is None:
+                if line[0] == self.comment_delimiter:
+                    delimiter = self.comment_delimiter
+                else:
+                    delimiter = self.icon_delimiter
+                
+            if re.match('\\\\',re.escape(delimiter)):
+                return re.compile(delimiter).split(line)
+            else:
+                return line.split(delimiter)        
+
+
 
     def parse_line(self, line, song_key='C', note_shift=0):
         """
@@ -325,12 +383,23 @@ class SongParser:
 
     def detect_input_mode(self, song_lines):
         """
-        Attempts to detect input musical notation for the textual song in 'song_lines'
+        Attempts to detect input musical notation for the textual song in 'song_lines'.
+        Returns a list with the probable input modes (eliminating the least likely)
         """
+
+        try:
+            json_dict = json.loads(song_lines[0])
+            json_dict[0]['songNotes']
+            #print('%%%JSON DETECTED!!!')
+            return [InputMode.SKYJSON]
+        except (json.JSONDecodeError, NameError, TypeError):
+            #print('%%%DEBUG not JSON...')
+            pass        
+        
         if isinstance(song_lines, str):  # Break newlines and make sure the result is a List
             song_lines = song_lines.split(os.linesep)
 
-        possible_modes = [mode for mode in InputMode]
+        possible_modes = [mode for mode in InputMode if InputMode is not InputMode.SKYJSON]
         possible_parsers = [self.get_note_parser(mode) for mode in possible_modes]
         possible_regex = [parser.single_note_name_regex for parser in possible_parsers]
 
@@ -389,6 +458,7 @@ class SongParser:
 
         return self.most_likely(scores, possible_modes, 0.9)
 
+
     def find_key(self, song_lines):
         """
         Attempts to find the musical key for the textual song in 'input_lines'.
@@ -402,11 +472,14 @@ class SongParser:
 
         try:
             possible_keys = [k for k in self.note_parser.CHROMATIC_SCALE_DICT.keys()]
+            if len(possible_keys) == 0:
+                return None 
             is_note_regex = self.note_parser.note_name_regex
             not_note_regex = self.note_parser.not_note_name_regex
         except AttributeError:
             # Parsers not having a chromatic scale keys should return None, eg Sky and Skykeyboard
             return None
+        
         scores = [0] * len(possible_keys)
         num_notes = [0] * len(possible_keys)
         for line in song_lines:

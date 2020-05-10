@@ -13,6 +13,7 @@ class InputMode(Enum):
     ENGLISHCHORDS = (6, "input_mode/englishchords/short_desc", "input_mode/englishchords/long_desc",
                      src.skymusic.parsers.noteparsers.englishchords.EnglishChords)
     DOREMIJP = (7, "input_mode/doremijp/short_desc", "input_mode/doremijp/long_desc", src.skymusic.parsers.noteparsers.doremi_jp.DoremiJP)
+    SKYJSON = (8, "input_mode/skyjson/short_desc", "input_mode/skyjson/long_desc", src.skymusic.parsers.noteparsers.skyjson.SkyJson)
 
     def __init__(self, number, short_desc, long_desc, note_parser_method):
         self.number = number

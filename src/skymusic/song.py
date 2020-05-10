@@ -110,7 +110,7 @@ class Song():
         elif render_mode == RenderMode.PNG:
             buffers = song_renderers.SongPNGRenderer(self.locale, kwargs['aspect_ratio']).write_buffers(song=self)
         elif render_mode == RenderMode.MIDI:
-            buffers = song_renderers.SongMIDIRenderer(self.locale).write_buffers(song=self)
+            buffers = song_renderers.SongMIDIRenderer(self.locale, kwargs['song_bpm']).write_buffers(song=self)
         else:  # Ascii
             buffers = song_renderers.SongASCIIRenderer(self.locale).write_buffers(song=self)
 

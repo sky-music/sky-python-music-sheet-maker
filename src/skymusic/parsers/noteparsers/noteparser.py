@@ -13,7 +13,7 @@ class NoteParser:
         self.columns = 5
         self.rows = 3
 
-        self.CHROMATIC_SCALE_DICT = {}
+        self.CHROMATIC_SCALE_DICT = None
         self.SEMITONE_INTERVAL_TO_MAJOR_SCALE_INTERVAL_DICT = {
             0: 0,  # 0 semitones means it’s the root note
             2: 1,  # 2 semitones means it’s a 2nd interval

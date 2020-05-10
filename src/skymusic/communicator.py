@@ -134,7 +134,7 @@ class Communicator:
                              'limits': []
                              },
 
-                'aspect_ratio': {'class': QueryOpen.__name__,
+            'aspect_ratio': {'class': QueryOpen.__name__,
                              'handler': 'None',
                              'foreword': Lang.get_string("stock_queries/aspect_ratio/foreword", self.locale),
                              'question': Lang.get_string("stock_queries/aspect_ratio/question", self.locale),
@@ -144,6 +144,18 @@ class Communicator:
                              'reply_type': ReplyType.NUMBER,
                              'limits': [0.1, 10.0, 16/9.0]
                              },
+
+            'song_bpm': {'class': QueryOpen.__name__,
+                             'handler': 'None',
+                             'foreword': Lang.get_string("stock_queries/song_bpm/foreword", self.locale),
+                             'question': Lang.get_string("stock_queries/song_bpm/question", self.locale),
+                             'afterword': Lang.get_string("stock_queries/song_bpm/afterword", self.locale),
+                             'input_tip': Lang.get_string("stock_queries/song_bpm/input_tip", self.locale),
+                             'help_text': Lang.get_string("stock_queries/song_bpm/help_text", self.locale),
+                             'reply_type': ReplyType.NUMBER,
+                             'limits': [12, 1200, 120]
+                             },
+
 
             'song_title': {'class': QueryOpen.__name__,
                            'handler': 'None',

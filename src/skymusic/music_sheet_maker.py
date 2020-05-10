@@ -278,32 +278,37 @@ class MusicSheetMaker:
         # 2.b Ask for render modes (query created for website only)
         (q_render, render_modes) = self.ask_render_modes(recipient=recipient)
 
-        #2.c
-        (q_aspect, aspect_ratio) = self.ask_aspect_ratio(recipient=recipient, render_modes=render_modes, prerequisites=[q_render])
+        # 2.c Asks for aspect ratio
+        #(q_aspect, aspect_ratio) = self.ask_aspect_ratio(recipient=recipient, render_modes=render_modes, prerequisites=[q_render])
+        (q_aspect, aspect_ratio) = self.ask_aspect_ratio(recipient=recipient, render_modes=render_modes, prerequisites=[q_render])  #TODO EXPERIMENTAL
+
+        # 2.D. Ask beats per minutes
+        #(q_song_bpm, song_bpm) = self.ask_song_bpm(recipient=recipient, render_modes=render_modes, prerequisites=[q_render])
+        (q_song_bpm, song_bpm) = self.ask_song_bpm(recipient=recipient, prerequisites=[q_render])  #TODO EXPERIMENTAL
 
         # 3. Ask for notes
         # TODO: allow the player to enter the notes using several messages??? or maybe not
         (q_notes, notes) = self.ask_notes_or_file(recipient=recipient, prerequisites=[i_instr])
 
         # 4. Ask for input mode (or display the one found)
-        (q_mode, input_mode) = self.ask_input_mode(recipient=recipient, notes=notes, prerequisites=[q_notes])
-        # (q_mode, input_mode) = self.ask_input_mode(recipient=recipient, prerequisites=[q_notes]) #TODO EXPERIMENTAL
+        #(q_mode, input_mode) = self.ask_input_mode(recipient=recipient, notes=notes, prerequisites=[q_notes])
+        (q_mode, input_mode) = self.ask_input_mode(recipient=recipient, prerequisites=[q_notes]) #TODO EXPERIMENTAL
 
         # 5. Set input_mode
-        self.get_song_parser().set_input_mode(input_mode)
-        # self.set_parser_input_mode(recipient) #TODO EXPERIMENTAL
+        #self.get_song_parser().set_input_mode(input_mode)
+        self.set_parser_input_mode(recipient) #TODO EXPERIMENTAL
 
         # 6. Ask for song key (or display the only one possible)
-        (q_key, song_key) = self.ask_song_key(recipient=recipient, notes=notes, input_mode=input_mode,
-                                              prerequisites=[q_notes, q_mode])
-        # (q_key, song_key) = self.ask_song_key(recipient=recipient, prerequisites=[q_notes, q_mode]) #TODO EXPERIMENTAL
+        #(q_key, song_key) = self.ask_song_key(recipient=recipient, notes=notes, input_mode=input_mode,
+        #                                      prerequisites=[q_notes, q_mode])
+        (q_key, song_key) = self.ask_song_key(recipient=recipient, prerequisites=[q_notes, q_mode]) #TODO EXPERIMENTAL
 
         # 7. Asks for octave shift
         (q_shift, octave_shift) = self.ask_octave_shift(recipient=recipient)
 
         # 8. Parse song
-        self.parse_song(recipient, notes=notes, song_key=song_key, octave_shift=octave_shift)
-        # self.parse_song(recipient) #TODO EXPERIMENTAL
+        #self.parse_song(recipient, notes=notes, song_key=song_key, octave_shift=octave_shift)
+        self.parse_song(recipient) #TODO EXPERIMENTAL
 
         # 9. Displays error ratio
         (i_error, res) = self.display_error_ratio(recipient=recipient, prerequisites=[q_notes, q_mode, q_shift])
@@ -311,13 +316,13 @@ class MusicSheetMaker:
         # 10. Asks for song metadata
         (qs_meta, (title, artist, transcript)) = self.ask_song_metadata(recipient=recipient)
 
-        self.set_song_metadata(recipient=recipient, meta=(title, artist, transcript), song_key=song_key)
-        # self.set_song_metadata(recipient=recipient) #TODO EXPERIMENTAL
+        #self.set_song_metadata(recipient=recipient, meta=(title, artist, transcript), song_key=song_key)
+        self.set_song_metadata(recipient=recipient) #TODO EXPERIMENTAL
 
-        # 11. Renders Song
-        song_bundle = self.render_song(recipient, render_modes, aspect_ratio)
+        # 12. Renders Song
+        song_bundle = self.render_song(recipient=recipient, render_modes=render_modes, aspect_ratio=aspect_ratio, song_bpm=song_bpm)
 
-        # 12. Sends result back (required for website)
+        # 13. Sends result back (required for website)
         return song_bundle
 
 
@@ -347,23 +352,6 @@ class MusicSheetMaker:
         else:
             return i_instr, None
 
-    def ask_aspect_ratio(self, recipient, render_modes=None, prerequisites=None, execute=True):
-
-        if render_modes is None:
-            render_modes = self.retrieve_render_modes()
-
-        image_modes = [RenderMode.PNG, RenderMode.SVG]
-        if not any([mode in image_modes for mode in render_modes]):
-            return None, 16/9.0
-        else:
-            q_aspect = self.communicator.send_stock_query('aspect_ratio', recipient=recipient, prerequisites=prerequisites)
-    
-            if execute:
-                recipient.execute_queries(q_aspect)
-                aspect_ratio = q_aspect.get_reply().get_result()
-                return q_aspect, aspect_ratio
-            else:
-                return q_aspect, None
 
     def ask_song_metadata(self, recipient, prerequisites=None, execute=True):
 
@@ -703,44 +691,25 @@ class MusicSheetMaker:
 
             return q_key, song_key
 
-    def retrieve_song_key(self, recipient, notes=None, input_mode=None):
+
+    def retrieve_song_key(self, recipient):
         """
         Retrieves song key from previous answered queries.
         Should work, but not fully tested
         """
         
-        song_key = 'C'
+        song_key = 'C'        
         
-        if notes is None:
-            notes = self.retrieve_notes(recipient)
-
-        if input_mode is None:
-            input_mode = self.retrieve_input_mode(recipient, notes=notes)
-
-        q_key = self.communicator.recall_by_recipient(recipient, criterion="possible_keys", filters=["valid_reply"],
+        q_key = self.communicator.recall_by_recipient(recipient, criterion="possible_keys|recommended_key|one_possible_key", filters=["valid_reply"],
                                                       sort_by="date")
-        if len(q_key) != 0:
-            song_key = q_key[-1].get_reply().get_result()
-            return song_key
-
-        q_key = self.communicator.recall_by_recipient(recipient, criterion="recommended_key", filters=["valid_reply"],
-                                                      sort_by="date")
+        
         if len(q_key) != 0:
             song_key = q_key[-1].get_reply().get_result()
             if len(song_key.strip()) == 0:
                 song_key = 'C'
             return song_key
-
-        q_key = self.communicator.recall_by_recipient(recipient, criterion="one_possible_key", filters=["valid_reply"],
-                                                      sort_by="date")
-        if len(q_key) != 0:
-            try:
-                song_key = self.get_song_parser().find_key(notes)[0]
-                return song_key
-            except TypeError:
-                song_key = 'C'
-                return song_key
-
+        
+                
         q_key = self.communicator.recall_by_recipient(recipient, criterion="no_possible_key", filters=["valid_reply"],
                                                       sort_by="date")
         if len(q_key) != 0:
@@ -748,6 +717,7 @@ class MusicSheetMaker:
             return song_key
 
         return song_key
+
 
     def ask_octave_shift(self, recipient, prerequisites=None, execute=True):
 
@@ -760,6 +730,7 @@ class MusicSheetMaker:
         else:
             return q_shift, None
 
+    '''
     def retrieve_octave_shift(self, recipient):
         """
         Retrieves desired octave shift from previous answered queries.
@@ -773,22 +744,46 @@ class MusicSheetMaker:
             octave_shift = q_shift[-1].get_reply().get_result()
             
         return octave_shift
+    '''
+    
+    def ask_aspect_ratio(self, recipient, render_modes=None, prerequisites=None, execute=True):
 
-    def retrieve_aspect_ratio(self, recipient):
-        """
-        Retrieves desired aspect ratio from previous answered queries.
-        Should work, but not fully tested
-        """
-        aspect_ratio = 16/9.0
-        
-        q_aspect = self.communicator.recall_by_recipient(recipient, criterion="aspect_ratio", filters=["valid_reply"],
-                                                        sort_by="date")
-        if len(q_aspect) != 0:
-            aspect_ratio = q_aspect[-1].get_reply().get_result()
-            return aspect_ratio
+        if render_modes is None:
+            render_modes = self.retrieve_render_modes(recipient)
+
+        image_modes = [RenderMode.PNG, RenderMode.SVG]
+        if not any([mode in render_modes for mode in image_modes]):
+            return None, 16/9.0
+        else:
+            q_aspect = self.communicator.send_stock_query('aspect_ratio', recipient=recipient, prerequisites=prerequisites)
+    
+            if execute:
+                recipient.execute_queries(q_aspect)
+                aspect_ratio = q_aspect.get_reply().get_result()
+                return q_aspect, aspect_ratio
+            else:
+                return q_aspect, None
             
-        return aspect_ratio
 
+    def ask_song_bpm(self, recipient, render_modes=None, prerequisites=None, execute=True):
+
+        if render_modes is None:
+            render_modes = self.retrieve_render_modes(recipient)
+
+        time_modes = [RenderMode.MIDI] #TODO: add SkyJSON
+        if not any([mode in render_modes for mode in time_modes]):
+            print('%%DEBUG I SAID NO')
+            return None, 120
+        else:
+            q_song_bpm = self.communicator.send_stock_query('song_bpm', recipient=recipient, prerequisites=prerequisites)
+    
+            if execute:
+                recipient.execute_queries(q_song_bpm)
+                song_bpm = q_song_bpm.get_reply().get_result()
+                return q_song_bpm, song_bpm
+            else:
+                return q_song_bpm, None
+    
 
     def display_error_ratio(self, recipient, prerequisites=None, execute=True):
 
@@ -838,10 +833,10 @@ class MusicSheetMaker:
             notes = self.retrieve_notes(recipient)
 
         if octave_shift is None:
-            octave_shift = self.retrieve_octave_shift(recipient)
+            octave_shift = self.retrieve_past_query_result(recipient, 'octave_shift')
 
         if song_key is None:
-            song_key = self.retrieve_song_key(recipient, notes=notes)
+            song_key = self.retrieve_song_key(recipient)
 
         song = self.get_song_parser().parse_song(song_lines=notes, song_key=song_key, octave_shift=octave_shift)
         
@@ -855,15 +850,15 @@ class MusicSheetMaker:
         render_modes = self.render_modes_enabled
 
         if len(render_modes) == 1:
-            return None, render_modes
+            return render_modes
 
         if self.is_commandline(recipient):
 
-            return None, render_modes
+            return render_modes
 
         elif self.is_botcog(recipient):
 
-            return None, self.botcog_render_modes
+            return self.botcog_render_modes
 
         else:
         
@@ -877,7 +872,25 @@ class MusicSheetMaker:
         return render_modes
 
 
-    def render_song(self, recipient, render_modes=None, aspect_ratio=16/9.0):
+    
+    def retrieve_past_query_result(self, recipient, query_name, default=None):
+        """
+        Retrieves reply from previously replied query
+        Should work, but not fully tested
+        """        
+        qs = self.communicator.recall_by_recipient(recipient, criterion=query_name, filters=["valid_reply"],
+                                                        sort_by="date")
+
+        if len(qs) != 0:
+            q = qs[-1]
+            if q.get_expect_reply():
+            reply_result = .get_reply().get_result()
+            return reply_result
+            
+        return default
+
+
+    def render_song(self, recipient, render_modes=None, aspect_ratio=16/9.0, song_bpm=120):
 
         if render_modes is None:
             if self.is_botcog(recipient):
@@ -894,7 +907,7 @@ class MusicSheetMaker:
         song_bundle.set_meta(self.get_song().get_meta())
 
         for render_mode in render_modes:
-            buffers = self.get_song().render(render_mode=render_mode, aspect_ratio=aspect_ratio, css_mode=self.css_mode, rel_css_path=self.rel_css_path)  # A list of IOString or IOBytes buffers
+            buffers = self.get_song().render(render_mode=render_mode, aspect_ratio=aspect_ratio, song_bpm=song_bpm, css_mode=self.css_mode, rel_css_path=self.rel_css_path)  # A list of IOString or IOBytes buffers
             song_bundle.add_render(render_mode, buffers)
             if self.is_commandline(recipient):
                 file_paths = self.build_file_paths(render_mode, len(buffers))
