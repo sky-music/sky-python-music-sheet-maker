@@ -231,6 +231,7 @@ class Note:
         return note_render
 
 
+
 class NoteCircle(Note):
 
     def __init__(self, chord, pos):

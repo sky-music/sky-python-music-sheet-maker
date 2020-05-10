@@ -1,9 +1,10 @@
 import re, io
+import json
 from src.skymusic.modes import RenderMode, CSSMode
 from src.skymusic import Lang
 from src.skymusic.resources import Resources
-from src.skymusic.renderers.instrument_renderers import InstrumentHTMLRenderer,\
-InstrumentSVGRenderer, InstrumentPNGRenderer, InstrumentMIDIRenderer, InstrumentASCIIRenderer
+from src.skymusic.renderers.instrument_renderers import InstrumentHTMLRenderer, InstrumentSVGRenderer, \
+InstrumentPNGRenderer, InstrumentMIDIRenderer, InstrumentSKYJSONRenderer, InstrumentASCIIRenderer
 
 try:
     from PIL import Image, ImageDraw, ImageFont
@@ -267,7 +268,7 @@ class SongSVGRenderer(SongRenderer):
             end_col = len(line)
             
             # Line SVG container
-            if linetype.lower() == 'voice':
+            if linetype.lower().strip() == 'voice':
                 
                 song_render += (f'\n<svg x="0" y="{y :.2f}" width="{self.SVG_line_width :.2f}" height="{self.SVG_text_height :.2f}"'
                                 f' class="instrument-line line-{row}">'
@@ -301,7 +302,7 @@ class SongSVGRenderer(SongRenderer):
                 instrument.set_index(instrument_index)
 
                 #NEW
-                if linetype.lower() == 'voice':
+                if linetype.lower().strip() == 'voice':
                     ypredict = y + ysong + (self.SVG_text_height + self.SVG_harp_spacings[1] / 2.0) + self.SVG_harp_spacings[1] / 2.0                
                 else:
                     ypredict = y + ysong + (self.SVG_harp_size[1] + self.SVG_harp_spacings[1]) + self.SVG_harp_spacings[1] / 2.0
@@ -323,7 +324,7 @@ class SongSVGRenderer(SongRenderer):
 
                      # print('max reached at row=' + str(row) + ' col=' + str(col))
                     # New Line SVG placeholder
-                    if linetype.lower() == 'voice':
+                    if linetype.lower().strip() == 'voice':
                         line_render += (f'\n<svg x="0" y="{y :.2f}" width="{self.SVG_line_width :.2f}" height="{self.SVG_text_height :.2f}"'
                                         f' class="instrument-line line-{row}-{sub_line}">'
                                         )
@@ -553,7 +554,7 @@ class SongPNGRenderer(SongRenderer):
             end_col = len(line)
 
             # Line
-            if linetype.lower() == 'voice':
+            if linetype.lower().strip() == 'voice':
                 line_render = Image.new('RGBA', (int(self.png_line_width), int(self.png_lyric_size[1])), self.png_color)
             else:
                 # Dividing line
@@ -577,7 +578,7 @@ class SongPNGRenderer(SongRenderer):
                 instrument.set_index(instrument_index)
                 
                 #NEW
-                if linetype.lower() == 'voice':
+                if linetype.lower().strip() == 'voice':
                     ypredict = yline_in_song + (self.png_lyric_size[1] + self.png_harp_spacings[1] / 2.0)* nsublines_predict + self.png_harp_spacings[1] / 2.0
                 else:
                     ypredict = yline_in_song + (self.png_harp_size[1] + self.png_harp_spacings[1])*nsublines_predict + self.png_harp_spacings[1] / 2.0
@@ -598,7 +599,7 @@ class SongPNGRenderer(SongRenderer):
                     sub_line += 1
                     # print('max reached at row=' + str(row) + ' col=' + str(col))
                     # New Line
-                    if linetype.lower() == 'voice':
+                    if linetype.lower().strip() == 'voice':
                         line_render = Image.new('RGBA', (int(self.png_line_width), int(self.png_lyric_size[1])),
                                                 self.png_color)
                     else:
@@ -626,7 +627,7 @@ class SongPNGRenderer(SongRenderer):
             #end loop on cols: pasting line
             song_render = self.trans_paste(song_render, line_render,(int(xline_in_song), int(yline_in_song)))
             yline_in_song += line_render.size[1] + self.png_harp_spacings[1] / 2.0
-            if linetype.lower() != 'voice':
+            if linetype.lower().strip() != 'voice':
                 yline_in_song += self.png_harp_spacings[1] / 2.0
 
             if page_break:
@@ -710,7 +711,7 @@ class SongMIDIRenderer(SongRenderer):
         song_lines = song.get_lines()
         for line in song_lines:
             if len(line) > 0:
-                if line[0].get_type() != 'voice':
+                if line[0].get_type().lower().strip() != 'voice':
                     instrument_index = 0
                     for instrument in line:
                         instrument.set_index(instrument_index)
@@ -728,15 +729,53 @@ class SongMIDIRenderer(SongRenderer):
 
         return [midi_buffer]
 
+class SongSKYJSONRenderer(SongRenderer):
 
+    def __init__(self, locale=None, song_bpm=120):
+        
+        super().__init__(locale)
+        self.song_bpm = song_bpm
+
+    def write_buffers(self, song):
+
+        meta = song.get_meta()
+        dt = (60000/self.song_bpm) / 4
+        
+        print('%%DEBUG')
+        print(dt)
+    
+        json_buffer = io.StringIO()
+
+        instrument_renderer = InstrumentSKYJSONRenderer(self.locale)
+        
+        json_dict = {'name': meta['title'][1], 'songNotes': []}
+    
+        instrument_index = 0
+        time = 0
+        for line in song.get_lines():
+            if len(line) > 0:
+                if line[0].get_type().lower().strip() != 'voice':
+                    for instrument in line:
+                        instrument.set_index(instrument_index)
+                        time += dt
+                        if not instrument.get_is_silent():
+                            json_dict['songNotes'] += instrument_renderer.render(instrument, time, dt)
+  
+                        instrument_index += 1
+
+        print(json_dict)
+        
+        json.dump([json_dict], json_buffer)
+
+        return [json_buffer]
 
 class SongASCIIRenderer(SongRenderer):
 
     def __init__(self, locale=None):
         
-        super().__init__(locale)    
-
-    def write_buffers(self, song, render_mode=RenderMode.SKYASCII):
+        super().__init__(locale) 
+        
+    def write_buffers(self, song, render_mode):
 
         meta = song.get_meta()
         ascii_buffer = io.StringIO()
@@ -744,11 +783,11 @@ class SongASCIIRenderer(SongRenderer):
         note_parser = render_mode.get_note_parser()
         instrument_renderer = InstrumentASCIIRenderer(self.locale)
         
-        ascii_buffer.write('#%s\n' % meta['title'][1])
+        ascii_buffer.write(f"{Resources.COMMENT_DELIMITER}{meta['title'][1]}\n")
 
         for k in meta:
             if k != 'title':
-                ascii_buffer.write('#%s %s\n' % (meta[k][0], meta[k][1]))
+                ascii_buffer.write(f"{Resources.COMMENT_DELIMITER}{meta[k][0]}{meta[k][1]}\n")
 
         
         song_render = '\n'
@@ -758,11 +797,15 @@ class SongASCIIRenderer(SongRenderer):
             for instrument in line:
                 instrument.set_index(instrument_index)
                 #instrument_render = instrument.render_in_ascii(note_parser)
-                instrument_render = instrument_renderer.render(instrument, note_parser)
+                instrument_render = instrument_renderer.render(instrument, note_parser)                
+                repeat = instrument.get_repeat()
+                if repeat > 1:
+                    instrument_render += Resources.REPEAT_INDICATOR + str(repeat)
+                line_render += instrument_render + re.sub('\\\\s', ' ', Resources.ICON_DELIMITER)
                 instrument_index += 1
-                line_render += instrument_render + ' '
             song_render += '\n' + line_render
 
         ascii_buffer.write(song_render)
 
         return [ascii_buffer]
+

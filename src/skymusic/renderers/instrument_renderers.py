@@ -4,6 +4,8 @@ from src.skymusic import notes
 from src.skymusic.resources import Resources
 from src.skymusic import Lang
 from src.skymusic.instruments import Harp, Voice
+from src.skymusic.parsers.noteparsers.skyjson import SkyJson
+
 
 try:
     from PIL import Image, ImageDraw, ImageFont
@@ -29,6 +31,10 @@ class InstrumentRenderer():
             print(f"**WARNING: Song self.maker has no locale. Reverting to: {self.locale}")
         else:
             self.locale = locale
+
+        
+
+
 
     def render(self, *args, **kwargs):
         
@@ -166,6 +172,19 @@ class InstrumentPNGRenderer(InstrumentRenderer):
         # self.font_color = (255,255,255)#Uncomment to make it different from the inherited class
         # self.font = 'fonts/NotoSansCJKjp-Regular.otf'
 
+    def trans_paste(self, bg, fg, box=(0, 0)):
+        if fg.mode == 'RGBA':
+            if bg.mode != 'RGBA':
+                bg = bg.convert('RGBA')
+            fg_trans = Image.new('RGBA', bg.size)
+            fg_trans.paste(fg, box, mask=fg)  # transparent foreground
+            return Image.alpha_composite(bg, fg_trans)
+        else:
+            if bg.mode == 'RGBA':
+                bg = bg.convert('RGB')
+            bg.paste(fg, box)
+            return bg
+
  
     def set_png_chord_size(self):
         """ Sets the size of the chord image from the .png file """
@@ -225,18 +244,6 @@ class InstrumentPNGRenderer(InstrumentRenderer):
 
 
     def render_harp(self, instrument, rescale=1.0):
-        def trans_paste(bg, fg, box=(0, 0)):
-            if fg.mode == 'RGBA':
-                if bg.mode != 'RGBA':
-                    bg = bg.convert('RGBA')
-                fg_trans = Image.new('RGBA', bg.size)
-                fg_trans.paste(fg, box, mask=fg)  # transparent foreground
-                return Image.alpha_composite(bg, fg_trans)
-            else:
-                if bg.mode == 'RGBA':
-                    bg = bg.convert('RGB')
-                bg.paste(fg, box)
-                return bg
 
         harp_silent = instrument.get_is_silent()
         harp_broken = instrument.get_is_broken()
@@ -256,14 +263,14 @@ class InstrumentPNGRenderer(InstrumentRenderer):
 
         if harp_broken:  # '?' in the middle of the image (no harp around)
             symbol = Image.open(self.broken_png)
-            harp_render = trans_paste(harp_render, symbol, (
+            harp_render = self.trans_paste(harp_render, symbol, (
                 int((harp_size[0] - symbol.size[0]) / 2.0), int((harp_size[1] - symbol.size[1]) / 2.0)))
         elif harp_silent:  # '.' in the middle of the image (no harp around)
             symbol = Image.open(self.silent_png)
-            harp_render = trans_paste(harp_render, symbol, (
+            harp_render = self.trans_paste(harp_render, symbol, (
                 int((harp_size[0] - symbol.size[0]) / 2.0), int((harp_size[1] - symbol.size[1]) / 2.0)))
         else:
-            harp_render = trans_paste(harp_render, harp_file)  # default harp image
+            harp_render = self.trans_paste(harp_render, harp_file)  # default harp image
             for row in range(instrument.get_row_count()):
                 for col in range(instrument.get_column_count()):
 
@@ -277,7 +284,7 @@ class InstrumentPNGRenderer(InstrumentRenderer):
                         yn = (0.17 + row * (1 - 2 * 0.17) / (instrument.get_row_count() - 1)) * harp_size[1] - note_size[
                             1] / 2.0
                         note_render = note.render_in_png(note_rescale)
-                        harp_render = trans_paste(harp_render, note_render, (int(round(xn)), int(round(yn))))
+                        harp_render = self.trans_paste(harp_render, note_render, (int(round(xn)), int(round(yn))))
 
         if rescale != 1:
             harp_render = harp_render.resize((int(harp_render.size[0] * rescale), int(harp_render.size[1] * rescale)),
@@ -297,22 +304,23 @@ class InstrumentASCIIRenderer(InstrumentRenderer):
         ascii_chord = ''
 
         if instrument.get_is_broken():
-            ascii_chord = 'X'
+            ascii_chord = Resources.BROKEN_CHORD
         elif instrument.get_is_silent():
-            ascii_chord = '.'
+            ascii_chord = Resources.PAUSE
         else:
             chord_skygrid = instrument.get_chord_skygrid()
             for k in chord_skygrid:  # Cycle over positions in a frame
                 for f in chord_skygrid[k]:  # Cycle over triplets & quavers
                     if chord_skygrid[k][f]:  # Button is highlighted
-                        ascii_chord += note_parser.get_note_from_coordinate(k)
+                        ascii_chord += note_parser.get_note_from_coordinate(k) + Resources.QUAVER_DELIMITER
+            ascii_chord.rstrip(Resources.QUAVER_DELIMITER)
+            
         return ascii_chord
 
 
     def render_voice(self, instrument, render_mode):
-        chord_render = "#%s " % instrument.get_lyric()  # Lyrics marked as comments in output text files
+        chord_render = f"{Resources.COMMENT_DELIMITER}{instrument.get_lyric()}"  # Lyrics marked as comments in output text files
         return chord_render
-
 
 class InstrumentMIDIRenderer(InstrumentRenderer):
     
@@ -358,6 +366,36 @@ class InstrumentMIDIRenderer(InstrumentRenderer):
                                 t = durations[i]
 
         return harp_render
+
+
+    def render_voice(self, *args, **kwargs):    
+
+        return NotImplemented
+
+class InstrumentSKYJSONRenderer(InstrumentRenderer):
+    
+    def __init__(self, locale=None):
+        super().__init__(locale)
+        self.note_parser = SkyJson()
+
+    def render_harp(self, instrument, time=0, dt=60000/120):
+
+        json_chord = []
+
+        if instrument.get_is_broken():
+            json_chord = [{'time':int(time), 'key':'ERROR'}]
+        elif instrument.get_is_silent():
+            json_chord = [{'time':int(time), 'key':'.'}]
+        else:
+            repeat = instrument.get_repeat()
+            chord_skygrid = instrument.get_chord_skygrid()
+            for k in chord_skygrid:  # Cycle over positions in a frame
+                for f in chord_skygrid[k]:  # Cycle over triplets & quavers
+                    if chord_skygrid[k][f]:  # Button is highlighted
+                        json_chord += [{'time':int(time), 'key':self.note_parser.get_note_from_coordinate(k)}]
+                        time = time + dt
+                        
+        return json_chord
 
 
     def render_voice(self, *args, **kwargs):    

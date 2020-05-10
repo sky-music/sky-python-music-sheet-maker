@@ -32,6 +32,8 @@ render_mode:
         short_desc: partition graphique en PNG
     midi:
         short_desc: Fichier son en MIDI
+    skyjson:
+        short_desc: Fichier texte Sky JSON        
     skyascii:
         short_desc: Transcription en notation Sky
     englishascii:

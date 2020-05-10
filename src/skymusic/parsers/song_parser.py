@@ -8,7 +8,7 @@ from src.skymusic import instruments, Lang
 from src.skymusic.modes import InputMode
 from src.skymusic.song import Song
 import src.skymusic.parsers.noteparsers
-
+from resources import Resources
 
 class SongParserError(Exception):
     def __init__(self, explanation):
@@ -32,12 +32,12 @@ class SongParser:
         #Only regex with the following format are supported: \x, where x is [a-zA-Z]
         self.input_mode = None
         self.note_parser = None
-        self.icon_delimiter = '\s'
-        self.pause = '.'
-        self.quaver_delimiter = '-'
-        self.comment_delimiter = '#'
-        self.repeat_indicator = '*'
-        self.skyjson_chord_delay = 50 #Delay in ms below which 2 notes are considered a chord
+        self.icon_delimiter = Resources.ICON_DELIMITER
+        self.pause = Resources.PAUSE
+        self.quaver_delimiter = Resources.QUAVER_DELIMITER
+        self.comment_delimiter = Resources.COMMENT_DELIMITER
+        self.repeat_indicator = Resources.REPEAT_INDICATOR
+        self.skyjson_chord_delay = Resources.SKYJSON_CHORD_DELAY #Delay in ms below which 2 notes are considered a chord
         self.maker = maker
         try:
             self.locale = self.maker.get_locale()
@@ -45,15 +45,17 @@ class SongParser:
             self.locale = Lang.guess_locale()
             print(f"**WARNING: SongParser self.maker has no locale. Reverting to {self.locale}")
 
-    def set_delimiters(self, icon_delimiter=' ', pause='.', quaver_delimiter='-', comment_delimiter='#',
-                       repeat_indicator='*'):
+    """
+    def set_delimiters(self, icon_delimiter=Resources.ICON_DELIMITER, pause=Resources.PAUSE, quaver_delimiter=Resources.QUAVER_DELIMITER, comment_delimiter=Resources.COMMENT_DELIMITER,
+                       repeat_indicator=Resources.REPEAT_INDICATOR):
 
         self.icon_delimiter = icon_delimiter
         self.pause = pause
         self.quaver_delimiter = quaver_delimiter
         self.comment_delimiter = comment_delimiter
         self.repeat_indicator = repeat_indicator
-
+    """
+    
     def get_icon_delimiter(self):
 
         return self.icon_delimiter
@@ -81,12 +83,12 @@ class SongParser:
     def check_delimiters(self):
 
         if self.input_mode == InputMode.JIANPU or isinstance(self.note_parser, src.skymusic.parsers.noteparsers.jianpu.Jianpu):
-            if self.pause != '0':
+            if self.pause != Resources.JIANPU_QUAVER_DELIMITER:
                 print(f"Jianpu notation is used: setting 0 as the pause character instead of {self.pause}")
-                self.pause = '0'
+                self.pause = Resources.JIANPU_QUAVER_DELIMITER
             if self.quaver_delimiter == '-':
-                print(f"Jianpu notation is used: setting ^ as the quaver delimiter instead of {self.quaver_delimiter}")
-                self.quaver_delimiter = '^'
+                print(f"Jianpu notation is used: setting %s as the quaver delimiter instead of {self.quaver_delimiter}" % Resources.JIANPU_QUAVER_DELIMITER)
+                self.quaver_delimiter = Resources.JIANPU_QUAVER_DELIMITER
 
         delims = [self.icon_delimiter, self.pause, self.quaver_delimiter, self.comment_delimiter, self.repeat_indicator]
 
@@ -382,8 +384,6 @@ class SongParser:
                         instrument_line.append(voice)
             else:
                 icons = self.split_line(line)
-                print('%%DEBUG')
-                print(icons)
                 
                 for icon in icons:
                     chords = self.split_icon(icon)
@@ -431,16 +431,14 @@ class SongParser:
         try:
             json_dict = json.loads(song_lines[0])
             json_dict[0]['songNotes']
-            #print('%%%JSON DETECTED!!!')
             return [InputMode.SKYJSON]
         except (json.JSONDecodeError, NameError, TypeError):
-            #print('%%%DEBUG not JSON...')
             pass        
         
         if isinstance(song_lines, str):  # Break newlines and make sure the result is a List
             song_lines = song_lines.split(os.linesep)
 
-        possible_modes = [mode for mode in InputMode if InputMode is not InputMode.SKYJSON]
+        possible_modes = [mode for mode in InputMode if mode is not InputMode.SKYJSON]
         possible_parsers = [self.get_note_parser(mode) for mode in possible_modes]
         possible_regex = [parser.single_note_name_regex for parser in possible_parsers]
 

@@ -718,7 +718,6 @@ class MusicSheetMaker:
 
         time_modes = [RenderMode.MIDI] #TODO: add SkyJSON
         if not any([mode in render_modes for mode in time_modes]):
-            print('%%DEBUG I SAID NO')
             return None, 120
         else:
             q_song_bpm = self.communicator.send_stock_query('song_bpm', recipient=recipient, prerequisites=prerequisites)

@@ -33,3 +33,13 @@ with importlib_resources.path(css, 'main.css') as fp:
 
 with importlib_resources.path(fonts, 'NotoSansCJKjp-Regular.otf') as fp:
     font_path = str(fp)
+    
+ICON_DELIMITER = '\s'
+PAUSE = '.'
+JIANPU_PAUSE = '0'
+QUAVER_DELIMITER = '-'
+JIANPU_QUAVER_DELIMITER = '^'
+COMMENT_DELIMITER = '#'
+REPEAT_INDICATOR = '*'
+BROKEN_CHORD = 'X'
+SKYJSON_CHORD_DELAY = 50 #Delay in ms below which 2 notes are considered a chord

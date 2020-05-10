@@ -33,6 +33,8 @@ render_mode:
         short_desc: bảng nhạc trực quan bằng ảnh PNG
     midi:
         short_desc: tệp nhạc MIDI
+    skyjson:
+        short_desc: Sky JSON text file
     skyascii:
         short_desc: bài hát dưới dạng hệ kí tự Sky 
     englishascii:

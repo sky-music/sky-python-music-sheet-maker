@@ -32,6 +32,8 @@ render_mode:
         short_desc: PNG visual sheet
     midi:
         short_desc: Midi song file
+    skyjson:
+        short_desc: Sky JSON text file       
     skyascii:
         short_desc: song in Sky notation
     englishascii:

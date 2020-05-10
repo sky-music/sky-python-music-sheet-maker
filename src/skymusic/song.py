@@ -111,8 +111,10 @@ class Song():
             buffers = song_renderers.SongPNGRenderer(self.locale, kwargs['aspect_ratio']).write_buffers(song=self)
         elif render_mode == RenderMode.MIDI:
             buffers = song_renderers.SongMIDIRenderer(self.locale, kwargs['song_bpm']).write_buffers(song=self)
+        elif render_mode == RenderMode.SKYJSON:
+            buffers = song_renderers.SongSKYJSONRenderer(self.locale, kwargs['song_bpm']).write_buffers(song=self)    
         else:  # Ascii
-            buffers = song_renderers.SongASCIIRenderer(self.locale).write_buffers(song=self)
+            buffers = song_renderers.SongASCIIRenderer(self.locale).write_buffers(song=self, render_mode=render_mode)
 
         return buffers
        

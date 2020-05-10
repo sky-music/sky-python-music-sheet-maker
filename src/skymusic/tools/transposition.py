@@ -15,7 +15,7 @@ import os
 import math
 from src.skymusic.parsers.song_parser import SongParser
 from src.skymusic.modes import InputMode
-
+from src.skymusic.resources import Resources
 
 def set_dodecas(mode):
     if mode==InputMode.DOREMI:
@@ -32,11 +32,6 @@ def set_dodecas(mode):
         dodeca_flats = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B']
     return (dodeca_sharps,dodeca_flats)
 
-QUAVER_DELIMITER = '-'  # Dash-separated list of chords
-ICON_DELIMITER = '\s'  # Chords separation
-PAUSE = '.'
-COMMENT_DELIMITER = '#'  # Lyrics delimiter, can be used for comments
-REPEAT_INDICATOR = '*'
 
 def parse_chords(song_parser, chords, note_shift=0, song_jet='C'):
     splitted_chords = []
@@ -81,7 +76,7 @@ def parse_line(song_parser, line, note_shift=0, song_key='C'):
             lyrics = song_parser.split_line(line)
             for lyric in lyrics:
                 if len(lyric) > 0:
-                    splitted_line.append('#' + lyric)
+                    splitted_line.append(Resources.COMMENT_DELIMITER + lyric)
             # splitted_line.append(lyric_line)
         else:
             icons = song_parser.split_line(line)
@@ -106,7 +101,7 @@ def render_transposed_song(song_lines):
             song += '\n'
         for instr_idx, instrument in enumerate(song_line):
             try:
-                if song_line[0][0][0] == '#':
+                if song_line[0][0][0] == Resources.COMMENT_DELIMITER:
                     song += str(instrument)
                 else:
                     for icon_idx, icon in enumerate(instrument):
@@ -144,8 +139,6 @@ except ValueError:
 """
 
 song_parser = SongParser(None)
-song_parser.set_delimiters(icon_delimiter=ICON_DELIMITER, pause=PAUSE, quaver_delimiter=QUAVER_DELIMITER,
-                           comment_delimiter=COMMENT_DELIMITER, repeat_indicator=REPEAT_INDICATOR)
 
 possible_modes = song_parser.get_possible_modes(song_lines=song_lines)
 
