@@ -10,6 +10,8 @@ reb1mib1 fa1solb1lab1
 reb1-mib1-fa1-solb1 lab1-sib1do2reb2
 #Pauses:
 reb1 . mib1 . . fa1
+#Repetitions:
+reb1*2 mib1*14 .*2 fa1*1 .*1
 #Notes #without #octave:
 reb mib fa solb lab sib
 do# re# fa fa# sol# la#

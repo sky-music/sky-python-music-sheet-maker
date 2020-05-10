@@ -154,7 +154,7 @@ stock_queries:
       - Sharps "#" and flats "b" (semitones) are supported for Western and Jianpu notations.
   file:
     foreword:
-    question: 'Enter a vali file name (in {0}/)'
+    question: 'Enter a valid file name (in {0}/)'
     afterword:
     input_tip: any text file containing one or several musical notes
     help_text:

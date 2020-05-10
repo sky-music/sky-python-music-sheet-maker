@@ -6,6 +6,8 @@ A1A2 A3A4A5
 A1-A2-A3-A4 A5-B1B2B3
 #Pauses:
 A1 . A2 . . A3
+#Repetitions:
+A1*2 A2*14 .*2 A3*1 .*1
 #Errors:
 X + 0 a
 #out of #range:

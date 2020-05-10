@@ -44,12 +44,10 @@ class SongHTMLRenderer(SongRenderer):
         super().__init__(locale)
         self.HTML_note_width = '1em'
 
-    def write_buffers(self, song, css_mode=CSSMode.EMBED, rel_css_path='css/main.css'):
-                
+    def write_headers(self, html_buffer, song, css_mode, rel_css_path):
+        
         meta = song.get_meta()
         css_path = Resources.css_path
-        
-        html_buffer = io.StringIO()
 
         html_buffer.write(f'<!DOCTYPE html>'
                           f'\n<html xmlns:svg="http://www.w3.org/2000/svg">'
@@ -80,6 +78,24 @@ class SongHTMLRenderer(SongRenderer):
                 html_buffer.write(f"\n<p> <b>{meta[k][0]}</b>{meta[k][1]}</p>")
 
         html_buffer.write('\n<div id="transcript">\n')
+        
+        return html_buffer
+
+
+    def write_footer(self, html_buffer):
+        
+        html_buffer.write('\n</div>'
+                          '\n</body>'
+                          '\n</html>')
+       
+        return html_buffer        
+
+
+    def write_buffers(self, song, css_mode=CSSMode.EMBED, rel_css_path='css/main.css'):    
+        
+        html_buffer = io.StringIO()
+
+        self.write_headers(html_buffer, song, css_mode, rel_css_path)      
 
         song_render = ''
         instrument_index = 0
@@ -106,9 +122,7 @@ class SongHTMLRenderer(SongRenderer):
 
         html_buffer.write(song_render)
 
-        html_buffer.write('\n</div>'
-                          '\n</body>'
-                          '\n</html>')
+        self.write_footer(html_buffer)
 
         return [html_buffer]
 
@@ -146,20 +160,10 @@ class SongSVGRenderer(SongRenderer):
         """Tries to predict the height of the lyrics text when rendered in SVG"""
         return self.fontpt * self.pt2px
 
-    def write_buffers(self, song, css_mode=CSSMode.EMBED, rel_css_path='css/main.css', start_row=0, start_col=0, buffer_list=None):
-
-        if buffer_list is None:
-            buffer_list = []
-        if len(buffer_list) > self.maxFiles:
-            print(f"\nYour song is too long. Stopping at {self.maxFiles} files.")
-            return buffer_list
-
-        instrument_renderer = InstrumentSVGRenderer(self.locale)
+    def write_headers(self, svg_buffer, filenum, song, css_mode, rel_css_path):
+         
         css_path = Resources.css_path
-        meta = song.get_meta()
-        svg_buffer = io.StringIO()
-        filenum = len(buffer_list)
-
+        meta = song.get_meta()                 
         # SVG/XML headers
         svg_buffer.write('<?xml version="1.0" encoding="utf-8" ?>')
 
@@ -188,8 +192,25 @@ class SongSVGRenderer(SongRenderer):
         else:
             svg_buffer.write('\n<defs></defs>')
 
-        svg_buffer.write(f"\n<title>{meta['title'][1]}-{filenum}</title>")
+        svg_buffer.write(f"\n<title>{meta['title'][1]}-{filenum}</title>")        
 
+
+    def write_buffers(self, song, css_mode=CSSMode.EMBED, rel_css_path='css/main.css', start_row=0, start_col=0, buffer_list=None):
+
+        if buffer_list is None:
+            buffer_list = []
+        if len(buffer_list) > self.maxFiles:
+            print(f"\nYour song is too long. Stopping at {self.maxFiles} files.")
+            return buffer_list
+
+        instrument_renderer = InstrumentSVGRenderer(self.locale)
+
+        svg_buffer = io.StringIO()
+        filenum = len(buffer_list)
+        meta = song.get_meta()
+
+        self.write_headers(svg_buffer, filenum, song, css_mode, rel_css_path)             
+       
         # Header SVG container
         song_header = (f'\n<svg x="{self.SVG_viewPortMargins[0] :.2f}" y="{self.SVG_viewPortMargins[1] :.2f}"'
                        f' width="{self.SVG_line_width :.2f}" height="{(self.SVG_viewPort[3] - self.SVG_viewPortMargins[1]) :.2f}">'
@@ -230,7 +251,6 @@ class SongSVGRenderer(SongRenderer):
                       )
         y = 0  # Because we are nested in a new SVG
         x = 0
-
         instrument_index = 0
         # end_row = min(start_row+self.maxLinesPerFile,len(self.lines))
         end_row = song.get_num_lines()
@@ -247,7 +267,7 @@ class SongSVGRenderer(SongRenderer):
             end_col = len(line)
             
             # Line SVG container
-            if linetype == 'voice':
+            if linetype.lower() == 'voice':
                 
                 song_render += (f'\n<svg x="0" y="{y :.2f}" width="{self.SVG_line_width :.2f}" height="{self.SVG_text_height :.2f}"'
                                 f' class="instrument-line line-{row}">'
@@ -275,14 +295,13 @@ class SongSVGRenderer(SongRenderer):
             line_render = ''
             sub_line = 0
             x = 0
-
             for col in range(start_col, end_col):
 
                 instrument = song.get_instrument(row, col)
                 instrument.set_index(instrument_index)
 
                 #NEW
-                if linetype == 'voice':
+                if linetype.lower() == 'voice':
                     ypredict = y + ysong + (self.SVG_text_height + self.SVG_harp_spacings[1] / 2.0) + self.SVG_harp_spacings[1] / 2.0                
                 else:
                     ypredict = y + ysong + (self.SVG_harp_size[1] + self.SVG_harp_spacings[1]) + self.SVG_harp_spacings[1] / 2.0
@@ -304,7 +323,7 @@ class SongSVGRenderer(SongRenderer):
 
                      # print('max reached at row=' + str(row) + ' col=' + str(col))
                     # New Line SVG placeholder
-                    if linetype == 'voice':
+                    if linetype.lower() == 'voice':
                         line_render += (f'\n<svg x="0" y="{y :.2f}" width="{self.SVG_line_width :.2f}" height="{self.SVG_text_height :.2f}"'
                                         f' class="instrument-line line-{row}-{sub_line}">'
                                         )
@@ -330,14 +349,13 @@ class SongSVGRenderer(SongRenderer):
                                          )
                     instrument_render += f'\n<text x="2%" y="98%" class="repeat">x{instrument.get_repeat()} </text></svg>'
 
-
                     x += self.SVG_harp_spacings[0]
 
                 line_render += instrument_render
                 instrument_index += 1
                 x += self.SVG_harp_size[0] + self.SVG_harp_spacings[0]
 
-            #end loop on cols    
+            #end loop on cols: closing line
             line_render += '\n</svg>'  # Close instrument-line SVG
             song_render += line_render
 
@@ -422,18 +440,7 @@ class SongPNGRenderer(SongRenderer):
         """Calculates the text height in PNG for a standard text depending on the input font size"""
         return fnt.getsize('HQfgjyp')[1]
 
-
-    def write_buffers(self, song, start_row=0, start_col=0, buffer_list=None):
-        
-        if buffer_list is None:
-            buffer_list = []
-        global no_PIL_module
-
-        if no_PIL_module:
-            print("\n***WARNING: PNG was not rendered because PIL module was not found. ***\n")
-            return None
-
-        def trans_paste(bg, fg, box=(0, 0)):
+    def trans_paste(self, bg, fg, box=(0, 0)):
             if fg.mode == 'RGBA':
                 if bg.mode != 'RGBA':
                     bg = bg.convert('RGBA')
@@ -446,12 +453,69 @@ class SongPNGRenderer(SongRenderer):
                 bg.paste(fg, box)
                 return bg
 
+
+    def write_header(self, song_render, filenum, song, x_in_png, y_in_png):
+    
+        meta = song.get_meta()
+        harp_rescale = self.get_png_harp_rescale()
+    
+        if filenum == 0:
+
+            fnt = ImageFont.truetype(self.png_font, self.png_title_font_size)
+            h = self.get_png_text_height(fnt)
+            title_header = Image.new('RGBA', (int(self.png_line_width), int(h)))
+            draw = ImageDraw.Draw(title_header)
+            draw.text((0, 0), meta['title'][1], font=fnt, fill=self.font_color)
+            if harp_rescale != 1:
+                title_header = title_header.resize(
+                    (int(title_header.size[0] * harp_rescale), int(title_header.size[1] * harp_rescale)),
+                    resample=Image.LANCZOS)
+            song_render = self.trans_paste(song_render, title_header, (int(x_in_png), int(y_in_png)))
+            y_in_png += h * 2 * harp_rescale
+
+            for k in meta:
+                if k != 'title':
+                    fnt = ImageFont.truetype(self.png_font, self.png_font_size)
+                    h = self.get_png_text_height(fnt)
+                    header = Image.new('RGBA', (int(self.png_line_width), int(h)))
+                    draw = ImageDraw.Draw(header)
+                    draw.text((0, 0), meta[k][0] + ' ' + meta[k][1], font=fnt, fill=self.font_color)
+                    if harp_rescale != 1:
+                        header = header.resize((int(header.size[0] * harp_rescale), int(header.size[1] * harp_rescale)),
+                                               resample=Image.LANCZOS)
+                    song_render = self.trans_paste(song_render, header, (int(x_in_png), int(y_in_png)))
+                    y_in_png += h * 2 * harp_rescale
+        else:
+            fnt = ImageFont.truetype(self.png_font, self.png_font_size)
+            h = self.get_png_text_height(fnt)
+            title_header = Image.new('RGBA', (int(self.png_line_width), int(h)))
+            draw = ImageDraw.Draw(title_header)
+            draw.text((0, 0), meta['title'][1] + '(page ' + str(filenum + 1) + ')', font=fnt, fill=self.font_color)
+            if harp_rescale != 1:
+                title_header = title_header.resize(
+                    (int(title_header.size[0] * harp_rescale), int(title_header.size[1] * harp_rescale)),
+                    resample=Image.LANCZOS)
+            song_render = self.trans_paste(song_render, title_header, (int(x_in_png), int(y_in_png)))
+            y_in_png += 2 * h + self.png_harp_spacings[1]    
+    
+        return (song_render, x_in_png, y_in_png)
+    
+
+    def write_buffers(self, song, start_row=0, start_col=0, buffer_list=None):
+        
+        if buffer_list is None:
+            buffer_list = []
+        global no_PIL_module
+
+        if no_PIL_module:
+            print("\n***WARNING: PNG was not rendered because PIL module was not found. ***\n")
+            return None
+     
         filenum = len(buffer_list)
         if len(buffer_list) > self.maxFiles:
             print(f"\nYour song is too long. Stopping at {self.maxFiles} files.")
             return buffer_list
         
-        meta = song.get_meta()
         instrument_renderer = InstrumentPNGRenderer(self.locale)
         
         # Determines png size as a function of the numer of chords per line
@@ -467,72 +531,27 @@ class SongPNGRenderer(SongRenderer):
 
         x_in_png = int(self.png_margins[0])
         y_in_png = int(self.png_margins[0])
-
-        if filenum == 0:
-
-            fnt = ImageFont.truetype(self.png_font, self.png_title_font_size)
-            h = self.get_png_text_height(fnt)
-            title_header = Image.new('RGBA', (int(self.png_line_width), int(h)))
-            draw = ImageDraw.Draw(title_header)
-            draw.text((0, 0), meta['title'][1], font=fnt, fill=self.font_color)
-            if harp_rescale != 1:
-                title_header = title_header.resize(
-                    (int(title_header.size[0] * harp_rescale), int(title_header.size[1] * harp_rescale)),
-                    resample=Image.LANCZOS)
-            song_render = trans_paste(song_render, title_header, (int(x_in_png), int(y_in_png)))
-            y_in_png += h * 2 * harp_rescale
-
-            for k in meta:
-                if k != 'title':
-                    fnt = ImageFont.truetype(self.png_font, self.png_font_size)
-                    h = self.get_png_text_height(fnt)
-                    header = Image.new('RGBA', (int(self.png_line_width), int(h)))
-                    draw = ImageDraw.Draw(header)
-                    draw.text((0, 0), meta[k][0] + ' ' + meta[k][1], font=fnt, fill=self.font_color)
-                    if harp_rescale != 1:
-                        header = header.resize((int(header.size[0] * harp_rescale), int(header.size[1] * harp_rescale)),
-                                               resample=Image.LANCZOS)
-                    song_render = trans_paste(song_render, header, (int(x_in_png), int(y_in_png)))
-                    y_in_png += h * 2 * harp_rescale
-        else:
-            fnt = ImageFont.truetype(self.png_font, self.png_font_size)
-            h = self.get_png_text_height(fnt)
-            title_header = Image.new('RGBA', (int(self.png_line_width), int(h)))
-            draw = ImageDraw.Draw(title_header)
-            draw.text((0, 0), meta['title'][1] + '(page ' + str(filenum + 1) + ')', font=fnt, fill=self.font_color)
-            if harp_rescale != 1:
-                title_header = title_header.resize(
-                    (int(title_header.size[0] * harp_rescale), int(title_header.size[1] * harp_rescale)),
-                    resample=Image.LANCZOS)
-            song_render = trans_paste(song_render, title_header, (int(x_in_png), int(y_in_png)))
-            y_in_png += 2 * h + self.png_harp_spacings[1]
+        
+        (song_render, x_in_png, y_in_png) = self.write_header(song_render, filenum, song, x_in_png, y_in_png)
 
         ysong = y_in_png
         instrument_index = 0
         end_row = song.get_num_lines()
-
+        end_col = 0
+        ncols = self.maxIconsPerLine
+        page_break = False
         # Creating a new song image, located at x_in_song, yline_in_song
         xline_in_song = x_in_png
         yline_in_song = ysong
         for row in range(start_row, end_row):
 
             line = song.get_line(row)
+            if row > start_row:
+                start_col = 0            
             linetype = line[0].get_type()
-            ncols = len(line)
-            nsublines = int(1.0 * ncols / self.maxIconsPerLine)  # to be changed
+            ncols = len(line) - start_col
+            end_col = len(line)
 
-            if linetype.lower() == 'voice':
-                ypredict = yline_in_song + (self.png_lyric_size[1] + self.png_harp_spacings[1] / 2.0) * (
-                        nsublines + 1) + self.png_harp_spacings[1] / 2.0
-            else:
-                ypredict = yline_in_song + (self.png_harp_size[1] + self.png_harp_spacings[1]) * (nsublines + 1) + \
-                           self.png_harp_spacings[1] / 2.0
-
-            if ypredict > (self.png_size[1] - self.png_margins[1]):
-                end_row = row
-                break  # Bottom of image is reached, pausing line rendering
-
-            sub_line = 0
             # Line
             if linetype.lower() == 'voice':
                 line_render = Image.new('RGBA', (int(self.png_line_width), int(self.png_lyric_size[1])), self.png_color)
@@ -545,17 +564,33 @@ class SongPNGRenderer(SongRenderer):
                 line_render = Image.new('RGBA', (int(self.png_line_width), int(self.png_harp_size[1])), self.png_color)
 
             # Creating a new instrument image, starting at x=0 (in line) and y=0 (in line)
+            if min([ncols, self.maxIconsPerLine])*(self.png_harp_size[0] + self.png_harp_spacings[0]) > self.png_line_width:
+                nsublines_predict = 2
+            else:
+                nsublines_predict = 1
+            sub_line = 0
             x = 0
             y = 0
-            for col in range(ncols):
+            for col in range(start_col, end_col):
 
                 instrument = song.get_instrument(row, col)
                 instrument.set_index(instrument_index)
+                
+                #NEW
+                if linetype.lower() == 'voice':
+                    ypredict = yline_in_song + (self.png_lyric_size[1] + self.png_harp_spacings[1] / 2.0)* nsublines_predict + self.png_harp_spacings[1] / 2.0
+                else:
+                    ypredict = yline_in_song + (self.png_harp_size[1] + self.png_harp_spacings[1])*nsublines_predict + self.png_harp_spacings[1] / 2.0
+    
+                if ypredict > (self.png_size[1] - self.png_margins[1]):
+                    page_break = True
+                    end_col = col
+                    break
 
                 # Creating a new line if max number is exceeded
                 if x + self.png_harp_size[0] + self.png_harp_spacings[0] / 2.0 > self.png_line_width:
                     x = 0
-                    song_render = trans_paste(song_render, line_render, (int(xline_in_song), int(yline_in_song)))
+                    song_render = self.trans_paste(song_render, line_render, (int(xline_in_song), int(yline_in_song)))
                     yline_in_song += line_render.size[1] + self.png_harp_spacings[1] / 2.0
                     if linetype.lower() != 'voice':
                         yline_in_song += self.png_harp_spacings[1] / 2.0
@@ -573,14 +608,14 @@ class SongPNGRenderer(SongRenderer):
                 # INSTRUMENT RENDER
                 #instrument_render = instrument.render_in_png(harp_rescale)
                 instrument_render = instrument_renderer.render(instrument, harp_rescale)
-                line_render = trans_paste(line_render, instrument_render, (int(x), int(y)))
+                line_render = self.trans_paste(line_render, instrument_render, (int(x), int(y)))
 
                 x += max(self.png_harp_size[0], instrument_render.size[0])
 
                 # REPEAT
                 if instrument.get_repeat() > 1:
                     repeat_im = instrument_renderer.get_repeat_png(instrument, self.png_harp_spacings[0], harp_rescale)
-                    line_render = trans_paste(line_render, repeat_im,
+                    line_render = self.trans_paste(line_render, repeat_im,
                                               (int(x), int(y + self.png_harp_size[1] - repeat_im.size[1])))
                     x += max(repeat_im.size[0], self.png_harp_spacings[0])
                 else:
@@ -588,20 +623,25 @@ class SongPNGRenderer(SongRenderer):
 
                 instrument_index += 1
 
-            song_render = trans_paste(song_render, line_render,
-                                      (int(xline_in_song), int(yline_in_song)))  # Paste line in song
+            #end loop on cols: pasting line
+            song_render = self.trans_paste(song_render, line_render,(int(xline_in_song), int(yline_in_song)))
             yline_in_song += line_render.size[1] + self.png_harp_spacings[1] / 2.0
             if linetype.lower() != 'voice':
                 yline_in_song += self.png_harp_spacings[1] / 2.0
 
+            if page_break:
+                end_row = row
+                break
+
+        #End loop on rows
         song_buffer = io.BytesIO()
         song_render.save(song_buffer, format='PNG', dpi=self.png_dpi, compress_level=self.png_compress)
 
         buffer_list.append(song_buffer)
 
         # Open new file
-        if end_row < song.get_num_lines():
-            buffer_list = self.write_buffers(song, end_row, 0, buffer_list)
+        if end_row < song.get_num_lines() or end_col < ncols:
+            buffer_list = self.write_buffers(song, end_row, end_col, buffer_list)
 
         return buffer_list
 
@@ -614,12 +654,28 @@ class SongMIDIRenderer(SongRenderer):
         
         if not no_mido_module:
             # WARNING: instrument codes correspond to General Midi codes (see Wikipedia) minus 1
-            # Instrument will sound very strange if played outside its natural pitch range
+            # An instrument will sound very strange if played outside its natural pitch range
             midi_instruments = {'piano': 0, 'guitar': 24, 'flute': 73, 'pan': 75}
             self.midi_note_duration = 0.3  # note duration is seconds for 120 bpm
             self.midi_bpm = song_bpm  # Beats per minute
             self.midi_instrument = midi_instruments['piano']
             self.midi_key = None
+
+
+    def write_header(self, mid, track, tempo):
+                
+        track.append(mido.MetaMessage('set_tempo', tempo=tempo))
+
+        try:
+            track.append(mido.MetaMessage('key_signature', key=self.midi_key))
+        except ValueError:
+            print("\n***Warning: invalid key passed to MIDI renderer. Using C instead.\n")
+            track.append(mido.MetaMessage('key_signature', key='C'))
+        try:
+            track.append(mido.Message('program_change', program=self.midi_instrument, time=0))
+        except ValueError:
+            print("\n***Warning: invalid instrument passed to MIDI renderer. Using piano instead.\n")
+            track.append(mido.Message('program_change', program=1, time=0))      
 
 
     def write_buffers(self, song):
@@ -635,32 +691,20 @@ class SongMIDIRenderer(SongRenderer):
             print("\n***Warning: Invalid music key passed to the MIDI renderer: using C instead\n")
             self.midi_key = 'C'
 
+        try:
+            tempo = mido.bpm2tempo(self.midi_bpm)
+        except ValueError:
+            print("\n***Warning: invalid tempo passed to MIDI renderer. Using 120 bpm instead.\n")
+            tempo = mido.bpm2tempo(120)
 
         mid = mido.MidiFile(type=0)
         track = mido.MidiTrack()
         mid.tracks.append(track)
 
-        try:
-            tempo = mido.bpm2tempo(self.midi_bpm)
-            track.append(mido.MetaMessage('set_tempo', tempo=tempo))
-        except ValueError:
-            print("\n***Warning: invalid tempo passed to MIDI renderer. Using 120 bpm instead.\n")
-            tempo = mido.bpm2tempo(120)
-            track.append(mido.MetaMessage('set_tempo', tempo=tempo))
-
         sec = mido.second2tick(1, ticks_per_beat=mid.ticks_per_beat, tempo=tempo)  # 1 second in ticks
         note_ticks = self.midi_note_duration * sec * 120 / self.midi_bpm  # note duration in ticks
-
-        try:
-            track.append(mido.MetaMessage('key_signature', key=self.midi_key))
-        except ValueError:
-            print("\n***Warning: invalid key passed to MIDI renderer. Using C instead.\n")
-            track.append(mido.MetaMessage('key_signature', key='C'))
-        try:
-            track.append(mido.Message('program_change', program=self.midi_instrument, time=0))
-        except ValueError:
-            print("\n***Warning: invalid instrument passed to MIDI renderer. Using piano instead.\n")
-            track.append(mido.Message('program_change', program=1, time=0))
+                        
+        self.write_header(mid, track, tempo)
 
         instrument_renderer = InstrumentMIDIRenderer(self.locale)
         song_lines = song.get_lines()
@@ -678,6 +722,7 @@ class SongMIDIRenderer(SongRenderer):
                             for note_render in instrument_render:
                                 track.append(note_render)
                             instrument_index += 1
+        
         midi_buffer = io.BytesIO()
         mid.save(file=midi_buffer)
 

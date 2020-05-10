@@ -308,20 +308,26 @@ class SongParser:
         tempos = [tempo for tempo in self.analyze_tempo(times) if tempo > 2*self.skyjson_chord_delay]
         
         if len(tempos) > 0:
-            main_tempo = tempos[0]
+            main_tempo = min(tempos)
         else:
             main_tempo = None
                 
         icons = [keys[0]]
         #icons_times = [times[0]]
-                
+        
+        print('%DEBUG')
+        print(tempos)
+        
         for i in range(1,len(times)):
             if times[i] - times[i-1] < self.skyjson_chord_delay:
-                icons[i-1] += keys[i] # Notes belong to the same chord
+                icons[-1] += keys[i] # Notes belong to the same chord
             else:
-                n_pauses = max([0, round((times[i] - times[i-1])/main_tempo) - 1])
-                for i in range(n_pauses):
-                    icons += [self.pause]
+                n_pauses = max([0, round((times[i] - times[i-1])/main_tempo - 1)])
+                if n_pauses > 0:
+                    repeat = n_pauses - 1
+                    icons += [self.pause + (self.repeat_indicator+str(repeat) if repeat > 1 else '')]
+
+                        
                 
                 icons += [keys[i]]           
                 #icons_times.append(times[i])
