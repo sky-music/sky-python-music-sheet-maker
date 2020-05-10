@@ -146,7 +146,7 @@ class SongSVGRenderer(SongRenderer):
         """Tries to predict the height of the lyrics text when rendered in SVG"""
         return self.fontpt * self.pt2px
 
-    def write_buffers(self, song, css_mode=CSSMode.EMBED, rel_css_path='css/main.css', start_row=0, buffer_list=None):
+    def write_buffers(self, song, css_mode=CSSMode.EMBED, rel_css_path='css/main.css', start_row=0, start_col=0, buffer_list=None):
 
         if buffer_list is None:
             buffer_list = []
@@ -234,28 +234,18 @@ class SongSVGRenderer(SongRenderer):
         instrument_index = 0
         # end_row = min(start_row+self.maxLinesPerFile,len(self.lines))
         end_row = song.get_num_lines()
+        end_col = 0
+        ncols = self.maxIconsPerLine
+        page_break = False
         for row in range(start_row, end_row):
 
             line = song.get_line(row)
+            if row > start_row:
+                start_col = 0
             linetype = line[0].get_type()
-            ncols = len(line)
-            nsublines = int(1.0 * ncols / self.maxIconsPerLine)
-
-            if linetype == 'voice':
-                ypredict = y + ysong + (self.SVG_text_height + self.SVG_harp_spacings[1] / 2.0) * (nsublines + 1) + \
-                           self.SVG_harp_spacings[1] / 2.0
-            else:
-                ypredict = y + ysong + (self.SVG_harp_size[1] + self.SVG_harp_spacings[1]) * (nsublines + 1) + \
-                           self.SVG_harp_spacings[1] / 2.0
-
-            if ypredict > (self.SVG_viewPort[3] - self.SVG_viewPortMargins[1]):
-                end_row = row
-                break
-
-            line_render = ''
-            sub_line = 0
-            x = 0
-
+            ncols = len(line) - start_col
+            end_col = len(line)
+            
             # Line SVG container
             if linetype == 'voice':
                 
@@ -281,17 +271,38 @@ class SongSVGRenderer(SongRenderer):
 
                 y += self.SVG_harp_size[1] + self.SVG_harp_spacings[1] / 2.0
 
-            for col in range(ncols):
+
+            line_render = ''
+            sub_line = 0
+            x = 0
+
+            for col in range(start_col, end_col):
 
                 instrument = song.get_instrument(row, col)
                 instrument.set_index(instrument_index)
 
+                #NEW
+                if linetype == 'voice':
+                    ypredict = y + ysong + (self.SVG_text_height + self.SVG_harp_spacings[1] / 2.0) + self.SVG_harp_spacings[1] / 2.0                
+                else:
+                    ypredict = y + ysong + (self.SVG_harp_size[1] + self.SVG_harp_spacings[1]) + self.SVG_harp_spacings[1] / 2.0
+
+                if ypredict > (self.SVG_viewPort[3] - self.SVG_viewPortMargins[1]):
+                    page_break = True
+                    end_col = col
+                    break
+
+
                 # Creating a new line if max number is exceeded
-                if (int(1.0 * col / self.maxIconsPerLine) - sub_line) > 0:
+                if (int(1.0 * (col-start_col+1) / self.maxIconsPerLine) - sub_line) > 0:
+
+                    
+                    # Closing previous instrument-line
                     line_render += '\n</svg>'
                     sub_line += 1
                     x = 0
-                    # print('max reached at row=' + str(row) + ' col=' + str(col))
+
+                     # print('max reached at row=' + str(row) + ' col=' + str(col))
                     # New Line SVG placeholder
                     if linetype == 'voice':
                         line_render += (f'\n<svg x="0" y="{y :.2f}" width="{self.SVG_line_width :.2f}" height="{self.SVG_text_height :.2f}"'
@@ -315,7 +326,7 @@ class SongSVGRenderer(SongRenderer):
                 if instrument.get_repeat() > 1:
 
                     instrument_render += (f'\n<svg x="{(x + self.SVG_harp_size[0]) :.2f}" y="0%" class="repeat"'
-                                          f' width="{(100.0 * self.SVG_harp_size[0] / self.SVG_line_width) :.2f}% height="100%">'
+                                          f' width="{(100.0 * self.SVG_harp_size[0] / self.SVG_line_width) :.2f}%" height="100%">'
                                          )
                     instrument_render += f'\n<text x="2%" y="98%" class="repeat">x{instrument.get_repeat()} </text></svg>'
 
@@ -326,19 +337,25 @@ class SongSVGRenderer(SongRenderer):
                 instrument_index += 1
                 x += self.SVG_harp_size[0] + self.SVG_harp_spacings[0]
 
+            #end loop on cols    
+            line_render += '\n</svg>'  # Close instrument-line SVG
             song_render += line_render
-            song_render += '\n</svg>'  # Close line SVG
 
-        song_render += '\n</svg>'  # Close song SVG
+            if page_break:
+                end_row = row
+                break
+
+        #End loop on rows                
+        song_render += '\n</svg>'  # Close song-class SVG
+        
         svg_buffer.write(song_render)
-
         svg_buffer.write('\n</svg>')  # Close file SVG
 
         buffer_list.append(svg_buffer)
 
         # Open new file
-        if end_row < song.get_num_lines():
-            buffer_list = self.write_buffers(song, css_mode, rel_css_path, end_row, buffer_list)
+        if end_row < song.get_num_lines() or end_col < ncols:
+            buffer_list = self.write_buffers(song, css_mode, rel_css_path, end_row, end_col, buffer_list)
 
         return buffer_list
 
@@ -406,7 +423,7 @@ class SongPNGRenderer(SongRenderer):
         return fnt.getsize('HQfgjyp')[1]
 
 
-    def write_buffers(self, song, start_row=0, buffer_list=None):
+    def write_buffers(self, song, start_row=0, start_col=0, buffer_list=None):
         
         if buffer_list is None:
             buffer_list = []
@@ -562,7 +579,7 @@ class SongPNGRenderer(SongRenderer):
 
                 # REPEAT
                 if instrument.get_repeat() > 1:
-                    repeat_im = instrument.get_repeat_png(self.png_harp_spacings[0], harp_rescale)
+                    repeat_im = instrument_renderer.get_repeat_png(instrument, self.png_harp_spacings[0], harp_rescale)
                     line_render = trans_paste(line_render, repeat_im,
                                               (int(x), int(y + self.png_harp_size[1] - repeat_im.size[1])))
                     x += max(repeat_im.size[0], self.png_harp_spacings[0])
@@ -584,7 +601,7 @@ class SongPNGRenderer(SongRenderer):
 
         # Open new file
         if end_row < song.get_num_lines():
-            buffer_list = self.write_buffers(song, end_row, buffer_list)
+            buffer_list = self.write_buffers(song, end_row, 0, buffer_list)
 
         return buffer_list
 

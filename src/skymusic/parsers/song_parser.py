@@ -261,39 +261,71 @@ class SongParser:
         diffs = [times[i] - times[i-1] for i in range(1, len(times))]
         
         hbin = self.skyjson_chord_delay
-        num_slots = 1 + int(max(diffs) / hbin)
+        num_slots = 2 + int(max(diffs) / hbin)
         
-        counts = [0]*num_slots
-        slots = [i*hbin for i in range(num_slots)]
+        y = [0]*num_slots
+        t = [i*hbin for i in range(num_slots)]
         
         for diff in diffs:   #Builds histogram          
-            i = int(diff/hbin)
-            counts[i] += 1
+            i = 1 + int(diff/hbin)
+            y[i] += 1
+            
+        num_peaks = 3
+        floor = 2  #TODO: change this criterion: percentage of number of notes? % of first peak ?        
+         
+        tempos = []
         
-        print(slots)
-        print(counts)
+        for i in range(num_peaks):   
+            y0 = max(y)
+            if y0 < floor:
+                break
+            i0 = y.index(y0)
+            i1 = max([0,i0-2])
+            i2 = min([len(y),i0+2])
+            y_band = y[i1:i2]
+            t_band = t[i1:i2]
+            tG = sum([y*t for (t,y) in zip(t_band, y_band)])/sum(y_band)
+            
+            #print(t)
+            #print(y)
+            #print(t0)
+            #print(tG)
+            
+            tempos.append(tG)
+            y[i1:i2] = [0]*len(y[i1:i2])
+        
+        return tempos
 
 
     def split_json(self, line):
         
-        json_dict = json.loads(line)
+        json_dict = json.loads(line).copy()
         notes = json_dict[0]['songNotes']
 
         times = [note['time'] for note in notes]
         keys = [note['key'] for note in notes]
+
+        tempos = [tempo for tempo in self.analyze_tempo(times) if tempo > 2*self.skyjson_chord_delay]
+        
+        if len(tempos) > 0:
+            main_tempo = tempos[0]
+        else:
+            main_tempo = None
                 
         icons = [keys[0]]
-        icons_times = [times[0]]
+        #icons_times = [times[0]]
                 
         for i in range(1,len(times)):
             if times[i] - times[i-1] < self.skyjson_chord_delay:
-                icons[i-1] += notes[i] # Notes belong to the same chord
+                icons[i-1] += keys[i] # Notes belong to the same chord
             else:
-                icons.append(keys[i])            
-                icons_times.append(times[i])
-
-        self.analyze_tempo(times)
+                n_pauses = max([0, round((times[i] - times[i-1])/main_tempo) - 1])
+                for i in range(n_pauses):
+                    icons += [self.pause]
                 
+                icons += [keys[i]]           
+                #icons_times.append(times[i])
+   
         #print(icons_times)
         #print(icons)        
 
@@ -343,10 +375,13 @@ class SongParser:
                         voice.set_lyric(lyric.strip())
                         instrument_line.append(voice)
             else:
-                icons = self.split_line(line)     
+                icons = self.split_line(line)
+                print('%%DEBUG')
+                print(icons)
                 
                 for icon in icons:
                     chords = self.split_icon(icon)
+                    #print(chords)
                     # From here, real chords are still glued, quavers have been split in different list slots
                     chord_skygrid, harp_broken, harp_silent, repeat = self.parse_chords(chords, song_key, note_shift)
                     harp = instruments.Harp()
