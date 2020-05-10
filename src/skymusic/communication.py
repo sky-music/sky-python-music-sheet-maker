@@ -168,7 +168,7 @@ class Query:
         self.expect_reply = True # Currently used for Information queries
         self.expect_long_answer = expect_long_answer
 
-        self.valid_locutors_names = ['music-cog', 'music-sheet-maker', 'command-line', 'sky-music-website']  # A list of valid locutors for security purposes
+        #self.valid_locutors_names = ['music-cog', 'music-sheet-maker', 'command-line', 'sky-music-website']  # A list of valid locutors for security purposes
 
         self.reply = None  # Reply object
         self.result = None  # The full question with foreword and afterword
@@ -356,14 +356,8 @@ class Query:
             return locutor_ok
             # raise InvalidQueryError('invalid locutor for ID=' + str(self.get_identifier()) + ': ' + str(locutor))
 
-        if len(self.valid_locutors_names) != 0:
-            # Try to retrieve the locutor name
+        locutor_name = self.get_locutor_name(locutor)
 
-            locutor_name = self.get_locutor_name(locutor)
-
-            if locutor_name not in self.valid_locutors_names:
-                locutor_ok = False
-                print("locutor is not in internal validation list")
 
         if allowed != 'all':
             allowed = get_list_and_sanitize(allowed)
@@ -383,18 +377,12 @@ class Query:
 
         sender_ok = self.check_locutor(self.sender, allowed, forbidden)
 
-        if not sender_ok:
-            raise InvalidQueryError(f"invalid sender for Query ID={self.get_identifier()}: '{self.sender}'. It must be among '{self.valid_locutors_names}'")
-
         return sender_ok
 
     def check_recipient(self, allowed='all', forbidden=None):
 
         recipient_ok = self.check_locutor(self.recipient, allowed, forbidden)
-
-        if not recipient_ok:
-            raise InvalidQueryError(f"invalid recipient for Query ID={self.get_identifier()}: '{self.sender}'. It must be among '{self.valid_locutors_names}'")
-            
+           
         if self.recipient == self.sender:
             raise InvalidQueryError("sender cannot ask a question to itself")
 

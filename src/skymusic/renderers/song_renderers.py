@@ -404,13 +404,13 @@ class SongPNGRenderer(SongRenderer):
             self.png_lyric_size0 = (self.png_harp_size0[0], InstrumentPNGRenderer(self.locale).get_lyric_height())
             self.png_lyric_size = None
             self.png_dpi = (96 * 2, 96 * 2)
-            self.png_compress = 6
+            self.png_compress = Resources.png_compress
             self.font_color = (0, 0, 0)
             self.png_color = (255, 255, 255)
             # self.font_color = (0, 0, 0)   #Discord colors
             # self.png_color = (54, 57, 63)    #Discord colors
-            self.png_font_size = 36
-            self.png_title_font_size = 48
+            self.png_font_size = Resources.png_font_size
+            self.png_title_font_size = Resources.png_title_font_size
             self.png_font = Resources.font_path
 
 
@@ -741,8 +741,8 @@ class SongSKYJSONRenderer(SongRenderer):
         meta = song.get_meta()
         dt = (60000/self.song_bpm) / 4
         
-        print('%%DEBUG')
-        print(dt)
+        #print('%%DEBUG')
+        #print(dt)
     
         json_buffer = io.StringIO()
 

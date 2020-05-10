@@ -90,7 +90,7 @@ class SongBundle:
 class MusicSheetMaker:
 
     def __init__(self, locale='en_US', songs_in='test_songs', songs_out='songs_out'):
-        self.name = 'music-sheet-maker'
+        self.name = Resources.MUSIC_MAKER_NAME
         self.locale = self.set_locale(locale)
         self.communicator = Communicator(owner=self, locale=self.locale)
         self.song = None
@@ -135,7 +135,7 @@ class MusicSheetMaker:
 
     def is_botcog(self, recipient):
         try:
-            is_bot = recipient.get_name() == "music-cog"
+            is_bot = recipient.get_name() == Resources.MUSIC_COG_NAME
         except AttributeError:
             try:  # Guesses harder
                 recipient.bot
@@ -146,7 +146,7 @@ class MusicSheetMaker:
 
     def is_website(self, recipient):
         try:
-            is_website = recipient.get_name() == "sky-music-website"
+            is_website = recipient.get_name() == Resources.WEBSITE_NAME
         except AttributeError:
             try:  # Guesses harder
                 recipient.session_ID
@@ -158,7 +158,7 @@ class MusicSheetMaker:
 
     def is_commandline(self, recipient):
         try:
-            return recipient.get_name() == "command-line"
+            return recipient.get_name() == Resources.COMMANDLINE_NAME
         except AttributeError:  # Guesses harder
             return not (self.is_botcog(recipient) or self.is_website(recipient))
 

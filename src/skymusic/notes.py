@@ -51,11 +51,6 @@ class Note:
         
         self.png_size = None
 
-        self.midi_pitches = {'C': 60, 'C#': 61, 'Db': 61, 'D': 62, 'D#': 63, 'Eb': 63, 'E': 64,
-                             'F': 65, 'F#': 66, 'Gb': 66, 'G': 67, 'G#': 68, 'Ab': 68, 'A': 69,
-                             'A#': 70, 'Bb': 70, 'B': 71}
-        self.midi_semitones = [0, 2, 4, 5, 7, 9, 11]  # May no longer be used when Western_scales is merged
-
     def get_position(self):
         """Return the note position as a tuple row/column"""
         return self.position
@@ -212,12 +207,12 @@ class Note:
         Starts or ends a MIDI note, assuming a chromatic scale (12 semitones)
         """
         octave = int(self.get_index() / 7)
-        semi = self.midi_semitones[self.get_index() % 7]
+        semi = Resources.MIDI_SEMITONES[self.get_index() % 7]
         try:
-            root_pitch = self.midi_pitches[music_key]
+            root_pitch = Resources.MIDI_PITCHES[music_key]
         except KeyError:
             print("***Warning: Invalid music key passed to the MIDI renderer: assuming C instead.")
-            root_pitch = self.midi_pitches['C']
+            root_pitch = Resources.MIDI_PITCHES['C']
         note_pitch = root_pitch + octave * 12 + semi
 
         if not self.harp_is_broken and not self.harp_is_silent:

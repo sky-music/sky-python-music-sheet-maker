@@ -33,7 +33,13 @@ with importlib_resources.path(css, 'main.css') as fp:
 
 with importlib_resources.path(fonts, 'NotoSansCJKjp-Regular.otf') as fp:
     font_path = str(fp)
-    
+
+harp_font_size = 38
+voice_font_size = 32
+png_font_size = 36
+png_title_font_size = 48
+png_compress = 6
+
 ICON_DELIMITER = '\s'
 PAUSE = '.'
 JIANPU_PAUSE = '0'
@@ -43,3 +49,11 @@ COMMENT_DELIMITER = '#'
 REPEAT_INDICATOR = '*'
 BROKEN_CHORD = 'X'
 SKYJSON_CHORD_DELAY = 50 #Delay in ms below which 2 notes are considered a chord
+
+MUSIC_MAKER_NAME = 'music-sheet-maker'
+MUSIC_COG_NAME = 'music-cog'
+WEBSITE_NAME = 'sky-music-website'
+COMMANDLINE_NAME = 'command-line'
+
+MIDI_PITCHES = {'C': 60, 'C#': 61, 'Db': 61, 'D': 62, 'D#': 63, 'Eb': 63, 'E': 64, 'F': 65, 'F#': 66, 'Gb': 66, 'G': 67, 'G#': 68, 'Ab': 68, 'A': 69, 'A#': 70, 'Bb': 70, 'B': 71}
+MIDI_SEMITONES = [0, 2, 4, 5, 7, 9, 11]  # May no longer be used when Western_scales is merged

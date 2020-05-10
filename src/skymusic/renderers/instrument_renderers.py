@@ -32,9 +32,6 @@ class InstrumentRenderer():
         else:
             self.locale = locale
 
-        
-
-
 
     def render(self, *args, **kwargs):
         
@@ -164,10 +161,10 @@ class InstrumentPNGRenderer(InstrumentRenderer):
         self.font_color = (0, 0, 0)
         
         self.font = Resources.font_path
-        self.harp_font_size = 38
+        self.harp_font_size = Resources.harp_font_size
         self.repeat_height = None
 
-        self.voice_font_size = 32
+        self.voice_font_size = Resources.voice_font_size
         # self.text_bkg = (255, 255, 255, 0)#Uncomment to make it different from the inherited class
         # self.font_color = (255,255,255)#Uncomment to make it different from the inherited class
         # self.font = 'fonts/NotoSansCJKjp-Regular.otf'

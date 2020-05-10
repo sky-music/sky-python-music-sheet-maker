@@ -317,8 +317,8 @@ class SongParser:
         icons = [keys[0]]
         #icons_times = [times[0]]
         
-        print('%DEBUG')
-        print(tempos)
+        #print('%DEBUG')
+        #print(tempos)
         
         for i in range(1,len(times)):
             if times[i] - times[i-1] < self.skyjson_chord_delay:
