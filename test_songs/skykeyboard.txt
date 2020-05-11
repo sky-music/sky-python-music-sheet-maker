@@ -6,6 +6,8 @@ QW ERT
 Q-W-E-R T-ASD
 #Pauses:
 Q . W . . E
+#Repetitions:
+Q*2 W*14 .*2 E*1 .*1
 #Errors:
 K + : 0
 #lowercase and #multiple #spaces:

@@ -1,0 +1,5 @@
+aspect_ratio: 16/9
+song_bpm: 120
+#octave_shift: 0
+render_modes: HTML, SVG, PNG, MIDI, SKYJSON, SKYASCII, ENGLISHASCII, JIANPUASCII, DOREMIASCII
+    

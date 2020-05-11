@@ -4,6 +4,8 @@ C D F G Dm Em A+ C6 Am9 Fmaj Dm11 Cmaj7
 C-D
 #Pauses:
 C . D . . F
+#Repetitions:
+C*2 Em*14 .*2 Am9*1 .*1
 #Errors:
 X + : 0
 #incorrect case:
