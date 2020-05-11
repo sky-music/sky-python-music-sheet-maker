@@ -8,7 +8,8 @@ from src.skymusic import instruments, Lang
 from src.skymusic.modes import InputMode
 from src.skymusic.song import Song
 import src.skymusic.parsers.noteparsers
-from resources import Resources
+from src.skymusic.resources import Resources
+
 
 class SongParserError(Exception):
     def __init__(self, explanation):
