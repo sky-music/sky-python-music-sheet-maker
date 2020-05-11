@@ -1,0 +1,228 @@
+# this translation is not 100% accurate and is welcome for more translator!!
+input_mode:
+    skykeyboard:
+        short_desc: Bàn phím Sky 
+        long_desc: "Nhập trên bàn phím như đánh đàn trong Sky:\n   QWERT\n   ASDFG\n   ZXCVB"
+    sky:
+        short_desc: 'Sky ABC1-5'
+        long_desc: "Hệ kí tự dòng/cột trong Sky:\n   A1 A2 A3 A4 A5\n   B1 B2 B3 B4 B5\n   C1 C2 C3 C4 C5"
+    english:
+        short_desc: Nốt nhạc trong Tiếng Anh CDEFGAB
+        long_desc: "Nốt nhạc dạng C D E F G A B + biến tấu b/# + số quãng tám, VD: Cb4 D#4 E5 ..."
+    doremi:
+        short_desc: Nốt nhạc trong Tiếng Pháp Đồ Rê Mi
+        long_desc: "Nốt nhạc dạng do re mi fa sol la si/ti + biến tấu b/# + số quãng tám, VD: dob4 re#4 mi5 ..."
+    jianpu:
+        short_desc: 'Hệ kí tự số Jianpu 1234567+-'
+        long_desc: "Nốt nhạc dạng 1 2 3 4 5 6 7, bắt đầu với biến tấu b/# và dấu - hoặc + để chỉnh nốt quãng tám"
+    englishchords:
+        short_desc: Hợp âm Tiếng Anh CDEFGABmaj
+        long_desc: "Nốt có hợp âm Tiếng Anh ngắn (VD: C, F, Dm, Bdim, A+, Csus2, Dsus4, C6, Cmaj7, Dm11)"
+render_mode:
+    html:
+        short_desc: bảng nhạc trực quan HTML 
+    svg:
+        short_desc: bảng nhạc trực quan SVG
+    png:
+        short_desc: bảng nhạc trực quan bằng ảnh PNG
+    midi:
+        short_desc: tệp nhạc MIDI
+    skyascii:
+        short_desc: bài hát dưới dạng hệ kí tự Sky 
+    englishascii:
+        short_desc: bài hát dưới dạng hệ kí tự English 
+    jianpuascii:
+        short_desc: bài hát dưới dạng hệ kí tự Jianpu 
+    doremiascii:
+        short_desc: bài hát dưới dạng hệ kí tự do-re-mi 
+song_meta:
+   title: Tiêu đề
+   artist: Nghệ sĩ gốc
+   transcript: Người dịch
+   musical_key: Phím nhạc
+   untitle: Untitled
+stock_queries:
+  instructions_stdout:
+    foreword: "===== BẢNG NHẠC TRỰC QUAN CHO TỰA GAME: SKY: CHILDREN OF THE LIGHT =====\n"
+    question: |
+      Dạng nốt nhạc được chấp nhận: %s
+      
+      - Khi viết hợp âm phải dính các phím lại với nhau (VD: A1B1C1).
+      - Tách các hợp âm bằng: %s
+      - Sử dụng "%s" để ngắt quãng (nghỉ).
+      - Sử dụng "%s" để nối nốt trong một biểu tượng (liên ba, láy rền/hát rung,...) (VD: %s)
+      - Thêm "%s" sau một hợp âm để biểu thị sự lập lại (repetition).
+      - Dấu thăng # và dấu giáng b (nửa cung) được hỗ trợ cho hệ kí tự Phương Tây và Jianpu.
+      
+      Nhập '?' để được trợ giúp cho câu hỏi cụ thể
+    afterword: =======================================
+    input_tip:
+    help_text:
+  instructions_website:
+    foreword:
+    question: |
+      Dạng nốt nhạc được chấp nhận: %s
+      
+      - Khi viết hợp âm phải dính các phím lại với nhau (VD: A1B1C1).
+      - Tách các hợp âm bằng: %s
+      - Sử dụng "%s" để ngắt quãng (nghỉ).
+      - Sử dụng "%s" để nối nốt trong một biểu tượng (liên ba, láy rền/hát rung,...) (VD: %s)
+      - Thêm "%s" sau một hợp âm để biểu thị sự lập lại (repetition).
+      - Dấu thăng # và dấu giáng b (nửa cung) được hỗ trợ cho hệ kí tự Phương Tây và Jianpu.
+    afterword:
+    input_tip: Bấm OK để tiếp tục
+    help_text:
+  instructions_botcog:
+    foreword:
+    question: |
+      Dạng nốt nhạc được chấp nhận: %s
+      
+      - Khi viết hợp âm phải dính các phím lại với nhau (VD: A1B1C1).
+      - Tách các hợp âm bằng: %s
+      - Sử dụng "%s" để ngắt quãng (nghỉ).
+      - Sử dụng "%s" để nối nốt trong một biểu tượng (liên ba, láy rền/hát rung,...) (VD: %s)
+      - Thêm "%s" sau một hợp âm để biểu thị sự lập lại (repetition).
+      - Dấu thăng # và dấu giáng b (nửa cung) được hỗ trợ cho hệ kí tự Phương Tây và Jianpu.
+      
+      Nhập '?' để được trợ giúp cho câu hỏi cụ thể
+    afterword:
+    input_tip:
+    help_text:
+  render_modes:
+    foreword:
+    question: Hãy chọn các định dạng xuất bản đầu ra (rendering formats) 
+    afterword:
+    input_tip: Chọn một hoặc nhiều hộp thoại
+    help_text: |
+      Bảng nhạc trực quan có thể xuất ra thành nhiều định dạng.
+      Hãy chọn những tùy chọn bạn muốn.
+  song_title:
+    foreword:
+    question: Tiêu đề bài hát là gì?
+    afterword:
+    input_tip: 'Có thể nhập bất kì. Để trống nếu bạn muốn sử dụng "untitled" (không tên)'
+    help_text: 
+  original_artist:
+    foreword:
+    question: Nghệ sĩ gốc của bài hát này là ai?
+    afterword:
+    input_tip: Có thể nhập bất kì, bao gồm cả ô được để trống
+    help_text: 'Nghệ sĩ gốc bao gồm nhà soạn nhạc, nghệ sĩ, người hát,...'
+  transcript_writer:
+    foreword:
+    question: Người thông dịch bài hát này là ai?
+    afterword:
+    input_tip: Có thể nhập bất kì, bao gồm cả ô được để trống
+    help_text: 'Người dịch là người viết bài nhạc này, nó cũng có thể là bạn!'
+  notes_file:
+    foreword:
+    question: 'Nhập, hoặc dán nốt vào, hoặc nhập tên tệp (trong thư mục %s/)'
+    afterword:
+    input_tip: Tên nốt như dạng C1 D1F1, hoặc tên tệp như song.txt
+    help_text: |
+      Bạn có thể nhập hoặc cắt-dán nốt trực tiếp trong vùng nhập này.
+      Bạn cũng có thể nhập đường dẫn đến một tệp bao gồm các nốt.
+  file:
+    foreword:
+    question: 'Nhập tên tệp (trong %s/)'
+    afterword:
+    input_tip: Bất kì tên tệp chứa nốt nhạc.
+    help_text:
+  notes:
+    foreword:
+    question: Hãy nhập hoặc cắt-dán nốt vào
+    afterword:
+    input_tip: bất kì kí tự với một hoặc nhiều nốt nhạc 
+    help_text: |
+      Nhập một hoặc nhiều nốt nhạc với định dạng bạn yêu thích, như là: C D E F G.
+      Đối với hợp âm (nốt được chơi cùng nhau), dính chúng lại với nhau (VD: C1D1)
+  one_input_mode:
+    foreword:
+    question: "Nhận dạng là bạn đang sử dụng hệ kí tự: %s."
+    afterword:
+    input_tip: Bấm OK để tiếp tục
+    help_text:
+  musical_notation:
+    foreword: Dù đã cố gắng nhưng tôi không thể đoán được hệ kí tự nốt bạn đang sử dụng.
+    question: Hãy chọn dạng hệ kí tự mà bạn đang sử dụng
+    afterword:
+    input_tip: Nhập số (giữa 0 và n-1)
+    help_text: |
+      Trong câu hỏi trước, bạn đã nhập nốt nhạc của bạn. Tôi đã cố đoán hệ kí tự bạn đang sử dụng.
+      Dù đã cố gắng như nó có vẻ còn mơ hồ. Hãy chọn hệ kí tự mà bạn đang sử dụng trong danh sách.
+  no_possible_key:
+    foreword:
+    question: |
+      Bài hát của bạn không thể chuyển đúng sang Sky.
+      Phím mặc định sẽ được đặt là C.
+    afterword:
+    input_tip: Bấm OK để tiếp tục
+    help_text:
+  one_possible_key:
+    foreword:
+    question: 'Bài hát của bạn có thể chuyển đúng sang Sky với phím: %s'
+    afterword:
+    input_tip: Bấm OK để tiếp tục
+    help_text:
+  possible_keys:
+    foreword: 'Bài hát của bạn có thể chuyển đúng sang Sky với những phím sau: %s.'
+    question: Hãy chọn phím nhạc bạn muốn sử dụng
+    afterword:
+    input_tip: Nhập số (giữa 0 và n-1)
+    help_text: |
+      Hệ thống nhạc của Sky không bao gồm các phím thăng hay dấu giáng b nên bạn không thể chơi bài này từ thế giới bên ngoài.
+      Tôi nhận dạng được bài hát của bạn có thể chơi với nhiều nốt. Hãy chọn tùy chọn mà bạn cảm thấy được nhất.
+  recommended_key:
+    foreword: Hệ kí tự nhạc của bạn có sử dụng độ cao thấp (pitch) tương đối.
+    question: Phím được đề xuất để chơi trong Sky (mặc định là C) 
+    afterword:
+    input_tip: Để trống hoặc nhâp tên nốt (C trong hệ tiếng Anh)
+    help_text: |
+      Bạn đã sử dụng hệ kí tự nhạc mà cho phép bạn có thể xác định độ cao thấp chính xác của nốt nhạc.
+      Tuy nhiên thì bảng nhạc trực quan có thể có âm khác tùy vào tùy nơi trong Sky.
+  octave_shift:
+    foreword: Bạn có muốn chỉnh độ cao thấp của nốt nhạc không?
+    question: Chỉnh quãng tám (để trống hoặc nhập 0 để bỏ qua)
+    afterword:
+    input_tip: chỉnh quãng tám bằng số nguyên từ -6 đến +6
+    help_text: |
+      'Một nốt nhạc được xác định bởi tên và số quãng tám của nó. Hệ thống nhạc trong Sky có ít hơn 3 quãng tám.
+      Nếu bạn không ghi rõ só quãng tám sau một nốt, tôi sẽ nghĩ rằng nó là quãng tám đầu tiên trong Sky, nên nốt nhạc của bạn chủ yếu sẽ được chơi ngang nốt trầm.
+      Bạn có thể chỉnh nốt của bạn lên độ cao hơn bằng cách đặt số dương trong mục này.
+      Nếu bạn đã ghi rõ số quãng tám và nó quá cao để có thể chơi trong hệ thống nhạc của Sky, bạn có thể giảm xuống bằng cách nhập số âm.'  
+  no_song_file:
+    foreword: ---------------------------------------
+    question: 'Bài hát %s của bạn không được lưu vào tệp.'
+    afterword:
+    input_tip: Bấm OK để tiếp tục
+    help_text:
+  one_song_file:
+    foreword: ---------------------------------------
+    question: 'Bài hát %s của bạn được lưu vào: %s'
+    afterword:
+    input_tip: Bấm OK để tiếp tục
+    help_text:
+  several_song_files:
+    foreword: ---------------------------------------
+    question: 'Bài hát %s của bạn được lưu vào: %s'
+    afterword: 'Bài hát của bạn được chia thành %s tệp giữa"%s" và "%s"'
+    input_tip: Bấm OK để tiếp tục
+    help_text:
+  few_errors:
+    foreword:
+    question: 'Bài hát được nhập thành công với vài lỗi nhỏ.'
+    afterword:
+    input_tip: Bấm OK để tiếp tục
+    help_text:
+  many_errors:
+    foreword:
+    question: '*LƯU Ý:* Bài hát của bạn chứa quá nhiều lỗi'
+    afterword: |
+      'Vui lòng kiểm tra những lỗi sau:
+
+      - Tất cả các nốt nhạc phải ở từ 4 đến 6 quãng tám. Nếu không, hãy thử lại với nốt quãng tám.
+      - Bài hát của bạn không có lỗi chính tả. Vui lòng xem hướng dẫn đầy đủ ở trang web này: 
+
+      https://sky.bloomexperiment.com/t/summary-of-input-modes/403 (tiếng Anh)'
+    input_tip: Bấm OK để tiếp tục
+    help_text:

@@ -12,7 +12,7 @@ import os
 import re
 import math
 from responder import Responder
-from parsers import SongParser
+from songparser import SongParser
 from modes import InputMode, ResponseMode
 
 def set_dodecas(mode):
@@ -94,6 +94,10 @@ def parse_line(line, note_shift=0, song_key='C'):
 
 
 def render_transposed_song(song_lines):
+    
+    if isinstance(song_lines,str): #Break newlines and make sure the result is a List
+        song_lines = song_lines.split(os.linesep)
+    
     song = ''
     for song_line in song_lines:
         if song_line[0] != '':
@@ -148,13 +152,13 @@ elif len(possible_modes) == 0:
     print('\nCould not detect your note format. Maybe your song contains typo errors?')
     song_notation = song_responder.ask_to_select_mode(possible_modes)
 else:
-    print('\nWe detected that you use the following notation: ' + possible_modes[0].value[1] + '.')
+    print('\nWe detected that you use the following notation: %s.'%possible_modes[0].get_short_desc())
     song_notation = possible_modes[0]
 
 skyparser.set_input_mode(song_notation)
 
 if song_notation == InputMode.JIANPU and PAUSE != '0':
-    print('\nWarning: pause in Jianpu has been reset to ''0''.')
+    print('\nWarning: pause in Jianpu has been reset to ''0''.\n')
     PAUSE = '0'
 
 # Attempts to detect key for input written in absolute musical scales (western, Jianpu)

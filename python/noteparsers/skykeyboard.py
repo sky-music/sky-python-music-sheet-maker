@@ -1,10 +1,9 @@
 import re
 import os
 
-import sky
+from . import skyabc15
 
-
-class SkyKeyboard(sky.Sky):
+class SkyKeyboard(skyabc15.SkyABC15):
 
     def __init__(self):
 
