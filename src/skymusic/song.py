@@ -1,5 +1,5 @@
 from src.skymusic import instruments, Lang
-from src.skymusic.renderers import song_renderers
+from src.skymusic.renderers.song_renderers import html_sr, svg_sr, png_sr, midi_sr, skyjson_sr, ascii_sr
 from src.skymusic.modes import RenderMode
 
 class Song():
@@ -104,17 +104,17 @@ class Song():
     def render(self, render_mode, **kwargs):
 
         if render_mode == RenderMode.HTML:
-            buffers = song_renderers.SongHTMLRenderer(self.locale).write_buffers(song=self, css_mode=kwargs['css_mode'], rel_css_path=kwargs['rel_css_path'])
+            buffers = html_sr.HtmlSongRenderer(self.locale).write_buffers(song=self, css_mode=kwargs['css_mode'], rel_css_path=kwargs['rel_css_path'])
         elif render_mode == RenderMode.SVG:
-            buffers = song_renderers.SongSVGRenderer(self.locale, kwargs['aspect_ratio']).write_buffers(song=self, css_mode=kwargs['css_mode'], rel_css_path=kwargs['rel_css_path'])
+            buffers = svg_sr.SvgSongRenderer(self.locale, kwargs['aspect_ratio']).write_buffers(song=self, css_mode=kwargs['css_mode'], rel_css_path=kwargs['rel_css_path'])
         elif render_mode == RenderMode.PNG:
-            buffers = song_renderers.SongPNGRenderer(self.locale, kwargs['aspect_ratio']).write_buffers(song=self)
+            buffers = png_sr.PngSongRenderer(self.locale, kwargs['aspect_ratio']).write_buffers(song=self)
         elif render_mode == RenderMode.MIDI:
-            buffers = song_renderers.SongMIDIRenderer(self.locale, kwargs['song_bpm']).write_buffers(song=self)
+            buffers = midi_sr.MidiSongRenderer(self.locale, kwargs['song_bpm']).write_buffers(song=self)
         elif render_mode == RenderMode.SKYJSON:
-            buffers = song_renderers.SongSKYJSONRenderer(self.locale, kwargs['song_bpm']).write_buffers(song=self)    
+            buffers = skyjson_sr.SkyjsonSongRenderer(self.locale, kwargs['song_bpm']).write_buffers(song=self)    
         else:  # Ascii
-            buffers = song_renderers.SongASCIIRenderer(self.locale).write_buffers(song=self, render_mode=render_mode)
+            buffers = ascii_sr.AsciiSongRenderer(self.locale).write_buffers(song=self, render_mode=render_mode)
 
         return buffers
        

@@ -204,7 +204,6 @@ class SongParser:
         harp_broken = True
         chord_skygrid = {}
 
-        # print(chord)
         if len(chords) > 1:
             idx0 = 1  # Notes in quavers and triplets have a frame index >1
         else:
@@ -287,11 +286,6 @@ class SongParser:
             y_band = y[i1:i2]
             t_band = t[i1:i2]
             tG = sum([y*t for (t,y) in zip(t_band, y_band)])/sum(y_band)
-            
-            #print(t)
-            #print(y)
-            #print(t0)
-            #print(tG)
             
             tempos.append(tG)
             y[i1:i2] = [0]*len(y[i1:i2])

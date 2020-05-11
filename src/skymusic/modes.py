@@ -2,7 +2,6 @@ from enum import Enum
 import src.skymusic.parsers.noteparsers
 from src.skymusic import Lang
 
-
 class InputMode(Enum):
     SKYKEYBOARD = (1, "input_mode/skykeyboard/short_desc", "input_mode/skykeyboard/long_desc", src.skymusic.parsers.noteparsers.skykeyboard.SkyKeyboard)
     SKY = (2, "input_mode/sky/short_desc", "input_mode/sky/long_desc", src.skymusic.parsers.noteparsers.skyabc15.SkyABC15)

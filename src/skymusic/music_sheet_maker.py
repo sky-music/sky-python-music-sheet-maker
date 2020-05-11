@@ -4,8 +4,6 @@ from src.skymusic.communicator import Communicator, QueriesExecutionAbort
 from src.skymusic.parsers.song_parser import SongParser
 from src.skymusic import Lang
 from src.skymusic.resources import Resources
-#from src.skymusic.renderers.song_renderers import SongRenderer
-#from song import Song
 
 
 class MusicSheetMakerError(Exception):
@@ -100,7 +98,7 @@ class MusicSheetMaker:
         self.song_dir_out = os.path.join(self.directory_base, songs_out)
         self.css_path = Resources.css_path
         self.rel_css_path = os.path.relpath(self.css_path, start=self.song_dir_out)
-        self.css_mode = CSSMode.EMBED  # TODO: move that into Renderer
+        self.css_mode = CSSMode.EMBED
         self.render_modes_enabled = [mode for mode in RenderMode]
         # self.render_modes_disabled = [RenderMode.JIANPUASCII, RenderMode.DOREMIASCII]
         self.render_modes_disabled = []
