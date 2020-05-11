@@ -106,13 +106,15 @@ stock_queries:
     help_text: |
       La portée visuelle peut être savegardée sous différents formats.
       Cochez ceux que vous souhaitez garder.
+      A l'invite de commande, entrez une liste de choix séparés par des virgules, par exemple 0, 1, 3
+      Sur le site web, cochez les cases.
   aspect_ratio:
-    foreword: By default the visual sheet is a 16:9 image in landscape orientation.
-    question: Please choose a different aspect ratio, or leave blank to skip
+    foreword: Par défaut le format d'image PNG est en paysage 16/9.
+    question: Vous pouvez choisir un rapport d'aspect différent, ou laissez blanc pour passer
     afterword:
-    input_tip: a positive number or a fraction (eg 4/3) between 0.1 and 10. Leave blank or 0 to skip.
+    input_tip: un nombre positif ou une fraction (par ex. 4/3) entre 0.1 et 10. Laisser blanc ou 0 pour passer.
     help_text: |
-      By default the visual sheet is a 16:9 image in landscape orientation. Please choose a different aspect ratio if you like. Only numbers between 1/10 (0.1) and 10 are accepted.      
+      Par défaut le format d'image PNG est en paysage 16/9. Vous pouvez choisir un rapport d'aspect différent, ou laissez blanc pour passer. Seul les nombres entre 1/10 (0.1) et 10 sont acceptés.      
   song_bpm:
     foreword: One of the output formats needs timing information.
     question: Please choose the song tempo (BPM, beats per minute), or leave blank to skip

@@ -114,7 +114,10 @@ class Reply:
             self.result = limits[index]
         else:#QueryOpen
             if self.query.get_reply_type() == ReplyType.NUMBER:
-                self.result = eval(self.answer)
+                try:
+                    self.result = eval(self.answer)
+                except TypeError:
+                    self.result = self.answer
             else:
                 self.result = self.answer
                 
@@ -749,7 +752,7 @@ class QueryChoice(Query):
         if isinstance(choices[0], str):
             choices = [c.lower().strip() for c in choices]
         elif isinstance(choices[0], (InputMode, RenderMode)):
-            choices = [str(c).lower().strip() for c in choices]
+            choices = [c.name.lower().strip() for c in choices]
 
         try:
             index = choices.index(answer) #Tries to find the answer directly in choices=self.limits

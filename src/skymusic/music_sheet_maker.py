@@ -105,7 +105,6 @@ class MusicSheetMaker:
         self.render_modes_enabled = [mode for mode in self.render_modes_enabled if
                                      mode not in self.render_modes_disabled]
         self.botcog_render_modes = [RenderMode.PNG]
-        self.website_render_modes = [RenderMode.HTML]
 
     def __getattr__(self, attr_name):
         """
@@ -530,11 +529,7 @@ class MusicSheetMaker:
         if len(render_modes) == 1:
             return None, render_modes
 
-        if self.is_commandline(recipient):
-
-            return None, render_modes
-
-        elif self.is_botcog(recipient):
+        if self.is_botcog(recipient):
 
             return None, self.botcog_render_modes
 
@@ -833,14 +828,15 @@ class MusicSheetMaker:
 
         if render_modes is None:
             if self.is_botcog(recipient):
-                self.css_mode = CSSMode.EMBED
                 render_modes = self.botcog_render_modes
-            elif self.is_website(recipient):
-                self.css_mode = CSSMode.EMBED
-                render_modes = self.website_render_modes
             else:
-                print("=" * 40)
                 render_modes = self.render_modes_enabled
+            
+        if not self.is_commandline(recipient):
+            self.css_mode = CSSMode.EMBED
+                
+        if self.is_commandline(recipient):
+            print("=" * 40)
 
         song_bundle = SongBundle()
         song_bundle.set_meta(self.get_song().get_meta())

@@ -107,6 +107,8 @@ stock_queries:
     help_text: |
       Bảng nhạc trực quan có thể xuất ra thành nhiều định dạng.
       Hãy chọn những tùy chọn bạn muốn.
+      On the command-line, enter a comma-separated list of choices numbers, such as 0, 1, 3.
+      On the website, check the boxes.
   aspect_ratio:
     foreword: By default the visual sheet is a 16:9 image in landscape orientation.
     question: Please choose a different aspect ratio, or leave blank to skip

@@ -5,10 +5,11 @@ if __name__ == '__main__':
     if project_path not in sys.path:
         sys.path.append(project_path)
 
-
+import yaml
 from src.skymusic.music_sheet_maker import MusicSheetMaker
 from src.skymusic.communicator import Communicator, QueriesExecutionAbort
 from src.skymusic import Lang
+from src.skymusic.resources import Resources
 
 try:
     import readline
@@ -30,9 +31,10 @@ class CommandLinePlayer:
     """
 
     def __init__(self, locale='en_US'):
-        self.name = 'command-line'
+        self.name = Resources.COMMANDLINE_NAME
         self.locale = self.set_locale(locale)
         self.communicator = Communicator(owner=self, locale=locale)
+        self.preferences = self.load_preferences('../../preferences.yaml')
         
     def __getattr__(self, attr_name):
         """
@@ -58,7 +60,25 @@ class CommandLinePlayer:
             
         return self.locale
 
-    
+    def load_preferences(self, filepath):
+        try:
+            with open(os.path.normpath(os.path.join(os.path.dirname(__file__), filepath)), mode='r', encoding='utf-8', errors='ignore') as file:
+                return yaml.safe_load(file)
+        except FileNotFoundError:
+            return None               
+
+    def get_answer_from_preferences(self, q):
+        
+        try:
+            answer = self.preferences[q.get_name()]
+            if answer is not None:
+                answer = str(answer).strip() 
+            return answer
+        except (TypeError, KeyError):
+            pass
+        
+        return None
+
     def receive(self, *args, **kwargs):
         self.communicator.receive(*args, **kwargs)
 
@@ -76,11 +96,19 @@ class CommandLinePlayer:
         """
         for q in queries:
             reply_valid = False
+            tried_preferences = False
             while not reply_valid:
                 question = self.communicator.query_to_stdout(q)
                 reply_valid = True #to be sure to break the loop
-                if q.get_expect_reply(): 
-                    answer = input('\n%s: '%question)   
+                if q.get_expect_reply():
+                    if not tried_preferences:
+                        tried_preferences = True
+                        answer = self.get_answer_from_preferences(q)                        
+                        if answer:
+                            print(f"\n{question}: {answer}") 
+                            #print(f"Answered {q.get_sender().get_name()}'s question with a value found in your preferences: {answer}")
+                    else:
+                        answer = input('\n%s: '%question)   
                     q.reply_to(answer)
                     reply_valid = q.get_reply_validity()
                 else:                  
