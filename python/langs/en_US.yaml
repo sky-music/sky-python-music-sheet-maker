@@ -51,8 +51,8 @@ stock_queries:
       
       - Notes composing a chord must be glued together (e.g. A1B1C1).
       - Separate chords with {1}
-      - Use "{2}" for a silence (rest).
-      - Use "{3}" to link notes within an icon, for triplets, quavers... (e.g. {4})
+      - Use "{2}" for a silence (rest), except for Jianpu where 0 is officially used.
+      - Use "{3}" to link notes within an icon, for triplets, quavers... (e.g. {4}). Do not use '-' with Jianpu, replace it with '^' to avoid confusion with the octave.
       - Add "{5}" after a chord to indicate repetition.
       - Sharps # and flats b (semitones) are supported for Western and Jianpu notations.
       
@@ -67,8 +67,8 @@ stock_queries:
       
       - Notes composing a chord must be glued together (e.g. A1B1C1).
       - Separate chords with {1}
-      - Use "{2}" for a silence (rest).
-      - Use "{3}" to link notes within an icon, for triplets, quavers... (e.g. {4})
+      - Use "{2}" for a silence (rest), except for Jianpu where 0 is officially used.
+      - Use "{3}" to link notes within an icon, for triplets, quavers... (e.g. {4}). Do not use '-' with Jianpu, replace it with '^' to avoid confusion with the octave.
       - Add "{5}" after a chord to indicate repetition.
       - Sharps # and flats b (semitones) are supported for Western and Jianpu notations.
     afterword:
@@ -81,8 +81,8 @@ stock_queries:
       
       - Notes composing a chord must be glued together (e.g. A1B1C1).
       - Separate chords with {1}
-      - Use "{2}" for a silence (rest).
-      - Use "{3}" to link notes within an icon, for triplets, quavers... (e.g. {4})
+      - Use "{2}" for a silence (rest), except for Jianpu where 0 is officially used.
+      - Use "{3}" to link notes within an icon, for triplets, quavers... (e.g. {4}). Do not use '-' with Jianpu, replace it with '^' to avoid confusion with the octave.
       - Add "{5}" after a chord to indicate repetition.
       - Sharps # and flats b (semitones) are supported for Western and Jianpu notations.
       
