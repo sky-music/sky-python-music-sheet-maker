@@ -93,6 +93,11 @@ class SongParser:
 
         delims = [self.icon_delimiter, self.pause, self.quaver_delimiter, self.comment_delimiter, self.repeat_indicator]
 
+
+        if self.quaver_delimiter == '\s' or re.match('\s', self.quaver_delimiter):
+            print("***WARNING: You cannot use a blank delimiter to separate notes in a quaver")
+        if self.pause == '\s' or re.match('\s', self.pause):
+            print("***WARNING: You cannot use a blank delimiter to a pause")
         if self.comment_delimiter == '\s' or re.match('\s', self.comment_delimiter):
             print("***WARNING: You cannot use a blank delimiter to indicate comments")
         if self.comment_delimiter == '\s' or re.match('\s', self.repeat_indicator):
@@ -250,10 +255,16 @@ class SongParser:
         :param line:
         :return:
         """
-        # Remove surnumerous spaces from line
-        line = line.strip()        
-        line = re.sub(re.escape(self.icon_delimiter) + '{2,' + str(max(2, len(line))) + '}',
-                      re.escape(self.icon_delimiter), line)  # removes surnumerous spaces
+        line = re.sub('(\s){2,}', '\\1', line)  # removes surnumerous blank characters
+        line = line.strip()
+        
+        if re.match('\\\\',re.escape(self.icon_delimiter)):
+            delimiter = self.icon_delimiter
+        else:
+            delimiter = re.escape(self.icon_delimiter)       
+
+        line = re.sub('(' + delimiter + ')' + '{2,}', '\\1', line)  # removes surnumerous delimiters
+        line = re.sub('^'+delimiter+'|'+delimiter+'$','', line) #strip delimiters on edges
         
         return line
 

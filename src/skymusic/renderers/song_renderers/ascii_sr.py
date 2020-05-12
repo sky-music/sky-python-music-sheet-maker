@@ -37,6 +37,7 @@ class AsciiSongRenderer(song_renderer.SongRenderer):
                 if repeat > 1:
                     instrument_render += Resources.REPEAT_INDICATOR + str(repeat)
                 line_render += instrument_render + re.sub('\\\\s', ' ', Resources.ICON_DELIMITER)
+                line_render = line_render.rstrip(Resources.ICON_DELIMITER)
                 instrument_index += 1
             song_render += '\n' + line_render
 

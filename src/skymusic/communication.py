@@ -55,7 +55,7 @@ class Reply:
         if not isinstance(query, Query):
             raise InvalidReplyError("this reply does not follow any query")
             
-        self.sanitize_answer()
+        #self.sanitize_answer()
 
     def __repr__(self):
         try:
@@ -75,19 +75,7 @@ class Reply:
     def get_answer(self):
         return self.answer
 
-    def sanitize_answer(self):
         
-        answer = self.answer
-        if isinstance(answer, str):
-            answer = answer.strip()
-        if answer == '' and self.query.get_reply_type() == ReplyType.NUMBER:
-            try:
-                answer = str(self.query.get_limits()[2]) #Is a default value defined in limits?
-            except (TypeError, IndexError):
-                answer = '0'
-        
-        self.answer = answer
-
     def get_validity(self):
         if self.is_valid is not True:
             self.is_valid = self.query.check_reply()
@@ -132,7 +120,7 @@ class Reply:
 
 class Query:
 
-    def __init__(self, name=None, sender=None, recipient=None, question=None, foreword=None, afterword=None, help_text=None, input_tip=None, reply_type=ReplyType.OTHER, expect_long_answer=False, limits=None, prerequisites=None):
+    def __init__(self, name=None, sender=None, recipient=None, question=None, foreword=None, afterword=None, help_text=None, input_tip=None, reply_type=ReplyType.OTHER, expect_long_answer=False, limits=None, default=None, prerequisites=None):
         """
         The general Query class
 
@@ -159,6 +147,7 @@ class Query:
             self.limits = [limits]
         else:
             self.limits = list(filter(None, limits)) # Choices, regexp...
+        self.default = default
         #Repairing prerequisites:
         if prerequisites is None:
             self.prerequisites = prerequisites
@@ -291,6 +280,9 @@ class Query:
                 return None
             except TypeError:
                 return [self.limits]
+
+    def get_default_answer(self):
+        return self.default
 
     def get_is_replied(self):
         return self.is_replied
@@ -438,6 +430,9 @@ class Query:
         if any([type(limit) != type(limits[0]) for limit in limits]):
             raise InvalidQueryError("limits are not all of the same type")
 
+        if self.default is not None and type(self.default) != type(limits[0]):
+            raise InvalidQueryError("default and limits are not of the same type")
+
         # Smart guess of some common types
         if self.reply_type is None:
             if isinstance(limits[0], str):
@@ -478,17 +473,20 @@ class Query:
             limits = self.get_limits()
                         
             if answers is None: #Even a non expect reply query expects an 'OK' answer                
-                return False
-             
+                return False           
+            
             if not self.expect_reply: # An answer is expected, whatever it is
                 return True
             
             if not isinstance(answers, list):
                 answers = [answers] #To call answers[0]
-  
+
+            if answers == []:
+                return False
+   
             if any([type(answer) != type(answers[0]) for answer in answers]):
                 return False #All answers must be of the same type
-                   
+                 
             # GENERAL CHECKING
             if self.reply_type in [ReplyType.TEXT, ReplyType.NOTE, ReplyType.FILEPATH]:
                 if isinstance(answers[0], str):
@@ -541,7 +539,6 @@ class Query:
                 if all([re.search(ext,os.path.splitext(answers[0])[-1]) is None for ext in extensions]) and len(extensions) != 0:
 
                     is_reply_valid = False
-            
              
             #CHECKING AGAINST LIMITS FOR NUMBERS
             #In this case only answers[0] is checked
@@ -552,8 +549,8 @@ class Query:
                     num = float(Fraction(answers[0]))
                     
                 try:                        
-                    low_lim = min(limits[:2])
-                    high_lim = max(limits[:2])
+                    low_lim = min(limits)
+                    high_lim = max(limits)
                 except (ValueError, TypeError):
                     if len(limits) != 0:
                         is_reply_valid = False #If limits is not None
@@ -660,6 +657,24 @@ class Query:
         recipient.receive(self)  # Assumes that all recipients contain a method to receive() queries
 
         return self.is_sent
+
+
+    def sanitize_answer(self, answer):
+        
+        if isinstance(answer, str):
+            answer = answer.strip()
+        if isinstance(answer, list):
+            answer = list(filter(None, answer))
+        if isinstance(answer, tuple):
+            answer = tuple(filter(None, answer))   
+        if answer in ('', [], ()):
+            default = self.default
+            if default is not None:
+                answer = default
+            elif self.reply_type == ReplyType.NUMBER:
+                answer = '0'
+        
+        return answer
     
 
     def reply_to(self, answer):
@@ -673,6 +688,8 @@ class Query:
                 self.build_result()
         except (IndexError, AttributeError, TypeError):
             self.help_required = False #Important: to avoid looping over an empty string
+
+        answer = self.sanitize_answer(answer)
             
         reply = Reply(self, answer)
         self.reply = reply
@@ -802,16 +819,23 @@ class QueryMultipleChoices(QueryChoice):
         Caution: an answer tuple is considered as a single object
         """
         
-        if isinstance(answer, str):
-            answers = list(filter(None,re.split(r'\t| |,|;', answer)))
-            if answers == []:
-                answers = ['']
-        elif not isinstance(answer, list):
-            answers = [answer] #maybe the user has selected only 1 choice
-        else:
-            answers = answer
+        answer = super().sanitize_answer(answer)
         
-        super().reply_to(answers) #does self.answer=answer
+        if answer == "all":
+            
+            answers = [str(i) for (i, limit) in enumerate(self.get_limits())]
+            #answer = ', '.join([str(i) for (i, limit) in enumerate(self.get_limits())])
+        else:
+            if isinstance(answer, str):
+                answers = list(filter(None,re.split(r'\t| |,|;', answer)))
+                if answers == []:
+                    answers = ['']
+            elif not isinstance(answer, list):
+                answers = [answer] #maybe the user has selected only 1 choice
+            else:
+                answers = answer
+            
+        return super().reply_to(answers)
 
 
     def get_answer_indices(self):

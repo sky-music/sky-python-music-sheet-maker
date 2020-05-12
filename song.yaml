@@ -1,5 +1,4 @@
-aspect_ratio: 16/9
+aspect_ratio: 9.0/16
 song_bpm: 120
 octave_shift: 0
 render_modes: all
-    

@@ -523,7 +523,6 @@ class MusicSheetMaker:
         """
         Asks for the desired render modes for the Song
         """
-
         render_modes = self.render_modes_enabled
 
         if len(render_modes) == 1:

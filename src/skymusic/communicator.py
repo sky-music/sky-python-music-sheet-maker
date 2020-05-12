@@ -131,7 +131,8 @@ class Communicator:
                              'input_tip': Lang.get_string("stock_queries/render_modes/input_tip", self.locale),
                              'help_text': Lang.get_string("stock_queries/render_modes/help_text", self.locale),
                              'reply_type': ReplyType.RENDERMODES,
-                             'limits': []
+                             'limits': [],
+                             'default': 'all'
                              },
 
             'aspect_ratio': {'class': QueryOpen.__name__,
@@ -142,7 +143,8 @@ class Communicator:
                              'input_tip': Lang.get_string("stock_queries/aspect_ratio/input_tip", self.locale),
                              'help_text': Lang.get_string("stock_queries/aspect_ratio/help_text", self.locale),
                              'reply_type': ReplyType.NUMBER,
-                             'limits': [0.1, 10.0, 16/9.0]
+                             'limits': [0.1, 10.0],
+                             'default': 16/9.0
                              },
 
             'song_bpm': {'class': QueryOpen.__name__,
@@ -153,7 +155,8 @@ class Communicator:
                              'input_tip': Lang.get_string("stock_queries/song_bpm/input_tip", self.locale),
                              'help_text': Lang.get_string("stock_queries/song_bpm/help_text", self.locale),
                              'reply_type': ReplyType.NUMBER,
-                             'limits': [12, 1200, 120]
+                             'limits': [12, 1200],
+                             'default': 120
                              },
 
 
@@ -293,7 +296,8 @@ class Communicator:
                              'input_tip': Lang.get_string("stock_queries/octave_shift/input_tip", self.locale),
                              'help_text': Lang.get_string("stock_queries/octave_shift/help_text", self.locale),
                              'reply_type': ReplyType.NUMBER,
-                             'limits': [-6, 6, 0]
+                             'limits': [-6, 6],
+                             'default': 0
                              },
 
             'one_song_file': {'class': Information.__name__,

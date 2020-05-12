@@ -116,12 +116,12 @@ stock_queries:
     help_text: |
       Par défaut le format d'image PNG est en paysage 16/9. Vous pouvez choisir un rapport d'aspect différent, ou laissez blanc pour passer. Seul les nombres entre 1/10 (0.1) et 10 sont acceptés.      
   song_bpm:
-    foreword: One of the output formats needs timing information.
-    question: Please choose the song tempo (BPM, beats per minute), or leave blank to skip
+    foreword: Un des formats d'exportation choisi prend en compte le rythme.
+    question: Merci de choisir le tempo (BPM, beats per minute), ou laissez blanc pour passer
     afterword:
-    input_tip: a positive number between 12 and 1200. Leave blank or 0 to skip.
+    input_tip: un nombre entier positif entre 12 et 1200. Laissez blanc ou 0 pour passer.
     help_text: |
-      You have selected an output format (such as Midi) that requires to know how fast to play the song. This is usually expressed in terms of beats per minute. Please give a integer value between 12 and 1200.
+      Vous avez choisi un format (Midi par ex.) qui veut savoir à quelle vitesse jouer la chanson. Ceci s'exprime généralement en BPM (beats per minute), un nombre entier entre 12 et 1200.
   song_title:
     foreword:
     question: Quel est le titre de la chanson ?

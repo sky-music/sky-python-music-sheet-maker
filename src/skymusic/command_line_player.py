@@ -107,9 +107,10 @@ class CommandLinePlayer:
                         if answer:
                             print(f"\n{question}: {answer}") 
                             #print(f"Answered {q.get_sender().get_name()}'s question with a value found in your preferences: {answer}")
+                            q.reply_to(answer)
                     else:
-                        answer = input('\n%s: '%question)   
-                    q.reply_to(answer)
+                        answer = input('%s: '%question)
+                        q.reply_to(answer)
                     reply_valid = q.get_reply_validity()
                 else:                  
                     print(question)
