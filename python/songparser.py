@@ -77,10 +77,10 @@ class SongParser:
 
         if self.input_mode == InputMode.JIANPU or isinstance(self.note_parser, noteparsers.jianpu.Jianpu):
             if self.pause != '0':
-                print('Jianpu notation is used: setting 0 as the pause character instead of ' + self.pause)
+                print('***WARNING: Jianpu notation is used: using 0 as the pause character instead of ' + self.pause + '. Make sure that your input complies with this notation')
                 self.pause = '0'
             if self.quaver_delimiter == '-':
-                print('Jianpu notation is used: setting ^ as the quaver delimiter instead of ' + self.quaver_delimiter)
+                print('***WARNING: Jianpu notation is used: setting ^ as the quaver delimiter instead of ' + self.quaver_delimiter + '. Make sure that your input complies with this notation')
                 self.quaver_delimiter = '^'
 
         delims = [self.icon_delimiter, self.pause, self.quaver_delimiter, self.comment_delimiter, self.repeat_indicator]
