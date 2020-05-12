@@ -1,7 +1,7 @@
 import io, re
 from src.skymusic.modes import InputMode, RenderMode, ReplyType
 from src.skymusic.communication import QueryOpen, QueryChoice, QueryMultipleChoices, QueryMemory, Information
-from src.skymusic import Lang
+from src.skymusic import Lang, QueryStock
 
 """
 Classes to ask and answer questions called Query and Reply between the bot and the music sheet maker
@@ -63,289 +63,7 @@ class Communicator:
         self.locale=self.set_locale(locale)
         # A dictionary of standard queries arguments
         # The key must be lower case without blanks, use _ instead
-
-
-        '''
-        NOTE ABOUT LIMITS
-        
-        Limits should be a list (even though entering another iterable is possible)
-        For QueryChoice, it will be a list of choices
-        For QueryBoolean, it is a list of keywords grouped by pairs (yes, no, oui, non)
-        
-        If a ReplyType is specified in reply_type, limits must be of the same type
-        
-        For ReplyType.FILEPATH, it contains valid search directories and valid file extensions, in any order
-        
-        For ReplyType.NUMBER, it is a list of [min, max, default], default being optional
-        
-        For ReplyType.TEXT, limits can be a (compilable) regular expression
-        
-        '''
-        self.query_stock = {
-            # Queries asked by the Player / Music Cog
-            'create_song': {'class': QueryOpen.__name__,
-                            'handler': 'create_song',  # The name of the method that must be executed by the recipient
-                            'question': 'create_song',
-                            'reply_type': ReplyType.OTHER
-                            },
-
-            # Generic Query
-            'information': {'class': Information.__name__,
-                            'handler': 'None',
-                            'question': '',
-                            'reply_type': ReplyType.TEXT
-                            },
-
-            'instructions_stdout': {'class': Information.__name__,
-                                    'handler': 'None',
-                                    'foreword': Lang.get_string("stock_queries/instructions_stdout/foreword", self.locale),
-                                    'question': Lang.get_string("stock_queries/instructions_stdout/question", self.locale),
-                                    'afterword': Lang.get_string("stock_queries/instructions_stdout/afterword", self.locale),
-                                    'input_tip': Lang.get_string("stock_queries/instructions_stdout/input_tip", self.locale),
-                                    'help_text': Lang.get_string("stock_queries/instructions_stdout/help_text", self.locale)
-                                    },
-
-           'instructions_website': {'class': Information.__name__,
-                                    'handler': 'None',
-                                    'foreword': Lang.get_string("stock_queries/instructions_website/foreword", self.locale),
-                                    'question': Lang.get_string("stock_queries/instructions_website/question", self.locale),
-                                    'afterword': Lang.get_string("stock_queries/instructions_website/afterword", self.locale),
-                                    'input_tip': Lang.get_string("stock_queries/instructions_website/input_tip", self.locale),
-                                    'help_text': Lang.get_string("stock_queries/instructions_website/help_text", self.locale)
-                                    },
-                                        
-            'instructions_botcog': {'class': Information.__name__,
-                                    'handler': 'None',
-                                    'foreword': Lang.get_string("stock_queries/instructions_botcog/foreword", self.locale),
-                                    'question': Lang.get_string("stock_queries/instructions_botcog/question", self.locale),
-                                    'afterword': Lang.get_string("stock_queries/instructions_botcog/afterword", self.locale),
-                                    'input_tip': Lang.get_string("stock_queries/instructions_botcog/input_tip", self.locale),
-                                    'help_text': Lang.get_string("stock_queries/instructions_botcog/help_text", self.locale)
-                                    },
-
-            'render_modes': {'class': QueryMultipleChoices.__name__,
-                             'handler': 'None',
-                             'foreword': Lang.get_string("stock_queries/render_modes/foreword", self.locale),
-                             'question': Lang.get_string("stock_queries/render_modes/question", self.locale),
-                             'afterword': Lang.get_string("stock_queries/render_modes/afterword", self.locale),
-                             'input_tip': Lang.get_string("stock_queries/render_modes/input_tip", self.locale),
-                             'help_text': Lang.get_string("stock_queries/render_modes/help_text", self.locale),
-                             'reply_type': ReplyType.RENDERMODES,
-                             'limits': [],
-                             'default': 'all'
-                             },
-
-            'aspect_ratio': {'class': QueryOpen.__name__,
-                             'handler': 'None',
-                             'foreword': Lang.get_string("stock_queries/aspect_ratio/foreword", self.locale),
-                             'question': Lang.get_string("stock_queries/aspect_ratio/question", self.locale),
-                             'afterword': Lang.get_string("stock_queries/aspect_ratio/afterword", self.locale),
-                             'input_tip': Lang.get_string("stock_queries/aspect_ratio/input_tip", self.locale),
-                             'help_text': Lang.get_string("stock_queries/aspect_ratio/help_text", self.locale),
-                             'reply_type': ReplyType.NUMBER,
-                             'limits': [0.1, 10.0],
-                             'default': 16/9.0
-                             },
-
-            'song_bpm': {'class': QueryOpen.__name__,
-                             'handler': 'None',
-                             'foreword': Lang.get_string("stock_queries/song_bpm/foreword", self.locale),
-                             'question': Lang.get_string("stock_queries/song_bpm/question", self.locale),
-                             'afterword': Lang.get_string("stock_queries/song_bpm/afterword", self.locale),
-                             'input_tip': Lang.get_string("stock_queries/song_bpm/input_tip", self.locale),
-                             'help_text': Lang.get_string("stock_queries/song_bpm/help_text", self.locale),
-                             'reply_type': ReplyType.NUMBER,
-                             'limits': [12, 1200],
-                             'default': 120
-                             },
-
-
-            'song_title': {'class': QueryOpen.__name__,
-                           'handler': 'None',
-                           'foreword': Lang.get_string("stock_queries/song_title/foreword", self.locale),
-                           'question': Lang.get_string("stock_queries/song_title/question", self.locale),
-                           'afterword': Lang.get_string("stock_queries/song_title/afterword", self.locale),
-                           'input_tip': Lang.get_string("stock_queries/song_title/input_tip", self.locale),
-                           'help_text': Lang.get_string("stock_queries/song_title/help_text", self.locale),
-                           'reply_type': ReplyType.TEXT,
-                           'limits': None
-                           },
-
-            'original_artist': {'class': QueryOpen.__name__,
-                                'handler': 'None',
-                                'foreword': Lang.get_string("stock_queries/original_artist/foreword", self.locale),
-                                'question': Lang.get_string("stock_queries/original_artist/question", self.locale),
-                                'afterword': Lang.get_string("stock_queries/original_artist/afterword", self.locale),
-                                'input_tip': Lang.get_string("stock_queries/original_artist/input_tip", self.locale),
-                                'help_text': Lang.get_string("stock_queries/original_artist/help_text", self.locale),
-                                'reply_type': ReplyType.TEXT,
-                                'limits': None
-                                },
-
-            'transcript_writer': {'class': QueryOpen.__name__,
-                                  'handler': 'None',
-                                  'foreword': Lang.get_string("stock_queries/transcript_writer/foreword", self.locale),
-                                  'question': Lang.get_string("stock_queries/transcript_writer/question", self.locale),
-                                  'afterword': Lang.get_string("stock_queries/transcript_writer/afterword", self.locale),
-                                  'input_tip': Lang.get_string("stock_queries/transcript_writer/input_tip", self.locale),
-                                  'help_text': Lang.get_string("stock_queries/transcript_writer/help_text", self.locale),
-                                  'reply_type': ReplyType.TEXT,
-                                  'limits': None
-                                  },
-
-            'notes_file': {'class': QueryOpen.__name__,
-                           'handler': 'None',
-                           'foreword': Lang.get_string("stock_queries/notes_file/foreword", self.locale),
-                           'question': Lang.get_string("stock_queries/notes_file/question", self.locale),
-                           'afterword': Lang.get_string("stock_queries/notes_file/afterword", self.locale),
-                           'input_tip': Lang.get_string("stock_queries/notes_file/input_tip", self.locale),
-                           'help_text': Lang.get_string("stock_queries/notes_file/help_text", self.locale),
-                           'reply_type': ReplyType.OTHER,
-                           'expect_long_answer': True,
-                           'limits': None
-                           },
-
-            'file': {'class': QueryOpen.__name__,
-                     'handler': 'None',
-                     'foreword': Lang.get_string("stock_queries/file/foreword", self.locale),
-                     'question': Lang.get_string("stock_queries/file/question", self.locale),
-                     'afterword': Lang.get_string("stock_queries/file/afterword", self.locale),
-                     'input_tip': Lang.get_string("stock_queries/file/input_tip", self.locale),
-                     'help_text': Lang.get_string("stock_queries/file/help_text", self.locale),
-                     'reply_type': ReplyType.FILEPATH,
-                     'limits': '.'
-                     },
-
-            'notes': {'class': QueryOpen.__name__,
-                      'handler': 'None',
-                      'foreword': Lang.get_string("stock_queries/notes/foreword", self.locale),
-                      'question': Lang.get_string("stock_queries/notes/question", self.locale),
-                      'afterword': Lang.get_string("stock_queries/notes/afterword", self.locale),
-                      'input_tip': Lang.get_string("stock_queries/notes/input_tip", self.locale),
-                      'help_text': Lang.get_string("stock_queries/notes/help_text", self.locale),
-                      'reply_type': ReplyType.TEXT,
-                      'expect_long_answer': True,
-                      'limits': None
-                      },
-
-            'one_input_mode': {'class': Information.__name__,
-                               'handler': 'None',
-                               'foreword': Lang.get_string("stock_queries/one_input_mode/foreword", self.locale),
-                               'question': Lang.get_string("stock_queries/one_input_mode/question", self.locale),
-                               'afterword': Lang.get_string("stock_queries/one_input_mode/afterword", self.locale),
-                               'input_tip': Lang.get_string("stock_queries/one_input_mode/input_tip", self.locale),
-                               'help_text': Lang.get_string("stock_queries/one_input_mode/help_text", self.locale)
-                            },                               
-                                                       
-            'musical_notation': {'class': QueryChoice.__name__,
-                                 'handler': 'None',
-                                 'foreword': Lang.get_string("stock_queries/musical_notation/foreword", self.locale),
-                                 'question': Lang.get_string("stock_queries/musical_notation/question", self.locale),
-                                 'afterword': Lang.get_string("stock_queries/musical_notation/afterword", self.locale),
-                                 'input_tip': Lang.get_string("stock_queries/musical_notation/input_tip", self.locale),
-                                 'help_text': Lang.get_string("stock_queries/musical_notation/help_text", self.locale),
-                                 'reply_type': ReplyType.INPUTMODE,
-                                 'limits': []
-                                 },
-
-            'no_possible_key': {'class': Information.__name__,
-                                'handler': 'None',
-                                'foreword': Lang.get_string("stock_queries/no_possible_key/foreword", self.locale),
-                                'question': Lang.get_string("stock_queries/no_possible_key/question", self.locale),
-                                'afterword': Lang.get_string("stock_queries/no_possible_key/afterword", self.locale),
-                                'input_tip': Lang.get_string("stock_queries/no_possible_key/input_tip", self.locale),
-                                'help_text': Lang.get_string("stock_queries/no_possible_key/help_text", self.locale)
-                                },
-
-            'one_possible_key': {'class': Information.__name__,
-                                 'handler': 'None',
-                                 'foreword': Lang.get_string("stock_queries/one_possible_key/foreword", self.locale),
-                                 'question': Lang.get_string("stock_queries/one_possible_key/question", self.locale),
-                                 'afterword': Lang.get_string("stock_queries/one_possible_key/afterword", self.locale),
-                                 'input_tip': Lang.get_string("stock_queries/one_possible_key/input_tip", self.locale),
-                                 'help_text': Lang.get_string("stock_queries/one_possible_key/help_text", self.locale)
-                                 },
-
-            'possible_keys': {'class': QueryChoice.__name__,
-                              'handler': 'None',
-                              'foreword': Lang.get_string("stock_queries/possible_keys/foreword", self.locale),
-                              'question': Lang.get_string("stock_queries/possible_keys/question", self.locale),
-                              'afterword': Lang.get_string("stock_queries/possible_keys/afterword", self.locale),
-                              'input_tip': Lang.get_string("stock_queries/possible_keys/input_tip", self.locale),
-                              'help_text': Lang.get_string("stock_queries/possible_keys/help_text", self.locale),
-                              'reply_type': ReplyType.NOTE,
-                              'limits': []
-                              },
-
-            'recommended_key': {'class': QueryOpen.__name__,
-                              'handler': 'None',
-                              'foreword': Lang.get_string("stock_queries/recommended_key/foreword", self.locale),
-                              'question': Lang.get_string("stock_queries/recommended_key/question", self.locale),
-                              'afterword': Lang.get_string("stock_queries/recommended_key/afterword", self.locale),
-                              'input_tip': Lang.get_string("stock_queries/recommended_key/input_tip", self.locale),
-                              'help_text': Lang.get_string("stock_queries/recommended_key/help_text", self.locale),
-                              'reply_type': ReplyType.NOTE,
-                              'limits': None
-                              },
-                            
-            'octave_shift': {'class': QueryOpen.__name__,
-                             'handler': 'None',
-                             'foreword': Lang.get_string("stock_queries/octave_shift/foreword", self.locale),
-                             'question': Lang.get_string("stock_queries/octave_shift/question", self.locale),
-                             'afterword': Lang.get_string("stock_queries/octave_shift/afterword", self.locale),
-                             'input_tip': Lang.get_string("stock_queries/octave_shift/input_tip", self.locale),
-                             'help_text': Lang.get_string("stock_queries/octave_shift/help_text", self.locale),
-                             'reply_type': ReplyType.NUMBER,
-                             'limits': [-6, 6],
-                             'default': 0
-                             },
-
-            'one_song_file': {'class': Information.__name__,
-                              'handler': 'None',
-                              'foreword': Lang.get_string("stock_queries/one_song_file/foreword", self.locale),
-                              'question': Lang.get_string("stock_queries/one_song_file/question", self.locale),
-                              'afterword': Lang.get_string("stock_queries/one_song_file/afterword", self.locale),
-                              'input_tip': Lang.get_string("stock_queries/one_song_file/input_tip", self.locale),
-                              'help_text': Lang.get_string("stock_queries/one_song_file/help_text", self.locale)
-                              },
-
-            'several_song_files': {'class': Information.__name__,
-                             'handler': 'None',
-                             'foreword': Lang.get_string("stock_queries/several_song_files/foreword", self.locale),
-                             'question': Lang.get_string("stock_queries/several_song_files/question", self.locale),
-                             'afterword': Lang.get_string("stock_queries/several_song_files/afterword", self.locale),
-                             'input_tip': Lang.get_string("stock_queries/several_song_files/input_tip", self.locale),
-                             'help_text': Lang.get_string("stock_queries/several_song_files/help_text", self.locale)
-                             },
-                             
-            'no_song_file': {'class': Information.__name__,
-                             'handler': 'None',
-                             'foreword': Lang.get_string("stock_queries/no_song_file/foreword", self.locale),
-                             'question': Lang.get_string("stock_queries/no_song_file/question", self.locale),
-                             'afterword': Lang.get_string("stock_queries/no_song_file/afterword", self.locale),
-                             'input_tip': Lang.get_string("stock_queries/no_song_file/input_tip", self.locale),
-                             'help_text': Lang.get_string("stock_queries/no_song_file/help_text", self.locale)
-                             },
-
-            'few_errors': {'class': Information.__name__,
-                             'handler': 'None',
-                             'foreword': Lang.get_string("stock_queries/few_errors/foreword", self.locale),
-                             'question': Lang.get_string("stock_queries/few_errors/question", self.locale),
-                             'afterword': Lang.get_string("stock_queries/few_errors/afterword", self.locale),
-                             'input_tip': Lang.get_string("stock_queries/few_errors/input_tip", self.locale),
-                             'help_text': Lang.get_string("stock_queries/few_errors/help_text", self.locale)
-                             },
-                                                                                                                                           
-            'many_errors': {'class': Information.__name__,
-                             'handler': 'None',
-                             'foreword': Lang.get_string("stock_queries/many_errors/foreword", self.locale),
-                             'question': Lang.get_string("stock_queries/many_errors/question", self.locale),
-                             'afterword': Lang.get_string("stock_queries/many_errors/afterword", self.locale),
-                             'input_tip': Lang.get_string("stock_queries/many_errors/input_tip", self.locale),
-                             'help_text': Lang.get_string("stock_queries/many_errors/help_text", self.locale)
-                             },
-
-            }
+        self.query_stock = QueryStock.load(locale)
 
     def __str__(self):
 
@@ -366,6 +84,15 @@ class Communicator:
     def get_locale(self):        
         return self.locale
 
+    def get_stock_query(self, stock_query_name):
+        
+        try:
+            stock_query_name = stock_query_name.lower().replace(' ', '_').replace('-', '_')
+            stock_query_dict = self.query_stock[stock_query_name]
+            return stock_query_dict
+        except KeyError:
+            raise CommunicatorError(f"{stock_query_name} is not a standard query")
+        
 
     def set_locale(self, locale):
         
@@ -388,13 +115,9 @@ class Communicator:
         """
         Create and send a query from a catalog, overriding some parameters with kwargs
         """
-        try:
-            stock_query_name = stock_query_name.lower().replace(' ', '_')
-            stock_query = self.query_stock[stock_query_name]
-        except KeyError:
-            raise CommunicatorError(f"{stock_query_name} is not a standard query")
-
-        method_args = stock_query.copy()
+        stock_query_dict = self.get_stock_query(stock_query_name)
+        
+        method_args = stock_query_dict.copy()
         method_args.pop('class')  # The class was used and is not an argument for Query
         method_args.pop('handler')  # The handler is not useful here and is not an argument for Query
         method_args['name'] = stock_query_name
@@ -422,11 +145,9 @@ class Communicator:
                 method_args['help_text'] = method_args['help_text'].format(*helptext_rep)
             except TypeError:
                 print('\n***Warning: help_text_rep does not match pattern in help_text.\n')
-
-        query_object = eval(
-            stock_query['class'])  # supposes we have imported QueryChoice, QueryOpen, QueryBoolean, Information, etc
-
-        q = query_object(**method_args)  # Creates the Query
+                
+        # supposes we have imported QueryChoice, QueryOpen, QueryBoolean, Information, etc
+        q = stock_query_dict['class'](**method_args)  # Creates the Query
         self.memory.store(q)
         q.check_sender(allowed=self.owner)
         q.send(recipient=recipient)

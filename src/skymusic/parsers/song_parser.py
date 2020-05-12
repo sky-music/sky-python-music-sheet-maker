@@ -84,11 +84,11 @@ class SongParser:
     def check_delimiters(self):
 
         if self.input_mode == InputMode.JIANPU or isinstance(self.note_parser, src.skymusic.parsers.noteparsers.jianpu.Jianpu):
-            if self.pause != Resources.JIANPU_QUAVER_DELIMITER:
-                print(f"Jianpu notation is used: setting 0 as the pause character instead of {self.pause}")
-                self.pause = Resources.JIANPU_QUAVER_DELIMITER
+            if self.pause != Resources.JIANPU_PAUSE:
+                print(f"***WARNING: Jianpu notation is used: setting 0 as the pause character instead of {self.pause}. Please make sure your input follows this convention.")
+                self.pause = Resources.JIANPU_PAUSE
             if self.quaver_delimiter == '-':
-                print(f"Jianpu notation is used: setting %s as the quaver delimiter instead of {self.quaver_delimiter}" % Resources.JIANPU_QUAVER_DELIMITER)
+                print(f"***WARNING: Jianpu notation is used: setting {Resources.JIANPU_QUAVER_DELIMITER} as the quaver delimiter instead of {self.quaver_delimiter}. Please make sure your input follows this convention.")
                 self.quaver_delimiter = Resources.JIANPU_QUAVER_DELIMITER
 
         delims = [self.icon_delimiter, self.pause, self.quaver_delimiter, self.comment_delimiter, self.repeat_indicator]
@@ -97,7 +97,7 @@ class SongParser:
         if self.quaver_delimiter == '\s' or re.match('\s', self.quaver_delimiter):
             print("***WARNING: You cannot use a blank delimiter to separate notes in a quaver")
         if self.pause == '\s' or re.match('\s', self.pause):
-            print("***WARNING: You cannot use a blank delimiter to a pause")
+            print("***WARNING: You cannot use a blank delimiter to indicate a pause")
         if self.comment_delimiter == '\s' or re.match('\s', self.comment_delimiter):
             print("***WARNING: You cannot use a blank delimiter to indicate comments")
         if self.comment_delimiter == '\s' or re.match('\s', self.repeat_indicator):
@@ -106,8 +106,7 @@ class SongParser:
         parser = self.get_note_parser()
         if parser is not None:
             for delim in delims:
-                if (parser.not_note_name_regex.match(delim) is None or parser.not_octave_regex.match(
-                        delim) is None) and delim != self.comment_delimiter:
+                if (parser.not_note_name_regex.match(delim) is None or parser.not_octave_regex.match(delim) is None) and delim != self.comment_delimiter:
                     print(f"***WARNING: You chose an invalid delimiter for notation {self.input_mode.get_short_desc(self.locale)}: {delim}")
                 if delims.count(delim) > 1:
                     print("***WARNING: You used the same delimiter for different purposes.")

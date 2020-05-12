@@ -199,7 +199,7 @@ class MusicSheetMaker:
                 # Fetching the stock Query name and arguments
                 query_name = q.get_name()
                 try:
-                    stock_query = self.communicator.query_stock[query_name]
+                    stock_query = self.communicator.get_stock_query(query_name)
                     handler_args = ', '.join(('sender=q.get_sender()', 'query=q'))
                     expression = f"self.{stock_query['handler']}({handler_args})"
                 except KeyError as err:
@@ -329,6 +329,7 @@ class MusicSheetMaker:
                         self.get_song_parser().get_icon_delimiter().replace('\s','<space>'), self.get_song_parser().get_pause().replace('\s','<space>'),
                         self.get_song_parser().get_quaver_delimiter().replace('\s','<space>'),
                         self.get_song_parser().get_quaver_delimiter().replace('\s','<space>').join(['A1', 'B1', 'C1']),
+                        Resources.JIANPU_QUAVER_DELIMITER,
                         self.get_song_parser().get_repeat_indicator() + '2'
                         )
 
@@ -384,6 +385,7 @@ class MusicSheetMaker:
                 self.get_song_parser().get_icon_delimiter().replace('\s','<space>'), self.get_song_parser().get_pause().replace('\s','<space>'),
                 self.get_song_parser().get_quaver_delimiter().replace('\s','<space>'),
                 self.get_song_parser().get_quaver_delimiter().replace('\s','<space>').join(['A1', 'B1', 'C1']),
+                Resources.JIANPU_QUAVER_DELIMITER,
                 self.get_song_parser().get_repeat_indicator() + '2'
                 )
         
@@ -438,6 +440,7 @@ class MusicSheetMaker:
                 self.get_song_parser().get_icon_delimiter().replace('\s','<space>'), self.get_song_parser().get_pause().replace('\s','<space>'),
                 self.get_song_parser().get_quaver_delimiter().replace('\s','<space>'),
                 self.get_song_parser().get_quaver_delimiter().replace('\s','<space>').join(['A1', 'B1', 'C1']),
+                Resources.JIANPU_QUAVER_DELIMITER,
                 self.get_song_parser().get_repeat_indicator() + '2'
                 )
 

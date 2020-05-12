@@ -58,8 +58,8 @@ stock_queries:
       
       - Les notes composant un accord doivent être attachées (e.g. A1B1C1).
       - Separate chords with {1}
-      - Tapez "{2}" pour marquer une pause (silence).
-      - Tapez "{3}" pour relier les notes entre elles, pour les triplets... (e.g. {4})
+      - Tapez "{2}" pour marquer une pause (silence), sauf en notation Jianpu où '0' (zéro) est utilisé conventionellement
+      - Tapez "{3}" pour relier les notes entre elles, pour les triplets... (e.g. {4}). En Jianpu, utilisez "{5}" au lieu de '-' pour éviter la confusion avec l'octave.
       - Tapez "{5}" après un groupe de notes pour indiquer la répétition.
       - Les dièses "#" et les bémoles "b" (demi-tons) sont possibles pour les notations autres que Sky ABC-15.
       
@@ -74,9 +74,9 @@ stock_queries:
       
       - Les notes composant un accord doivent être attachées (e.g. A1B1C1).
       - Separate chords with {1}
-      - Tapez "{2}" pour marquer une pause (silence).
-      - Tapez "{3}" pour relier les notes entre elles, pour les triplets... (e.g. {4})
-      - Tapez "{5}" après un groupe de notes pour indiquer la répétition.
+      - Tapez "{2}" pour marquer une pause (silence), sauf en notation Jianpu où '0' (zéro) est utilisé conventionellement.
+      - Tapez "{3}" pour relier les notes entre elles, pour les triplets... (e.g. {4}). En Jianpu, utilisez "{5}" au lieu de '-' pour éviter la confusion avec l'octave.
+      - Tapez "{6}" après un groupe de notes pour indiquer la répétition.
       - Les dièses "#" et les bémoles "b" (demi-tons) sont possibles pour les notations autres que Sky ABC-15.
     afterword:
     input_tip: cliquez sur OK pour passer
@@ -94,9 +94,9 @@ stock_queries:
       
       - Les notes composant un accord doivent être attachées (e.g. A1B1C1).
       - Separate chords with {1}
-      - Tapez "{2}" pour marquer une pause (silence).
-      - Tapez "{3}" pour relier les notes entre elles, pour les triplets... (e.g. {4})
-      - Tapez "{5}" après un groupe de notes pour indiquer la répétition.
+      - Tapez "{2}" pour marquer une pause (silence), sauf en notation Jianpu où '0' (zéro) est utilisé conventionellement
+      - Tapez "{3}" pour relier les notes entre elles, pour les triplets... (e.g. {4}). En Jianpu, utilisez "{5}" au lieu de '-' pour éviter la confusion avec l'octave.
+      - Tapez "{6}" après un groupe de notes pour indiquer la répétition.
       - Les dièses "#" et les bémoles "b" (demi-tons) sont possibles pour les notations autres que Sky ABC-15.
   render_modes:
     foreword:
@@ -151,8 +151,8 @@ stock_queries:
       - Les notes composant un accord doivent être attachées (e.g. A1B1C1).
       - Separate chords with {1}
       - Tapez "{2}" pour marquer une pause (silence).
-      - Tapez "{3}" pour relier les notes entre elles, pour les triplets... (e.g. {4})
-      - Tapez "{5}" après un groupe de notes pour indiquer la répétition.
+      - Tapez "{3}" pour relier les notes entre elles, pour les triplets... (e.g. {4}). En Jianpu, utilisez "{5}" au lieu de '-' pour éviter la confusion avec l'octave.
+      - Tapez "{6}" après un groupe de notes pour indiquer la répétition.
       - Les dièses "#" et les bémoles "b" (demi-tons) sont possibles pour les notations autres que Sky ABC-15.
   file:
     foreword:
@@ -171,8 +171,8 @@ stock_queries:
       - Les notes composant un accord doivent être attachées (e.g. A1B1C1).
       - Separate chords with {1}
       - Tapez "{2}" pour marquer une pause (silence).
-      - Tapez "{3}" pour relier les notes entre elles, pour les triplets... (e.g. {4})
-      - Tapez "{5}" après un groupe de notes pour indiquer la répétition.
+      - Tapez "{3}" pour relier les notes entre elles, pour les triplets... (e.g. {4}). En Jianpu, utilisez "{5}" au lieu de '-' pour éviter la confusion avec l'octave.
+      - Tapez "{6}" après un groupe de notes pour indiquer la répétition.
       - Les dièses "#" et les bémoles "b" (demi-tons) sont possibles pour les notations autres que Sky ABC-15.
   one_input_mode:
     foreword:
@@ -185,7 +185,7 @@ stock_queries:
     foreword: Malgré nos efforts, nous n'avons pas pu détecter votre format de notes.
     question: Merci de nous aider en choissant le bon dans la liste ci-contre
     afterword:
-    input_tip: Numéro de votre choix (entier entre 0 and choix_max)
+    input_tip: Case à choix unique
     help_text: |
       A la question précédente, vous avez tapé des notes de musiques. Nous avons essayé de détecter quelle notation vous avez utilisé.
       Toutefois, il reste une ambiguité. Merci de choisir votre notation dans la liste ci-contre.
@@ -262,6 +262,6 @@ stock_queries:
       - Si vous avez spécifié l'octave, il doit être entre 1 et 3. Sinon, recommencez en utilisant le décalage d'octave.
       - Votre chanson ne contien pas d'erreur de frappe. Veuillez consulter ce site web pour plus d'infos: 
       
-      https://sky.bloomexperiment.com/t/summary-of-input-modes/403'
+      https://sky-music.github.io/make-your-own-sheet.html'
     input_tip: cliquez sur OK pour passer
     help_text:

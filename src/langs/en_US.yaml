@@ -58,9 +58,9 @@ stock_queries:
       
       - Notes composing a chord must be glued together (e.g. A1B1C1).
       - Separate chords with "{1}".
-      - Use "{2}" for a silence (rest).
-      - Use "{3}" to link notes within an icon, for triplets, quavers... (e.g. {4})
-      - Add "{5}" after a chord to indicate repetition.
+      - Use "{2}" for a silence (rest), except for Jianpu where '0' is the official pause character.
+      - Use "{3}" to link notes within an icon, for triplets, quavers... (e.g. {4}). With Jianpu, use "{5}" instead of "-" to avoid confusion with the octave.
+      - Add "{6}" after a chord to indicate repetition.
       - Sharps "#" and flats "b" (semitones) are supported for Western and Jianpu notations.
       
       Type '?' to get help for a particular question
@@ -74,9 +74,9 @@ stock_queries:
       
       - Notes composing a chord must be glued together (e.g. A1B1C1).
       - Separate chords with "{1}".
-      - Use "{2}" for a silence (rest).
-      - Use "{3}" to link notes within an icon, for triplets, quavers... (e.g. {4})
-      - Add "{5}" after a chord to indicate repetition.
+      - Use "{2}" for a silence (rest), except for Jianpu where '0' is the official pause character.
+      - Use "{3}" to link notes within an icon, for triplets, quavers... (e.g. {4}) With Jianpu, use "{5}" instead of "-" to avoid confusion with the octave.
+      - Add "{6}" after a chord to indicate repetition.
       - Sharps "#" and flats "b" (semitones) are supported for Western and Jianpu notations.
     afterword:
     input_tip: click OK to acknowledge
@@ -95,9 +95,9 @@ stock_queries:
       Pay attention to these special characters:
       - Notes composing a chord must be glued together (e.g. A1B1C1).
       - Separate chords with "{1}".
-      - Use "{2}" for a silence (rest).
-      - Use "{3}" to link notes within an icon, for triplets, quavers... (e.g. {4})
-      - Add "{5}" after a chord to indicate repetition.
+      - Use "{2}" for a silence (rest), except for Jianpu where '0' is the official pause character.
+      - Use "{3}" to link notes within an icon, for triplets, quavers... (e.g. {4}). With Jianpu, use "{5}" instead of "-" to avoid confusion with the octave.
+      - Add "{6}" after a chord to indicate repetition.
       - Sharps "#" and flats "b" (semitones) are supported for Western and Jianpu notations.
   render_modes:
     foreword:
@@ -153,8 +153,8 @@ stock_queries:
       - Notes composing a chord must be glued together (e.g. A1B1C1).
       - Separate chords with "{1}".
       - Use "{2}" for a silence (rest).
-      - Use "{3}" to link notes within an icon, for triplets, quavers... (e.g. {4})
-      - Add "{5}" after a chord to indicate repetition.
+      - Use "{3}" to link notes within an icon, for triplets, quavers... (e.g. {4}). With Jianpu, use "{5}" instead of "-" to avoid confusion with the octave.
+      - Add "{6}" after a chord to indicate repetition.
       - Sharps "#" and flats "b" (semitones) are supported for Western and Jianpu notations.
   file:
     foreword:
@@ -174,7 +174,7 @@ stock_queries:
       - Notes composing a chord must be glued together (e.g. A1B1C1).
       - Separate chords with "{1}".
       - Use "{2}" for a silence (rest).
-      - Use "{3}" to link notes within an icon, for triplets, quavers... (e.g. {4})
+      - Use "{3}" to link notes within an icon, for triplets, quavers... (e.g. {4}). With Jianpu, use "{5}" instead of "-" to avoid confusion with the octave.
       - Add "{5}" after a chord to indicate repetition.
       - Sharps "#" and flats "b" (semitones) are supported for Western and Jianpu notations.
   one_input_mode:
@@ -188,7 +188,7 @@ stock_queries:
     foreword: Despite our efforts, we could not guess what musical notation you are using.
     question: Please help us by choosing your format in the list below
     afterword:
-    input_tip: Choice number (integer between 0 and n-1)
+    input_tip: Unique choice button
     help_text: |
       In the previous question, you have typed your song notes. We tried to automatically guess which notation you are using.
       Despite our best efforts, there is still an ambiguity. Please select the right one in the list.
@@ -265,6 +265,6 @@ stock_queries:
       - If you have specified the octave number, it must be between 1 and 3. If not, try again with an octave shift.
       - Your song is free of typos. Please check this website for full instructions: 
       
-      https://sky.bloomexperiment.com/t/summary-of-input-modes/403'
+      https://sky-music.github.io/make-your-own-sheet.html'
     input_tip: click OK to acknowledge
     help_text:
