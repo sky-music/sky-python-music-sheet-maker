@@ -72,12 +72,13 @@ class CommandLinePlayer:
         try:
             answer = self.preferences[q.get_name()]
             if answer is not None:
-                answer = str(answer).strip() 
-            return answer
+                answer = str(answer).strip()
+            else:
+                answer = ''
         except (TypeError, KeyError):
-            pass
-        
-        return None
+            answer = ''
+
+        return answer
 
     def receive(self, *args, **kwargs):
         self.communicator.receive(*args, **kwargs)
@@ -104,12 +105,13 @@ class CommandLinePlayer:
                     if not tried_preferences:
                         tried_preferences = True
                         answer = self.get_answer_from_preferences(q)                        
-                        if answer:
+                        if answer or q.get_default_answer() == '':
                             print(f"\n{question}: {answer}") 
                             #print(f"Answered {q.get_sender().get_name()}'s question with a value found in your preferences: {answer}")
+                            q.reply_to(answer)
                     else:
-                        answer = input('\n%s: '%question)   
-                    q.reply_to(answer)
+                        answer = input('%s: '%question)
+                        q.reply_to(answer)
                     reply_valid = q.get_reply_validity()
                 else:                  
                     print(question)

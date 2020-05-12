@@ -45,7 +45,7 @@ class Instrument():
 
     def get_is_silent(self):
         """Returns whether the Harp is empty of notes (silent)"""
-        return self.is_silent
+        return (len(self.chord_skygrid) == 0 or self.is_silent)
 
     def get_is_broken(self):
         """Returns whether the Harp is broken (notes were not recognized by the Parser)"""

@@ -21,7 +21,7 @@ class AsciiInstrumentRenderer(instrument_renderer.InstrumentRenderer):
                 for f in chord_skygrid[k]:  # Cycle over triplets & quavers
                     if chord_skygrid[k][f]:  # Button is highlighted
                         ascii_chord += note_parser.get_note_from_coordinate(k) + Resources.QUAVER_DELIMITER
-            ascii_chord.rstrip(Resources.QUAVER_DELIMITER)
+            ascii_chord = ascii_chord.rstrip(Resources.QUAVER_DELIMITER)
             
         return ascii_chord
 
