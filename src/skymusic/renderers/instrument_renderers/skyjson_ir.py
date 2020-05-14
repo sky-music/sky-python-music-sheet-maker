@@ -20,7 +20,7 @@ class SkyjsonInstrumentRenderer(instrument_renderer.InstrumentRenderer):
         else:
             chord_skygrid = instrument.get_chord_skygrid()
             
-            dt = Resources.SKYJSON_CHORD_DELAY/(instrument.get_num_highlighted()+0)
+            dt = Resources.SKYJSON_CHORD_DELAY/max([instrument.get_num_highlighted(),5])
             for k in chord_skygrid:  # Cycle over positions in a frame
                 for f in chord_skygrid[k]:  # Cycle over triplets & quavers
                     if chord_skygrid[k][f]:  # Button is highlighted

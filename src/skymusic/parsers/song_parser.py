@@ -270,20 +270,46 @@ class SongParser:
 
     def analyze_tempo(self, times):
         
+        def find_barycenter(t, y, i0, di):
+           
+            while len(t) < 2*di+1:
+                di = di - 1
+            if di < 0:
+                return None
+            
+            dt = t[1] - t[0]
+            tmin = t[0]
+            nmax = 10
+            
+            n = 0
+            iG = i0
+            iG_old = iG - 10
+            while (iG-iG_old) > 1 and n < nmax:            
+                i1 = max([0,iG-di])
+                i2 = min([len(t),iG+di])
+                y_band = y[i1:i2+1]
+                t_band = t[i1:i2+1]
+                iG_old = iG
+                tG = sum([y*t for (t,y) in zip(t_band, y_band)])/sum(y_band)
+                iG = round((tG - tmin)/dt)
+                n += 1                
+            y[i1:i2+1] = [0]*len(y[i1:i2+1])          
+            return tG 
+        
         diffs = [times[i] - times[i-1] for i in range(1, len(times))]
         
-        hbin = self.skyjson_chord_delay
+        div_resol = 3
+        hbin = self.skyjson_chord_delay / div_resol
         num_slots = 2 + int(max(diffs) / hbin)
         
         y = [0]*num_slots
         t = [i*hbin for i in range(num_slots)]
         
-        for diff in diffs:   #Builds histogram          
-            i = 1 + int(diff/hbin)
-            y[i] += 1
+        for diff in diffs: #histogram starting from t=0
+            y[1+int(diff/hbin)] += 1
             
         num_peaks = 3
-        floor = 2  #TODO: change this criterion: percentage of number of notes? % of first peak ?        
+        floor = max(y)/10
          
         tempos = []
         
@@ -292,14 +318,8 @@ class SongParser:
             if y0 < floor:
                 break
             i0 = y.index(y0)
-            i1 = max([0,i0-2])
-            i2 = min([len(y),i0+2])
-            y_band = y[i1:i2]
-            t_band = t[i1:i2]
-            tG = sum([y*t for (t,y) in zip(t_band, y_band)])/sum(y_band)
-            
+            tG = find_barycenter(t, y, i0, div_resol)       
             tempos.append(tG)
-            y[i1:i2] = [0]*len(y[i1:i2])
         
         return tempos
 
@@ -318,12 +338,8 @@ class SongParser:
             main_tempo = min(tempos)
         else:
             main_tempo = None
-                
+                        
         icons = [keys[0]]
-        #icons_times = [times[0]]
-        
-        #print('%DEBUG')
-        #print(tempos)
         
         for i in range(1,len(times)):
             if times[i] - times[i-1] < self.skyjson_chord_delay:
@@ -331,17 +347,10 @@ class SongParser:
             else:
                 n_pauses = max([0, round((times[i] - times[i-1])/main_tempo - 1)])
                 if n_pauses > 0:
-                    repeat = n_pauses - 1
-                    icons += [self.pause + (self.repeat_indicator+str(repeat) if repeat > 1 else '')]
-
-                        
+                    icons += [self.pause + (self.repeat_indicator + str(n_pauses) if n_pauses > 1 else '')]
                 
-                icons += [keys[i]]           
-                #icons_times.append(times[i])
-   
-        #print(icons_times)
-        #print(icons)        
-
+                icons += [keys[i]]
+                
         return icons
 
 

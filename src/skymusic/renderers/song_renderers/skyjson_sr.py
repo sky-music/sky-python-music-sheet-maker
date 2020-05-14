@@ -39,10 +39,7 @@ class SkyjsonSongRenderer(song_renderer.SongRenderer):
                                 json_dict['songNotes'] += instrument_renderer.render(instrument, time)
   
                         instrument_index += 1
-        
-        #print('%%DEBUG%%%')
-        #print(json_dict)
-        
+                
         json.dump([json_dict], json_buffer)
 
         return [json_buffer]
