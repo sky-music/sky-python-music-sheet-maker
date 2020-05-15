@@ -7,8 +7,8 @@ This program is not being actively maintained by Tracey. Feel free to take the c
 ***
 
 The script requires Python >= 3.6 and the following packages:
-* pillow (PIL)
-* import_resources (for Python < 3.7)
+* pillow (PIL) (optional: for generating PNG output)
+* importlib_resources (for Python < 3.7)
 * mido (optional: for generating midi output)
 
 See here for how to download and use. This currently requires a Desktop computer and is a work-in-progress.
