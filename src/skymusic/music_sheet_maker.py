@@ -845,10 +845,12 @@ class MusicSheetMaker:
 
         for render_mode in render_modes:
             buffers = self.get_song().render(render_mode=render_mode, aspect_ratio=aspect_ratio, song_bpm=song_bpm, css_mode=self.css_mode, rel_css_path=self.rel_css_path)  # A list of IOString or IOBytes buffers
-            song_bundle.add_render(render_mode, buffers)
-            if self.is_commandline(recipient):
-                file_paths = self.build_file_paths(render_mode, len(buffers))
-                self.send_buffers_to_files(render_mode, buffers, file_paths, recipient=recipient)
+            
+            if buffers is not None:
+                song_bundle.add_render(render_mode, buffers)
+                if self.is_commandline(recipient):
+                    file_paths = self.build_file_paths(render_mode, len(buffers))
+                    self.send_buffers_to_files(render_mode, buffers, file_paths, recipient=recipient)
                         
         return song_bundle
 
