@@ -5,65 +5,37 @@ class EnglishChords(english.English):
     def __init__(self):
 
         super().__init__()
-
-        oct_str = ''
+        
         oct_int = self.get_default_starting_octave()
         if oct_int > 1:
-            oct_str = str(oct_int)
-        oct_str2 = str(oct_int + 1)
+            x = str(oct_int)
+        else:
+            x = ""
+        y = str(oct_int + 1)
 
-        self.english_chords = {
-            'C': 'C' + oct_str + 'E' + oct_str + 'G' + oct_str, 'D': 'D' + oct_str + 'A' + oct_str,
-            'F': 'F' + oct_str + 'A' + oct_str + 'C' + oct_str2, 'G': 'G' + oct_str + 'B' + oct_str + 'D' + oct_str2,
-            'Dm': 'D' + oct_str + 'F' + oct_str + 'A' + oct_str, 'Em': 'E' + oct_str + 'G' + oct_str + 'B' + oct_str,
-            'Am': 'A' + oct_str + 'C' + oct_str2 + 'E' + oct_str2, 'Bm': 'B' + oct_str + 'D' + oct_str2,
-            'Bdim': 'B' + oct_str + 'D' + oct_str2 + 'F' + oct_str2,
-            'A+': 'A' + oct_str + 'C' + oct_str2 + 'F' + oct_str2,
-            'Csus2': 'C' + oct_str + 'D' + oct_str + 'G' + oct_str,
-            'Dsus2': 'C' + oct_str + 'E' + oct_str + 'A' + oct_str,
-            'Fsus2': 'F' + oct_str + 'G' + oct_str + 'C' + oct_str2,
-            'Gsus2': 'G' + oct_str + 'A' + oct_str + 'D' + oct_str2,
-            'Asus2': 'A' + oct_str + 'B' + oct_str + 'E' + oct_str2,
-            'Csus' + oct_str: 'C' + oct_str + 'F' + oct_str + 'G' + oct_str,
-            'Dsus' + oct_str: 'D' + oct_str + 'G' + oct_str + 'A' + oct_str,
-            'Esus' + oct_str: 'E' + oct_str + 'A' + oct_str + 'B' + oct_str,
-            'Gsus' + oct_str: 'G' + oct_str + 'C' + oct_str2 + 'D' + oct_str2,
-            'Asus' + oct_str: 'A' + oct_str + 'D' + oct_str2 + 'E' + oct_str2,
-            'D7sus' + oct_str: 'D' + oct_str + 'G' + oct_str + 'A' + oct_str + 'C' + oct_str2,
-            'E7sus' + oct_str: 'E' + oct_str + 'A' + oct_str + 'B' + oct_str + 'D' + oct_str2,
-            'G7sus' + oct_str: 'G' + oct_str + 'C' + oct_str2 + 'D' + oct_str2 + 'F' + oct_str2,
-            'A7sus' + oct_str: 'A' + oct_str + 'D' + oct_str2 + 'E' + oct_str2 + 'G' + oct_str2,
-            'C6': 'C' + oct_str + 'E' + oct_str + 'G' + oct_str + 'A' + oct_str,
-            'F6': 'F' + oct_str + 'A' + oct_str + 'C' + oct_str2 + 'D' + oct_str2,
-            'G6': 'G' + oct_str + 'B' + oct_str + 'D' + oct_str2 + 'E' + oct_str2,
-            'G7': 'G' + oct_str + 'B' + oct_str + 'D' + oct_str2 + 'F' + oct_str2,
-            'G9': 'G' + oct_str + 'B' + oct_str + 'D' + oct_str2 + 'F' + oct_str2 + 'A' + oct_str2,
-            'Cmaj7': 'C' + oct_str + 'E' + oct_str + 'G' + oct_str + 'B' + oct_str,
-            'Fmaj7': 'F' + oct_str + 'A' + oct_str + 'C' + oct_str2 + 'E' + oct_str2,
-            'Cmaj9': 'C' + oct_str + 'E' + oct_str + 'G' + oct_str + 'D' + oct_str2,
-            'Fmaj9': 'F' + oct_str + 'A' + oct_str + 'C' + oct_str2 + 'E' + oct_str2 + 'G' + oct_str2,
-            'Cmaj11': 'C' + oct_str + 'E' + oct_str + 'G' + oct_str + 'D' + oct_str2 + 'F' + oct_str2,
-            'Dm6': 'D' + oct_str + 'F' + oct_str + 'A' + oct_str + 'B' + oct_str,
-            'Dm7': 'D' + oct_str + 'F' + oct_str + 'A' + oct_str + 'C' + oct_str2,
-            'Em7': 'E' + oct_str + 'G' + oct_str + 'B' + oct_str + 'D' + oct_str2,
-            'Am7': 'A' + oct_str + 'C' + oct_str2 + 'E' + oct_str2 + 'G' + oct_str2,
-            'Dm9': 'D' + oct_str + 'F' + oct_str + 'A' + oct_str + 'C' + oct_str2 + 'E' + oct_str2,
-            'Am9': 'A' + oct_str + 'C' + oct_str2 + 'E' + oct_str2 + 'G' + oct_str2 + 'B' + oct_str2,
-            'Dm11': 'D' + oct_str + 'F' + oct_str + 'A' + oct_str + 'C' + oct_str2 + 'E' + oct_str2 + 'G' + oct_str2,
-            'Am11': 'D' + oct_str + 'A' + oct_str + 'C' + oct_str2 + 'E' + oct_str2 + 'G' + oct_str2 + 'B' + oct_str2,
-            'Cmaj': 'C' + oct_str + 'E' + oct_str + 'G' + oct_str, 'Dmaj': 'D' + oct_str + 'A' + oct_str,
-            'Fmaj': 'F' + oct_str + 'A' + oct_str + 'C' + oct_str2,
-            'Gmaj': 'G' + oct_str + 'B' + oct_str + 'D' + oct_str2,
-            'Aaug': 'A' + oct_str + 'C' + oct_str2 + 'F' + oct_str2,
-            'Csus': 'C' + oct_str + 'F' + oct_str + 'G' + oct_str,
-            'Dsus': 'D' + oct_str + 'G' + oct_str + 'A' + oct_str,
-            'Esus': 'E' + oct_str + 'A' + oct_str + 'B' + oct_str,
-            'Gsus': 'G' + oct_str + 'C' + oct_str2 + 'D' + oct_str2,
-            'Asus': 'A' + oct_str + 'D' + oct_str2 + 'E' + oct_str2,
-            'D7sus': 'D' + oct_str + 'G' + oct_str + 'A' + oct_str + 'C' + oct_str2,
-            'E7sus': 'E' + oct_str + 'A' + oct_str + 'B' + oct_str + 'D' + oct_str2,
-            'G7sus': 'G' + oct_str + 'C' + oct_str2 + 'D' + oct_str2 + 'F' + oct_str2,
-            'A7sus': 'A' + oct_str + 'D' + oct_str2 + 'E' + oct_str2 + 'G' + oct_str2
+        self.chords = {
+            'C': f"C{x}E{x}G{x}", 'D': f"D{x}A{x}", 'F': f"F{x}A{x}C{y}", 'G': f"G{x}B{x}D{y}",
+            'Dm': f"D{x}F{x}A{x}", 'Em': f"E{x}G{x}B{x}", 'Am': f"A{x}C{y}E{y}", 'Bm': f"B{x}D{y}",
+            'Bdim': f"B{x}D{y}F{y}", 'A+': f"A{x}C{y}F{y}",
+            'Csus2': f"C{x}D{x}G{x}", 'Dsus2': f"C{x}E{x}A{x}", 'Fsus2': f"F{x}G{x}C{y}",
+            'Gsus2': f"G{x}A{x}D{y}", 'Asus2': f"A{x}B{x}E{y}",
+            'Csus{x}': f"C{x}F{x}G{x}", 'Dsus{x}': f"D{x}G{x}A{x}",
+            'Esus{x}': f"E{x}A{x}B{x}", 'Gsus{x}': f"G{x}C{y}D{y}", 'Asus{x}': f"A{x}D{y}E{y}",
+            'D7sus{x}': f"D{x}G{x}A{x}C{y}", 'E7sus{x}': f"E{x}A{x}B{x}D{y}",
+            'G7sus{x}': f"G{x}C{y}D{y}F{y}", 'A7sus{x}': f"A{x}D{y}E{y}G{y}",
+            'C6': f"C{x}E{x}G{x}A{x}", 'F6': f"F{x}A{x}C{y}D{y}", 'G6': f"G{x}B{x}D{y}E{y}",
+            'G7': f"G{x}B{x}D{y}F{y}", 'G9': f"G{x}B{x}D{y}F{y}A{y}",
+            'Cmaj7': f"C{x}E{x}G{x}B{x}", 'Fmaj7': f"F{x}A{x}C{y}E{y}",
+            'Cmaj9': f"C{x}E{x}G{x}B{x}D{y}", 'Fmaj9': f"F{x}A{x}C{y}E{y}G{y}",
+            'Cmaj11': f"C{x}E{x}G{x}B{x}D{y}F{y}", 'Dm6': f"D{x}F{x}A{x}B{x}",
+            'Dm7': f"D{x}F{x}A{x}C{y}", 'Em7': f"E{x}G{x}B{x}D{y}", 'Am7': f"A{x}C{y}E{y}G{y}",
+            'Dm9': f"D{x}F{x}A{x}C{y}E{y}", 'Am9': f"A{x}C{y}E{y}G{y}B{y}",
+            'Dm11': f"D{x}F{x}A{x}C{y}E{y}G{y}", 'Am11': f"D{x}A{x}C{y}E{y}G{y}B{y}",
+            'Cmaj': f"C{x}E{x}G{x}", 'Dmaj': f"D{x}A{x}", 'Fmaj': f"F{x}A{x}C{y}", 'Gmaj': f"G{x}B{x}D{y}",
+            'Aaug': f"A{x}C{y}F{y}", 'Csus': f"C{x}F{x}G{x}", 'Dsus': f"D{x}G{x}A{x}",
+            'Esus': f"E{x}A{x}B{x}", 'Gsus': f"G{x}C{y}D{y}", 'Asus': f"A{x}D{y}E{y}",
+            'D7sus': f"D{x}G{x}A{x}C{y}", 'E7sus': f"E{x}A{x}B{x}D{y}", 'G7sus': f"G{x}C{y}D{y}F{y}",
+            'A7sus': f"A{x}D{y}E{y}G{y}"
         }
         # use EnglishNoteParser as a helper parser for the individual notes
         self.helper_parser = english.English()
@@ -74,7 +46,7 @@ class EnglishChords(english.English):
         """
         chord = self.sanitize_chord_name(chord)
         try:
-            return self.english_chords[chord]
+            return self.chords[chord]
         except:
             return chord
 
