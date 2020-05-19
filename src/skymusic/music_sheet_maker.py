@@ -245,11 +245,10 @@ class MusicSheetMaker:
         (q_mode, input_mode) = self.ask_input_mode(recipient=recipient, notes=notes, prerequisites=[q_notes])
         #(q_mode, input_mode) = self.ask_input_mode(recipient=recipient, prerequisites=[q_notes]) # EXPERIMENTAL
         self.set_parser_input_mode(recipient, input_mode=input_mode)
-        #self.set_parser_input_mode(recipient) #Experimental
+        #self.set_parser_input_mode(recipient) # EXPERIMENTAL
 
         # 5. Ask for song key (or display the only one possible)
-        (q_key, song_key) = self.ask_song_key(recipient=recipient, notes=notes, input_mode=input_mode,
-                                              prerequisites=[q_notes, q_mode])
+        (q_key, song_key) = self.ask_song_key(recipient=recipient, notes=notes, input_mode=input_mode, prerequisites=[q_notes, q_mode])
         #(q_key, song_key) = self.ask_song_key(recipient=recipient, prerequisites=[q_notes, q_mode]) # EXPERIMENTAL
 
         # 6. Asks for octave shift
@@ -272,7 +271,7 @@ class MusicSheetMaker:
 
         # 11. Asks for aspect ratio
         (q_aspect, aspect_ratio) = self.ask_aspect_ratio(recipient=recipient, render_modes=render_modes, prerequisites=[q_render])
-        #(q_aspect, aspect_ratio) = self.ask_aspect_ratio(recipient=recipient, render_modes=render_modes, prerequisites=[q_render])  #TODO EXPERIMENTAL
+        #(q_aspect, aspect_ratio) = self.ask_aspect_ratio(recipient=recipient, prerequisites=[q_render])  # EXPERIMENTAL
 
         # 12. Ask beats per minutes
         (q_song_bpm, song_bpm) = self.ask_song_bpm(recipient=recipient, render_modes=render_modes, prerequisites=[q_render])
@@ -884,56 +883,38 @@ class MusicSheetMaker:
         """
         Retrieves input mode (musical notation) from previous answered queries.
         Should work, but not fully tested
-        """
-        input_mode = None
-        
-        if notes is None:
-            notes = self.retrieve_notes(recipient)
-
+        """        
         try:
             input_mode = self.get_song_parser.get_input_mode()
         except AttributeError:
             input_mode = None
 
-        if input_mode is None:
-            q_mode = self.communicator.recall_by_recipient(recipient, criterion=ReplyType.INPUTMODE,
-                                                           filters=["valid_reply"], sort_by="date")
-            if len(q_mode) == 0:
-                input_mode = self.get_song_parser().get_possible_modes(notes)[0]
-            else:
-                input_mode = q_mode[-1].get_reply().get_result()
+        if input_mode is None:            
+            input_mode = self.retrieve_query_result(recipient, ReplyType.INPUTMODE)
+            
+        if input_mode is None: 
+            notes = self.retrieve_notes(recipient)
+            input_mode = self.get_song_parser().get_possible_modes(notes)[0]
 
         return input_mode
 
 
     def retrieve_render_modes(self, recipient):
-        
-        render_modes = self.render_modes_enabled
 
-        if len(render_modes) == 1:
-            return render_modes
-
-        if self.is_commandline(recipient):
-
-            return render_modes
-
-        elif self.is_botcog(recipient):
-
+        if self.is_botcog(recipient):
             return self.botcog_render_modes
-
-        else:
         
-            return self.retrieve_query_result(recipient, 'render_modes')                
-                
+        render_modes = self.retrieve_query_result(recipient, 'render_modes', default=self.render_modes_enabled) 
+                    
         return render_modes
 
     
-    def retrieve_query_result(self, recipient, query_name, default=None):
+    def retrieve_query_result(self, recipient, criterion, default=None):
         """
         Retrieves reply from previously replied query
         Should work, but not fully tested
         """        
-        qs = self.communicator.recall_by_recipient(recipient, criterion=query_name, filters=["valid_reply"],
+        qs = self.communicator.recall_by_recipient(recipient, criterion=criterion, filters=["valid_reply"],
                                                         sort_by="date")
 
         if len(qs) != 0:
