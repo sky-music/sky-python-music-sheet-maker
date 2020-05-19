@@ -139,7 +139,7 @@ class SongParser:
 
     def find_key(self, song_lines=None):
         
-        self.music_theory.find_key(song_lines)
+        return self.music_theory.find_key(song_lines)
 
     def get_note_parser(self, input_mode=None):
 
