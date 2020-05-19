@@ -22,7 +22,7 @@ input_mode:
         long_desc: "Japanese do re mi: ド、ド#／レb、レ、レ#／ミb、ミ、ファ、ファ#／ソb、ソ、ソ#／ラb、ラ、ラ#／シb、シ"
     skyjson:
         short_desc: 'SkyMusic JSON'
-        long_desc: "Dictionary with timeline [{'time': xxxx, 'key': KeyN}]"
+        long_desc: "Dictionary with time in ms and key number 0-14 [{'time': xxxx, 'key': KeyN}]"
 render_mode:
     html:
         short_desc: HTML visual sheet
@@ -49,18 +49,18 @@ song_meta:
    musical_key: Musical key
    untitled: Untitled
 open_file: |
-    (Notes imported from {0})
+    (Notes imported from {file_path})
 stock_queries:
   instructions_stdout:
     foreword: "===== VISUAL MUSIC SHEETS FOR SKY:CHILDREN OF THE LIGHT =====\n"
     question: |
-      Accepted music notes formats:{0}
+      Accepted music notes formats:{input_modes}
       
       - Notes composing a chord must be glued together (e.g. A1B1C1).
-      - Separate chords with "{1}".
-      - Use "{2}" for a silence (rest), except for Jianpu where '0' is the official pause character.
-      - Use "{3}" to link notes within an icon, for triplets, quavers... (e.g. {4}). With Jianpu, use "{5}" instead of "-" to avoid confusion with the octave.
-      - Add "{6}" after a chord to indicate repetition.
+      - Separate chords with "{icon_delimiter}".
+      - Use "{pause}" for a silence (rest), except for Jianpu where '0' is the official pause character.
+      - Use "{quaver_delimiter}" to link notes within an icon, for triplets, quavers... (e.g. {quaver_example}). With Jianpu, use "{jianpu_quaver_delimiter}" instead of "-" to avoid confusion with the octave.
+      - Add "{repeat_indictaor}" after a chord to indicate repetition.
       - Sharps "#" and flats "b" (semitones) are supported for Western and Jianpu notations.
       
       Type '?' to get help for a particular question
@@ -70,13 +70,13 @@ stock_queries:
   instructions_website:
     foreword:
     question: |
-      Accepted music notes formats:{0}
+      Accepted music notes formats:{input_modes}
       
       - Notes composing a chord must be glued together (e.g. A1B1C1).
-      - Separate chords with "{1}".
-      - Use "{2}" for a silence (rest), except for Jianpu where '0' is the official pause character.
-      - Use "{3}" to link notes within an icon, for triplets, quavers... (e.g. {4}) With Jianpu, use "{5}" instead of "-" to avoid confusion with the octave.
-      - Add "{6}" after a chord to indicate repetition.
+      - Separate chords with "{icon_delimiter}".
+      - Use "{pause}" for a silence (rest), except for Jianpu where '0' is the official pause character.
+      - Use "{quaver_delimiter}" to link notes within an icon, for triplets, quavers... (e.g. {quaver_example}). With Jianpu, use "{jianpu_quaver_delimiter}" instead of "-" to avoid confusion with the octave.
+      - Add "{repeat_indictaor}" after a chord to indicate repetition.
       - Sharps "#" and flats "b" (semitones) are supported for Western and Jianpu notations.
     afterword:
     input_tip: click OK to acknowledge
@@ -90,14 +90,14 @@ stock_queries:
     afterword:
     input_tip:
     help_text: |
-      I accept the following music notes formats:{0}
+      I accept the following music notes formats:{input_modes}
       
       Pay attention to these special characters:
       - Notes composing a chord must be glued together (e.g. A1B1C1).
-      - Separate chords with "{1}".
-      - Use "{2}" for a silence (rest), except for Jianpu where '0' is the official pause character.
-      - Use "{3}" to link notes within an icon, for triplets, quavers... (e.g. {4}). With Jianpu, use "{5}" instead of "-" to avoid confusion with the octave.
-      - Add "{6}" after a chord to indicate repetition.
+      - Separate chords with "{icon_delimiter}".
+      - Use "{pause}" for a silence (rest), except for Jianpu where '0' is the official pause character.
+      - Use "{quaver_delimiter}" to link notes within an icon, for triplets, quavers... (e.g. {quaver_example}). With Jianpu, use "{jianpu_quaver_delimiter}" instead of "-" to avoid confusion with the octave.
+      - Add "{repeat_indictaor}" after a chord to indicate repetition.
       - Sharps "#" and flats "b" (semitones) are supported for Western and Jianpu notations.
   render_modes:
     foreword:
@@ -143,22 +143,22 @@ stock_queries:
     help_text: 'The transcript writer is the person who found the notes you typed earlier. It could be yourself!'
   notes_file:
     foreword:
-    question: 'Type or copy-paste notes below. You can also enter a text file name containing the notes (in {0}/)'
+    question: 'Type or copy-paste notes below. You can also enter a text file name containing the notes (in {songs_in}/)'
     afterword:
     input_tip: a string of notes such as C1 D1F1, or a file name such as song.txt
     help_text: |
-      I accept the following music notes formats:{0}
+      I accept the following music notes formats:{input_modes}
       
       Pay attention to these special characters:
       - Notes composing a chord must be glued together (e.g. A1B1C1).
-      - Separate chords with "{1}".
-      - Use "{2}" for a silence (rest).
-      - Use "{3}" to link notes within an icon, for triplets, quavers... (e.g. {4}). With Jianpu, use "{5}" instead of "-" to avoid confusion with the octave.
-      - Add "{6}" after a chord to indicate repetition.
+      - Separate chords with "{icon_delimiter}".
+      - Use "{pause}" for a silence (rest), except for Jianpu where '0' is the official pause character.
+      - Use "{quaver_delimiter}" to link notes within an icon, for triplets, quavers... (e.g. {quaver_example}). With Jianpu, use "{jianpu_quaver_delimiter}" instead of "-" to avoid confusion with the octave.
+      - Add "{repeat_indictaor}" after a chord to indicate repetition.
       - Sharps "#" and flats "b" (semitones) are supported for Western and Jianpu notations.
   file:
     foreword:
-    question: 'Enter a valid file name (in {0}/)'
+    question: 'Enter a valid file name (in {songs_in}/)'
     afterword:
     input_tip: any text file containing one or several musical notes
     help_text:
@@ -168,19 +168,19 @@ stock_queries:
     afterword:
     input_tip: any text with one or several musical notes (leave blank to skip)
     help_text: |
-      I accept the following music notes formats:{0}
+      I accept the following music notes formats:{input_modes}
       
       Pay attention to these special characters:
       - Notes composing a chord must be glued together (e.g. A1B1C1).
-      - Separate chords with "{1}".
-      - Use "{2}" for a silence (rest).
-      - Use "{3}" to link notes within an icon, for triplets, quavers... (e.g. {4}). With Jianpu, use "{5}" instead of "-" to avoid confusion with the octave.
-      - Add "{5}" after a chord to indicate repetition.
+      - Separate chords with "{icon_delimiter}".
+      - Use "{pause}" for a silence (rest), except for Jianpu where '0' is the official pause character.
+      - Use "{quaver_delimiter}" to link notes within an icon, for triplets, quavers... (e.g. {quaver_example}). With Jianpu, use "{jianpu_quaver_delimiter}" instead of "-" to avoid confusion with the octave.
+      - Add "{repeat_indictaor}" after a chord to indicate repetition.
       - Sharps "#" and flats "b" (semitones) are supported for Western and Jianpu notations.
   one_input_mode:
     foreword:
     question: |
-        We detected that you use the following notation: '{0}'.
+        We detected that you use the following notation: '{songs_in}'.
     afterword:
     input_tip: click OK to acknowledge
     help_text:
@@ -202,12 +202,12 @@ stock_queries:
     help_text:
   one_possible_key:
     foreword:
-    question: 'Your song can be transposed in Sky with the following key: {0}'
+    question: 'Your song can be transposed in Sky with the following key: {song_key}'
     afterword:
     input_tip: click OK to acknowledge
     help_text:
   possible_keys:
-    foreword: 'Your song can be transposed in Sky with the following keys: {0}.'
+    foreword: 'Your song can be transposed in Sky with the following keys: {song_key}.'
     question: Please choose your musical key
     afterword:
     input_tip: Type the key name
@@ -234,20 +234,20 @@ stock_queries:
       If you have specified an octave number and it is too high to be played within Sky\''s system, you can downshift the pitch by entering a negative integer'
   no_song_file:
     foreword: ---------------------------------------
-    question: 'Your {0} was not saved to file.'
+    question: 'Your {render_mode} was not saved to file.'
     afterword:
     input_tip: click OK to acknowledge
     help_text:
   one_song_file:
     foreword: ---------------------------------------
-    question: 'Your {0} is located at: {1}'
+    question: 'Your {render_mode} is located at: {song_file}'
     afterword:
     input_tip: click OK to acknowledge
     help_text:
   several_song_files:
     foreword: ---------------------------------------
-    question: 'Your {0} is located at: {1}'
-    afterword: 'Your song has been split into {0} files between "{1}" and "{2}"'
+    question: 'Your {render_mode} is located at: {song_file}'
+    afterword: 'Your song has been split into {num_files} files between "{first_file}" and "{last_file}"'
     input_tip: click OK to acknowledge
     help_text:
   few_errors:

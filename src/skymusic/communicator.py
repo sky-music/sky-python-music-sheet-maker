@@ -110,8 +110,7 @@ class Communicator:
         return self.locale
 
 
-    def send_stock_query(self, stock_query_name, recipient, foreword_rep=(), question_rep=(), afterword_rep=(),
-                         helptext_rep=(), **kwargs):
+    def send_stock_query(self, stock_query_name, recipient, replacements=None, **kwargs):
         """
         Create and send a query from a catalog, overriding some parameters with kwargs
         """
@@ -120,32 +119,18 @@ class Communicator:
         method_args = stock_query_dict.copy()
         method_args.pop('class')  # The class was used and is not an argument for Query
         method_args.pop('handler')  # The handler is not useful here and is not an argument for Query
+        if replacements is not None:
+            for k in method_args:
+                try:
+                    #print(method_arg)
+                    method_args[k] = method_args[k].format_map(replacements)
+                except (KeyError, AttributeError):
+                    pass            
         method_args['name'] = stock_query_name
         method_args['sender'] = self.owner
         method_args['recipient'] = recipient
         method_args.update(kwargs)  # Merge tuples to override default parameters with optional keyword arguments
-        if 'foreword' in method_args.keys() and len(foreword_rep) > 0:
-            try:
-                method_args['foreword'] = method_args['foreword'].format(*foreword_rep)
-            except TypeError:
-                print('\n***Warning: foreword_rep does not match pattern in foreword.\n')
-        if 'question' in method_args.keys() and len(question_rep) > 0:
-            try:
-                method_args['question'] = method_args['question'].format(*question_rep)
-            except TypeError:
-                print('\n***Warning: question_rep does not match pattern in question.\n')
-        if 'afterword' in method_args.keys() and len(afterword_rep) > 0:
-            try:
-                method_args['afterword'] = method_args['afterword'].format(*afterword_rep)
-            except TypeError:
-                print('\n***Warning: afterword_rep does not match pattern in afterword.\n')
-
-        if 'help_text' in method_args.keys() and len(helptext_rep) > 0:
-            try:
-                method_args['help_text'] = method_args['help_text'].format(*helptext_rep)
-            except TypeError:
-                print('\n***Warning: help_text_rep does not match pattern in help_text.\n')
-                
+                        
         # supposes we have imported QueryChoice, QueryOpen, QueryBoolean, Information, etc
         q = stock_query_dict['class'](**method_args)  # Creates the Query
         self.memory.store(q)

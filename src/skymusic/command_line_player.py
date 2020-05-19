@@ -76,7 +76,7 @@ class CommandLinePlayer:
             else:
                 answer = ''
         except (TypeError, KeyError):
-            answer = ''
+            answer = None
 
         return answer
 
@@ -105,7 +105,7 @@ class CommandLinePlayer:
                     if not tried_preferences:
                         tried_preferences = True
                         answer = self.get_answer_from_preferences(q)                        
-                        if answer or q.get_default_answer() == '':
+                        if answer is not None:
                             print(f"\n{question}: {answer}") 
                             #print(f"Answered {q.get_sender().get_name()}'s question with a value found in your preferences: {answer}")
                             q.reply_to(answer)

@@ -286,23 +286,24 @@ class MusicSheetMaker:
 
     def ask_instructions(self, recipient, prerequisites=None, execute=True):
 
-        rep = ('\n'.join(['\n* ' + input_mode.get_long_desc(self.locale) for input_mode in InputMode]),
-                        self.get_song_parser().get_icon_delimiter().replace('\s','<space>'), self.get_song_parser().get_pause().replace('\s','<space>'),
-                        self.get_song_parser().get_quaver_delimiter().replace('\s','<space>'),
-                        self.get_song_parser().get_quaver_delimiter().replace('\s','<space>').join(['A1', 'B1', 'C1']),
-                        Resources.JIANPU_QUAVER_DELIMITER,
-                        self.get_song_parser().get_repeat_indicator() + '2'
-                        )
+        replacements = {'input_modes':'\n'.join(['\n* ' + input_mode.get_long_desc(self.locale) for input_mode in InputMode]),
+                        'icon_delimiter': self.get_song_parser().get_icon_delimiter().replace('\s','<space>'),
+                        'pause': self.get_song_parser().get_pause().replace('\s','<space>'),
+                        'quaver_delimiter': self.get_song_parser().get_quaver_delimiter().replace('\s','<space>'),
+                        'quaver_example': self.get_song_parser().get_quaver_delimiter().replace('\s','<space>').join(['A1', 'B1', 'C1']),
+                        'jianpu_quaver_delimiter': Resources.JIANPU_QUAVER_DELIMITER,
+                        'repeat_indicator': self.get_song_parser().get_repeat_indicator() + '2'
+                        }
 
         if self.is_commandline(recipient):
             i_instr = self.communicator.send_stock_query('instructions_stdout', recipient=recipient,
-                                                         question_rep=rep, prerequisites=prerequisites)
+                                                         replacements=replacements, prerequisites=prerequisites)
         elif self.is_website(recipient):
             i_instr = self.communicator.send_stock_query('instructions_website', recipient=recipient,
-                                                         question_rep=rep, prerequisites=prerequisites)
+                                                         replacements=replacements, prerequisites=prerequisites)
         else:
             i_instr = self.communicator.send_stock_query('instructions_botcog', recipient=recipient,
-                                                         helptext_rep=rep, prerequisites=prerequisites)
+                                                         replacements=replacements, prerequisites=prerequisites)
 
         if execute:
             recipient.execute_queries(i_instr)
@@ -314,15 +315,16 @@ class MusicSheetMaker:
 
     def ask_notes(self, recipient, prerequisites=None, execute=True):
 
-        helptext_rep = ('\n'.join(['\n* ' + input_mode.get_long_desc(self.locale) for input_mode in InputMode]),
-                self.get_song_parser().get_icon_delimiter().replace('\s','<space>'), self.get_song_parser().get_pause().replace('\s','<space>'),
-                self.get_song_parser().get_quaver_delimiter().replace('\s','<space>'),
-                self.get_song_parser().get_quaver_delimiter().replace('\s','<space>').join(['A1', 'B1', 'C1']),
-                Resources.JIANPU_QUAVER_DELIMITER,
-                self.get_song_parser().get_repeat_indicator() + '2'
-                )
+        replacements = {'input_modes':'\n'.join(['\n* ' + input_mode.get_long_desc(self.locale) for input_mode in InputMode]),
+                        'icon_delimiter': self.get_song_parser().get_icon_delimiter().replace('\s','<space>'),
+                        'pause': self.get_song_parser().get_pause().replace('\s','<space>'),
+                        'quaver_delimiter': self.get_song_parser().get_quaver_delimiter().replace('\s','<space>'),
+                        'quaver_example': self.get_song_parser().get_quaver_delimiter().replace('\s','<space>').join(['A1', 'B1', 'C1']),
+                        'jianpu_quaver_delimiter': Resources.JIANPU_QUAVER_DELIMITER,
+                        'repeat_indicator': self.get_song_parser().get_repeat_indicator() + '2'
+                        }
         
-        q_notes = self.communicator.send_stock_query('notes', recipient=recipient, helptext_rep=helptext_rep, prerequisites=prerequisites)
+        q_notes = self.communicator.send_stock_query('notes', recipient=recipient, replacements=replacements, prerequisites=prerequisites)
 
         if execute:
             recipient.execute_queries(q_notes)
@@ -334,7 +336,7 @@ class MusicSheetMaker:
     def ask_file(self, recipient, prerequisites=None, execute=True):
 
         q_file = self.communicator.send_stock_query('file', recipient=recipient,
-                                                    question_rep=(os.path.relpath(os.path.normpath(self.song_dir_in)),),
+                                                    replacements={'songs_in': os.path.relpath(os.path.normpath(self.song_dir_in))},
                                                     prerequisites=prerequisites,
                                                     limits=(os.path.normpath(self.song_dir_in)))
 
@@ -369,13 +371,14 @@ class MusicSheetMaker:
         If notes are detected, return the notes as a list of strings splitted by the OS line separator
         """
 
-        helptext_rep = ('\n'.join(['\n* ' + input_mode.get_long_desc(self.locale) for input_mode in InputMode]),
-                self.get_song_parser().get_icon_delimiter().replace('\s','<space>'), self.get_song_parser().get_pause().replace('\s','<space>'),
-                self.get_song_parser().get_quaver_delimiter().replace('\s','<space>'),
-                self.get_song_parser().get_quaver_delimiter().replace('\s','<space>').join(['A1', 'B1', 'C1']),
-                Resources.JIANPU_QUAVER_DELIMITER,
-                self.get_song_parser().get_repeat_indicator() + '2'
-                )
+        replacements = {'input_modes':'\n'.join(['\n* ' + input_mode.get_long_desc(self.locale) for input_mode in InputMode]),
+                        'icon_delimiter': self.get_song_parser().get_icon_delimiter().replace('\s','<space>'),
+                        'pause': self.get_song_parser().get_pause().replace('\s','<space>'),
+                        'quaver_delimiter': self.get_song_parser().get_quaver_delimiter().replace('\s','<space>'),
+                        'quaver_example': self.get_song_parser().get_quaver_delimiter().replace('\s','<space>').join(['A1', 'B1', 'C1']),
+                        'jianpu_quaver_delimiter': Resources.JIANPU_QUAVER_DELIMITER,
+                        'repeat_indicator': self.get_song_parser().get_repeat_indicator() + '2'
+                        }
 
         if not self.is_commandline(recipient):
 
@@ -383,8 +386,8 @@ class MusicSheetMaker:
 
         else:
 
-            q_notes = self.communicator.send_stock_query('notes_file', question_rep=(os.path.relpath(os.path.normpath(self.song_dir_in)),),
-                                                         recipient=recipient, helptext_rep=helptext_rep, prerequisites=prerequisites)
+            replacements.update({"songs_in": os.path.relpath(os.path.normpath(self.song_dir_in))})
+            q_notes = self.communicator.send_stock_query('notes_file', recipient=recipient, replacements=replacements, prerequisites=prerequisites)
 
             if not execute:
                 return q_notes, None
@@ -412,7 +415,7 @@ class MusicSheetMaker:
 
                 if isfile and self.is_commandline(recipient):
                     notes = self.read_file(file_path)
-                    print(Lang.get_string("open_file", self.locale).format(os.path.abspath(file_path)))
+                    print(Lang.get_string("open_file", self.locale).format(file_path=os.path.abspath(file_path)))
                 else:
                     notes = result.split(os.linesep)  # Returns a list of strings in any case
 
@@ -466,7 +469,7 @@ class MusicSheetMaker:
 
         elif len(possible_modes) == 1:
             q_mode = self.communicator.send_stock_query('one_input_mode', recipient=recipient,
-                                                        question_rep=(possible_modes[0].get_short_desc(self.locale),),
+                                                        replacements={'input_mode': possible_modes[0].get_short_desc(self.locale)},
                                                         prerequisites=prerequisites)
 
         else:
@@ -515,12 +518,12 @@ class MusicSheetMaker:
         elif len(possible_keys) == 1:
             # Sends information that there is only 1 possible key
             q_key = self.communicator.send_stock_query('one_possible_key', recipient=recipient,
-                                                       question_rep=(str(possible_keys[0]),),
+                                                       replacements={'song_key': str(possible_keys[0])},
                                                        prerequisites=prerequisites)
         else:
             # Asks to choose a key within a list
             q_key = self.communicator.send_stock_query('possible_keys', recipient=recipient,
-                                                       foreword_rep=(', '.join(possible_keys),), limits=possible_keys,
+                                                       replacements={'song_key': ', '.join(possible_keys)}, limits=possible_keys,
                                                        prerequisites=prerequisites)
 
         if execute:
@@ -754,25 +757,29 @@ class MusicSheetMaker:
 
                 if numfiles == 1:
 
-                    question_rep = (render_mode.get_short_desc(self.locale), str(os.path.relpath(file_paths[0])))
+                    replacements = {'render_mode': render_mode.get_short_desc(self.locale),
+                                    'song_file': str(os.path.relpath(file_paths[0]))
+                                    }
 
                     i_song_files = self.communicator.send_stock_query('one_song_file', recipient=recipient,
-                                                                      question_rep=question_rep,
+                                                                      replacements=replacements,
                                                                       prerequisites=prerequisites)
 
                 elif numfiles > 1 and i == 0:
 
-                    question_rep = (render_mode.get_short_desc(self.locale), str(os.path.relpath(self.song_dir_out)))
-                    afterword_rep = (
-                    str(numfiles), str(os.path.split(file_paths[0])[1]), str(os.path.split(file_paths[-1])[1]))
+                    replacements = {'render_mode': render_mode.get_short_desc(self.locale),
+                                    'songs_in': str(os.path.relpath(self.song_dir_out)),
+                                    'num_files': str(numfiles),
+                                    'first_file': str(os.path.split(file_paths[0])[1]),
+                                    'last_file': str(os.path.split(file_paths[-1])[1])
+                                    }
                     i_song_files = self.communicator.send_stock_query('several_song_files', recipient=recipient,
-                                                                      question_rep=question_rep,
-                                                                      afterword_rep=afterword_rep,
+                                                                      replacements=replacements,
                                                                       prerequisites=prerequisites)
             else:
-                question_rep = (render_mode.get_short_desc(self.locale),)
+                replacements = {'render_mode': render_mode.get_short_desc(self.locale)}
                 i_song_files = self.communicator.send_stock_query('no_song_file', recipient=recipient,
-                                                                  question_rep=question_rep,
+                                                                  replacements=replacements,
                                                                   prerequisites=prerequisites)
 
         if execute:
