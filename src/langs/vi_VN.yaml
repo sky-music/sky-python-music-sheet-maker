@@ -22,8 +22,8 @@ input_mode:
         short_desc: 日本語イタリアドレミ
         long_desc: "Japanese do re mi: ド、ド#／レb、レ、レ#／ミb、ミ、ファ、ファ#／ソb、ソ、ソ#／ラb、ラ、ラ#／シb、シ"
     skyjson:
-        short_desc: 'SkyMusic JSON'
-        long_desc: "Dictionary with time in ms and key number 0-14 [{'time': xxxx, 'key': KeyN}]"
+        short_desc: 'Sky-Music recording (JSON text)'
+        long_desc: "Dictionary with time in ms and key number 0-14 used by https://sky-music.herokuapp.com"
 render_mode:
     html:
         short_desc: bảng nhạc trực quan HTML 
@@ -34,7 +34,7 @@ render_mode:
     midi:
         short_desc: tệp nhạc MIDI
     skyjson:
-        short_desc: Sky JSON text file
+        short_desc: Sky-Music recording (JSON text file)
     skyascii:
         short_desc: bài hát dưới dạng hệ kí tự Sky 
     englishascii:

@@ -21,8 +21,8 @@ input_mode:
         short_desc: 日本語イタリアドレミ
         long_desc: "Japanese do re mi: ド、ド#／レb、レ、レ#／ミb、ミ、ファ、ファ#／ソb、ソ、ソ#／ラb、ラ、ラ#／シb、シ"
     skyjson:
-        short_desc: 'SkyMusic JSON'
-        long_desc: "Dictionary with time in ms and key number 0-14 [{'time': xxxx, 'key': KeyN}]"
+        short_desc: 'Sky-Music recording (JSON text)'
+        long_desc: "Dictionary with time in ms and key number 0-14 used by https://sky-music.herokuapp.com"
 render_mode:
     html:
         short_desc: HTML visual sheet
@@ -33,7 +33,7 @@ render_mode:
     midi:
         short_desc: Midi song file
     skyjson:
-        short_desc: Sky JSON text file       
+        short_desc: Sky-Music recording (JSON text file)
     skyascii:
         short_desc: song in Sky notation
     englishascii:
@@ -60,7 +60,7 @@ stock_queries:
       - Separate chords with "{icon_delimiter}".
       - Use "{pause}" for a silence (rest), except for Jianpu where '0' is the official pause character.
       - Use "{quaver_delimiter}" to link notes within an icon, for triplets, quavers... (e.g. {quaver_example}). With Jianpu, use "{jianpu_quaver_delimiter}" instead of "-" to avoid confusion with the octave.
-      - Add "{repeat_indictaor}" after a chord to indicate repetition.
+      - Add "{repeat_indicator}" after a chord to indicate repetition.
       - Sharps "#" and flats "b" (semitones) are supported for Western and Jianpu notations.
       
       Type '?' to get help for a particular question
@@ -76,7 +76,7 @@ stock_queries:
       - Separate chords with "{icon_delimiter}".
       - Use "{pause}" for a silence (rest), except for Jianpu where '0' is the official pause character.
       - Use "{quaver_delimiter}" to link notes within an icon, for triplets, quavers... (e.g. {quaver_example}). With Jianpu, use "{jianpu_quaver_delimiter}" instead of "-" to avoid confusion with the octave.
-      - Add "{repeat_indictaor}" after a chord to indicate repetition.
+      - Add "{repeat_indicator}" after a chord to indicate repetition.
       - Sharps "#" and flats "b" (semitones) are supported for Western and Jianpu notations.
     afterword:
     input_tip: click OK to acknowledge
@@ -97,7 +97,7 @@ stock_queries:
       - Separate chords with "{icon_delimiter}".
       - Use "{pause}" for a silence (rest), except for Jianpu where '0' is the official pause character.
       - Use "{quaver_delimiter}" to link notes within an icon, for triplets, quavers... (e.g. {quaver_example}). With Jianpu, use "{jianpu_quaver_delimiter}" instead of "-" to avoid confusion with the octave.
-      - Add "{repeat_indictaor}" after a chord to indicate repetition.
+      - Add "{repeat_indicator}" after a chord to indicate repetition.
       - Sharps "#" and flats "b" (semitones) are supported for Western and Jianpu notations.
   render_modes:
     foreword:
@@ -154,7 +154,7 @@ stock_queries:
       - Separate chords with "{icon_delimiter}".
       - Use "{pause}" for a silence (rest), except for Jianpu where '0' is the official pause character.
       - Use "{quaver_delimiter}" to link notes within an icon, for triplets, quavers... (e.g. {quaver_example}). With Jianpu, use "{jianpu_quaver_delimiter}" instead of "-" to avoid confusion with the octave.
-      - Add "{repeat_indictaor}" after a chord to indicate repetition.
+      - Add "{repeat_indicator}" after a chord to indicate repetition.
       - Sharps "#" and flats "b" (semitones) are supported for Western and Jianpu notations.
   file:
     foreword:
@@ -175,12 +175,12 @@ stock_queries:
       - Separate chords with "{icon_delimiter}".
       - Use "{pause}" for a silence (rest), except for Jianpu where '0' is the official pause character.
       - Use "{quaver_delimiter}" to link notes within an icon, for triplets, quavers... (e.g. {quaver_example}). With Jianpu, use "{jianpu_quaver_delimiter}" instead of "-" to avoid confusion with the octave.
-      - Add "{repeat_indictaor}" after a chord to indicate repetition.
+      - Add "{repeat_indicator}" after a chord to indicate repetition.
       - Sharps "#" and flats "b" (semitones) are supported for Western and Jianpu notations.
   one_input_mode:
     foreword:
     question: |
-        We detected that you use the following notation: '{songs_in}'.
+        We detected that you use the following notation: '{song_key}'.
     afterword:
     input_tip: click OK to acknowledge
     help_text:

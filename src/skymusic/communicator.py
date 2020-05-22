@@ -122,7 +122,6 @@ class Communicator:
         if replacements is not None:
             for k in method_args:
                 try:
-                    #print(method_arg)
                     method_args[k] = method_args[k].format_map(replacements)
                 except (KeyError, AttributeError):
                     pass            
