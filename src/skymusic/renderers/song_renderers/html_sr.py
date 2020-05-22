@@ -90,6 +90,8 @@ class HtmlSongRenderer(song_renderer.SongRenderer):
         html_buffer.write(song_render)
 
         self.write_footer(html_buffer)
+        
+        html_buffer.seek(0)
 
         return [html_buffer]
     

@@ -21,7 +21,10 @@ class MidiSongRenderer(song_renderer.SongRenderer):
             # An instrument will sound very strange if played outside its natural pitch range
             midi_instruments = {'piano': 0, 'guitar': 24, 'flute': 73, 'pan': 75}
             self.midi_note_duration = 0.3  # note duration is seconds for 120 bpm
-            self.midi_bpm = song_bpm  # Beats per minute
+            if isinstance(song_bpm, (int, float)):
+                self.midi_bpm = song_bpm  # Beats per minute
+            else:
+                self.midi_bpm = 120
             self.midi_instrument = midi_instruments['piano']
             self.midi_key = None
 
@@ -89,5 +92,7 @@ class MidiSongRenderer(song_renderer.SongRenderer):
         
         midi_buffer = io.BytesIO()
         mid.save(file=midi_buffer)
+        
+        midi_buffer.seek(0)
 
         return [midi_buffer]

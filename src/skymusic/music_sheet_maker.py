@@ -67,6 +67,9 @@ class SongBundle:
 
         if any([not isinstance(buffer, (io.StringIO, io.BytesIO)) for buffer in buffers]):
             raise MusicSheetMakerError('An invalid buffer type was passed to SongBundle')
+
+        #for buffer in buffers:
+        #    buffer.seek(0)
         
         self.renders.update({render_mode: buffers})
 
@@ -244,6 +247,8 @@ class MusicSheetMaker:
         # 4. Ask for input mode (or display the one found)
         (q_mode, input_mode) = self.ask_input_mode(recipient=recipient, notes=notes, prerequisites=[q_notes])
         #(q_mode, input_mode) = self.ask_input_mode(recipient=recipient, prerequisites=[q_notes]) # EXPERIMENTAL
+        
+        # 4.b Set input mode
         self.set_parser_input_mode(recipient, input_mode=input_mode)
         #self.set_parser_input_mode(recipient) # EXPERIMENTAL
 
@@ -254,7 +259,7 @@ class MusicSheetMaker:
         # 6. Asks for octave shift
         (q_shift, octave_shift) = self.ask_octave_shift(recipient=recipient)
 
-        # 7. Parse song
+        # 7. Parses song
         self.parse_song(recipient, notes=notes, song_key=song_key, octave_shift=octave_shift)
         #self.parse_song(recipient) # EXPERIMENTAL
 
@@ -263,10 +268,12 @@ class MusicSheetMaker:
 
         # 9. Asks for song metadata
         (qs_meta, (title, artist, transcript)) = self.ask_song_metadata(recipient=recipient)
+        
+        # 9.b sets song metadata
         self.set_song_metadata(recipient=recipient, meta=(title, artist, transcript), song_key=song_key)
         #self.set_song_metadata(recipient=recipient) # EXPERIMENTAL
 
-        # 10 Ask for render modes
+        # 10 Asks for render modes
         (q_render, render_modes) = self.ask_render_modes(recipient=recipient)
 
         # 11. Asks for aspect ratio
@@ -660,7 +667,7 @@ class MusicSheetMaker:
 
         self.get_song_parser().set_input_mode(input_mode)
 
-    def set_song_metadata(self, recipient, meta=None, song_key=None, notes=None):
+    def set_song_metadata(self, recipient, meta=None, song_key=None):
 
         if meta is None:
             (title, artist, transcript) = self.retrieve_song_metadata(recipient)
@@ -698,7 +705,13 @@ class MusicSheetMaker:
                 render_modes = self.botcog_render_modes
             else:
                 render_modes = self.render_modes_enabled
-            
+        
+        if not isinstance(song_bpm, (float, int)):
+            song_bpm = 120
+
+        if not isinstance(aspect_ratio, (float, int)):
+            aspect_ratio = 16/9.0
+        
         if not self.is_commandline(recipient):
             self.css_mode = CSSMode.EMBED
                 

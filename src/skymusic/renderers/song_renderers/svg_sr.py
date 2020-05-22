@@ -245,8 +245,10 @@ class SvgSongRenderer(song_renderer.SongRenderer):
         svg_buffer.write(song_render)
         svg_buffer.write('\n</svg>')  # Close file SVG
 
+        svg_buffer.seek(0)
         buffer_list.append(svg_buffer)
 
+        
         # Open new file
         if end_row < song.get_num_lines() or end_col < ncols:
             buffer_list = self.write_buffers(song, css_mode, rel_css_path, end_row, end_col, buffer_list)
