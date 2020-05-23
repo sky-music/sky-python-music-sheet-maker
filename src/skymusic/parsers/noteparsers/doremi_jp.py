@@ -5,8 +5,9 @@ from . import doremi
 
 class DoremiJP(doremi.Doremi):
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **kwargs):
+        
+        super().__init__(**kwargs)
 
         self.CHROMATIC_SCALE_DICT = {'ド': 0, 'ド#': 1, 'レb': 1, 'レ': 2, 'レ#': 3, 'ミb': 3, 'ミ': 4, 'ファ': 5,
                                      'ファ#': 6, 'ソb': 6, 'ソ': 7, 'ソ#': 8, 'ラb': 8, 'ラ': 9, 'ラ#': 10, 'シb': 10, 'シ': 11,

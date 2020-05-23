@@ -4,9 +4,9 @@ from . import noteparser
 
 class SkyABC15(noteparser.NoteParser):
 
-    def __init__(self):
+    def __init__(self, **kwargs):
 
-        super().__init__()
+        super().__init__(**kwargs)
 
         self.position_map = {
             '.': (-1, -1),

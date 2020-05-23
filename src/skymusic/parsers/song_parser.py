@@ -149,7 +149,7 @@ class SongParser:
         if input_mode is None:
             input_mode = self.input_mode
 
-        note_parser = input_mode.get_note_parser()
+        note_parser = input_mode.get_note_parser(locale=self.locale)
 
         return note_parser
 

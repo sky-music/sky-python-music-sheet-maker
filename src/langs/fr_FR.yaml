@@ -1,28 +1,28 @@
 input_mode:
     skykeyboard:
-        short_desc: Sky keyboard
-        long_desc: "Tapez sur votre clavier comme vous le feriez dans Sky:\n   QWERT\n   ASDFG\n   ZXCVB"
+        short_desc: Clavier
+        long_desc: "Tapez sur votre clavier comme vous le feriez dans Sky:\n   AZERT\n   QSDFG\n   WXCVB"
     sky:
         short_desc: 'Sky ABC1-5'
         long_desc: "Notation ligne/colonne:\n   A1 A2 A3 A4 A5\n   B1 B2 B3 B4 B5\n   C1 C2 C3 C4 C5"
     english:
-        short_desc: English CDEFGAB
+        short_desc: Anglaise CDEFGAB
         long_desc: "Notation anglaise (note C D E F G A B + altération b/# + numéro d'octave, par exemple Cb4 D#4 E5 ...)"
     doremi:
-        short_desc: French doremi
+        short_desc: Traditionnelle
         long_desc: "Notation traditionelle (nom de la note do re mi fa sol la si + altération b/# + numéro d'octave, par ex dob1 re#1 mi2 ...)"
     jianpu:
         short_desc: 'Jianpu 1234567+-'
         long_desc: "Jianpu (notes 1 2 3 4 5 6 7, suivies de l'altération b/# et d'un ou plusieurs + or - pour changer d'octave)"
     englishchords:
-        short_desc: Chords CDEFGABmaj
+        short_desc: Accords CDEFGABmaj
         long_desc: "Nom d'accord anglais (par exemple C, F, Dm, Bdim, A+, Csus2, Dsus4, C6, Cmaj7, Dm11)"
     doremijp:
         short_desc: 日本語イタリアドレミ
         long_desc: "do re mi en japonais: ド、ド#／レb、レ、レ#／ミb、ミ、ファ、ファ#／ソb、ソ、ソ#／ラb、ラ、ラ#／シb、シ"
     skyjson:
-        short_desc: 'Sky-Music recording (JSON text)'
-        long_desc: "Dictionary with time in ms and key number 0-14 used by https://sky-music.herokuapp.com"
+        short_desc: 'Enregistrement Sky-Music  (JSON text)'
+        long_desc: "Dictionaire avec le temps en ms et la touche 0-14 comme sur https://sky-music.herokuapp.com"
 render_mode:
     html:
         short_desc: partition graphique en HTML
@@ -52,12 +52,12 @@ open_file: |
     (Fichier de notes ouvert depuis {file_path})
 stock_queries:
   instructions_stdout:
-    foreword: "===== PORTEES VISUELLES POUR SKY:CHILDREN OF THE LIGHT ===\n"
+    foreword: "===== PORTEES VISUELLES POUR SKY: CHILDREN OF THE LIGHT ===\n"
     question: |
       Formats de notes acceptés :{input_modes}
       
       - Les notes composant un accord doivent être attachées (e.g. A1B1C1).
-      - Separate chords with {icon_delimiter}
+      - Separez les accords avec {icon_delimiter}
       - Tapez "{pause}" pour marquer une pause (silence), sauf en notation Jianpu où '0' (zéro) est utilisé conventionellement
       - Tapez "{quaver_delimiter}" pour relier les notes entre elles, pour les triplets... (e.g. {quaver_example}). En Jianpu, utilisez "{jianpu_quaver_delimiter}" au lieu de '-' pour éviter la confusion avec l'octave.
       - Tapez "{repeat_indicator}" après un groupe de notes pour indiquer la répétition.
@@ -260,7 +260,7 @@ stock_queries:
       'Veuillez vérifier les points suivants:
       
       - Si vous avez spécifié l'octave, il doit être entre 1 et 3. Sinon, recommencez en utilisant le décalage d'octave.
-      - Votre chanson ne contien pas d'erreur de frappe. Veuillez consulter ce site web pour plus d'infos: 
+      - Que votre chanson ne contient pas d'erreur de frappe. Veuillez consulter ce site web pour plus d'infos: 
       
       https://sky-music.github.io/make-your-own-sheet.html'
     input_tip: cliquez sur OK pour passer

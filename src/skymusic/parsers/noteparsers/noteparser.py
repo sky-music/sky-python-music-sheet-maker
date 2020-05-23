@@ -8,8 +8,9 @@ class NoteParser:
     coordinate on Sky's 3*5 piano.
     """
 
-    def __init__(self):
+    def __init__(self, locale='en_US'):
 
+        self.locale = locale
         self.columns = 5
         self.rows = 3
 
