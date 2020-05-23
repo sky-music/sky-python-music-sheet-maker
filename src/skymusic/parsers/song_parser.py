@@ -2,12 +2,12 @@
 import os
 import re
 import json
-from operator import truediv, itemgetter
 
 from src.skymusic import instruments, Lang
 from src.skymusic.modes import InputMode
 from src.skymusic.song import Song
 import src.skymusic.parsers.noteparsers
+from src.skymusic.parsers import music_theory
 from src.skymusic.resources import Resources
 
 
@@ -40,6 +40,7 @@ class SongParser:
         self.repeat_indicator = Resources.REPEAT_INDICATOR
         self.skyjson_chord_delay = Resources.SKYJSON_CHORD_DELAY #Delay in ms below which 2 notes are considered a chord
         self.maker = maker
+        self.music_theory = music_theory.MusicTheory(self)
         try:
             self.locale = self.maker.get_locale()
         except AttributeError:  # Should never happen
@@ -120,7 +121,8 @@ class SongParser:
         else:
             if isinstance(song_lines, str):  # Break newlines and make sure the result is a List
                 song_lines = song_lines.split(os.linesep)
-            return self.detect_input_mode(song_lines)
+                
+            return self.music_theory.detect_input_mode(song_lines)
 
     def set_input_mode(self, input_mode):
 
@@ -134,6 +136,10 @@ class SongParser:
     def get_input_mode(self):
 
         return self.input_mode
+
+    def find_key(self, song_lines=None):
+        
+        return self.music_theory.find_key(song_lines)
 
     def get_note_parser(self, input_mode=None):
 
@@ -217,9 +223,15 @@ class SongParser:
         if self.note_parser is None:
             self.set_note_parser()
 
+        try:
+            self.note_parser.decode_chord
+            is_chord_parser = True
+        except AttributeError:
+            is_chord_parser = False
+
         for chord_idx, chord in enumerate(chords):
 
-            if isinstance(self.note_parser, src.skymusic.parsers.noteparsers.englishchords.EnglishChords):
+            if is_chord_parser:
                 chord = self.note_parser.decode_chord(chord)
 
             repeat, chord = self.split_chord(chord)
@@ -270,20 +282,46 @@ class SongParser:
 
     def analyze_tempo(self, times):
         
+        def find_barycenter(t, y, i0, di):
+           
+            while len(t) < 2*di+1:
+                di = di - 1
+            if di < 0:
+                return None
+            
+            dt = t[1] - t[0]
+            tmin = t[0]
+            nmax = 10
+            
+            n = 0
+            iG = i0
+            iG_old = iG - 10
+            while (iG-iG_old) > 1 and n < nmax:            
+                i1 = max([0,iG-di])
+                i2 = min([len(t),iG+di])
+                y_band = y[i1:i2+1]
+                t_band = t[i1:i2+1]
+                iG_old = iG
+                tG = sum([y*t for (t,y) in zip(t_band, y_band)])/sum(y_band)
+                iG = round((tG - tmin)/dt)
+                n += 1                
+            y[i1:i2+1] = [0]*len(y[i1:i2+1])          
+            return tG 
+        
         diffs = [times[i] - times[i-1] for i in range(1, len(times))]
         
-        hbin = self.skyjson_chord_delay
+        div_resol = 3
+        hbin = self.skyjson_chord_delay / div_resol
         num_slots = 2 + int(max(diffs) / hbin)
         
         y = [0]*num_slots
         t = [i*hbin for i in range(num_slots)]
         
-        for diff in diffs:   #Builds histogram          
-            i = 1 + int(diff/hbin)
-            y[i] += 1
+        for diff in diffs: #histogram starting from t=0
+            y[1+int(diff/hbin)] += 1
             
         num_peaks = 3
-        floor = 2  #TODO: change this criterion: percentage of number of notes? % of first peak ?        
+        floor = max(y)/10
          
         tempos = []
         
@@ -292,14 +330,8 @@ class SongParser:
             if y0 < floor:
                 break
             i0 = y.index(y0)
-            i1 = max([0,i0-2])
-            i2 = min([len(y),i0+2])
-            y_band = y[i1:i2]
-            t_band = t[i1:i2]
-            tG = sum([y*t for (t,y) in zip(t_band, y_band)])/sum(y_band)
-            
+            tG = find_barycenter(t, y, i0, div_resol)       
             tempos.append(tG)
-            y[i1:i2] = [0]*len(y[i1:i2])
         
         return tempos
 
@@ -318,12 +350,8 @@ class SongParser:
             main_tempo = min(tempos)
         else:
             main_tempo = None
-                
+                        
         icons = [keys[0]]
-        #icons_times = [times[0]]
-        
-        #print('%DEBUG')
-        #print(tempos)
         
         for i in range(1,len(times)):
             if times[i] - times[i-1] < self.skyjson_chord_delay:
@@ -331,17 +359,10 @@ class SongParser:
             else:
                 n_pauses = max([0, round((times[i] - times[i-1])/main_tempo - 1)])
                 if n_pauses > 0:
-                    repeat = n_pauses - 1
-                    icons += [self.pause + (self.repeat_indicator+str(repeat) if repeat > 1 else '')]
-
-                        
+                    icons += [self.pause + (self.repeat_indicator + str(n_pauses) if n_pauses > 1 else '')]
                 
-                icons += [keys[i]]           
-                #icons_times.append(times[i])
-   
-        #print(icons_times)
-        #print(icons)        
-
+                icons += [keys[i]]
+                
         return icons
 
 
@@ -425,175 +446,3 @@ class SongParser:
             song.add_line(instrument_line)
 
         return song
-
-
-    def detect_input_mode(self, song_lines):
-        """
-        Attempts to detect input musical notation for the textual song in 'song_lines'.
-        Returns a list with the probable input modes (eliminating the least likely)
-        """
-
-        try:
-            json_dict = json.loads(song_lines[0])
-            json_dict[0]['songNotes']
-            return [InputMode.SKYJSON]
-        except (json.JSONDecodeError, NameError, TypeError):
-            pass        
-        
-        if isinstance(song_lines, str):  # Break newlines and make sure the result is a List
-            song_lines = song_lines.split(os.linesep)
-
-        possible_modes = [mode for mode in InputMode if mode is not InputMode.SKYJSON]
-        possible_parsers = [self.get_note_parser(mode) for mode in possible_modes]
-        possible_regex = [parser.single_note_name_regex for parser in possible_parsers]
-
-        good_notes = [0] * len(possible_modes)
-        num_notes = [0] * len(possible_modes)
-        defg_notes = 0
-        qwrt_notes = 0
-        octave_span = 0
-
-        for line in song_lines:
-            line = self.sanitize_line(line)
-            if len(line) > 0:
-                if line[0] != self.comment_delimiter:
-                    icons = line.split(self.icon_delimiter)
-                    for icon in icons:
-                        chords = self.split_icon(icon)
-                        for chord in chords:
-                            for idx, possible_mode in enumerate(possible_modes):
-
-                                if possible_mode == InputMode.ENGLISHCHORDS:
-                                    notes = [chord]  # Because abbreviated chord names are not composed of note names
-                                    good_notes[idx] += sum(
-                                        [int(note in possible_parsers[idx].english_chords.keys()) for note in notes])
-                                else:
-                                    repeat, notes = self.split_chord(chord, possible_parsers[idx])
-                                    good_notes[idx] += sum(
-                                        [int(possible_regex[idx].match(note) is not None) for note in notes if
-                                         note != self.pause])
-                                # TODO: use self.map_note_to_position?
-
-                                num_notes[idx] += sum([1 for note in notes if note != self.pause])
-
-                                if possible_mode == InputMode.ENGLISH:
-                                    defg_notes += sum([int(re.search('[D-Gd-g]', note) is not None) for note in notes])
-                                    qwrt_notes += sum(
-                                        [int(re.search('[QWRTSZXVqwrtszxv]', note) is not None) for note in notes])
-                                    octaves = [re.search('\d', note) for note in notes]
-
-                                    octaves = sorted([int(octave.group(0)) for octave in octaves if octave is not None])
-                                    if len(octaves) > 0:
-                                        octave_span = max(octave_span, octaves[-1] - octaves[0] + 1)
-
-        num_notes = [1 if x == 0 else x for x in num_notes]  # Removes zeros to avoid division by zero
-
-        scores = list(map(truediv, good_notes, num_notes))
-        defg_notes /= num_notes[possible_modes.index(InputMode.ENGLISH)]
-        qwrt_notes /= num_notes[possible_modes.index(InputMode.SKYKEYBOARD)]
-
-        if ((defg_notes == 0) or (defg_notes < 0.01 and octave_span > 2)) and (
-                num_notes[possible_modes.index(InputMode.ENGLISH)] > 10):
-            scores[possible_modes.index(InputMode.ENGLISH)] *= 0.5
-
-        if ((qwrt_notes == 0) or (qwrt_notes < 0.01 and octave_span <= 1)) and (
-                num_notes[possible_modes.index(InputMode.SKYKEYBOARD)] > 5):
-            scores[possible_modes.index(InputMode.SKYKEYBOARD)] *= 0.5
-
-        return self.most_likely(scores, possible_modes, 0.9)
-
-
-    def find_key(self, song_lines):
-        """
-        Attempts to find the musical key for the textual song in 'input_lines'.
-        Requires knoledge of the musical notation (input_mode) first.
-        """
-        if isinstance(song_lines, str):  # Break newlines and make sure the result is a List
-            song_lines = song_lines.split(os.linesep)
-
-        if self.note_parser is None:
-            self.set_note_parser()
-
-        try:
-            possible_keys = [k for k in self.note_parser.CHROMATIC_SCALE_DICT.keys()]
-            if len(possible_keys) == 0:
-                return None 
-            is_note_regex = self.note_parser.note_name_regex
-            not_note_regex = self.note_parser.not_note_name_regex
-        except AttributeError:
-            # Parsers not having a chromatic scale keys should return None, eg Sky and Skykeyboard
-            return None
-        
-        scores = [0] * len(possible_keys)
-        num_notes = [0] * len(possible_keys)
-        for line in song_lines:
-            if len(line) > 0:
-                if line[0] != self.comment_delimiter:
-                    notes = is_note_regex.sub(' \\1',
-                                              not_note_regex.sub('', line)).split()  # Clean-up, adds space and split
-                    for i, k in enumerate(possible_keys):
-                        for note in notes:
-                            num_notes[i] += 1
-                            try:
-                                # TODO: Support for Jianpu which uses a different octave indexing system
-                                self.note_parser.calculate_coordinate_for_note(note, k, note_shift=0,
-                                                                               is_finding_key=True)
-                            except KeyError:
-                                scores[i] += 1
-                            except SyntaxError:  # Wrongly formatted notes are ignored
-                                num_notes[i] -= 1
-
-        num_notes = [1 if x == 0 else x for x in num_notes]
-        # Removes zeros to avoid division by zero
-        scores = list(map(truediv, scores, num_notes))
-        scores = [(1 - score) for score in scores]
-
-        return self.most_likely(scores, possible_keys, 0.9, self.note_parser.CHROMATIC_SCALE_DICT)
-
-
-    def most_likely(self, scores, items, threshold=0.9, duplicates_dict=None):
-        """
-        Returns the items with scores above threshold, removing duplicates defined in the dict       
-        
-        """
-        if len(scores) == 0:
-            return None
-        if len(scores) == 1:
-            return [items[0]]
-
-        sorted_idx, sorted_scores = zip(
-            *sorted([(i, e) for i, e in enumerate(scores)], key=itemgetter(1), reverse=True))
-
-        sorted_items = [items[i] for i in sorted_idx]
-
-        if sorted_scores[0] == 1 and sorted_scores[1] < 1:
-            return [sorted_items[0]]
-
-        if sorted_scores[0] == 1 and sorted_scores[1] == 1:
-            if duplicates_dict is not None:
-                try:
-                    if sorted_scores[2] < 1 and duplicates_dict[sorted_items[0]] == duplicates_dict[sorted_items[1]]:
-                        return [sorted_items[0]]
-                except (IndexError, KeyError):
-                    pass
-            return [k for i, k in enumerate(sorted_items) if sorted_scores[i] == 1]
-
-        if sorted_scores[0] < threshold:
-            sorted_items = [k for i, k in enumerate(sorted_items) if sorted_scores[i] > threshold / 2]
-        else:
-            sorted_scores = list(map(truediv, sorted_scores, [max(sorted_scores)] * len(sorted_scores)))
-            over_items = [k for i, k in enumerate(sorted_items) if sorted_scores[i] > threshold]
-            if len(over_items) != 0:
-                sorted_items = over_items
-
-        if duplicates_dict is not None:
-            # Remove synonyms
-            for i in range(1, len(sorted_items), 2):
-                if duplicates_dict[sorted_items[i]] == duplicates_dict[sorted_items[i - 1]]:
-                    sorted_items[i] = None
-            sorted_items = [item for item in sorted_items if item is not None]
-
-        if len(sorted_items) == 0:
-            return items
-        else:
-            return sorted_items

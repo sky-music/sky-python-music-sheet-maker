@@ -9,7 +9,10 @@ class SkyjsonSongRenderer(song_renderer.SongRenderer):
     def __init__(self, locale=None, song_bpm=120):
         
         super().__init__(locale)
-        self.song_bpm = song_bpm
+        if isinstance(song_bpm, (int, float)):
+            self.song_bpm = song_bpm  # Beats per minute
+        else:
+            self.song_bpm = 120
 
     def write_buffers(self, song):
 
@@ -39,11 +42,10 @@ class SkyjsonSongRenderer(song_renderer.SongRenderer):
                                 json_dict['songNotes'] += instrument_renderer.render(instrument, time)
   
                         instrument_index += 1
-        
-        #print('%%DEBUG%%%')
-        #print(json_dict)
-        
-        json.dump([json_dict], json_buffer)
 
+        json_buffer.seek(0)
+                
+        json.dump([json_dict], json_buffer)
+        
         return [json_buffer]
 

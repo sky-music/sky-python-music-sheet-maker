@@ -42,6 +42,7 @@ class AsciiSongRenderer(song_renderer.SongRenderer):
             song_render += '\n' + line_render
 
         ascii_buffer.write(song_render)
+        ascii_buffer.seek(0)
 
         return [ascii_buffer]
 

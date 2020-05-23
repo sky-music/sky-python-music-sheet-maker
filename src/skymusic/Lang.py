@@ -4,7 +4,7 @@ import re
 import locale as localepy
 
 LANG = dict()
-locales = ['en_US', 'ja_JP', 'fr_FR', 'vi_VN']
+locales = ['en_US', 'fr_FR', 'vi_VN']
 substitutes = {'fr': 'fr_FR', 'en': 'en_US', 'vn': 'vi_VN'}
 loaded = dict((locale, False) for locale in locales)
 warn_count = 0
@@ -47,9 +47,19 @@ def guess_locale():
 
 def load(locale):
     global LANG, loaded
-    with open(os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "langs", "%s.yaml" % locale)), mode='r', encoding='utf-8', errors='ignore') as file:
+    
+    file_path = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "langs", "%s.yaml" % locale))
+    
+    if not os.path.isfile(file_path):
+        print(f"\n***WARNING: missing .yaml file for locale '{locale}'. Replacing with {locales[0]}\n")        
+        file_path = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "langs", "%s.yaml" % locales[0]))
+    
+    with open(file_path, mode='r', encoding='utf-8', errors='ignore') as file:
         LANG[locale] = yaml.safe_load(file)
+            
     loaded[locale] = True
+    
+    return locale
 
 
 def find_substitute(locale):
@@ -72,7 +82,7 @@ def find_substitute(locale):
 
 def get_string(key, locale=None, replacements=()):
     global locales, warn_count
-    if locale not in locales:
+    if not locale in locales:
         substitute = find_substitute(locale)
         if not loaded[substitute]:
             print(f"\n***WARNING: missing locale '{locale}' for key '{key}'. Replacing with {substitute}\n")
@@ -85,7 +95,7 @@ def get_string(key, locale=None, replacements=()):
     obj = LANG[locale]
 
     for i in key_list:
-        if i not in obj:
+        if not (i in obj):
             if warn_count < 10:
                 print(f"\n***WARNING: could not find lang key '{i}' for locale '{locale}'\n")
                 warn_count += 1

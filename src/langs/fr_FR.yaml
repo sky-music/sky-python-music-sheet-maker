@@ -21,8 +21,8 @@ input_mode:
         short_desc: 日本語イタリアドレミ
         long_desc: "do re mi en japonais: ド、ド#／レb、レ、レ#／ミb、ミ、ファ、ファ#／ソb、ソ、ソ#／ラb、ラ、ラ#／シb、シ"
     skyjson:
-        short_desc: 'SkyMusic JSON'
-        long_desc: "Dictionary with timeline [{'time': xxxx, 'key': KeyN}]"
+        short_desc: 'Sky-Music recording (JSON text)'
+        long_desc: "Dictionary with time in ms and key number 0-14 used by https://sky-music.herokuapp.com"
 render_mode:
     html:
         short_desc: partition graphique en HTML
@@ -33,7 +33,7 @@ render_mode:
     midi:
         short_desc: Fichier son en MIDI
     skyjson:
-        short_desc: Fichier texte Sky JSON        
+        short_desc: Enregistrement Sky-Music (texte JSON)
     skyascii:
         short_desc: Transcription en notation Sky
     englishascii:
@@ -49,18 +49,18 @@ song_meta:
    musical_key: Clef musicale
    untitled: Sans titre
 open_file: |
-    (Fichier de notes ouvert depuis {0})
+    (Fichier de notes ouvert depuis {file_path})
 stock_queries:
   instructions_stdout:
     foreword: "===== PORTEES VISUELLES POUR SKY:CHILDREN OF THE LIGHT ===\n"
     question: |
-      Formats de notes acceptés :{0}
+      Formats de notes acceptés :{input_modes}
       
       - Les notes composant un accord doivent être attachées (e.g. A1B1C1).
-      - Separate chords with {1}
-      - Tapez "{2}" pour marquer une pause (silence), sauf en notation Jianpu où '0' (zéro) est utilisé conventionellement
-      - Tapez "{3}" pour relier les notes entre elles, pour les triplets... (e.g. {4}). En Jianpu, utilisez "{5}" au lieu de '-' pour éviter la confusion avec l'octave.
-      - Tapez "{5}" après un groupe de notes pour indiquer la répétition.
+      - Separate chords with {icon_delimiter}
+      - Tapez "{pause}" pour marquer une pause (silence), sauf en notation Jianpu où '0' (zéro) est utilisé conventionellement
+      - Tapez "{quaver_delimiter}" pour relier les notes entre elles, pour les triplets... (e.g. {quaver_example}). En Jianpu, utilisez "{jianpu_quaver_delimiter}" au lieu de '-' pour éviter la confusion avec l'octave.
+      - Tapez "{repeat_indicator}" après un groupe de notes pour indiquer la répétition.
       - Les dièses "#" et les bémoles "b" (demi-tons) sont possibles pour les notations autres que Sky ABC-15.
       
       Tapez '?' pour obtenir de l'aide après une question
@@ -70,13 +70,13 @@ stock_queries:
   instructions_website:
     foreword:
     question: |
-      Formats de notes acceptés :{0}
+      Formats de notes acceptés :{input_modes}
       
       - Les notes composant un accord doivent être attachées (e.g. A1B1C1).
-      - Separate chords with {1}
-      - Tapez "{2}" pour marquer une pause (silence), sauf en notation Jianpu où '0' (zéro) est utilisé conventionellement.
-      - Tapez "{3}" pour relier les notes entre elles, pour les triplets... (e.g. {4}). En Jianpu, utilisez "{5}" au lieu de '-' pour éviter la confusion avec l'octave.
-      - Tapez "{6}" après un groupe de notes pour indiquer la répétition.
+      - Separate chords with {icon_delimiter}
+      - Tapez "{pause}" pour marquer une pause (silence), sauf en notation Jianpu où '0' (zéro) est utilisé conventionellement
+      - Tapez "{quaver_delimiter}" pour relier les notes entre elles, pour les triplets... (e.g. {quaver_example}). En Jianpu, utilisez "{jianpu_quaver_delimiter}" au lieu de '-' pour éviter la confusion avec l'octave.
+      - Tapez "{repeat_indicator}" après un groupe de notes pour indiquer la répétition.
       - Les dièses "#" et les bémoles "b" (demi-tons) sont possibles pour les notations autres que Sky ABC-15.
     afterword:
     input_tip: cliquez sur OK pour passer
@@ -90,13 +90,13 @@ stock_queries:
     afterword:
     input_tip:
     help_text: |
-      Formats de notes acceptés :{0}
+      Formats de notes acceptés :{input_modes}
       
       - Les notes composant un accord doivent être attachées (e.g. A1B1C1).
-      - Separate chords with {1}
-      - Tapez "{2}" pour marquer une pause (silence), sauf en notation Jianpu où '0' (zéro) est utilisé conventionellement
-      - Tapez "{3}" pour relier les notes entre elles, pour les triplets... (e.g. {4}). En Jianpu, utilisez "{5}" au lieu de '-' pour éviter la confusion avec l'octave.
-      - Tapez "{6}" après un groupe de notes pour indiquer la répétition.
+      - Separate chords with {icon_delimiter}
+      - Tapez "{pause}" pour marquer une pause (silence), sauf en notation Jianpu où '0' (zéro) est utilisé conventionellement
+      - Tapez "{quaver_delimiter}" pour relier les notes entre elles, pour les triplets... (e.g. {quaver_example}). En Jianpu, utilisez "{jianpu_quaver_delimiter}" au lieu de '-' pour éviter la confusion avec l'octave.
+      - Tapez "{repeat_indicator}" après un groupe de notes pour indiquer la répétition.
       - Les dièses "#" et les bémoles "b" (demi-tons) sont possibles pour les notations autres que Sky ABC-15.
   render_modes:
     foreword:
@@ -142,21 +142,21 @@ stock_queries:
     help_text: 'Le transcripteur est la personne qui a déchiffré la chanson. C''est peut-être vous!'
   notes_file:
     foreword:
-    question: 'Tapez ou collez vos notes ci-dessous. Vous pouvez aussi entrer un nom de fichier texte contenant les notes (à placer dans {0}/)'
+    question: 'Tapez ou collez vos notes ci-dessous. Vous pouvez aussi entrer un nom de fichier texte contenant les notes (à placer dans {songs_in}/)'
     afterword:
     input_tip: du texte contenant des notes telles que C1 D1F1, do re mi, ou un nom de fichier comme song.txt
     help_text: |
-      Formats de notes acceptés :{0}
+      Formats de notes acceptés :{input_modes}
       
       - Les notes composant un accord doivent être attachées (e.g. A1B1C1).
-      - Separate chords with {1}
-      - Tapez "{2}" pour marquer une pause (silence).
-      - Tapez "{3}" pour relier les notes entre elles, pour les triplets... (e.g. {4}). En Jianpu, utilisez "{5}" au lieu de '-' pour éviter la confusion avec l'octave.
-      - Tapez "{6}" après un groupe de notes pour indiquer la répétition.
+      - Separate chords with {icon_delimiter}
+      - Tapez "{pause}" pour marquer une pause (silence), sauf en notation Jianpu où '0' (zéro) est utilisé conventionellement
+      - Tapez "{quaver_delimiter}" pour relier les notes entre elles, pour les triplets... (e.g. {quaver_example}). En Jianpu, utilisez "{jianpu_quaver_delimiter}" au lieu de '-' pour éviter la confusion avec l'octave.
+      - Tapez "{repeat_indicator}" après un groupe de notes pour indiquer la répétition.
       - Les dièses "#" et les bémoles "b" (demi-tons) sont possibles pour les notations autres que Sky ABC-15.
   file:
     foreword:
-    question: 'Entrez un nom de fichier valide (dans {0}/)'
+    question: 'Entrez un nom de fichier valide (dans {songs_in}/)'
     afterword:
     input_tip: un fichier texte contenant des notes de musique
     help_text:
@@ -166,18 +166,18 @@ stock_queries:
     afterword:
     input_tip: du texte contenant des notes de musique
     help_text: |
-      Formats de notes acceptés :{0}
+      Formats de notes acceptés :{input_modes}
       
       - Les notes composant un accord doivent être attachées (e.g. A1B1C1).
-      - Separate chords with {1}
-      - Tapez "{2}" pour marquer une pause (silence).
-      - Tapez "{3}" pour relier les notes entre elles, pour les triplets... (e.g. {4}). En Jianpu, utilisez "{5}" au lieu de '-' pour éviter la confusion avec l'octave.
-      - Tapez "{6}" après un groupe de notes pour indiquer la répétition.
+      - Separate chords with {icon_delimiter}
+      - Tapez "{pause}" pour marquer une pause (silence), sauf en notation Jianpu où '0' (zéro) est utilisé conventionellement
+      - Tapez "{quaver_delimiter}" pour relier les notes entre elles, pour les triplets... (e.g. {quaver_example}). En Jianpu, utilisez "{jianpu_quaver_delimiter}" au lieu de '-' pour éviter la confusion avec l'octave.
+      - Tapez "{repeat_indicator}" après un groupe de notes pour indiquer la répétition.
       - Les dièses "#" et les bémoles "b" (demi-tons) sont possibles pour les notations autres que Sky ABC-15.
   one_input_mode:
     foreword:
     question: |
-        Nous avons détecté que vous utilisez la notation suivante: '{0}'.
+        Nous avons détecté que vous utilisez la notation suivante: '{input_mode}'.
     afterword:
     input_tip: cliquez sur OK pour passer
     help_text:
@@ -199,12 +199,12 @@ stock_queries:
     help_text:
   one_possible_key:
     foreword:
-    question: "Votre chanson peut être transposée dans le jeu Sky à condition d'utiliser la clef suivante: {0}"
+    question: "Votre chanson peut être transposée dans le jeu Sky à condition d'utiliser la clef suivante: {song_key}"
     afterword:
     input_tip: cliquez sur OK pour passer
     help_text:
   possible_keys:
-    foreword: "Votre chanson peut être transposée dans le jeu Sky avec les clefs suivantes: {0}."
+    foreword: "Votre chanson peut être transposée dans le jeu Sky avec les clefs suivantes: {song_key}."
     question: Merci de choisir votre clef
     afterword:
     input_tip: nom de la clef
@@ -231,20 +231,20 @@ stock_queries:
       If you have specified an octave number and it is too high to be played within Sky\''s system, you can downshift the pitch by entering a negative integer'
   no_song_file:
     foreword: ---------------------------------------
-    question: "Votre {0} n'a pas été sauvegardée."
+    question: "Votre {render_mode} n'a pas été sauvegardée."
     afterword:
     input_tip: cliquez sur OK pour passer
     help_text:
   one_song_file:
     foreword: ---------------------------------------
-    question: 'Votre {0} est enregistrée ici: {1}'
+    question: 'Votre {render_mode} est enregistrée ici: {song_file}'
     afterword:
     input_tip: cliquez sur OK pour passer
     help_text:
   several_song_files:
     foreword: ---------------------------------------
-    question: 'Votre {0} est enregistrée ici: {1}'
-    afterword: 'Votre chanson a été découpée en {0} fichiers entre "{1}" et "{2}"'
+    question: 'Votre {render_mode} est enregistrée ici: {song_file}'
+    afterword: 'Votre chanson a été découpée en {num_files} fichiers entre "{first_file}" et "{last_file}"'
     input_tip: cliquez sur OK pour passer
     help_text:
   few_errors:

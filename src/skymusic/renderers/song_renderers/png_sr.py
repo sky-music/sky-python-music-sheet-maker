@@ -273,7 +273,9 @@ class PngSongRenderer(song_renderer.SongRenderer):
         song_buffer = io.BytesIO()
         song_render.save(song_buffer, format='PNG', dpi=self.png_dpi, compress_level=self.png_compress)
 
+        song_buffer.seek(0)
         buffer_list.append(song_buffer)
+
 
         # Open new file
         if end_row < song.get_num_lines() or end_col < ncols:

@@ -16,7 +16,6 @@ class MusicSheetMakerError(Exception):
     pass
 
 
-
 class SongBundle:
     """
     An object containing a song rendered in several formats
@@ -68,6 +67,9 @@ class SongBundle:
 
         if any([not isinstance(buffer, (io.StringIO, io.BytesIO)) for buffer in buffers]):
             raise MusicSheetMakerError('An invalid buffer type was passed to SongBundle')
+
+        #for buffer in buffers:
+        #    buffer.seek(0)
         
         self.renders.update({render_mode: buffers})
 
@@ -82,7 +84,6 @@ class SongBundle:
     def get_all_renders(self):
         
         return self.renders
-
 
 
 class MusicSheetMaker:
@@ -215,38 +216,6 @@ class MusicSheetMaker:
                 except QueriesExecutionAbort as qExecAbort:
                     raise qExecAbort
 
-    '''
-    def next_step(self, recipient, step_number=0):
-        """
-        Starts the next step of song creation for the given recipient
-        Requires a current_step dictionary
-        """
-        steps = [self.ask_instructions, self.ask_render_modes, self.ask_notes_or_file, self.ask_input_mode,
-                 self.set_parser_input_mode, self.ask_song_key, self.ask_octave_shift, self.parse_song,
-                 self.display_error_ratio, self.ask_song_metadata, self.set_song_metadata]
-              
-        if step_number == 0:
-            res = self.set_song_parser()
-        elif step_number > 1 and step_number < len(steps) + 1:
-            res = steps[step_number](recipient)
-        else:
-            res = self.render_song(recipient)
-
-        if isinstance(res, tuple):
-            (q, r) = res
-            try:
-                q.expect_reply()
-                return q
-            except AttributeError:
-                pass
-            try:
-                q[0].expect_reply()
-                return q
-            except (IndexError, AttributeError):
-                pass
-                
-        return None
-    '''
 
     def create_song(self, **kwargs):
         """
@@ -272,76 +241,76 @@ class MusicSheetMaker:
         # 2. Display instructions
         (i_instr, res) = self.ask_instructions(recipient=recipient)
 
-        # 2.b Ask for render modes (query created for website only)
-        (q_render, render_modes) = self.ask_render_modes(recipient=recipient)
-
-        # 2.c Asks for aspect ratio
-        (q_aspect, aspect_ratio) = self.ask_aspect_ratio(recipient=recipient, render_modes=render_modes, prerequisites=[q_render])
-        #(q_aspect, aspect_ratio) = self.ask_aspect_ratio(recipient=recipient, render_modes=render_modes, prerequisites=[q_render])  #TODO EXPERIMENTAL
-
-        # 2.D. Ask beats per minutes
-        (q_song_bpm, song_bpm) = self.ask_song_bpm(recipient=recipient, render_modes=render_modes, prerequisites=[q_render])
-        #(q_song_bpm, song_bpm) = self.ask_song_bpm(recipient=recipient, prerequisites=[q_render])  #TODO EXPERIMENTAL
-
         # 3. Ask for notes
-        # TODO: allow the player to enter the notes using several messages??? or maybe not
         (q_notes, notes) = self.ask_notes_or_file(recipient=recipient, prerequisites=[i_instr])
 
         # 4. Ask for input mode (or display the one found)
         (q_mode, input_mode) = self.ask_input_mode(recipient=recipient, notes=notes, prerequisites=[q_notes])
-        #(q_mode, input_mode) = self.ask_input_mode(recipient=recipient, prerequisites=[q_notes]) #TODO EXPERIMENTAL
+        #(q_mode, input_mode) = self.ask_input_mode(recipient=recipient, prerequisites=[q_notes]) # EXPERIMENTAL
+        
+        # 4.b Set input mode
+        self.set_parser_input_mode(recipient, input_mode=input_mode)
+        #self.set_parser_input_mode(recipient) # EXPERIMENTAL
 
-        # 5. Set input_mode
-        self.get_song_parser().set_input_mode(input_mode)
-        #self.set_parser_input_mode(recipient) #TODO EXPERIMENTAL
+        # 5. Ask for song key (or display the only one possible)
+        (q_key, song_key) = self.ask_song_key(recipient=recipient, notes=notes, input_mode=input_mode, prerequisites=[q_notes, q_mode])
+        #(q_key, song_key) = self.ask_song_key(recipient=recipient, prerequisites=[q_notes, q_mode]) # EXPERIMENTAL
 
-        # 6. Ask for song key (or display the only one possible)
-        (q_key, song_key) = self.ask_song_key(recipient=recipient, notes=notes, input_mode=input_mode,
-                                              prerequisites=[q_notes, q_mode])
-        #(q_key, song_key) = self.ask_song_key(recipient=recipient, prerequisites=[q_notes, q_mode]) #TODO EXPERIMENTAL
-
-        # 7. Asks for octave shift
+        # 6. Asks for octave shift
         (q_shift, octave_shift) = self.ask_octave_shift(recipient=recipient)
 
-        # 8. Parse song
+        # 7. Parses song
         self.parse_song(recipient, notes=notes, song_key=song_key, octave_shift=octave_shift)
-        #self.parse_song(recipient) #TODO EXPERIMENTAL
+        #self.parse_song(recipient) # EXPERIMENTAL
 
-        # 9. Displays error ratio
+        # 8. Displays error ratio
         (i_error, res) = self.display_error_ratio(recipient=recipient, prerequisites=[q_notes, q_mode, q_shift])
 
-        # 10. Asks for song metadata
+        # 9. Asks for song metadata
         (qs_meta, (title, artist, transcript)) = self.ask_song_metadata(recipient=recipient)
-
+        
+        # 9.b sets song metadata
         self.set_song_metadata(recipient=recipient, meta=(title, artist, transcript), song_key=song_key)
-        #self.set_song_metadata(recipient=recipient) #TODO EXPERIMENTAL
+        #self.set_song_metadata(recipient=recipient) # EXPERIMENTAL
 
-        # 12. Renders Song
+        # 10 Asks for render modes
+        (q_render, render_modes) = self.ask_render_modes(recipient=recipient)
+
+        # 11. Asks for aspect ratio
+        (q_aspect, aspect_ratio) = self.ask_aspect_ratio(recipient=recipient, render_modes=render_modes, prerequisites=[q_render])
+        #(q_aspect, aspect_ratio) = self.ask_aspect_ratio(recipient=recipient, prerequisites=[q_render])  # EXPERIMENTAL
+
+        # 12. Ask beats per minutes
+        (q_song_bpm, song_bpm) = self.ask_song_bpm(recipient=recipient, render_modes=render_modes, prerequisites=[q_render])
+        #(q_song_bpm, song_bpm) = self.ask_song_bpm(recipient=recipient, prerequisites=[q_render])  # EXPERIMENTAL       
+
+        # 13. Renders Song
         song_bundle = self.render_song(recipient=recipient, render_modes=render_modes, aspect_ratio=aspect_ratio, song_bpm=song_bpm)
 
-        # 13. Sends result back (required for website)
+        # 14. Sends result back (required for website)
         return song_bundle
 
 
     def ask_instructions(self, recipient, prerequisites=None, execute=True):
 
-        rep = ('\n'.join(['\n* ' + input_mode.get_long_desc(self.locale) for input_mode in InputMode]),
-                        self.get_song_parser().get_icon_delimiter().replace('\s','<space>'), self.get_song_parser().get_pause().replace('\s','<space>'),
-                        self.get_song_parser().get_quaver_delimiter().replace('\s','<space>'),
-                        self.get_song_parser().get_quaver_delimiter().replace('\s','<space>').join(['A1', 'B1', 'C1']),
-                        Resources.JIANPU_QUAVER_DELIMITER,
-                        self.get_song_parser().get_repeat_indicator() + '2'
-                        )
+        replacements = {'input_modes':'\n'.join(['\n* ' + input_mode.get_long_desc(self.locale) for input_mode in InputMode]),
+                        'icon_delimiter': self.get_song_parser().get_icon_delimiter().replace('\s','<space>'),
+                        'pause': self.get_song_parser().get_pause().replace('\s','<space>'),
+                        'quaver_delimiter': self.get_song_parser().get_quaver_delimiter().replace('\s','<space>'),
+                        'quaver_example': self.get_song_parser().get_quaver_delimiter().replace('\s','<space>').join(['A1', 'B1', 'C1']),
+                        'jianpu_quaver_delimiter': Resources.JIANPU_QUAVER_DELIMITER,
+                        'repeat_indicator': self.get_song_parser().get_repeat_indicator() + '2'
+                        }
 
         if self.is_commandline(recipient):
             i_instr = self.communicator.send_stock_query('instructions_stdout', recipient=recipient,
-                                                         question_rep=rep, prerequisites=prerequisites)
+                                                         replacements=replacements, prerequisites=prerequisites)
         elif self.is_website(recipient):
             i_instr = self.communicator.send_stock_query('instructions_website', recipient=recipient,
-                                                         question_rep=rep, prerequisites=prerequisites)
+                                                         replacements=replacements, prerequisites=prerequisites)
         else:
             i_instr = self.communicator.send_stock_query('instructions_botcog', recipient=recipient,
-                                                         helptext_rep=rep, prerequisites=prerequisites)
+                                                         replacements=replacements, prerequisites=prerequisites)
 
         if execute:
             recipient.execute_queries(i_instr)
@@ -351,45 +320,18 @@ class MusicSheetMaker:
             return i_instr, None
 
 
-    def ask_song_metadata(self, recipient, prerequisites=None, execute=True):
-
-        queries = []
-
-        queries += [self.communicator.send_stock_query('song_title', recipient=recipient, prerequisites=prerequisites)]
-        queries += [
-            self.communicator.send_stock_query('original_artist', recipient=recipient, prerequisites=prerequisites)]
-        queries += [
-            self.communicator.send_stock_query('transcript_writer', recipient=recipient, prerequisites=prerequisites)]
-
-        if execute:
-            recipient.execute_queries(queries)
-            meta_data = [q.get_reply().get_result() for q in queries]
-            return queries, tuple(meta_data)
-        else:
-            return queries, None
-
-    def retrieve_song_metadata(self, recipient):
-        """
-        Retrieves song meta data from previous answered queries.
-        Should work, but not fully tested
-        """
-        title = self.retrieve_query_result(recipient, 'song_title', 'Untitled')
-        artist = self.retrieve_query_result(recipient, 'original_artist', '')
-        transcript = self.retrieve_query_result(recipient, 'transcript_writer', '')
-
-        return title, artist, transcript
-
     def ask_notes(self, recipient, prerequisites=None, execute=True):
 
-        helptext_rep = ('\n'.join(['\n* ' + input_mode.get_long_desc(self.locale) for input_mode in InputMode]),
-                self.get_song_parser().get_icon_delimiter().replace('\s','<space>'), self.get_song_parser().get_pause().replace('\s','<space>'),
-                self.get_song_parser().get_quaver_delimiter().replace('\s','<space>'),
-                self.get_song_parser().get_quaver_delimiter().replace('\s','<space>').join(['A1', 'B1', 'C1']),
-                Resources.JIANPU_QUAVER_DELIMITER,
-                self.get_song_parser().get_repeat_indicator() + '2'
-                )
+        replacements = {'input_modes':'\n'.join(['\n* ' + input_mode.get_long_desc(self.locale) for input_mode in InputMode]),
+                        'icon_delimiter': self.get_song_parser().get_icon_delimiter().replace('\s','<space>'),
+                        'pause': self.get_song_parser().get_pause().replace('\s','<space>'),
+                        'quaver_delimiter': self.get_song_parser().get_quaver_delimiter().replace('\s','<space>'),
+                        'quaver_example': self.get_song_parser().get_quaver_delimiter().replace('\s','<space>').join(['A1', 'B1', 'C1']),
+                        'jianpu_quaver_delimiter': Resources.JIANPU_QUAVER_DELIMITER,
+                        'repeat_indicator': self.get_song_parser().get_repeat_indicator() + '2'
+                        }
         
-        q_notes = self.communicator.send_stock_query('notes', recipient=recipient, helptext_rep=helptext_rep, prerequisites=prerequisites)
+        q_notes = self.communicator.send_stock_query('notes', recipient=recipient, replacements=replacements, prerequisites=prerequisites)
 
         if execute:
             recipient.execute_queries(q_notes)
@@ -401,7 +343,7 @@ class MusicSheetMaker:
     def ask_file(self, recipient, prerequisites=None, execute=True):
 
         q_file = self.communicator.send_stock_query('file', recipient=recipient,
-                                                    question_rep=(os.path.relpath(os.path.normpath(self.song_dir_in)),),
+                                                    replacements={'songs_in': os.path.relpath(os.path.normpath(self.song_dir_in))},
                                                     prerequisites=prerequisites,
                                                     limits=(os.path.normpath(self.song_dir_in)))
 
@@ -436,13 +378,14 @@ class MusicSheetMaker:
         If notes are detected, return the notes as a list of strings splitted by the OS line separator
         """
 
-        helptext_rep = ('\n'.join(['\n* ' + input_mode.get_long_desc(self.locale) for input_mode in InputMode]),
-                self.get_song_parser().get_icon_delimiter().replace('\s','<space>'), self.get_song_parser().get_pause().replace('\s','<space>'),
-                self.get_song_parser().get_quaver_delimiter().replace('\s','<space>'),
-                self.get_song_parser().get_quaver_delimiter().replace('\s','<space>').join(['A1', 'B1', 'C1']),
-                Resources.JIANPU_QUAVER_DELIMITER,
-                self.get_song_parser().get_repeat_indicator() + '2'
-                )
+        replacements = {'input_modes':'\n'.join(['\n* ' + input_mode.get_long_desc(self.locale) for input_mode in InputMode]),
+                        'icon_delimiter': self.get_song_parser().get_icon_delimiter().replace('\s','<space>'),
+                        'pause': self.get_song_parser().get_pause().replace('\s','<space>'),
+                        'quaver_delimiter': self.get_song_parser().get_quaver_delimiter().replace('\s','<space>'),
+                        'quaver_example': self.get_song_parser().get_quaver_delimiter().replace('\s','<space>').join(['A1', 'B1', 'C1']),
+                        'jianpu_quaver_delimiter': Resources.JIANPU_QUAVER_DELIMITER,
+                        'repeat_indicator': self.get_song_parser().get_repeat_indicator() + '2'
+                        }
 
         if not self.is_commandline(recipient):
 
@@ -450,8 +393,8 @@ class MusicSheetMaker:
 
         else:
 
-            q_notes = self.communicator.send_stock_query('notes_file', question_rep=(os.path.relpath(os.path.normpath(self.song_dir_in)),),
-                                                         recipient=recipient, helptext_rep=helptext_rep, prerequisites=prerequisites)
+            replacements.update({"songs_in": os.path.relpath(os.path.normpath(self.song_dir_in))})
+            q_notes = self.communicator.send_stock_query('notes_file', recipient=recipient, replacements=replacements, prerequisites=prerequisites)
 
             if not execute:
                 return q_notes, None
@@ -479,7 +422,7 @@ class MusicSheetMaker:
 
                 if isfile and self.is_commandline(recipient):
                     notes = self.read_file(file_path)
-                    print(Lang.get_string("open_file", self.locale).format(os.path.abspath(file_path)))
+                    print(Lang.get_string("open_file", self.locale).format(file_path=os.path.abspath(file_path)))
                 else:
                     notes = result.split(os.linesep)  # Returns a list of strings in any case
 
@@ -495,57 +438,24 @@ class MusicSheetMaker:
                 return q_notes, notes
 
 
-    def retrieve_notes(self, recipient):
-        """
-        Retrieves notes from previous answered queries.
-        Should work, but not fully tested
-        """
-        notes = ''
-        
-        q_notes_file = self.communicator.recall_by_recipient(recipient, criterion="file|notes_file",
-                                                             filters=["valid_reply"], sort_by="date")
-        if len(q_notes_file) != 0:
-            result = q_notes_file[-1].get_reply().get_result()
-            file_path = os.path.join(self.song_dir_in, os.path.normpath(result))
-            isfile = os.path.isfile(file_path)
 
-            if isfile and self.is_commandline(recipient):
-                notes = self.read_file(file_path)
-            else:
-                notes = result.split(os.linesep)
-            return notes
+    def ask_song_metadata(self, recipient, prerequisites=None, execute=True):
 
-        q_notes = self.communicator.recall_by_recipient(recipient, criterion="notes", filters=["valid_reply"],
-                                                        sort_by="date")
-        if len(q_notes) != 0:
-            notes = q_notes_file[-1].get_reply().get_result().split(os.linesep)
-            
-        return notes
+        queries = []
 
-    def ask_render_modes(self, recipient, prerequisites=None, execute=True):
-        """
-        Asks for the desired render modes for the Song
-        """
-        render_modes = self.render_modes_enabled
+        queries += [self.communicator.send_stock_query('song_title', recipient=recipient, prerequisites=prerequisites)]
+        queries += [
+            self.communicator.send_stock_query('original_artist', recipient=recipient, prerequisites=prerequisites)]
+        queries += [
+            self.communicator.send_stock_query('transcript_writer', recipient=recipient, prerequisites=prerequisites)]
 
-        if len(render_modes) == 1:
-            return None, render_modes
-
-        if self.is_botcog(recipient):
-
-            return None, self.botcog_render_modes
-
+        if execute:
+            recipient.execute_queries(queries)
+            meta_data = [q.get_reply().get_result() for q in queries]
+            return queries, tuple(meta_data)
         else:
+            return queries, None
 
-            q_render = self.communicator.send_stock_query('render_modes', recipient=recipient, limits=render_modes,
-                                                          prerequisites=prerequisites)
-
-            if execute:
-                recipient.execute_queries(q_render)
-                render_modes = q_render.get_reply().get_result()
-                return q_render, render_modes
-            else:
-                return q_render, None
 
     def ask_input_mode(self, recipient, notes=None, prerequisites=None, execute=True):
         """
@@ -566,7 +476,7 @@ class MusicSheetMaker:
 
         elif len(possible_modes) == 1:
             q_mode = self.communicator.send_stock_query('one_input_mode', recipient=recipient,
-                                                        question_rep=(possible_modes[0].get_short_desc(self.locale),),
+                                                        replacements={'input_mode': possible_modes[0].get_short_desc(self.locale)},
                                                         prerequisites=prerequisites)
 
         else:
@@ -586,30 +496,6 @@ class MusicSheetMaker:
         else:
             return q_mode, mode
 
-    def retrieve_input_mode(self, recipient, notes=None):
-        """
-        Retrieves input mode (musical notation) from previous answered queries.
-        Should work, but not fully tested
-        """
-        input_mode = None
-        
-        if notes is None:
-            notes = self.retrieve_notes(recipient)
-
-        try:
-            input_mode = self.get_song_parser.get_input_mode()
-        except AttributeError:
-            input_mode = None
-
-        if input_mode is None:
-            q_mode = self.communicator.recall_by_recipient(recipient, criterion=ReplyType.INPUTMODE,
-                                                           filters=["valid_reply"], sort_by="date")
-            if len(q_mode) == 0:
-                input_mode = self.get_song_parser().get_possible_modes(notes)[0]
-            else:
-                input_mode = q_mode[-1].get_reply().get_result()
-
-        return input_mode
 
     def ask_song_key(self, recipient, notes=None, input_mode=None, prerequisites=None, execute=True):
         """
@@ -639,12 +525,12 @@ class MusicSheetMaker:
         elif len(possible_keys) == 1:
             # Sends information that there is only 1 possible key
             q_key = self.communicator.send_stock_query('one_possible_key', recipient=recipient,
-                                                       question_rep=(str(possible_keys[0]),),
+                                                       replacements={'song_key': str(possible_keys[0])},
                                                        prerequisites=prerequisites)
         else:
             # Asks to choose a key within a list
             q_key = self.communicator.send_stock_query('possible_keys', recipient=recipient,
-                                                       foreword_rep=(', '.join(possible_keys),), limits=possible_keys,
+                                                       replacements={'song_key': ', '.join(possible_keys)}, limits=possible_keys,
                                                        prerequisites=prerequisites)
 
         if execute:
@@ -686,6 +572,26 @@ class MusicSheetMaker:
         else:
             return q_shift, None
 
+
+    def display_error_ratio(self, recipient, prerequisites=None, execute=True):
+
+        error_ratio = self.get_song().get_num_broken() / max(1, self.get_song().get_num_instruments())
+
+        if error_ratio == 0:
+            i_error = None
+        elif error_ratio < 0.05:
+            i_error = self.communicator.send_stock_query('few_errors', recipient=recipient, prerequisites=prerequisites)
+        else:
+            i_error = self.communicator.send_stock_query('many_errors', recipient=recipient,
+                                                         prerequisites=prerequisites)
+
+        if execute and i_error is not None:
+            recipient.execute_queries(i_error)
+            error_message = i_error.get_reply().get_result()
+            return i_error, error_message
+        else:
+            return i_error, None
+
      
     def ask_aspect_ratio(self, recipient, render_modes=None, prerequisites=None, execute=True):
 
@@ -723,26 +629,32 @@ class MusicSheetMaker:
                 return q_song_bpm, song_bpm
             else:
                 return q_song_bpm, None
+
+    def ask_render_modes(self, recipient, prerequisites=None, execute=True):
+        """
+        Asks for the desired render modes for the Song
+        """
+        render_modes = self.render_modes_enabled
+
+        if len(render_modes) == 1:
+            return None, render_modes
+
+        if self.is_botcog(recipient):
+
+            return None, self.botcog_render_modes
+
+        else:
+
+            q_render = self.communicator.send_stock_query('render_modes', recipient=recipient, limits=render_modes,
+                                                          prerequisites=prerequisites)
+
+            if execute:
+                recipient.execute_queries(q_render)
+                render_modes = q_render.get_reply().get_result()
+                return q_render, render_modes
+            else:
+                return q_render, None
     
-
-    def display_error_ratio(self, recipient, prerequisites=None, execute=True):
-
-        error_ratio = self.get_song().get_num_broken() / max(1, self.get_song().get_num_instruments())
-
-        if error_ratio == 0:
-            i_error = None
-        elif error_ratio < 0.05:
-            i_error = self.communicator.send_stock_query('few_errors', recipient=recipient, prerequisites=prerequisites)
-        else:
-            i_error = self.communicator.send_stock_query('many_errors', recipient=recipient,
-                                                         prerequisites=prerequisites)
-
-        if execute and i_error is not None:
-            recipient.execute_queries(i_error)
-            error_message = i_error.get_reply().get_result()
-            return i_error, error_message
-        else:
-            return i_error, None
 
     def set_parser_input_mode(self, recipient, notes=None, input_mode=None):
 
@@ -755,7 +667,7 @@ class MusicSheetMaker:
 
         self.get_song_parser().set_input_mode(input_mode)
 
-    def set_song_metadata(self, recipient, meta=None, song_key=None, notes=None):
+    def set_song_metadata(self, recipient, meta=None, song_key=None):
 
         if meta is None:
             (title, artist, transcript) = self.retrieve_song_metadata(recipient)
@@ -766,6 +678,7 @@ class MusicSheetMaker:
             song_key = self.retrieve_query_result(recipient, '_key', 'C')
 
         self.get_song().set_meta(title=title, artist=artist, transcript=transcript, song_key=song_key)
+
 
     def parse_song(self, recipient, notes=None, song_key=None, octave_shift=None):
 
@@ -785,47 +698,6 @@ class MusicSheetMaker:
         return
 
 
-    def retrieve_render_modes(self, recipient):
-        
-        render_modes = self.render_modes_enabled
-
-        if len(render_modes) == 1:
-            return render_modes
-
-        if self.is_commandline(recipient):
-
-            return render_modes
-
-        elif self.is_botcog(recipient):
-
-            return self.botcog_render_modes
-
-        else:
-        
-            return self.retrieve_query_result(recipient, 'render_modes')                
-                
-        return render_modes
-
-
-    
-    def retrieve_query_result(self, recipient, query_name, default=None):
-        """
-        Retrieves reply from previously replied query
-        Should work, but not fully tested
-        """        
-        qs = self.communicator.recall_by_recipient(recipient, criterion=query_name, filters=["valid_reply"],
-                                                        sort_by="date")
-
-        if len(qs) != 0:
-            q = qs[-1]
-            if q.get_expect_reply():
-                reply_result = q.get_reply().get_result()
-                if reply_result not in (None, '', []):
-                    return reply_result
-            
-        return default
-
-
     def render_song(self, recipient, render_modes=None, aspect_ratio=16/9.0, song_bpm=120):
 
         if render_modes is None:
@@ -833,7 +705,13 @@ class MusicSheetMaker:
                 render_modes = self.botcog_render_modes
             else:
                 render_modes = self.render_modes_enabled
-            
+        
+        if not isinstance(song_bpm, (float, int)):
+            song_bpm = 120
+
+        if not isinstance(aspect_ratio, (float, int)):
+            aspect_ratio = 16/9.0
+        
         if not self.is_commandline(recipient):
             self.css_mode = CSSMode.EMBED
                 
@@ -845,10 +723,12 @@ class MusicSheetMaker:
 
         for render_mode in render_modes:
             buffers = self.get_song().render(render_mode=render_mode, aspect_ratio=aspect_ratio, song_bpm=song_bpm, css_mode=self.css_mode, rel_css_path=self.rel_css_path)  # A list of IOString or IOBytes buffers
-            song_bundle.add_render(render_mode, buffers)
-            if self.is_commandline(recipient):
-                file_paths = self.build_file_paths(render_mode, len(buffers))
-                self.send_buffers_to_files(render_mode, buffers, file_paths, recipient=recipient)
+            
+            if buffers is not None:
+                song_bundle.add_render(render_mode, buffers)
+                if self.is_commandline(recipient):
+                    file_paths = self.build_file_paths(render_mode, len(buffers))
+                    self.send_buffers_to_files(render_mode, buffers, file_paths, recipient=recipient)
                         
         return song_bundle
 
@@ -858,7 +738,7 @@ class MusicSheetMaker:
         Writes the content of an IOString or IOBytes buffer list to one or several files.
         Command line only
         """
-        # TODO: Move this method in Renderer???
+        # TODO: Move this method to SongRenderer???
         try:
             numfiles = len(buffers)
         except (TypeError, AttributeError):
@@ -890,25 +770,29 @@ class MusicSheetMaker:
 
                 if numfiles == 1:
 
-                    question_rep = (render_mode.get_short_desc(self.locale), str(os.path.relpath(file_paths[0])))
+                    replacements = {'render_mode': render_mode.get_short_desc(self.locale),
+                                    'song_file': str(os.path.relpath(file_paths[0]))
+                                    }
 
                     i_song_files = self.communicator.send_stock_query('one_song_file', recipient=recipient,
-                                                                      question_rep=question_rep,
+                                                                      replacements=replacements,
                                                                       prerequisites=prerequisites)
 
                 elif numfiles > 1 and i == 0:
 
-                    question_rep = (render_mode.get_short_desc(self.locale), str(os.path.relpath(self.song_dir_out)))
-                    afterword_rep = (
-                    str(numfiles), str(os.path.split(file_paths[0])[1]), str(os.path.split(file_paths[-1])[1]))
+                    replacements = {'render_mode': render_mode.get_short_desc(self.locale),
+                                    'songs_in': str(os.path.relpath(self.song_dir_out)),
+                                    'num_files': str(numfiles),
+                                    'first_file': str(os.path.split(file_paths[0])[1]),
+                                    'last_file': str(os.path.split(file_paths[-1])[1])
+                                    }
                     i_song_files = self.communicator.send_stock_query('several_song_files', recipient=recipient,
-                                                                      question_rep=question_rep,
-                                                                      afterword_rep=afterword_rep,
+                                                                      replacements=replacements,
                                                                       prerequisites=prerequisites)
             else:
-                question_rep = (render_mode.get_short_desc(self.locale),)
+                replacements = {'render_mode': render_mode.get_short_desc(self.locale)}
                 i_song_files = self.communicator.send_stock_query('no_song_file', recipient=recipient,
-                                                                  question_rep=question_rep,
+                                                                  replacements=replacements,
                                                                   prerequisites=prerequisites)
 
         if execute:
@@ -923,7 +807,7 @@ class MusicSheetMaker:
         """
         Command line only : generates a list of file paths for a given input mode.
         """
-        # TODO: move this method in Renderer???
+        # TODO: Move this method to SongRenderer???
         if numfiles == 0:
             return None
         
@@ -942,3 +826,122 @@ class MusicSheetMaker:
             file_paths = [file_base + file_ext]
 
         return file_paths
+
+    '''
+    def next_step(self, recipient, step_number=0):
+        """
+        Starts the next step of song creation for the given recipient
+        Requires a current_step dictionary
+        """
+        steps = [self.ask_instructions, self.ask_render_modes, self.ask_notes_or_file, self.ask_input_mode,
+                 self.set_parser_input_mode, self.ask_song_key, self.ask_octave_shift, self.parse_song,
+                 self.display_error_ratio, self.ask_song_metadata, self.set_song_metadata]
+              
+        if step_number == 0:
+            res = self.set_song_parser()
+        elif step_number > 1 and step_number < len(steps) + 1:
+            res = steps[step_number](recipient)
+        else:
+            res = self.render_song(recipient)
+
+        if isinstance(res, tuple):
+            (q, r) = res
+            try:
+                q.expect_reply()
+                return q
+            except AttributeError:
+                pass
+            try:
+                q[0].expect_reply()
+                return q
+            except (IndexError, AttributeError):
+                pass
+                
+        return None
+    '''
+
+    def retrieve_song_metadata(self, recipient):
+        """
+        Retrieves song meta data from previous answered queries.
+        Should work, but not fully tested
+        """
+        title = self.retrieve_query_result(recipient, 'song_title', 'Untitled')
+        artist = self.retrieve_query_result(recipient, 'original_artist', '')
+        transcript = self.retrieve_query_result(recipient, 'transcript_writer', '')
+
+        return title, artist, transcript
+
+
+    def retrieve_notes(self, recipient):
+        """
+        Retrieves notes from previous answered queries.
+        Should work, but not fully tested
+        """
+        notes = ''
+        
+        q_notes_file = self.communicator.recall_by_recipient(recipient, criterion="file|notes_file",
+                                                             filters=["valid_reply"], sort_by="date")
+        if len(q_notes_file) != 0:
+            result = q_notes_file[-1].get_reply().get_result()
+            file_path = os.path.join(self.song_dir_in, os.path.normpath(result))
+            isfile = os.path.isfile(file_path)
+
+            if isfile and self.is_commandline(recipient):
+                notes = self.read_file(file_path)
+            else:
+                notes = result.split(os.linesep)
+            return notes
+
+        q_notes = self.communicator.recall_by_recipient(recipient, criterion="notes", filters=["valid_reply"],
+                                                        sort_by="date")
+        if len(q_notes) != 0:
+            notes = q_notes_file[-1].get_reply().get_result().split(os.linesep)
+            
+        return notes
+
+    def retrieve_input_mode(self, recipient, notes=None):
+        """
+        Retrieves input mode (musical notation) from previous answered queries.
+        Should work, but not fully tested
+        """        
+        try:
+            input_mode = self.get_song_parser.get_input_mode()
+        except AttributeError:
+            input_mode = None
+
+        if input_mode is None:            
+            input_mode = self.retrieve_query_result(recipient, ReplyType.INPUTMODE)
+            
+        if input_mode is None: 
+            notes = self.retrieve_notes(recipient)
+            input_mode = self.get_song_parser().get_possible_modes(notes)[0]
+
+        return input_mode
+
+
+    def retrieve_render_modes(self, recipient):
+
+        if self.is_botcog(recipient):
+            return self.botcog_render_modes
+        
+        render_modes = self.retrieve_query_result(recipient, 'render_modes', default=self.render_modes_enabled) 
+                    
+        return render_modes
+
+    
+    def retrieve_query_result(self, recipient, criterion, default=None):
+        """
+        Retrieves reply from previously replied query
+        Should work, but not fully tested
+        """        
+        qs = self.communicator.recall_by_recipient(recipient, criterion=criterion, filters=["valid_reply"],
+                                                        sort_by="date")
+
+        if len(qs) != 0:
+            q = qs[-1]
+            if q.get_expect_reply():
+                reply_result = q.get_reply().get_result()
+                if reply_result not in (None, '', []):
+                    return reply_result
+            
+        return default

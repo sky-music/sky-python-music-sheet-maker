@@ -22,8 +22,8 @@ input_mode:
         short_desc: 日本語イタリアドレミ
         long_desc: "Japanese do re mi: ド、ド#／レb、レ、レ#／ミb、ミ、ファ、ファ#／ソb、ソ、ソ#／ラb、ラ、ラ#／シb、シ"
     skyjson:
-        short_desc: 'SkyMusic JSON'
-        long_desc: "Dictionary with timeline [{'time': xxxx, 'key': KeyN}]"
+        short_desc: 'Sky-Music recording (JSON text)'
+        long_desc: "Dictionary with time in ms and key number 0-14 used by https://sky-music.herokuapp.com"
 render_mode:
     html:
         short_desc: bảng nhạc trực quan HTML 
@@ -34,7 +34,7 @@ render_mode:
     midi:
         short_desc: tệp nhạc MIDI
     skyjson:
-        short_desc: Sky JSON text file
+        short_desc: Sky-Music recording (JSON text file)
     skyascii:
         short_desc: bài hát dưới dạng hệ kí tự Sky 
     englishascii:
@@ -50,18 +50,18 @@ song_meta:
    musical_key: Phím nhạc
    untitle: Untitled
 open_file: |
-    (Notes imported from {0})
+    (Notes imported from {file_path})
 stock_queries:
   instructions_stdout:
     foreword: "===== BẢNG NHẠC TRỰC QUAN CHO TỰA GAME: SKY: CHILDREN OF THE LIGHT =====\n"
     question: |
-      Dạng nốt nhạc được chấp nhận: {0}
+      Dạng nốt nhạc được chấp nhận: {input_modes}
       
       - Khi viết hợp âm phải dính các phím lại với nhau (VD: A1B1C1).
-      - Tách các hợp âm bằng: "{1}".
-      - Sử dụng "{2}" để ngắt quãng (nghỉ), except for Jianpu where '0' is the official pause character.
-      - Sử dụng "{3}" để nối nốt trong một biểu tượng (liên ba, láy rền/hát rung,...) (VD: {4}). With Jianpu, use "{5}" instead of "-" to avoid confusion with the octave.
-      - Thêm "{6}" sau một hợp âm để biểu thị sự lập lại (repetition).
+      - Tách các hợp âm bằng: "{icon_delimiter}".
+      - Sử dụng "{pause}" để ngắt quãng (nghỉ), except for Jianpu where '0' is the official pause character.
+      - Sử dụng "{quaver_delimiter}" để nối nốt trong một biểu tượng (liên ba, láy rền/hát rung,...) (VD: {quaver_example}). With Jianpu, use "{jianpu_quaver_delimiter}" instead of "-" to avoid confusion with the octave.
+      - Thêm "{repeat_indicator}" sau một hợp âm để biểu thị sự lập lại (repetition).
       - Dấu thăng "#" và dấu giáng "b" (nửa cung) được hỗ trợ cho hệ kí tự Phương Tây và Jianpu.
       
       Nhập '?' để được trợ giúp cho câu hỏi cụ thể
@@ -71,13 +71,13 @@ stock_queries:
   instructions_website:
     foreword:
     question: |
-      Dạng nốt nhạc được chấp nhận: {0}
+      Dạng nốt nhạc được chấp nhận: {input_modes}
       
       - Khi viết hợp âm phải dính các phím lại với nhau (VD: A1B1C1).
-      - Tách các hợp âm bằng: "{1}".
-      - Sử dụng "{2}" để ngắt quãng (nghỉ), except for Jianpu where '0' is the official pause character.
-      - Sử dụng "{3}" để nối nốt trong một biểu tượng (liên ba, láy rền/hát rung,...) (VD: {4}). With Jianpu, use "{5}" instead of "-" to avoid confusion with the octave.
-      - Thêm "{6}" sau một hợp âm để biểu thị sự lập lại (repetition).
+      - Tách các hợp âm bằng: "{icon_delimiter}".
+      - Sử dụng "{pause}" để ngắt quãng (nghỉ), except for Jianpu where '0' is the official pause character.
+      - Sử dụng "{quaver_delimiter}" để nối nốt trong một biểu tượng (liên ba, láy rền/hát rung,...) (VD: {quaver_example}). With Jianpu, use "{jianpu_quaver_delimiter}" instead of "-" to avoid confusion with the octave.
+      - Thêm "{repeat_indicator}" sau một hợp âm để biểu thị sự lập lại (repetition).
       - Dấu thăng "#" và dấu giáng "b" (nửa cung) được hỗ trợ cho hệ kí tự Phương Tây và Jianpu.
     afterword:
     input_tip: Bấm OK để tiếp tục
@@ -91,13 +91,13 @@ stock_queries:
     afterword:
     input_tip:
     help_text: |
-      Dạng nốt nhạc được chấp nhận: {0}
-
+      Dạng nốt nhạc được chấp nhận: {input_modes}
+      
       - Khi viết hợp âm phải dính các phím lại với nhau (VD: A1B1C1).
-      - Tách các hợp âm bằng: "{1}".
-      - Sử dụng "{2}" để ngắt quãng (nghỉ), except for Jianpu where '0' is the official pause character.
-      - Sử dụng "{3}" để nối nốt trong một biểu tượng (liên ba, láy rền/hát rung,...) (VD: {4}). With Jianpu, use "{5}" instead of "-" to avoid confusion with the octave.
-      - Thêm "{6}" sau một hợp âm để biểu thị sự lập lại (repetition).
+      - Tách các hợp âm bằng: "{icon_delimiter}".
+      - Sử dụng "{pause}" để ngắt quãng (nghỉ), except for Jianpu where '0' is the official pause character.
+      - Sử dụng "{quaver_delimiter}" để nối nốt trong một biểu tượng (liên ba, láy rền/hát rung,...) (VD: {quaver_example}). With Jianpu, use "{jianpu_quaver_delimiter}" instead of "-" to avoid confusion with the octave.
+      - Thêm "{repeat_indicator}" sau một hợp âm để biểu thị sự lập lại (repetition).
       - Dấu thăng "#" và dấu giáng "b" (nửa cung) được hỗ trợ cho hệ kí tự Phương Tây và Jianpu.
   render_modes:
     foreword:
@@ -110,12 +110,12 @@ stock_queries:
       On the command-line, enter a comma-separated list of choices numbers, such as 0, 1, 3.
       On the website, check the boxes.
   aspect_ratio:
-    foreword: By default the visual sheet is a 16:9 image in landscape orientation.
+    foreword: By default the visual sheet is a 16/9 image in landscape orientation.
     question: Please choose a different aspect ratio, or leave blank to skip
     afterword:
     input_tip: a positive number or a fraction (eg 4/3) between 0.1 and 10. Leave blank or 0 to skip.
     help_text: |
-      By default the visual sheet is a 16:9 image in landscape orientation. Please choose a different aspect ratio if you like. Only numbers between 1/10 (0.1) and 10 are accepted.
+      By default the visual sheet is a 16/9. image in landscape orientation. Please choose a different aspect ratio if you like. Only numbers between 1/10 (0.1) and 10 are accepted.
   song_bpm:
     foreword: One of the output formats needs timing information.
     question: Please choose the song tempo (BPM, beats per minute), or leave blank to skip
@@ -143,21 +143,21 @@ stock_queries:
     help_text: 'Người dịch là người viết bài nhạc này, nó cũng có thể là bạn!'
   notes_file:
     foreword:
-    question: 'Nhập, hoặc dán nốt vào, hoặc nhập tên tệp (trong thư mục {0}/)'
+    question: 'Nhập, hoặc dán nốt vào, hoặc nhập tên tệp (trong thư mục {songs_in}/)'
     afterword:
     input_tip: Tên nốt như dạng C1 D1F1, hoặc tên tệp như song.txt
     help_text: |
-      Dạng nốt nhạc được chấp nhận: {0}
+      Dạng nốt nhạc được chấp nhận: {input_modes}
       
       - Khi viết hợp âm phải dính các phím lại với nhau (VD: A1B1C1).
-      - Tách các hợp âm bằng: "{1}".
-      - Sử dụng "{2}" để ngắt quãng (nghỉ).
-      - Sử dụng "{3}" để nối nốt trong một biểu tượng (liên ba, láy rền/hát rung,...) (VD: {4}). With Jianpu, use "{5}" instead of "-" to avoid confusion with the octave.
-      - Thêm "{6}" sau một hợp âm để biểu thị sự lập lại (repetition).
+      - Tách các hợp âm bằng: "{icon_delimiter}".
+      - Sử dụng "{pause}" để ngắt quãng (nghỉ), except for Jianpu where '0' is the official pause character.
+      - Sử dụng "{quaver_delimiter}" để nối nốt trong một biểu tượng (liên ba, láy rền/hát rung,...) (VD: {quaver_example}). With Jianpu, use "{jianpu_quaver_delimiter}" instead of "-" to avoid confusion with the octave.
+      - Thêm "{repeat_indicator}" sau một hợp âm để biểu thị sự lập lại (repetition).
       - Dấu thăng "#" và dấu giáng "b" (nửa cung) được hỗ trợ cho hệ kí tự Phương Tây và Jianpu.
   file:
     foreword:
-    question: 'Nhập tên tệp (trong {0}/)'
+    question: 'Nhập tên tệp (trong {songs_in}/)'
     afterword:
     input_tip: any text file containing one or several musical notes.
     help_text:
@@ -167,18 +167,18 @@ stock_queries:
     afterword:
     input_tip: bất kì kí tự với một hoặc nhiều nốt nhạc 
     help_text: |
-      Dạng nốt nhạc được chấp nhận: {0}
+      Dạng nốt nhạc được chấp nhận: {input_modes}
       
       - Khi viết hợp âm phải dính các phím lại với nhau (VD: A1B1C1).
-      - Tách các hợp âm bằng: "{1}".
-      - Sử dụng "{2}" để ngắt quãng (nghỉ).
-      - Sử dụng "{3}" để nối nốt trong một biểu tượng (liên ba, láy rền/hát rung,...) (VD: {4}). With Jianpu, use "{5}" instead of "-" to avoid confusion with the octave.
-      - Thêm "{6}" sau một hợp âm để biểu thị sự lập lại (repetition).
+      - Tách các hợp âm bằng: "{icon_delimiter}".
+      - Sử dụng "{pause}" để ngắt quãng (nghỉ), except for Jianpu where '0' is the official pause character.
+      - Sử dụng "{quaver_delimiter}" để nối nốt trong một biểu tượng (liên ba, láy rền/hát rung,...) (VD: {quaver_example}). With Jianpu, use "{jianpu_quaver_delimiter}" instead of "-" to avoid confusion with the octave.
+      - Thêm "{repeat_indicator}" sau một hợp âm để biểu thị sự lập lại (repetition).
       - Dấu thăng "#" và dấu giáng "b" (nửa cung) được hỗ trợ cho hệ kí tự Phương Tây và Jianpu.
   one_input_mode:
     foreword:
     question: |
-        Nhận dạng là bạn đang sử dụng hệ kí tự: '{0}'.
+        Nhận dạng là bạn đang sử dụng hệ kí tự: '{input_mode}'.
     afterword:
     input_tip: Bấm OK để tiếp tục
     help_text:
@@ -200,12 +200,12 @@ stock_queries:
     help_text:
   one_possible_key:
     foreword:
-    question: 'Bài hát của bạn có thể chuyển đúng sang Sky với phím: {0}'
+    question: 'Bài hát của bạn có thể chuyển đúng sang Sky với phím: {song_key}'
     afterword:
     input_tip: Bấm OK để tiếp tục
     help_text:
   possible_keys:
-    foreword: 'Bài hát của bạn có thể chuyển đúng sang Sky với những phím sau: {0}.'
+    foreword: 'Bài hát của bạn có thể chuyển đúng sang Sky với những phím sau: {song_key}.'
     question: Hãy chọn phím nhạc bạn muốn sử dụng
     afterword:
     input_tip: Nhập số (giữa 0 và n-1)
@@ -232,20 +232,20 @@ stock_queries:
       Nếu bạn đã ghi rõ số quãng tám và nó quá cao để có thể chơi trong hệ thống nhạc của Sky, bạn có thể giảm xuống bằng cách nhập số âm.'  
   no_song_file:
     foreword: ---------------------------------------
-    question: 'Bài hát {0} của bạn không được lưu vào tệp.'
+    question: 'Bài hát {render_mode} của bạn không được lưu vào tệp.'
     afterword:
     input_tip: Bấm OK để tiếp tục
     help_text:
   one_song_file:
     foreword: ---------------------------------------
-    question: 'Bài hát {0} của bạn được lưu vào: {1}'
+    question: 'Bài hát {render_mode} của bạn được lưu vào: {song_file}'
     afterword:
     input_tip: Bấm OK để tiếp tục
     help_text:
   several_song_files:
     foreword: ---------------------------------------
-    question: 'Bài hát {0} của bạn được lưu vào: {1}'
-    afterword: 'Bài hát của bạn được chia thành {0} tệp giữa"{1}" và "{2}"'
+    question: 'Bài hát {render_mode}} của bạn được lưu vào: {song_file}'
+    afterword: 'Bài hát của bạn được chia thành {num_files} tệp giữa"{first_file}" và "{last_file}"'
     input_tip: Bấm OK để tiếp tục
     help_text:
   few_errors:
