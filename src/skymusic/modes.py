@@ -57,8 +57,8 @@ class RenderMode(Enum):
     def get_short_desc(self, locale='en_US'):
         return Lang.get_string(self.short_desc_yaml, locale)
 
-    def get_note_parser(self):
-        return self.note_parser_method()
+    def get_note_parser(self, locale='en_US'):
+        return self.note_parser_method(locale=locale)
 
     def get_mime_type(self):
         return self.mime_type
