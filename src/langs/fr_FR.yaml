@@ -243,7 +243,7 @@ stock_queries:
     help_text:
   several_song_files:
     foreword: ---------------------------------------
-    question: 'Votre {render_mode} est enregistrée ici: {song_file}'
+    question: 'Votre {render_mode} est enregistrée dans: {songs_out}'
     afterword: 'Votre chanson a été découpée en {num_files} fichiers entre "{first_file}" et "{last_file}"'
     input_tip: cliquez sur OK pour passer
     help_text:

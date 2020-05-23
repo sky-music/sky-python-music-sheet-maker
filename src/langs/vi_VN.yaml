@@ -244,7 +244,7 @@ stock_queries:
     help_text:
   several_song_files:
     foreword: ---------------------------------------
-    question: 'Bài hát {render_mode}} của bạn được lưu vào: {song_file}'
+    question: 'Bài hát {render_mode}} của bạn được lưu vào: {songs_out}'
     afterword: 'Bài hát của bạn được chia thành {num_files} tệp giữa"{first_file}" và "{last_file}"'
     input_tip: Bấm OK để tiếp tục
     help_text:

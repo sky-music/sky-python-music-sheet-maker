@@ -180,7 +180,7 @@ stock_queries:
   one_input_mode:
     foreword:
     question: |
-        We detected that you use the following notation: '{song_key}'.
+        We detected that you use the following notation: '{input_mode}'.
     afterword:
     input_tip: click OK to acknowledge
     help_text:
@@ -246,7 +246,7 @@ stock_queries:
     help_text:
   several_song_files:
     foreword: ---------------------------------------
-    question: 'Your {render_mode} is located at: {song_file}'
+    question: 'Your {render_mode} is located in: {songs_out}'
     afterword: 'Your song has been split into {num_files} files between "{first_file}" and "{last_file}"'
     input_tip: click OK to acknowledge
     help_text:

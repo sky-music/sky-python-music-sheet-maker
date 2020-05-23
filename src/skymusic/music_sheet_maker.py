@@ -2,6 +2,7 @@ import os, io, re
 from src.skymusic.modes import InputMode, CSSMode, RenderMode, ReplyType
 from src.skymusic.communicator import Communicator, QueriesExecutionAbort
 from src.skymusic.parsers.song_parser import SongParser
+from src.skymusic.renderers.song_renderers.song_renderer import SongRenderer
 from src.skymusic import Lang
 from src.skymusic.resources import Resources
 
@@ -727,73 +728,46 @@ class MusicSheetMaker:
             if buffers is not None:
                 song_bundle.add_render(render_mode, buffers)
                 if self.is_commandline(recipient):
-                    file_paths = self.build_file_paths(render_mode, len(buffers))
-                    self.send_buffers_to_files(render_mode, buffers, file_paths, recipient=recipient)
+                    self.send_buffers_to_files(render_mode, buffers, recipient=recipient)
                         
         return song_bundle
 
 
-    def send_buffers_to_files(self, render_mode, buffers, file_paths, recipient, prerequisites=None, execute=True):
+    def send_buffers_to_files(self, render_mode, buffers, recipient, prerequisites=None, execute=True):
         """
         Writes the content of an IOString or IOBytes buffer list to one or several files.
         Command line only
         """
-        # TODO: Move this method to SongRenderer???
-        try:
-            numfiles = len(buffers)
-        except (TypeError, AttributeError):
-            buffers = [buffers]
-            numfiles = 1
+        song_renderer = SongRenderer(self.locale)
+        
+        file_paths = song_renderer.write_buffers_to_files(self.get_song(), render_mode, buffers, self.song_dir_out)
+        
+        numfiles = len(file_paths)
+        
+        if numfiles == 1:
 
-        # Creates output directory if did not exist
-        if not os.path.isdir(self.song_dir_out):
-            os.mkdir(self.song_dir_out)
+            replacements = {'render_mode': render_mode.get_short_desc(self.locale),
+                            'song_file': str(os.path.relpath(file_paths[0]))
+                            }
 
-        if len(buffers) != len(file_paths):
-            raise MusicSheetMakerError("inconsistent lengths of buffers and file_paths")
+            i_song_files = self.communicator.send_stock_query('one_song_file', recipient=recipient,
+            replacements=replacements, prerequisites=prerequisites)
 
-        (file_base, file_ext) = os.path.splitext(file_paths[0])
+        elif numfiles > 1:
 
-        for i, buffer in enumerate(buffers):
-
-            if isinstance(buffer, io.StringIO):
-                output_file = open(file_paths[i], 'w+', encoding='utf-8', errors='ignore')
-            elif isinstance(buffer, io.BytesIO):
-                output_file = open(file_paths[i], 'bw+')
-            elif buffer is None:
-                pass
-            else:
-                raise MusicSheetMakerError(f"Unknown buffer type in {self}")
-
-            if buffer is not None:
-                output_file.write(buffer.getvalue())
-
-                if numfiles == 1:
-
-                    replacements = {'render_mode': render_mode.get_short_desc(self.locale),
-                                    'song_file': str(os.path.relpath(file_paths[0]))
-                                    }
-
-                    i_song_files = self.communicator.send_stock_query('one_song_file', recipient=recipient,
-                                                                      replacements=replacements,
-                                                                      prerequisites=prerequisites)
-
-                elif numfiles > 1 and i == 0:
-
-                    replacements = {'render_mode': render_mode.get_short_desc(self.locale),
-                                    'songs_in': str(os.path.relpath(self.song_dir_out)),
-                                    'num_files': str(numfiles),
-                                    'first_file': str(os.path.split(file_paths[0])[1]),
-                                    'last_file': str(os.path.split(file_paths[-1])[1])
-                                    }
-                    i_song_files = self.communicator.send_stock_query('several_song_files', recipient=recipient,
-                                                                      replacements=replacements,
-                                                                      prerequisites=prerequisites)
-            else:
-                replacements = {'render_mode': render_mode.get_short_desc(self.locale)}
-                i_song_files = self.communicator.send_stock_query('no_song_file', recipient=recipient,
-                                                                  replacements=replacements,
-                                                                  prerequisites=prerequisites)
+            replacements = {'render_mode': render_mode.get_short_desc(self.locale),
+                            'songs_out': str(os.path.relpath(self.song_dir_out)),
+                            'num_files': str(numfiles),
+                            'first_file': str(os.path.split(file_paths[0])[1]),
+                            'last_file': str(os.path.split(file_paths[-1])[1])
+                            }
+            i_song_files = self.communicator.send_stock_query('several_song_files', recipient=recipient,
+            replacements=replacements, prerequisites=prerequisites)
+            
+        else:
+            replacements = {'render_mode': render_mode.get_short_desc(self.locale)}
+            i_song_files = self.communicator.send_stock_query('no_song_file', recipient=recipient,
+            replacements=replacements, prerequisites=prerequisites)
 
         if execute:
             recipient.execute_queries(i_song_files)
@@ -803,29 +777,7 @@ class MusicSheetMaker:
             return i_song_files, None
 
 
-    def build_file_paths(self, render_mode, numfiles):
-        """
-        Command line only : generates a list of file paths for a given input mode.
-        """
-        # TODO: Move this method to SongRenderer???
-        if numfiles == 0:
-            return None
-        
-        sanitized_title = re.sub(r'[\\/:"*?<>|]', '', re.escape(self.get_song().get_title())).strip()
-        if len(sanitized_title) == 0:
-            sanitized_title = 'Untitled'
-        
-        file_base = os.path.join(self.song_dir_out, sanitized_title)
-        file_ext = render_mode.extension
-
-        file_paths = []
-        if numfiles > 1:
-            for i in range(numfiles):
-                file_paths += [file_base + str(i) + file_ext]
-        else:
-            file_paths = [file_base + file_ext]
-
-        return file_paths
+    
 
     '''
     def next_step(self, recipient, step_number=0):
