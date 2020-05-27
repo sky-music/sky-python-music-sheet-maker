@@ -89,15 +89,17 @@ class SongBundle:
 
 class MusicSheetMaker:
 
-    def __init__(self, locale='en_US', songs_in='test_songs', songs_out='songs_out'):
+    def __init__(self, locale='en_US', song_dir_in=None, song_dir_out=None):
         self.name = Resources.MUSIC_MAKER_NAME
         self.locale = self.set_locale(locale)
         self.communicator = Communicator(owner=self, locale=self.locale)
         self.song = None
         self.song_parser = None
         self.directory_base = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'))
-        self.song_dir_in = os.path.join(self.directory_base, songs_in)
-        self.song_dir_out = os.path.join(self.directory_base, songs_out)
+        self.song_dir_in = song_dir_in if song_dir_in is not None else os.path.join(self.directory_base, 'test_songs')
+        self.song_dir_out = song_dir_out if song_dir_out is not None else os.path.join(self.directory_base, 'songs_out')
+        print(self.song_dir_in)
+        print(self.song_dir_out)
         self.css_path = Resources.css_path
         self.rel_css_path = os.path.relpath(self.css_path, start=self.song_dir_out)
         self.css_mode = CSSMode.EMBED
@@ -174,9 +176,6 @@ class MusicSheetMaker:
         if song_parser is None:
             song_parser = SongParser(self)
         self.song_parser = song_parser
-
-    def get_directory_base(self):
-        return self.directory_base
 
     def get_render_modes_enabled(self):
 

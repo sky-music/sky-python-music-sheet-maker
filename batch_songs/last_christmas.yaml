@@ -1,0 +1,25 @@
+aspect_ratio: 16/9 # a number or a fraction
+song_bpm: 120 # an integer value between 12 and 1200
+octave_shift: 0 # an integer between -12 and +12
+render_modes: all # all to activate all modes, otherwise a comma-separated list of modes names among SVG, HTML, PNG, MIDI, SKYJSON, SKYASCII, ENGLISHASCII
+#notes_file: | # a file name, indented with 4 spaces...
+#    redemption.txt 
+notes_file: | # ... OR song notes, left indent of 4 spaces
+    #    #    # Last # # Christ - # mas # # I 
+    DF#A    .    E2   . E2 D2 . A 
+    # gave # you # my # heart
+    E2 E2 F#2 D2
+    # but # the # ve - # ry # next # day
+    A A DF#BE2 E2 F#2 D2
+    # you # gave # it # a - # way
+    D2 C#2 D2 C#2 B
+    # this # year # # to # save # me # from # tears
+    EGBF#2 E2 . B F#2 G2 F#2 E2
+    # I'll # give # it # to # some - # one # spe - # cial
+    D2 EAC#2 D2 D2 C#2 D2 C#2 A
+notes: #This question must be answered with a blank for complete automation
+musical_notation: ENGLISH # An input_mode short name
+song_title: Last Christmas # song title
+recommended_key: C # The key in case your notation does not use octaves
+original_artist: Popular # Artist name
+transcript_writer: me # Person who transcribed the notes
