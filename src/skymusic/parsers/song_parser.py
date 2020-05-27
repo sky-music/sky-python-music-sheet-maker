@@ -344,6 +344,10 @@ class SongParser:
         times = [note['time'] for note in notes]
         keys = [note['key'] for note in notes]
 
+        # A Special trick to have the same number of digit for all numbers
+        # Facilitates the splitting of glued chords into notes
+        keys = [self.get_note_parser().sanitize_digits(key) for key in keys]
+
         tempos = [tempo for tempo in self.analyze_tempo(times) if tempo > 2*self.skyjson_chord_delay]
         
         if len(tempos) > 0:

@@ -80,14 +80,21 @@ class NoteParser:
 
     def get_note_name(self, note):
 
-        note_name = self.get_note_name_regex().search(note).group(0)
-
+        note_regexobj = self.get_note_name_regex().search(note)
+        if note_regexobj:
+            note_name = note_regexobj.group(0)
+        else:
+            note_name = None
         return note_name
 
     def get_note_octave(self, note):
 
-        note_octave = int(self.get_note_octave_regex().search(note).group(0))
-
+        octave_regexobj = self.get_note_octave_regex().search(note)
+        if octave_regexobj:
+            note_octave = int(octave_regexobj.group(0))
+        else:
+            note_octave = ''
+            
         return note_octave
 
     def is_valid_note_name_with_octave(self, note):

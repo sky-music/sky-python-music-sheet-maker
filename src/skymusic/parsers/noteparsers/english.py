@@ -28,7 +28,7 @@ class English(noteparser.NoteParser):
 
         # Compile regexes for notes to save before using
         self.note_name_with_octave_regex = re.compile(r'([ABCDEFGabcdefg][b#♭♯]?\d)')
-        self.note_name_regex = re.compile(r'([ABCDEFGabcdefg][b#\u266D\u266F]?)')
+        self.note_name_regex = re.compile(r'([ABCDEFGabcdefg][b#♭♯]?)')
         self.single_note_name_regex = re.compile(r'(\b[ABCDEFGabcdefg][b#♭♯]?\d?\b)')
         self.note_octave_regex = re.compile(r'\d')
         self.not_note_name_regex = re.compile(r'[^ABCDEFGabcdefgb#♭♯]+')
