@@ -166,8 +166,9 @@ class Communicator:
         result_dict.update({'saves': []})
 
         sanitized_title = re.sub(r'[\\/:"*?<>|]', '', re.escape(song_bundle.get_meta()['title'])).strip()
-        if len(sanitized_title) == 0:
-            sanitized_title = 'Untitled'
+        sanitized_title = re.sub('(\s)+', '_', sanitized_title)  # replaces spaces by underscore
+        if len(sanitized_title) == 0 or sanitized_title == '_':
+            sanitized_title = Lang.get_string("song_meta/untitled", self.locale)
 
         for render_mode, buffers in song_bundle.get_all_renders().items():
 

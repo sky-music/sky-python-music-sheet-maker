@@ -265,24 +265,24 @@ class MusicSheetMaker:
 
         # 8. Displays error ratio
         (i_error, res) = self.display_error_ratio(recipient=recipient, prerequisites=[q_notes, q_mode, q_shift])
-
-        # 9. Asks for song metadata
-        (qs_meta, (title, artist, transcript)) = self.ask_song_metadata(recipient=recipient)
         
-        # 9.b sets song metadata
-        self.set_song_metadata(recipient=recipient, meta=(title, artist, transcript), song_key=song_key)
-        #self.set_song_metadata(recipient=recipient) # EXPERIMENTAL
-
-        # 10 Asks for render modes
+        # 9 Asks for render modes
         (q_render, render_modes) = self.ask_render_modes(recipient=recipient)
 
-        # 11. Asks for aspect ratio
+        # 10. Asks for aspect ratio
         (q_aspect, aspect_ratio) = self.ask_aspect_ratio(recipient=recipient, render_modes=render_modes, prerequisites=[q_render])
         #(q_aspect, aspect_ratio) = self.ask_aspect_ratio(recipient=recipient, prerequisites=[q_render])  # EXPERIMENTAL
 
-        # 12. Ask beats per minutes
+        # 11. Ask beats per minutes
         (q_song_bpm, song_bpm) = self.ask_song_bpm(recipient=recipient, render_modes=render_modes, prerequisites=[q_render])
         #(q_song_bpm, song_bpm) = self.ask_song_bpm(recipient=recipient, prerequisites=[q_render])  # EXPERIMENTAL       
+
+        # 12. Asks for song metadata
+        (qs_meta, (title, artist, transcript)) = self.ask_song_metadata(recipient=recipient)
+
+        # 12.b sets song metadata
+        self.set_song_metadata(recipient=recipient, meta=(title, artist, transcript), song_key=song_key)
+        #self.set_song_metadata(recipient=recipient) # EXPERIMENTAL
 
         # 13. Renders Song
         song_bundle = self.render_song(recipient=recipient, render_modes=render_modes, aspect_ratio=aspect_ratio, song_bpm=song_bpm)

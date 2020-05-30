@@ -74,8 +74,9 @@ class SongRenderer():
             return []
         
         sanitized_title = re.sub(r'[\\/:"*?<>|]', '', re.escape(song.get_title())).strip()
-        if len(sanitized_title) == 0:
-            sanitized_title = 'Untitled'
+        sanitized_title = re.sub('(\s)+', '_', sanitized_title)  # replaces spaces by underscore
+        if len(sanitized_title) == 0 or sanitized_title == '_':
+            sanitized_title = Lang.get_string("song_meta/untitled", self.locale)
         
         file_base = os.path.join(dir_out, sanitized_title)
         file_ext = render_mode.extension
