@@ -6,9 +6,9 @@ from . import noteparser
 
 class Doremi(noteparser.NoteParser):
 
-    def __init__(self):
+    def __init__(self, **kwargs):
 
-        super().__init__()
+        super().__init__(**kwargs)
 
         self.CHROMATIC_SCALE_DICT = {'do': 0, 'do#': 1, 'reb': 1, 're': 2, 're#': 3, 'mib': 3, 'mi': 4, 'fa': 5,
                                      'fa#': 6, 'solb': 6, 'sob': 6, 'sol': 7, 'so': 7, 'sol#': 8, 'so#': 8, 'lab': 8,

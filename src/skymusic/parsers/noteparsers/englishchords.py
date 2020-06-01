@@ -2,9 +2,9 @@ from . import english
 
 class EnglishChords(english.English):
 
-    def __init__(self):
+    def __init__(self, **kwargs):
 
-        super().__init__()
+        super().__init__(**kwargs)
         
         oct_int = self.get_default_starting_octave()
         if oct_int > 1:

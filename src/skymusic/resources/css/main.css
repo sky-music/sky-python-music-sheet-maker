@@ -392,6 +392,10 @@ svg rect.note-background {
   fill: none;
 }
 
+#navigation {
+  border: none;
+}
+
 /* <!-- Button styles if chord has en broken --> */
 /* <!-- TODO: Check if this has no effect ??? --> */
 /*

@@ -15,7 +15,7 @@ class AsciiSongRenderer(song_renderer.SongRenderer):
         meta = song.get_meta()
         ascii_buffer = io.StringIO()
 
-        note_parser = render_mode.get_note_parser()
+        note_parser = render_mode.get_note_parser(locale=self.locale)
         instrument_renderer = AsciiInstrumentRenderer(self.locale)
         
         ascii_buffer.write(f"{Resources.COMMENT_DELIMITER}{meta['title'][1]}\n")
