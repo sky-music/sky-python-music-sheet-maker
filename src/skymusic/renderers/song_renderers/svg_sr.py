@@ -75,7 +75,7 @@ class SvgSongRenderer(song_renderer.SongRenderer):
 
         if buffer_list is None:
             buffer_list = []
-        if len(buffer_list) > self.maxFiles:
+        if len(buffer_list) >= self.maxFiles:
             print(f"\nYour song is too long. Stopping at {self.maxFiles} files.")
             return buffer_list
 
@@ -250,7 +250,7 @@ class SvgSongRenderer(song_renderer.SongRenderer):
 
         
         # Open new file
-        if end_row < song.get_num_lines() or end_col < ncols:
+        if end_row < song.get_num_lines() or 0 < end_col < ncols:
             buffer_list = self.write_buffers(song, css_mode, rel_css_path, end_row, end_col, buffer_list)
 
         return buffer_list

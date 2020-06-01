@@ -19,9 +19,6 @@ class SkyjsonSongRenderer(song_renderer.SongRenderer):
         meta = song.get_meta()
         dt = (60000/self.song_bpm) / 4
         
-        #print('%%DEBUG')
-        #print(dt)
-    
         json_buffer = io.StringIO()
 
         instrument_renderer = SkyjsonInstrumentRenderer(self.locale)

@@ -124,7 +124,7 @@ class Communicator:
                 try:
                     method_args[k] = method_args[k].format_map(replacements)
                 except (KeyError, AttributeError):
-                    pass            
+                    pass
         method_args['name'] = stock_query_name
         method_args['sender'] = self.owner
         method_args['recipient'] = recipient

@@ -104,12 +104,17 @@ class Song():
             
     def render(self, render_mode, **kwargs):
 
+        try:
+            aspect_ratio = kwargs['aspect_ratio'].get_ratio()
+        except (KeyError, AttributeError):
+            aspect_ratio = 16/9.0
+        
         if render_mode == RenderMode.HTML:
             buffers = html_sr.HtmlSongRenderer(self.locale).write_buffers(song=self, css_mode=kwargs['css_mode'], rel_css_path=kwargs['rel_css_path'])
         elif render_mode == RenderMode.SVG:
-            buffers = svg_sr.SvgSongRenderer(self.locale, kwargs['aspect_ratio']).write_buffers(song=self, css_mode=kwargs['css_mode'], rel_css_path=kwargs['rel_css_path'])
+            buffers = svg_sr.SvgSongRenderer(self.locale, aspect_ratio).write_buffers(song=self, css_mode=kwargs['css_mode'], rel_css_path=kwargs['rel_css_path'])
         elif render_mode == RenderMode.PNG:
-            buffers = png_sr.PngSongRenderer(self.locale, kwargs['aspect_ratio']).write_buffers(song=self)
+            buffers = png_sr.PngSongRenderer(self.locale, aspect_ratio).write_buffers(song=self)
         elif render_mode == RenderMode.MIDI:
             buffers = midi_sr.MidiSongRenderer(self.locale, kwargs['song_bpm']).write_buffers(song=self)
         elif render_mode == RenderMode.SKYJSON:

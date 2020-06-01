@@ -1,61 +1,82 @@
+recipient_specifics:
+  skip:
+    command_line: leave blank and type enter
+    music_cog: answer with - (dash)
+    sky_music_website: leave blank and press answer
+  skip_number:
+    command_line: leave blank or 0 and type enter
+    music_cog: answer with - (dash) or 0
+    sky_music_website: leave blank or 0 and press answer
 input_mode:
-    skykeyboard:
-        short_desc: Sky keyboard
-        long_desc: "Type on keyboard as you would in Sky:\n   QWERT\n   ASDFG\n   ZXCVB"
-    sky:
-        short_desc: 'Sky ABC1-5'
-        long_desc: "Sky column/row notation:\n   A1 A2 A3 A4 A5\n   B1 B2 B3 B4 B5\n   C1 C2 C3 C4 C5"
-    english:
-        short_desc: English CDEFGAB
-        long_desc: "English (note name in C D E F G A B + alteration b/# + octave number, e.g. Cb4 D#4 E5 ...)"
-    doremi:
-        short_desc: French doremi
-        long_desc: "Doremi (note name in do re mi fa sol la si/ti + alteration b/# + octave number, e.g. dob4 re#4 mi5 ...)"
-    jianpu:
-        short_desc: 'Jianpu 1234567+-'
-        long_desc: "Jianpu (note name in 1 2 3 4 5 6 7, followed by alteration b/# and several + or - for octave shift)"
-    englishchords:
-        short_desc: Chords CDEFGABmaj
-        long_desc: "Abbreviated English chord name (e.g. C, F, Dm, Bdim, A+, Csus2, Dsus4, C6, Cmaj7, Dm11)"
-    doremijp:
-        short_desc: 日本語イタリアドレミ
-        long_desc: "Japanese do re mi: ド、ド#／レb、レ、レ#／ミb、ミ、ファ、ファ#／ソb、ソ、ソ#／ラb、ラ、ラ#／シb、シ"
-    skyjson:
-        short_desc: 'Sky-Music recording (JSON text)'
-        long_desc: "Dictionary with time in ms and key number 0-14 used by SkyStudio app and https://sky-music.herokuapp.com"
+  skykeyboard:
+    short_desc: Sky keyboard
+    long_desc: "Type on keyboard as you would in Sky:\n   QWERT\n   ASDFG\n   ZXCVB"
+  sky:
+    short_desc: 'Sky ABC1-5'
+    long_desc: "Sky column/row notation:\n   A1 A2 A3 A4 A5\n   B1 B2 B3 B4 B5\n   C1 C2 C3 C4 C5"
+  english:
+    short_desc: English CDEFGAB
+    long_desc: "English (note name in C D E F G A B + alteration b/# + octave number, e.g. Cb4 D#4 E5 ...)"
+  doremi:
+    short_desc: French doremi
+    long_desc: "Doremi (note name in do re mi fa sol la si/ti + alteration b/# + octave number, e.g. dob4 re#4 mi5 ...)"
+  jianpu:
+    short_desc: 'Jianpu 1234567+-'
+    long_desc: "Jianpu (note name in 1 2 3 4 5 6 7, followed by alteration b/# and several + or - for octave shift)"
+  englishchords:
+    short_desc: Chords CDEFGABmaj
+    long_desc: "Abbreviated English chord name (e.g. C, F, Dm, Bdim, A+, Csus2, Dsus4, C6, Cmaj7, Dm11)"
+  doremijp:
+    short_desc: 日本語イタリアドレミ
+    long_desc: "Japanese do re mi: ド、ド#／レb、レ、レ#／ミb、ミ、ファ、ファ#／ソb、ソ、ソ#／ラb、ラ、ラ#／シb、シ"
+  skyjson:
+    short_desc: 'Sky-Music recording (JSON text)'
+    long_desc: "Dictionary with time in ms and key number 0-14 used by SkyStudio app and https://sky-music.herokuapp.com"
 render_mode:
-    html:
-        short_desc: HTML visual sheet
-    svg:
-        short_desc: SVG visual sheet
-    png:
-        short_desc: PNG visual sheet
-    midi:
-        short_desc: Midi song file
-    skyjson:
-        short_desc: Sky-Music recording (JSON text file)
-    skyascii:
-        short_desc: song in Sky notation
-    englishascii:
-        short_desc: song in English notation
-    jianpuascii:
-        short_desc: song in Jianpu notation
-    doremiascii:
-        short_desc: song in do-re-mi notation
+  html:
+    short_desc: HTML visual sheet
+  svg:
+    short_desc: SVG visual sheet
+  png:
+    short_desc: PNG visual sheet
+  midi:
+    short_desc: Midi song file
+  skyjson:
+    short_desc: Sky-Music recording (JSON text file)
+  skyascii:
+    short_desc: song in Sky notation
+  englishascii:
+    short_desc: song in English notation
+  jianpuascii:
+    short_desc: song in Jianpu notation
+  doremiascii:
+    short_desc: song in do-re-mi notation
+aspect_ratio:
+  widescreen:
+    short_desc: Widescreen TV (16:9)
+  oldtv:
+    short_desc: Old TV (4:3)
+  square:
+    short_desc: Square (1:1)
+  A4:
+    short_desc: A4 paper sheet (1:1.4)
+  vertical_panel:
+    short_desc: Vertical panel (1:2)
 song_meta:
-   title: Title
-   artist: Original artist(s)
-   transcript: Transcript writer
-   musical_key: Musical key
-   untitled: Untitled
+  title: Title
+  artist: Original artist(s)
+  transcript: Transcript writer
+  musical_key: Musical key
+  untitled: Untitled
 open_file: |
     (Notes imported from {file_path})
 stock_queries:
-  instructions_stdout:
+  instructions_command_line:
     foreword: "===== VISUAL MUSIC SHEETS FOR SKY:CHILDREN OF THE LIGHT =====\n"
     question: |
       Accepted music notes formats:{input_modes}
       
+      Pay attention to these special characters:
       - Notes composing a chord must be glued together (e.g. A1B1C1).
       - Separate chords with "{icon_delimiter}".
       - Use "{pause}" for a silence (rest), except for Jianpu where '0' is the official pause character.
@@ -67,11 +88,12 @@ stock_queries:
     afterword: =======================================
     input_tip:
     help_text:
-  instructions_website:
+  instructions_sky_music_website:
     foreword:
     question: |
       Accepted music notes formats:{input_modes}
       
+      Pay attention to these special characters:
       - Notes composing a chord must be glued together (e.g. A1B1C1).
       - Separate chords with "{icon_delimiter}".
       - Use "{pause}" for a silence (rest), except for Jianpu where '0' is the official pause character.
@@ -81,7 +103,7 @@ stock_queries:
     afterword:
     input_tip: click OK to acknowledge
     help_text:
-  instructions_botcog:
+  instructions_music_cog:
     foreword:
     question: |
       Welcome to the Visual Song Sheet creator!
@@ -90,7 +112,7 @@ stock_queries:
     afterword:
     input_tip:
     help_text: |
-      I accept the following music notes formats:{input_modes}
+      Accepted music notes formats:{input_modes}
       
       Pay attention to these special characters:
       - Notes composing a chord must be glued together (e.g. A1B1C1).
@@ -110,36 +132,36 @@ stock_queries:
       On the command-line, enter a comma-separated list of choices numbers, such as 0, 1, 3.
       On the website, check the boxes.
   aspect_ratio:
-    foreword: By default the visual sheet is a 16/9 image in landscape orientation.
-    question: Please choose a different aspect ratio, or leave blank to skip
+    foreword: By default the visual sheet is a 16:9 image in landscape orientation.
+    question: 'Please choose a different aspect ratio in the list, or {skip_number} to skip'
     afterword:
-    input_tip: a positive number or a fraction (eg 4/3) between 0.1 and 10. Leave blank or 0 to skip.
+    input_tip: 'an aspect ratio in the list. {skip_number} to skip'
     help_text: |
-      By default the visual sheet is a 16/9 image in landscape orientation. Please choose a different aspect ratio if you like. Only numbers between 1/10 (0.1) and 10 are accepted.
+      By default the visual sheet is a 16:9 image in landscape orientation. Please choose a different aspect ratio if you like.
   song_bpm:
     foreword: One of the output formats needs timing information.
-    question: Please choose the song tempo (BPM, beats per minute), or leave blank to skip
+    question: 'Please choose the song tempo (BPM, beats per minute), or {skip_number} to skip'
     afterword:
-    input_tip: a positive number between 12 and 1200. Leave blank or 0 to skip.
+    input_tip: 'a positive number between 12 and 1200. {skip_number} to skip'
     help_text: |
       You have selected an output format (such as Midi) that requires to know how fast to play the song. This is usually expressed in terms of beats per minute. Please give a integer value between 12 and 1200.
   song_title:
     foreword:
     question: What is the song title?
     afterword:
-    input_tip: 'any text. Leave blank to use "untitled"'
+    input_tip: 'any text. {skip} to use "untitled"'
     help_text: 
   original_artist:
     foreword:
     question: What is(are) the Original artist(s)?
     afterword:
-    input_tip: any text, including blank
+    input_tip: any non-empty text
     help_text: Original artists include the composer, musician, singer, etc.
   transcript_writer:
     foreword:
     question: What is the transcript writer?
     afterword:
-    input_tip: any text, including blank
+    input_tip: 'any text, {skip} to skip'
     help_text: 'The transcript writer is the person who found the notes you typed earlier. It could be yourself!'
   notes_file:
     foreword:
@@ -147,7 +169,7 @@ stock_queries:
     afterword:
     input_tip: a string of notes such as C1 D1F1, or a file name such as song.txt
     help_text: |
-      I accept the following music notes formats:{input_modes}
+      Accepted music notes formats:{input_modes}
       
       Pay attention to these special characters:
       - Notes composing a chord must be glued together (e.g. A1B1C1).
@@ -164,11 +186,11 @@ stock_queries:
     help_text:
   notes:
     foreword:
-    question: Please type or copy-paste notes (leave blank to skip)
+    question: 'Please type or copy-paste notes ({skip} to skip)'
     afterword:
-    input_tip: any text with one or several musical notes (leave blank to skip)
+    input_tip: 'any text with one or several musical notes ({skip} to skip)'
     help_text: |
-      I accept the following music notes formats:{input_modes}
+      Accepted music notes formats:{input_modes}
       
       Pay attention to these special characters:
       - Notes composing a chord must be glued together (e.g. A1B1C1).
@@ -180,7 +202,7 @@ stock_queries:
   one_input_mode:
     foreword:
     question: |
-        We detected that you use the following notation: '{input_mode}'.
+      We detected that you use the following notation: '{input_mode}'.
     afterword:
     input_tip: click OK to acknowledge
     help_text:
@@ -216,15 +238,15 @@ stock_queries:
       We detected that your song can be played with several notes as the song key. Please choose the one that is most convenient for you.'
   recommended_key:
     foreword: Your musical notation uses relative pitch.
-    question: What is the recommended key to play in Sky (default is C)
+    question: 'What is the recommended key to play in Sky (default is C). {skip} to skip'
     afterword:
-    input_tip: leave blank, or type a note name (e.g. C in English notation)
+    input_tip: '{skip}, or type a note name (e.g. C in English notation)'
     help_text: |
       You have used a musical notation that does allow to determine the exact pitch of your notes.
       Hence the visual sheet will sound differently in different places in Sky.
   octave_shift:
     foreword: Do you want to shift the pitch of your notes?
-    question: Octave shift (leave blank or type 0 to skip)
+    question: 'Octave shift ({skip_number} to skip)'
     afterword:
     input_tip: octave shift as an integer between -6 and +6
     help_text: |

@@ -37,7 +37,7 @@ class CommandLinePlayer:
     """
 
     def __init__(self, locale='en_US', preferences_path='../../preferences.yaml'):
-        self.name = Resources.COMMANDLINE_NAME
+        self.name = Resources.COMMAND_LINE_NAME
         self.locale = self.set_locale(locale)
         self.communicator = Communicator(owner=self, locale=locale)
         self.preferences = self.load_preferences(preferences_path)

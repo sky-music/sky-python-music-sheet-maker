@@ -1,8 +1,8 @@
-from src.skymusic.modes import ReplyType
+from src.skymusic.modes import ReplyType, AspectRatio
 from src.skymusic.communication import QueryOpen, QueryChoice, QueryMultipleChoices, Information
 from src.skymusic import Lang
 
-'''
+"""
 NOTE ABOUT LIMITS
 
 Limits should be a list (even though entering another iterable is possible)
@@ -17,7 +17,12 @@ For ReplyType.NUMBER, it is a list of [min, max, default], default being optiona
 
 For ReplyType.TEXT, limits can be a (compilable) regular expression
 
-'''
+If a non-None value for 'default' is set, then a blank answer will revert to this value.
+Otherwise, blank answers are forbidden
+
+'expect_long_answer' is a special setting to display a textarea on the website
+
+"""
 
 def load(locale):
     
@@ -36,31 +41,31 @@ def load(locale):
                             'reply_type': ReplyType.TEXT
                             },
         
-            'instructions_stdout': {'class': Information,
+            'instructions_command_line': {'class': Information,
                                     'handler': 'None',
-                                    'foreword': Lang.get_string("stock_queries/instructions_stdout/foreword", locale),
-                                    'question': Lang.get_string("stock_queries/instructions_stdout/question", locale),
-                                    'afterword': Lang.get_string("stock_queries/instructions_stdout/afterword", locale),
-                                    'input_tip': Lang.get_string("stock_queries/instructions_stdout/input_tip", locale),
-                                    'help_text': Lang.get_string("stock_queries/instructions_stdout/help_text", locale)
+                                    'foreword': Lang.get_string("stock_queries/instructions_command_line/foreword", locale),
+                                    'question': Lang.get_string("stock_queries/instructions_command_line/question", locale),
+                                    'afterword': Lang.get_string("stock_queries/instructions_command_line/afterword", locale),
+                                    'input_tip': Lang.get_string("stock_queries/instructions_command_line/input_tip", locale),
+                                    'help_text': Lang.get_string("stock_queries/instructions_command_line/help_text", locale)
                                     },
         
-           'instructions_website': {'class': Information,
+           'instructions_sky_music_website': {'class': Information,
                                     'handler': 'None',
-                                    'foreword': Lang.get_string("stock_queries/instructions_website/foreword", locale),
-                                    'question': Lang.get_string("stock_queries/instructions_website/question", locale),
-                                    'afterword': Lang.get_string("stock_queries/instructions_website/afterword", locale),
-                                    'input_tip': Lang.get_string("stock_queries/instructions_website/input_tip", locale),
-                                    'help_text': Lang.get_string("stock_queries/instructions_website/help_text", locale)
+                                    'foreword': Lang.get_string("stock_queries/instructions_sky_music_website/foreword", locale),
+                                    'question': Lang.get_string("stock_queries/instructions_sky_music_website/question", locale),
+                                    'afterword': Lang.get_string("stock_queries/instructions_sky_music_website/afterword", locale),
+                                    'input_tip': Lang.get_string("stock_queries/instructions_sky_music_website/input_tip", locale),
+                                    'help_text': Lang.get_string("stock_queries/instructions_sky_music_website/help_text", locale)
                                     },
                                         
-            'instructions_botcog': {'class': Information,
+            'instructions_music_cog': {'class': Information,
                                     'handler': 'None',
-                                    'foreword': Lang.get_string("stock_queries/instructions_botcog/foreword", locale),
-                                    'question': Lang.get_string("stock_queries/instructions_botcog/question", locale),
-                                    'afterword': Lang.get_string("stock_queries/instructions_botcog/afterword", locale),
-                                    'input_tip': Lang.get_string("stock_queries/instructions_botcog/input_tip", locale),
-                                    'help_text': Lang.get_string("stock_queries/instructions_botcog/help_text", locale)
+                                    'foreword': Lang.get_string("stock_queries/instructions_music_cog/foreword", locale),
+                                    'question': Lang.get_string("stock_queries/instructions_music_cog/question", locale),
+                                    'afterword': Lang.get_string("stock_queries/instructions_music_cog/afterword", locale),
+                                    'input_tip': Lang.get_string("stock_queries/instructions_music_cog/input_tip", locale),
+                                    'help_text': Lang.get_string("stock_queries/instructions_music_cog/help_text", locale)
                                     },
         
             'render_modes': {'class': QueryMultipleChoices,
@@ -75,16 +80,16 @@ def load(locale):
                              'default': 'all'
                              },
         
-            'aspect_ratio': {'class': QueryOpen,
+            'aspect_ratio': {'class': QueryChoice,
                              'handler': 'None',
                              'foreword': Lang.get_string("stock_queries/aspect_ratio/foreword", locale),
                              'question': Lang.get_string("stock_queries/aspect_ratio/question", locale),
                              'afterword': Lang.get_string("stock_queries/aspect_ratio/afterword", locale),
                              'input_tip': Lang.get_string("stock_queries/aspect_ratio/input_tip", locale),
                              'help_text': Lang.get_string("stock_queries/aspect_ratio/help_text", locale),
-                             'reply_type': ReplyType.NUMBER,
-                             'limits': [0.1, 10.0],
-                             'default': 16/9.0
+                             'reply_type': ReplyType.ASPECTRATIO,
+                             'limits': list(AspectRatio),
+                             'default': AspectRatio.WIDESCREEN
                              },
         
             'song_bpm': {'class': QueryOpen,
@@ -108,7 +113,8 @@ def load(locale):
                            'input_tip': Lang.get_string("stock_queries/song_title/input_tip", locale),
                            'help_text': Lang.get_string("stock_queries/song_title/help_text", locale),
                            'reply_type': ReplyType.TEXT,
-                           'limits': None
+                           'limits': None,
+                           'default': Lang.get_string("song_meta/untitled", locale)
                            },
         
             'original_artist': {'class': QueryOpen,
@@ -130,7 +136,8 @@ def load(locale):
                                   'input_tip': Lang.get_string("stock_queries/transcript_writer/input_tip", locale),
                                   'help_text': Lang.get_string("stock_queries/transcript_writer/help_text", locale),
                                   'reply_type': ReplyType.TEXT,
-                                  'limits': None
+                                  'limits': None,
+                                  'default': ''
                                   },
         
             'notes_file': {'class': QueryOpen,
@@ -226,7 +233,8 @@ def load(locale):
                               'input_tip': Lang.get_string("stock_queries/recommended_key/input_tip", locale),
                               'help_text': Lang.get_string("stock_queries/recommended_key/help_text", locale),
                               'reply_type': ReplyType.NOTE,
-                              'limits': None
+                              'limits': None,
+                              'default': 'C'
                               },
                             
             'octave_shift': {'class': QueryOpen,

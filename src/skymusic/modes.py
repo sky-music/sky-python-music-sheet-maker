@@ -3,24 +3,27 @@ import src.skymusic.parsers.noteparsers
 from src.skymusic import Lang
 
 class InputMode(Enum):
-    SKYKEYBOARD = (1, "input_mode/skykeyboard/short_desc", "input_mode/skykeyboard/long_desc", src.skymusic.parsers.noteparsers.skykeyboard.SkyKeyboard)
-    SKY = (2, "input_mode/sky/short_desc", "input_mode/sky/long_desc", src.skymusic.parsers.noteparsers.skyabc15.SkyABC15)
-    ENGLISH = (3, "input_mode/english/short_desc", "input_mode/english/long_desc", src.skymusic.parsers.noteparsers.english.English)
-    DOREMI = (4, "input_mode/doremi/short_desc", "input_mode/doremi/long_desc", src.skymusic.parsers.noteparsers.doremi.Doremi)
-    JIANPU = (5, "input_mode/jianpu/short_desc", "input_mode/jianpu/long_desc", src.skymusic.parsers.noteparsers.jianpu.Jianpu)
-    ENGLISHCHORDS = (6, "input_mode/englishchords/short_desc", "input_mode/englishchords/long_desc",
+    SKYKEYBOARD = (False, "input_mode/skykeyboard/short_desc", "input_mode/skykeyboard/long_desc", src.skymusic.parsers.noteparsers.skykeyboard.SkyKeyboard)
+    SKY = (False, "input_mode/sky/short_desc", "input_mode/sky/long_desc", src.skymusic.parsers.noteparsers.skyabc15.SkyABC15)
+    SKYJSON = (False, "input_mode/skyjson/short_desc", "input_mode/skyjson/long_desc", src.skymusic.parsers.noteparsers.skyjson.SkyJson)
+    ENGLISH = (True, "input_mode/english/short_desc", "input_mode/english/long_desc", src.skymusic.parsers.noteparsers.english.English)
+    DOREMI = (True, "input_mode/doremi/short_desc", "input_mode/doremi/long_desc", src.skymusic.parsers.noteparsers.doremi.Doremi)
+    JIANPU = (True, "input_mode/jianpu/short_desc", "input_mode/jianpu/long_desc", src.skymusic.parsers.noteparsers.jianpu.Jianpu)
+    ENGLISHCHORDS = (True, "input_mode/englishchords/short_desc", "input_mode/englishchords/long_desc",
                      src.skymusic.parsers.noteparsers.englishchords.EnglishChords)
-    DOREMIJP = (7, "input_mode/doremijp/short_desc", "input_mode/doremijp/long_desc", src.skymusic.parsers.noteparsers.doremi_jp.DoremiJP)
-    SKYJSON = (8, "input_mode/skyjson/short_desc", "input_mode/skyjson/long_desc", src.skymusic.parsers.noteparsers.skyjson.SkyJson)
+    DOREMIJP = (True, "input_mode/doremijp/short_desc", "input_mode/doremijp/long_desc", src.skymusic.parsers.noteparsers.doremi_jp.DoremiJP)
 
-    def __init__(self, number, short_desc, long_desc, note_parser_method):
-        self.number = number
+    def __init__(self, chromatic, short_desc, long_desc, note_parser_method):
+        self.chromatic = chromatic
         self.short_desc_yaml = short_desc
         self.long_desc_yaml = long_desc
         self.note_parser_method = note_parser_method
 
     def __str__(self):
         return self.get_short_desc('en_US')
+
+    def get_is_chromatic(self):
+        return self.chromatic
 
     def get_short_desc(self, locale='en_US'):
         return Lang.get_string(self.short_desc_yaml, locale)
@@ -32,20 +35,21 @@ class InputMode(Enum):
         return self.note_parser_method(locale=locale)
 
 
+
 class RenderMode(Enum):
-    HTML = (1, "render_mode/html/short_desc", 'text/html', '.html', src.skymusic.parsers.noteparsers.skyabc15.SkyABC15)
-    SVG = (2, "render_mode/svg/short_desc", 'image/svg+xml', '.svg', src.skymusic.parsers.noteparsers.skyabc15.SkyABC15)
-    PNG = (3, "render_mode/png/short_desc", 'image/png', '.png', src.skymusic.parsers.noteparsers.skyabc15.SkyABC15)
-    MIDI = (4, "render_mode/midi/short_desc", 'audio/midi', '.mid', src.skymusic.parsers.noteparsers.skyabc15.SkyABC15)
-    SKYJSON = (5, "render_mode/skyjson/short_desc", 'application/json', '.json', src.skymusic.parsers.noteparsers.skyjson.SkyJson)
-    SKYASCII = (6, "render_mode/skyascii/short_desc", 'text/plain', '_sky.txt', src.skymusic.parsers.noteparsers.skyabc15.SkyABC15)
-    ENGLISHASCII = (7, "render_mode/englishascii/short_desc", 'text/plain', '_english.txt', src.skymusic.parsers.noteparsers.english.English)
-    JIANPUASCII = (8, "render_mode/jianpuascii/short_desc", 'text/plain', '_jianpu.txt', src.skymusic.parsers.noteparsers.jianpu.Jianpu)
-    DOREMIASCII = (9, "render_mode/doremiascii/short_desc", 'text/plain', '_doremi.txt', src.skymusic.parsers.noteparsers.doremi.Doremi)
+    HTML = (False, "render_mode/html/short_desc", 'text/html', '.html', src.skymusic.parsers.noteparsers.skyabc15.SkyABC15)
+    SVG = (True, "render_mode/svg/short_desc", 'image/svg+xml', '.svg', src.skymusic.parsers.noteparsers.skyabc15.SkyABC15)
+    PNG = (True, "render_mode/png/short_desc", 'image/png', '.png', src.skymusic.parsers.noteparsers.skyabc15.SkyABC15)
+    MIDI = (False, "render_mode/midi/short_desc", 'audio/midi', '.mid', src.skymusic.parsers.noteparsers.skyabc15.SkyABC15)
+    SKYJSON = (False, "render_mode/skyjson/short_desc", 'application/json', '.json', src.skymusic.parsers.noteparsers.skyjson.SkyJson)
+    SKYASCII = (False, "render_mode/skyascii/short_desc", 'text/plain', '_sky.txt', src.skymusic.parsers.noteparsers.skyabc15.SkyABC15)
+    ENGLISHASCII = (False, "render_mode/englishascii/short_desc", 'text/plain', '_english.txt', src.skymusic.parsers.noteparsers.english.English)
+    JIANPUASCII = (False, "render_mode/jianpuascii/short_desc", 'text/plain', '_jianpu.txt', src.skymusic.parsers.noteparsers.jianpu.Jianpu)
+    DOREMIASCII = (False, "render_mode/doremiascii/short_desc", 'text/plain', '_doremi.txt', src.skymusic.parsers.noteparsers.doremi.Doremi)
 
 
-    def __init__(self, number, short_desc, mime_type, extension, note_parser_method):
-        self.number = number
+    def __init__(self, image_mode, short_desc, mime_type, extension, note_parser_method):
+        self.image_mode = image_mode
         self.short_desc_yaml = short_desc
         self.mime_type = mime_type
         self.extension = extension
@@ -53,6 +57,9 @@ class RenderMode(Enum):
 
     def __str__(self):
         return self.get_short_desc('en_US')
+
+    def get_is_image(self):
+        return self.image_mode
 
     def get_short_desc(self, locale='en_US'):
         return Lang.get_string(self.short_desc_yaml, locale)
@@ -67,6 +74,27 @@ class RenderMode(Enum):
         return self.extension
 
 
+class AspectRatio(Enum):
+    WIDESCREEN = ("aspect_ratio/widescreen/short_desc", 16/9.0)
+    OLDTV = ("aspect_ratio/oldtv/short_desc", 4/3.0)
+    SQUARE = ("aspect_ratio/square/short_desc", 1.0)
+    A4 = ("aspect_ratio/A4/short_desc", 21/29.7)
+    VERTPANEL = ("aspect_ratio/vertical_panel/short_desc", 1/2.0)
+
+    def __init__(self, short_desc, ratio):
+        self.short_desc_yaml = short_desc
+        self.ratio = ratio
+
+    def __str__(self):
+        return self.get_short_desc('en_US')
+
+    def get_short_desc(self, locale='en_US'):
+        return Lang.get_string(self.short_desc_yaml, locale)
+
+    def get_ratio(self):
+        return self.ratio
+
+
 class CSSMode(Enum):
     XML = 1
     HREF = XML
@@ -76,16 +104,12 @@ class CSSMode(Enum):
     HARD = EMBED
 
 
-class ResponseMode(Enum):
-    COMMAND_LINE = 1
-    BOT = 2
-
-
 class ReplyType(Enum):
     TEXT = 1  # str
     NUMBER = 2  # int
     NOTE = 3  # str, with possible additional checks
     INPUTMODE = 4  # modes.InputMode
     RENDERMODES = 5
-    FILEPATH = 6  # A file path
-    OTHER = 7
+    ASPECTRATIO = 6
+    FILEPATH = 7  # A file path
+    OTHER = 8

@@ -1,5 +1,5 @@
 import os, io, re
-from src.skymusic.modes import InputMode, CSSMode, RenderMode, ReplyType
+from src.skymusic.modes import InputMode, CSSMode, RenderMode, ReplyType, AspectRatio
 from src.skymusic.communicator import Communicator, QueriesExecutionAbort
 from src.skymusic.parsers.song_parser import SongParser
 from src.skymusic.renderers.song_renderers.song_renderer import SongRenderer
@@ -98,8 +98,6 @@ class MusicSheetMaker:
         self.directory_base = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'))
         self.song_dir_in = song_dir_in if song_dir_in is not None else os.path.join(self.directory_base, 'test_songs')
         self.song_dir_out = song_dir_out if song_dir_out is not None else os.path.join(self.directory_base, 'songs_out')
-        print(self.song_dir_in)
-        print(self.song_dir_out)
         self.css_path = Resources.css_path
         self.rel_css_path = os.path.relpath(self.css_path, start=self.song_dir_out)
         self.css_mode = CSSMode.EMBED
@@ -108,7 +106,7 @@ class MusicSheetMaker:
         self.render_modes_disabled = []
         self.render_modes_enabled = [mode for mode in self.render_modes_enabled if
                                      mode not in self.render_modes_disabled]
-        self.botcog_render_modes = [RenderMode.PNG]
+        self.music_cog_render_modes = [RenderMode.PNG]
 
     def __getattr__(self, attr_name):
         """
@@ -134,20 +132,20 @@ class MusicSheetMaker:
 
         return self.locale
 
-    def is_botcog(self, recipient):
+    def is_music_cog(self, recipient):
         try:
-            is_bot = recipient.get_name() == Resources.MUSIC_COG_NAME
+            is_cog = recipient.get_name() == Resources.MUSIC_COG_NAME
         except AttributeError:
             try:  # Guesses harder
                 recipient.bot
-                is_bot = True
+                is_cog = True
             except AttributeError:
-                is_bot = False
-        return is_bot
+                is_cog = False
+        return is_cog
 
-    def is_website(self, recipient):
+    def is_sky_music_website(self, recipient):
         try:
-            is_website = recipient.get_name() == Resources.WEBSITE_NAME
+            is_website = recipient.get_name() == Resources.SKY_MUSIC_WEBSITE_NAME
         except AttributeError:
             try:  # Guesses harder
                 recipient.session_ID
@@ -157,11 +155,11 @@ class MusicSheetMaker:
 
         return is_website
 
-    def is_commandline(self, recipient):
+    def is_command_line(self, recipient):
         try:
-            return recipient.get_name() == Resources.COMMANDLINE_NAME
+            return recipient.get_name() == Resources.COMMAND_LINE_NAME
         except AttributeError:  # Guesses harder
-            return not (self.is_botcog(recipient) or self.is_website(recipient))
+            return not (self.is_music_cog(recipient) or self.is_sky_music_website(recipient))
 
     def get_song(self):
         return self.song
@@ -257,7 +255,7 @@ class MusicSheetMaker:
         #(q_key, song_key) = self.ask_song_key(recipient=recipient, prerequisites=[q_notes, q_mode]) # EXPERIMENTAL
 
         # 6. Asks for octave shift
-        (q_shift, octave_shift) = self.ask_octave_shift(recipient=recipient)
+        (q_shift, octave_shift) = self.ask_octave_shift(recipient=recipient, input_mode=input_mode)
 
         # 7. Parses song
         self.parse_song(recipient, notes=notes, song_key=song_key, octave_shift=octave_shift)
@@ -301,17 +299,15 @@ class MusicSheetMaker:
                         'jianpu_quaver_delimiter': Resources.JIANPU_QUAVER_DELIMITER,
                         'repeat_indicator': self.get_song_parser().get_repeat_indicator() + '2'
                         }
-
-        if self.is_commandline(recipient):
-            i_instr = self.communicator.send_stock_query('instructions_stdout', recipient=recipient,
+        if self.is_command_line(recipient):
+            i_instr = self.communicator.send_stock_query('instructions_command_line', recipient=recipient,
                                                          replacements=replacements, prerequisites=prerequisites)
-        elif self.is_website(recipient):
-            i_instr = self.communicator.send_stock_query('instructions_website', recipient=recipient,
+        elif self.is_sky_music_website(recipient):
+            i_instr = self.communicator.send_stock_query('instructions_sky_music_website', recipient=recipient,
                                                          replacements=replacements, prerequisites=prerequisites)
         else:
-            i_instr = self.communicator.send_stock_query('instructions_botcog', recipient=recipient,
+            i_instr = self.communicator.send_stock_query('instructions_music_cog', recipient=recipient,
                                                          replacements=replacements, prerequisites=prerequisites)
-
         if execute:
             recipient.execute_queries(i_instr)
             instructions = i_instr.get_reply().get_result()
@@ -330,6 +326,7 @@ class MusicSheetMaker:
                         'jianpu_quaver_delimiter': Resources.JIANPU_QUAVER_DELIMITER,
                         'repeat_indicator': self.get_song_parser().get_repeat_indicator() + '2'
                         }
+        replacements.update({'skip': Lang.get_string(f"recipient_specifics/skip/{recipient.get_name()}", self.locale)})
         
         q_notes = self.communicator.send_stock_query('notes', recipient=recipient, replacements=replacements, prerequisites=prerequisites)
 
@@ -387,13 +384,13 @@ class MusicSheetMaker:
                         'repeat_indicator': self.get_song_parser().get_repeat_indicator() + '2'
                         }
 
-        if not self.is_commandline(recipient):
+        if not self.is_command_line(recipient):
 
             return self.ask_notes(recipient=recipient, prerequisites=prerequisites, execute=execute)
 
         else:
 
-            replacements.update({"songs_in": os.path.relpath(os.path.normpath(self.song_dir_in))})
+            replacements.update({'songs_in': os.path.relpath(os.path.normpath(self.song_dir_in))})
             q_notes = self.communicator.send_stock_query('notes_file', recipient=recipient, replacements=replacements, prerequisites=prerequisites)
 
             if not execute:
@@ -403,7 +400,7 @@ class MusicSheetMaker:
 
                 result = q_notes.get_reply().get_result()
 
-                if self.is_commandline(recipient):
+                if self.is_command_line(recipient):
                     # Detects if the result is a file path
                     file_path = os.path.join(self.song_dir_in, os.path.normpath(result))
                     isfile = os.path.isfile(file_path)
@@ -420,13 +417,13 @@ class MusicSheetMaker:
                 else:
                     isfile = False  # Don't allow reading files on the website or music-cog
 
-                if isfile and self.is_commandline(recipient):
+                if isfile and self.is_command_line(recipient):
                     notes = self.read_file(file_path)
                     print(Lang.get_string("open_file", self.locale).format(file_path=os.path.abspath(file_path)))
                 else:
                     notes = result.split(os.linesep)  # Returns a list of strings in any case
 
-                    if self.is_commandline(recipient):  # Loop to ask for several lines in the standard input interface
+                    if self.is_command_line(recipient):  # Loop to ask for several lines in the standard input interface
                         while result:
                             
                             (q_notes, result) = self.ask_notes(recipient=recipient, prerequisites=prerequisites, execute=execute)
@@ -442,12 +439,14 @@ class MusicSheetMaker:
     def ask_song_metadata(self, recipient, prerequisites=None, execute=True):
 
         queries = []
-
-        queries += [self.communicator.send_stock_query('song_title', recipient=recipient, prerequisites=prerequisites)]
+        replacements = {'skip': Lang.get_string(f"recipient_specifics/skip/{recipient.get_name()}", self.locale)}
+        queries += [self.communicator.send_stock_query('song_title', recipient=recipient, 
+                                                       replacements=replacements,
+                                                       prerequisites=prerequisites)]
         queries += [
             self.communicator.send_stock_query('original_artist', recipient=recipient, prerequisites=prerequisites)]
         queries += [
-            self.communicator.send_stock_query('transcript_writer', recipient=recipient, prerequisites=prerequisites)]
+            self.communicator.send_stock_query('transcript_writer', replacements=replacements, recipient=recipient, prerequisites=prerequisites)]
 
         if execute:
             recipient.execute_queries(queries)
@@ -514,6 +513,7 @@ class MusicSheetMaker:
         if possible_keys is None:
             # Asks for any text string
             q_key = self.communicator.send_stock_query('recommended_key', recipient=recipient,
+                                                       replacements={'skip': Lang.get_string(f"recipient_specifics/skip/{recipient.get_name()}", self.locale)},
                                                        prerequisites=prerequisites)
 
         elif len(possible_keys) == 0:
@@ -561,16 +561,26 @@ class MusicSheetMaker:
             return q_key, song_key
 
 
-    def ask_octave_shift(self, recipient, prerequisites=None, execute=True):
-
-        q_shift = self.communicator.send_stock_query('octave_shift', recipient=recipient, prerequisites=prerequisites)
-
-        if execute:
-            recipient.execute_queries(q_shift)
-            octave_shift = q_shift.get_reply().get_result()
-            return q_shift, octave_shift
+    def ask_octave_shift(self, recipient, input_mode=None, prerequisites=None, execute=True):
+                
+        if input_mode is None:
+            input_mode = self.retrieve_input_mode(recipient)        
+        
+        if not input_mode.get_is_chromatic():
+            return None, 0
         else:
-            return q_shift, None
+        
+            replacements = {'skip_number': Lang.get_string(f"recipient_specifics/skip_number/{recipient.get_name()}", self.locale)}
+            q_shift = self.communicator.send_stock_query('octave_shift', recipient=recipient,
+                                                         replacements=replacements,
+                                                         prerequisites=prerequisites)
+    
+            if execute:
+                recipient.execute_queries(q_shift)
+                octave_shift = q_shift.get_reply().get_result()
+                return q_shift, octave_shift
+            else:
+                return q_shift, None
 
 
     def display_error_ratio(self, recipient, prerequisites=None, execute=True):
@@ -598,11 +608,12 @@ class MusicSheetMaker:
         if render_modes is None:
             render_modes = self.retrieve_render_modes(recipient)
 
-        image_modes = [RenderMode.PNG, RenderMode.SVG]
-        if not any([mode in render_modes for mode in image_modes]):
-            return None, 16/9.0
+        if not any([mode.get_is_image() for mode in render_modes]):
+            return None, AspectRatio.WIDESCREEN
         else:
-            q_aspect = self.communicator.send_stock_query('aspect_ratio', recipient=recipient, prerequisites=prerequisites)
+            replacements = {'skip_number': Lang.get_string(f"recipient_specifics/skip_number/{recipient.get_name()}", self.locale)}
+            q_aspect = self.communicator.send_stock_query('aspect_ratio', recipient=recipient, 
+                                                          replacements=replacements, prerequisites=prerequisites)
     
             if execute:
                 recipient.execute_queries(q_aspect)
@@ -621,7 +632,9 @@ class MusicSheetMaker:
         if not any([mode in render_modes for mode in time_modes]):
             return None, 120
         else:
-            q_song_bpm = self.communicator.send_stock_query('song_bpm', recipient=recipient, prerequisites=prerequisites)
+            replacements = {'skip_number': Lang.get_string(f"recipient_specifics/skip_number/{recipient.get_name()}", self.locale)}
+            q_song_bpm = self.communicator.send_stock_query('song_bpm', recipient=recipient,
+                                                            replacements=replacements, prerequisites=prerequisites)
     
             if execute:
                 recipient.execute_queries(q_song_bpm)
@@ -639,9 +652,9 @@ class MusicSheetMaker:
         if len(render_modes) == 1:
             return None, render_modes
 
-        if self.is_botcog(recipient):
+        if self.is_music_cog(recipient):
 
-            return None, self.botcog_render_modes
+            return None, self.music_cog_render_modes
 
         else:
 
@@ -698,24 +711,24 @@ class MusicSheetMaker:
         return
 
 
-    def render_song(self, recipient, render_modes=None, aspect_ratio=16/9.0, song_bpm=120):
+    def render_song(self, recipient, render_modes=None, aspect_ratio=AspectRatio.WIDESCREEN, song_bpm=120):
 
         if render_modes is None:
-            if self.is_botcog(recipient):
-                render_modes = self.botcog_render_modes
+            if self.is_music_cog(recipient):
+                render_modes = self.music_cog_render_modes
             else:
                 render_modes = self.render_modes_enabled
         
         if not isinstance(song_bpm, (float, int)):
             song_bpm = 120
 
-        if not isinstance(aspect_ratio, (float, int)):
-            aspect_ratio = 16/9.0
+        if not isinstance(aspect_ratio, AspectRatio):
+            aspect_ratio = AspectRatio.WIDESCREEN
         
-        if not self.is_commandline(recipient):
+        if not self.is_command_line(recipient):
             self.css_mode = CSSMode.EMBED
                 
-        if self.is_commandline(recipient):
+        if self.is_command_line(recipient):
             print("=" * 40)
 
         song_bundle = SongBundle()
@@ -726,7 +739,7 @@ class MusicSheetMaker:
             
             if buffers is not None:
                 song_bundle.add_render(render_mode, buffers)
-                if self.is_commandline(recipient):
+                if self.is_command_line(recipient):
                     self.send_buffers_to_files(render_mode, buffers, recipient=recipient)
                         
         return song_bundle
@@ -837,7 +850,7 @@ class MusicSheetMaker:
             file_path = os.path.join(self.song_dir_in, os.path.normpath(result))
             isfile = os.path.isfile(file_path)
 
-            if isfile and self.is_commandline(recipient):
+            if isfile and self.is_command_line(recipient):
                 notes = self.read_file(file_path)
             else:
                 notes = result.split(os.linesep)
@@ -872,9 +885,9 @@ class MusicSheetMaker:
 
     def retrieve_render_modes(self, recipient):
 
-        if self.is_botcog(recipient):
-            return self.botcog_render_modes
-        
+        if self.is_music_cog(recipient):
+            return self.music_cog_render_modes
+
         render_modes = self.retrieve_query_result(recipient, 'render_modes', default=self.render_modes_enabled) 
                     
         return render_modes

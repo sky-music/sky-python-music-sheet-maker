@@ -1,5 +1,5 @@
 import re, os
-from src.skymusic.modes import ReplyType, InputMode, RenderMode
+from src.skymusic.modes import ReplyType, InputMode, RenderMode, AspectRatio
 from datetime import datetime
 import hashlib
 from fractions import Fraction
@@ -147,6 +147,7 @@ class Query:
             self.limits = [limits]
         else:
             self.limits = list(filter(None, limits)) # Choices, regexp...
+        self.blanks = ('', (), [], '-')
         self.default = default
         #Repairing prerequisites:
         if prerequisites is None:
@@ -418,6 +419,9 @@ class Query:
         if self.reply_type == ReplyType.RENDERMODES and not isinstance(limits[0], RenderMode):
             raise InvalidQueryTypeError("incorrect limits type", limits[0], RenderMode)
 
+        if self.reply_type == ReplyType.ASPECTRATIO and not isinstance(limits[0], AspectRatio):
+            raise InvalidQueryTypeError("incorrect limits type", limits[0], AspectRatio)
+
         if self.reply_type == ReplyType.FILEPATH:
             if os.path.isdir(limits[0]):
                 pass
@@ -449,6 +453,8 @@ class Query:
                 self.reply_type = ReplyType.INPUTMODE
             elif isinstance(limits[0], RenderMode):
                 self.reply_type = ReplyType.RENDERMODES
+            elif isinstance(limits[0], AspectRatio):
+                self.reply_type = ReplyType.ASPECTRATIO
             else:
                 self.reply_type = ReplyType.OTHER
            
@@ -456,7 +462,9 @@ class Query:
                 
                 
     def check_reply(self):
-         
+        """
+        A very important function that checks whether an answer is valid
+        """
         if self.help_required:
             return False        
         
@@ -471,8 +479,12 @@ class Query:
             is_reply_valid = False
             answers = self.reply.get_answer() #answer exists because reply is a Reply object
             limits = self.get_limits()
+            if self.default in self.blanks:
+                blank_accepted = True
+            else:
+                blank_accepted = False
                         
-            if answers is None: #Even a non expect reply query expects an 'OK' answer                
+            if answers is None: #Even a not_expect_reply query expects an 'OK' answer             
                 return False           
             
             if not self.expect_reply: # An answer is expected, whatever it is
@@ -486,8 +498,12 @@ class Query:
    
             if any([type(answer) != type(answers[0]) for answer in answers]):
                 return False #All answers must be of the same type
-                 
+
+            if not blank_accepted and all([answer in self.blanks for answer in answers]):
+                return False
+                             
             # GENERAL CHECKING
+                        
             if self.reply_type in [ReplyType.TEXT, ReplyType.NOTE, ReplyType.FILEPATH]:
                 if isinstance(answers[0], str):
                     is_reply_valid = True
@@ -509,6 +525,10 @@ class Query:
            
             elif self.reply_type == ReplyType.RENDERMODES:
                 if isinstance(answers[0], RenderMode) or isinstance(answers[0], (str,int)):
+                    is_reply_valid = True #A render mode can be chosen using its order number in a list or its string description
+
+            elif self.reply_type == ReplyType.ASPECTRATIO:
+                if isinstance(answers[0], AspectRatio) or isinstance(answers[0], (str,int,float)):
                     is_reply_valid = True #A render mode can be chosen using its order number in a list or its string description
             
             elif self.reply_type == ReplyType.OTHER:
@@ -667,7 +687,7 @@ class Query:
             answer = list(filter(None, answer))
         if isinstance(answer, tuple):
             answer = tuple(filter(None, answer))   
-        if answer in ('', [], ()):
+        if answer in self.blanks:
             default = self.default
             if default is not None:
                 answer = default
@@ -690,7 +710,7 @@ class Query:
             self.help_required = False #Important: to avoid looping over an empty string
 
         answer = self.sanitize_answer(answer)
-            
+                
         reply = Reply(self, answer)
         self.reply = reply
         reply.build_result()
@@ -726,7 +746,7 @@ class QueryChoice(Query):
         
         if self.reply_type == ReplyType.NOTE:
             result[-1] += " %s" % ', '.join(list(self.get_limits()))
-        elif self.reply_type in [ReplyType.INPUTMODE, ReplyType.RENDERMODES]:
+        elif self.reply_type in [ReplyType.INPUTMODE, ReplyType.RENDERMODES, ReplyType.ASPECTRATIO]:
             choices = ["{i:d}) {choice_str}".format(i=i, choice_str=choice.get_short_desc(self.get_recipient_locale())) for i, choice in enumerate(self.get_limits())]
             result[-1] += ":\n\n{choices_str}".format(choices_str='\n'.join(choices))
         else:
@@ -768,8 +788,12 @@ class QueryChoice(Query):
         
         if isinstance(choices[0], str):
             choices = [c.lower().strip() for c in choices]
-        elif isinstance(choices[0], (InputMode, RenderMode)):
-            choices = [c.name.lower().strip() for c in choices]
+
+        if isinstance(choices[0], (InputMode, RenderMode, AspectRatio)):
+            try:
+                return choices.index(answer)
+            except ValueError:
+                choices = [c.name.lower().strip() for c in choices]
 
         try:
             index = choices.index(answer) #Tries to find the answer directly in choices=self.limits
@@ -810,7 +834,7 @@ class QueryMultipleChoices(QueryChoice):
                 is_reply_valid = False
             
             return is_reply_valid
-       
+
 
     def reply_to(self, answer):
         """

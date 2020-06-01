@@ -1,7 +1,7 @@
-aspect_ratio: 16/9 # a number or a fraction
-song_bpm: 120 # an integer value between 12 and 1200
-octave_shift: 0 # an integer between -12 and +12
-render_modes: all # all to activate all modes, otherwise a comma-separated list of modes names among SVG, HTML, PNG, MIDI, SKYJSON, SKYASCII
+#aspect_ratio: 16/9 # a number or a fraction
+#song_bpm: 120 # an integer value between 12 and 1200
+#octave_shift: 0 # an integer between -12 and +12
+#render_modes: all # all to activate all modes, otherwise a comma-separated list of modes names among SVG, HTML, PNG, MIDI, SKYJSON, SKYASCII
 #notes_file: | # a file name...
 #    redemption.txt 
 #notes: #This question must be answered with a blank for complete automation
