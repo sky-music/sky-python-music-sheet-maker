@@ -1,4 +1,4 @@
-aspect_ratio: 16/9 # a number or a fraction
+aspect_ratio: WIDESCREEN # an aspect ratio short name among WIDESCREEN, OLDTV, SQUARE, A4, VERTPANEL
 song_bpm: 120 # an integer value between 12 and 1200
 octave_shift: 0 # an integer between -12 and +12
 render_modes: all # all to activate all modes, otherwise a comma-separated list of modes names among SVG, HTML, PNG, MIDI, SKYJSON, SKYASCII, ENGLISHASCII
@@ -18,7 +18,7 @@ notes_file: | # ... OR song notes, left indent of 4 spaces
     # I'll # give # it # to # some - # one # spe - # cial
     D2 EAC#2 D2 D2 C#2 D2 C#2 A
 notes: #This question must be answered with a blank for complete automation
-musical_notation: ENGLISH # An input_mode short name
+musical_notation: ENGLISH # An input_mode short name among SKY, SKYKEYBOARD, ENGLISH, JIANPU, DOREMI, DOREMIJP, ENGLISHCHORDS
 song_title: Last Christmas # song title
 recommended_key: C # The key in case your notation does not use octaves
 original_artist: Popular # Artist name
