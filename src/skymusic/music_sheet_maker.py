@@ -859,7 +859,7 @@ class MusicSheetMaker:
         q_notes = self.communicator.recall_by_recipient(recipient, criterion="notes", filters=["valid_reply"],
                                                         sort_by="date")
         if len(q_notes) != 0:
-            notes = q_notes_file[-1].get_reply().get_result().split(os.linesep)
+            notes = q_notes[-1].get_reply().get_result().split(os.linesep)
             
         return notes
 
