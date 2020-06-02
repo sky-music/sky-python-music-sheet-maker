@@ -1,0 +1,286 @@
+recipient_specifics:
+  skip:
+    command_line: laissez vide et tapez entrée
+    music_cog: répondez avec un espace
+    sky_music_website: laissez vide et appuyez sur answer
+  skip_number:
+    command_line: laissez blanc ou '0' et tapez entrée
+    music_cog: répondez avec un espace ou '0'
+    sky_music_website: laissez blanc ou '0' et appuyez sur answer
+input_mode:
+  skykeyboard:
+    short_desc: Clavier
+    long_desc: "Tapez sur votre clavier comme vous le feriez dans Sky:\n   AZERT\n   QSDFG\n   WXCVB"
+  sky:
+    short_desc: 'Sky ABC1-5'
+    long_desc: "Notation ligne/colonne:\n   A1 A2 A3 A4 A5\n   B1 B2 B3 B4 B5\n   C1 C2 C3 C4 C5"
+  english:
+    short_desc: Anglaise CDEFGAB
+    long_desc: "Notation anglaise (note C D E F G A B + altération b/# + numéro d'octave, par exemple Cb4 D#4 E5 ...)"
+  doremi:
+    short_desc: Traditionnelle
+    long_desc: "Notation traditionelle (nom de la note do re mi fa sol la si + altération b/# + numéro d'octave, par ex dob1 re#1 mi2 ...)"
+  jianpu:
+    short_desc: 'Jianpu 1234567+-'
+    long_desc: "Jianpu (notes 1 2 3 4 5 6 7, suivies de l'altération b/# et d'un ou plusieurs + or - pour changer d'octave)"
+  englishchords:
+    short_desc: Accords CDEFGABmaj
+    long_desc: "Nom d'accord anglais (par exemple C, F, Dm, Bdim, A+, Csus2, Dsus4, C6, Cmaj7, Dm11)"
+  doremijp:
+    short_desc: 日本語イタリアドレミ
+    long_desc: "do re mi en japonais: ド、ド#／レb、レ、レ#／ミb、ミ、ファ、ファ#／ソb、ソ、ソ#／ラb、ラ、ラ#／シb、シ"
+  skyjson:
+    short_desc: 'Enregistrement Sky-Music  (JSON text)'
+    long_desc: "Dictionaire avec le temps en ms et la touche 0-14 comme sur l'app SkyStudio et https://sky-music.herokuapp.com"
+render_mode:
+  html:
+    short_desc: partition graphique en HTML
+  svg:
+    short_desc: partition graphique en SVG
+  png:
+    short_desc: partition graphique en PNG
+  midi:
+    short_desc: Fichier son en MIDI
+  skyjson:
+    short_desc: Enregistrement Sky-Music (texte JSON)
+  skyascii:
+    short_desc: Transcription en notation Sky
+  englishascii:
+    short_desc: Transcription en notation anglo-saxone
+  jianpuascii:
+    short_desc: Transcription en Jianpu
+  doremiascii:
+    short_desc: Transcription en format traditionnel
+aspect_ratio:
+  widescreen:
+    short_desc: Widescreen TV (16:9)
+  oldtv:
+    short_desc: Old TV (4:3)
+  square:
+    short_desc: Square (1:1)
+  A4:
+    short_desc: A4 paper sheet (1:1.4)
+  vertical_panel:
+    short_desc: Vertical panel (1:2)
+song_meta:
+  title: Titre
+  artist: Artiste(s) d'origine
+  transcript: Transcripteur
+  musical_key: Clef musicale
+  untitled: Sans titre
+open_file: |
+  (Fichier de notes ouvert depuis {file_path})
+stock_queries:
+  instructions_command_line:
+    foreword: "===== PORTEES VISUELLES POUR SKY: CHILDREN OF THE LIGHT ===\n"
+    question: |
+      Formats de notes acceptés :{input_modes}
+    
+      - Les notes composant un accord doivent être attachées (e.g. A1B1C1).
+      - Separez les accords avec {icon_delimiter}
+      - Tapez "{pause}" pour marquer une pause (silence), sauf en notation Jianpu où '0' (zéro) est utilisé conventionellement
+      - Tapez "{quaver_delimiter}" pour relier les notes entre elles, pour les triplets... (e.g. {quaver_example}). En Jianpu, utilisez "{jianpu_quaver_delimiter}" au lieu de '-' pour éviter la confusion avec l'octave.
+      - Tapez "{repeat_indicator}" après un groupe de notes pour indiquer la répétition.
+      - Les dièses "#" et les bémoles "b" (demi-tons) sont possibles pour les notations autres que Sky ABC-15.
+    
+      Tapez '?' pour obtenir de l'aide après une question
+    afterword: =======================================
+    input_tip:
+    help_text:
+  instructions_sky_music_website:
+    foreword:
+    question: |
+      Formats de notes acceptés :{input_modes}
+    
+      - Les notes composant un accord doivent être attachées (e.g. A1B1C1).
+      - Separate chords with {icon_delimiter}
+      - Tapez "{pause}" pour marquer une pause (silence), sauf en notation Jianpu où '0' (zéro) est utilisé conventionellement
+      - Tapez "{quaver_delimiter}" pour relier les notes entre elles, pour les triplets... (e.g. {quaver_example}). En Jianpu, utilisez "{jianpu_quaver_delimiter}" au lieu de '-' pour éviter la confusion avec l'octave.
+      - Tapez "{repeat_indicator}" après un groupe de notes pour indiquer la répétition.
+      - Les dièses "#" et les bémoles "b" (demi-tons) sont possibles pour les notations autres que Sky ABC-15.
+    afterword:
+    input_tip: cliquez sur OK pour passer
+    help_text:
+  instructions_music_cog:
+    foreword:
+    question: |
+      Bienvenue dans le créateur de portée visuelles pour Sky!
+      Je vais vous posez plusieurs questions afin de construire votre portée.
+      Tapez '?' après une question pour de l'aide supplémentaire.
+    afterword:
+    input_tip:
+    help_text: |
+      Formats de notes acceptés :{input_modes}
+    
+      - Les notes composant un accord doivent être attachées (e.g. A1B1C1).
+      - Separate chords with {icon_delimiter}
+      - Tapez "{pause}" pour marquer une pause (silence), sauf en notation Jianpu où '0' (zéro) est utilisé conventionellement
+      - Tapez "{quaver_delimiter}" pour relier les notes entre elles, pour les triplets... (e.g. {quaver_example}). En Jianpu, utilisez "{jianpu_quaver_delimiter}" au lieu de '-' pour éviter la confusion avec l'octave.
+      - Tapez "{repeat_indicator}" après un groupe de notes pour indiquer la répétition.
+      - Les dièses "#" et les bémoles "b" (demi-tons) sont possibles pour les notations autres que Sky ABC-15.
+  render_modes:
+    foreword:
+    question: Merci de choisir les formats d'exportation de la chanson
+    afterword:
+    input_tip: cochez ou décochez les différents choix
+    help_text: |
+      La portée visuelle peut être savegardée sous différents formats.
+      Cochez ceux que vous souhaitez garder.
+      A l'invite de commande, entrez une liste de choix séparés par des virgules, par exemple 0, 1, 3
+      Sur le site web, cochez les cases.
+  aspect_ratio:
+    foreword: Par défaut le format d'image PNG est en paysage 16:9.
+    question: Vous pouvez choisir un rapport d'aspect différent, ou {skip} pour passer
+    afterword:
+    input_tip: 'un choix dans la liste. {skip_number} pour passer.'
+    help_text: |
+      Par défaut le format d'image PNG est en paysage 16:9. Vous pouvez choisir un rapport d'aspect différent, ou {skip} pour passer    
+  song_bpm:
+    foreword: Un des formats d'exportation choisi prend en compte le rythme.
+    question: 'Merci de choisir le tempo (BPM, beats per minute), ou {skip_number} pour passer'
+    afterword:
+    input_tip: 'un nombre entier positif entre 12 et 1200. {skip_number} pour passer'
+    help_text: |
+      Vous avez choisi un format (Midi par ex.) qui veut savoir à quelle vitesse jouer la chanson. Ceci s'exprime généralement en BPM (beats per minute), un nombre entier entre 12 et 1200.
+  song_title:
+    foreword:
+    question: Quel est le titre de la chanson ?
+    afterword:
+    input_tip: 'texte. {skip} pour utiliser "Sans titre"'
+    help_text: 
+  original_artist:
+    foreword:
+    question: Qui sont les artistes d'origine de la chanson ?
+    afterword:
+    input_tip: texte
+    help_text: Original artists include the composer, musician, singer, etc.
+  transcript_writer:
+    foreword:
+    question: Qui est le transcripteur ?
+    afterword:
+    input_tip: 'texte facultatif, {skip} pour passer'
+    help_text: 'Le transcripteur est la personne qui a déchiffré la chanson. C''est peut-être vous!'
+  notes_file:
+    foreword:
+    question: 'Tapez ou collez vos notes ci-dessous. Vous pouvez aussi entrer un nom de fichier texte contenant les notes (à placer dans {songs_in}/)'
+    afterword:
+    input_tip: du texte contenant des notes telles que C1 D1F1, do re mi, ou un nom de fichier comme song.txt
+    help_text: |
+      Formats de notes acceptés :{input_modes}
+    
+      - Les notes composant un accord doivent être attachées (e.g. A1B1C1).
+      - Separate chords with {icon_delimiter}
+      - Tapez "{pause}" pour marquer une pause (silence), sauf en notation Jianpu où '0' (zéro) est utilisé conventionellement
+      - Tapez "{quaver_delimiter}" pour relier les notes entre elles, pour les triplets... (e.g. {quaver_example}). En Jianpu, utilisez "{jianpu_quaver_delimiter}" au lieu de '-' pour éviter la confusion avec l'octave.
+      - Tapez "{repeat_indicator}" après un groupe de notes pour indiquer la répétition.
+      - Les dièses "#" et les bémoles "b" (demi-tons) sont possibles pour les notations autres que Sky ABC-15.
+  file:
+    foreword:
+    question: 'Entrez un nom de fichier valide (dans {songs_in}/)'
+    afterword:
+    input_tip: un fichier texte contenant des notes de musique
+    help_text:
+  notes:
+    foreword:
+    question: Merci de taper ou de coller vos notes de musique
+    afterword:
+    input_tip: du texte contenant des notes de musique
+    help_text: |
+      Formats de notes acceptés :{input_modes}
+    
+      - Les notes composant un accord doivent être attachées (e.g. A1B1C1).
+      - Separate chords with {icon_delimiter}
+      - Tapez "{pause}" pour marquer une pause (silence), sauf en notation Jianpu où '0' (zéro) est utilisé conventionellement
+      - Tapez "{quaver_delimiter}" pour relier les notes entre elles, pour les triplets... (e.g. {quaver_example}). En Jianpu, utilisez "{jianpu_quaver_delimiter}" au lieu de '-' pour éviter la confusion avec l'octave.
+      - Tapez "{repeat_indicator}" après un groupe de notes pour indiquer la répétition.
+      - Les dièses "#" et les bémoles "b" (demi-tons) sont possibles pour les notations autres que Sky ABC-15.
+  one_input_mode:
+    foreword:
+    question: 'Nous avons détecté que vous utilisez la notation suivante: "{input_mode}".'
+    afterword:
+    input_tip: cliquez sur OK pour passer
+    help_text:
+  musical_notation:
+    foreword: Malgré nos efforts, nous n'avons pas pu détecter votre format de notes.
+    question: Merci de nous aider en choissant le bon dans la liste ci-contre
+    afterword:
+    input_tip: Case à choix unique
+    help_text: |
+      A la question précédente, vous avez tapé des notes de musiques. Nous avons essayé de détecter quelle notation vous avez utilisé.
+      Toutefois, il reste une ambiguité. Merci de choisir votre notation dans la liste ci-contre.
+  no_possible_key:
+    foreword:
+    question: |
+      Votre chanson contient des notes non transposables dans le jeu Sky.
+      La clef musicale sera mise à C (do) par défaut.
+    afterword:
+    input_tip: cliquez sur OK pour passer
+    help_text:
+  one_possible_key:
+    foreword:
+    question: "Votre chanson peut être transposée dans le jeu Sky à condition d'utiliser la clef suivante: {song_key}"
+    afterword:
+    input_tip: cliquez sur OK pour passer
+    help_text:
+  possible_keys:
+    foreword: "Votre chanson peut être transposée dans le jeu Sky avec les clefs suivantes: {song_key}"
+    question: Merci de choisir votre clef
+    afterword:
+    input_tip: nom de la clef
+    help_text: |
+      Le jeu Sky ne permet pas de jouer les dièses # et les bémols b. Vous devrez donc souvent transposer votre chanson dans une clef différente pour pouvoir la jouer.
+      Heureusement, nous avons trouvé plusieurs clefs permettant de jouer votre chanson. Merci de choisir celle qui vous convient le mieux.
+  recommended_key:
+    foreword: "Votre notation musicale n'utilise pas la notion d'octave."
+    question: 'Quelle clef recommenderiez vous pour jouer dans Sky ? (do par défaut). {skip} pour passer'
+    afterword:
+    input_tip: '{skip} pour garder do, ou tapez un nom de clef'
+    help_text: |
+      Votre notation musicale n'utilise pas la notion d'octave : la hauteur de vos notes est donc indéterminée.
+      Votre partition risque de sonner différement à différents endroits du jeu. Indiquez une clef pour obliger les joueurs à respecter votre chanson.
+  octave_shift:
+    foreword: Voulez-vous transposer vos notes ?
+    question: "Décalage d'octave ({skip_number} pour ne rien faire)"
+    afterword:
+    input_tip: décalage d'octave vers le haut ou le bas entre -6 et +6
+    help_text: |
+      'A musical note is identified by its name and an octave number. Sky\''s music system spans less than 3 octaves.
+      If you do not specify an octave number after a note, we will assume it is the first octave of Sky, so your notes will essential by played near the bass.
+      You can shift your notes to a higher pitch by setting a positive number in this field.
+      If you have specified an octave number and it is too high to be played within Sky\''s system, you can downshift the pitch by entering a negative integer'
+  no_song_file:
+    foreword: ---------------------------------------
+    question: "Votre {render_mode} n'a pas été sauvegardée."
+    afterword:
+    input_tip: cliquez sur OK pour passer
+    help_text:
+  one_song_file:
+    foreword: ---------------------------------------
+    question: 'Votre {render_mode} est enregistrée ici: {song_file}'
+    afterword:
+    input_tip: cliquez sur OK pour passer
+    help_text:
+  several_song_files:
+    foreword: ---------------------------------------
+    question: 'Votre {render_mode} est enregistrée dans: {songs_out}'
+    afterword: 'Votre chanson a été découpée en {num_files} fichiers entre "{first_file}" et "{last_file}"'
+    input_tip: cliquez sur OK pour passer
+    help_text:
+  few_errors:
+    foreword:
+    question: "Chanson décodée avec peu d'erreurs"
+    afterword:
+    input_tip: cliquez sur OK pour passer
+    help_text:
+  many_errors:
+    foreword:
+    question: "*ATTENTION*: Le décodage de votre chanson a généré beaucoup d'erreurs."
+    afterword: |
+      'Veuillez vérifier les points suivants:
+    
+      - Si vous avez spécifié l'octave, il doit être entre 1 et 3. Sinon, recommencez en utilisant le décalage d'octave.
+      - Que votre chanson ne contient pas d'erreur de frappe. Veuillez consulter ce site web pour plus d'infos: 
+    
+      https://sky-music.github.io/make-your-own-sheet.html'
+    input_tip: cliquez sur OK pour passer
+    help_text:

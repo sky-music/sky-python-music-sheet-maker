@@ -8,6 +8,8 @@ Db1Eb1 F1Gb1Ab1
 Db1-Eb1-F1-Gb1 Ab1-Bb1C2Db2
 #Pauses:
 Db1 . Eb1 . . F1
+#Repetitions:
+Db1*2 Eb1*14 .*2 F1*1 .*1
 #Notes #without #octave:
 Db Eb F Gb Ab Bb C C# D# F F# G# A#
 #Chords #without #octaves:

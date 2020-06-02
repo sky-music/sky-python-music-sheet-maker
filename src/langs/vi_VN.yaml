@@ -1,0 +1,288 @@
+# this translation is not 100% accurate and is welcome for more translator!!
+recipient_specifics:
+  skip:
+    command_line: leave blank and type enter
+    music_cog: answer with space
+    sky_music_website: leave blank and press answer
+  skip_number:
+    command_line: leave blank or 0 and type enter
+    music_cog: answer with space or 0
+    sky_music_website: leave blank or 0 and press answer
+input_mode:
+  skykeyboard:
+    short_desc: Bàn phím Sky 
+    long_desc: "Nhập trên bàn phím như đánh đàn trong Sky:\n   QWERT\n   ASDFG\n   ZXCVB"
+  sky:
+    short_desc: 'Sky ABC1-5'
+    long_desc: "Hệ kí tự dòng/cột trong Sky:\n   A1 A2 A3 A4 A5\n   B1 B2 B3 B4 B5\n   C1 C2 C3 C4 C5"
+  english:
+    short_desc: Nốt nhạc trong Tiếng Anh CDEFGAB
+    long_desc: "Nốt nhạc dạng C D E F G A B + biến tấu b/# + số quãng tám, VD: Cb4 D#4 E5 ..."
+  doremi:
+    short_desc: Nốt nhạc trong Tiếng Pháp Đồ Rê Mi
+    long_desc: "Nốt nhạc dạng do re mi fa sol la si/ti + biến tấu b/# + số quãng tám, VD: dob4 re#4 mi5 ..."
+  jianpu:
+    short_desc: 'Hệ kí tự số Jianpu 1234567+-'
+    long_desc: "Nốt nhạc dạng 1 2 3 4 5 6 7, bắt đầu với biến tấu b/# và dấu - hoặc + để chỉnh nốt quãng tám"
+  englishchords:
+    short_desc: Hợp âm Tiếng Anh CDEFGABmaj
+    long_desc: "Nốt có hợp âm Tiếng Anh ngắn (VD: C, F, Dm, Bdim, A+, Csus2, Dsus4, C6, Cmaj7, Dm11)"
+  doremijp:
+    short_desc: 日本語イタリアドレミ
+    long_desc: "Japanese do re mi: ド、ド#／レb、レ、レ#／ミb、ミ、ファ、ファ#／ソb、ソ、ソ#／ラb、ラ、ラ#／シb、シ"
+  skyjson:
+    short_desc: 'Sky-Music recording (JSON text)'
+    long_desc: "Dictionary with time in ms and key number 0-14 used by SkyStudio app and https://sky-music.herokuapp.com"
+render_mode:
+  html:
+    short_desc: bảng nhạc trực quan HTML 
+  svg:
+    short_desc: bảng nhạc trực quan SVG
+  png:
+    short_desc: bảng nhạc trực quan bằng ảnh PNG
+  midi:
+    short_desc: tệp nhạc MIDI
+  skyjson:
+    short_desc: Sky-Music recording (JSON text file)
+  skyascii:
+    short_desc: bài hát dưới dạng hệ kí tự Sky 
+  englishascii:
+    short_desc: bài hát dưới dạng hệ kí tự English 
+  jianpuascii:
+    short_desc: bài hát dưới dạng hệ kí tự Jianpu 
+  doremiascii:
+    short_desc: bài hát dưới dạng hệ kí tự do-re-mi 
+aspect_ratio:
+  widescreen:
+    short_desc: Widescreen TV (16:9)
+  oldtv:
+    short_desc: Old TV (4:3)
+  square:
+    short_desc: Square (1:1)
+  A4:
+    short_desc: A4 paper sheet (1:1.4)
+  vertical_panel:
+    short_desc: Vertical panel (1:2)
+song_meta:
+   title: Tiêu đề
+   artist: Nghệ sĩ gốc
+   transcript: Người dịch
+   musical_key: Phím nhạc
+   untitle: Untitled
+open_file: |
+  (Notes imported from {file_path})
+stock_queries:
+  instructions_command_line:
+    foreword: "===== BẢNG NHẠC TRỰC QUAN CHO TỰA GAME: SKY: CHILDREN OF THE LIGHT =====\n"
+    question: |
+      Dạng nốt nhạc được chấp nhận: {input_modes}
+    
+      - Khi viết hợp âm phải dính các phím lại với nhau (VD: A1B1C1).
+      - Tách các hợp âm bằng: "{icon_delimiter}".
+      - Sử dụng "{pause}" để ngắt quãng (nghỉ), except for Jianpu where '0' is the official pause character.
+      - Sử dụng "{quaver_delimiter}" để nối nốt trong một biểu tượng (liên ba, láy rền/hát rung,...) (VD: {quaver_example}). With Jianpu, use "{jianpu_quaver_delimiter}" instead of "-" to avoid confusion with the octave.
+      - Thêm "{repeat_indicator}" sau một hợp âm để biểu thị sự lập lại (repetition).
+      - Dấu thăng "#" và dấu giáng "b" (nửa cung) được hỗ trợ cho hệ kí tự Phương Tây và Jianpu.
+    
+      Nhập '?' để được trợ giúp cho câu hỏi cụ thể
+    afterword: =======================================
+    input_tip:
+    help_text:
+  instructions_sky_music_website:
+    foreword:
+    question: |
+      Dạng nốt nhạc được chấp nhận: {input_modes}
+    
+      - Khi viết hợp âm phải dính các phím lại với nhau (VD: A1B1C1).
+      - Tách các hợp âm bằng: "{icon_delimiter}".
+      - Sử dụng "{pause}" để ngắt quãng (nghỉ), except for Jianpu where '0' is the official pause character.
+      - Sử dụng "{quaver_delimiter}" để nối nốt trong một biểu tượng (liên ba, láy rền/hát rung,...) (VD: {quaver_example}). With Jianpu, use "{jianpu_quaver_delimiter}" instead of "-" to avoid confusion with the octave.
+      - Thêm "{repeat_indicator}" sau một hợp âm để biểu thị sự lập lại (repetition).
+      - Dấu thăng "#" và dấu giáng "b" (nửa cung) được hỗ trợ cho hệ kí tự Phương Tây và Jianpu.
+    afterword:
+    input_tip: Bấm OK để tiếp tục
+    help_text:
+  instructions_music_cog:
+    foreword:
+    question: |
+      Welcome to the Visual Song Sheet creator!
+      I am going to ask you several questions to build your song sheet.
+      Nhập '?' để được trợ giúp cho câu hỏi cụ thể
+    afterword:
+    input_tip:
+    help_text: |
+      Dạng nốt nhạc được chấp nhận: {input_modes}
+    
+      - Khi viết hợp âm phải dính các phím lại với nhau (VD: A1B1C1).
+      - Tách các hợp âm bằng: "{icon_delimiter}".
+      - Sử dụng "{pause}" để ngắt quãng (nghỉ), except for Jianpu where '0' is the official pause character.
+      - Sử dụng "{quaver_delimiter}" để nối nốt trong một biểu tượng (liên ba, láy rền/hát rung,...) (VD: {quaver_example}). With Jianpu, use "{jianpu_quaver_delimiter}" instead of "-" to avoid confusion with the octave.
+      - Thêm "{repeat_indicator}" sau một hợp âm để biểu thị sự lập lại (repetition).
+      - Dấu thăng "#" và dấu giáng "b" (nửa cung) được hỗ trợ cho hệ kí tự Phương Tây và Jianpu.
+  render_modes:
+    foreword:
+    question: Hãy chọn các định dạng xuất bản đầu ra (rendering formats) 
+    afterword:
+    input_tip: Chọn một hoặc nhiều hộp thoại
+    help_text: |
+      Bảng nhạc trực quan có thể xuất ra thành nhiều định dạng.
+      Hãy chọn những tùy chọn bạn muốn.
+      On the command-line, enter a comma-separated list of choices numbers, such as 0, 1, 3.
+      On the website, check the boxes.
+  aspect_ratio:
+    foreword: By default the visual sheet is a 16:9 image in landscape orientation.
+    question: 'Please choose a different aspect ratio in the list, or {skip_number} to skip'
+    afterword:
+    input_tip: 'an aspect ratio in the list. {skip_number} to skip'
+    help_text: |
+      By default the visual sheet is a 16:9 image in landscape orientation. Please choose a different aspect ratio if you like.
+  song_bpm:
+    foreword: One of the output formats needs timing information.
+    question: Please choose the song tempo (BPM, beats per minute), or leave blank to skip
+    afterword:
+    input_tip: a positive number between 12 and 1200. Leave blank or 0 to skip.
+    help_text: |
+      You have selected an output format (such as Midi) that requires to know how fast to play the song. This is usually expressed in terms of beats per minute. Please give a integer value between 12 and 1200.
+  song_title:
+    foreword:
+    question: Tiêu đề bài hát là gì?
+    afterword:
+    input_tip: 'Có thể nhập bất kì. Để trống nếu bạn muốn sử dụng "untitled" (không tên)'
+    help_text: 
+  original_artist:
+    foreword:
+    question: Nghệ sĩ gốc của bài hát này là ai?
+    afterword:
+    input_tip: Có thể nhập bất kì, bao gồm cả ô được để trống
+    help_text: 'Nghệ sĩ gốc bao gồm nhà soạn nhạc, nghệ sĩ, người hát,...'
+  transcript_writer:
+    foreword:
+    question: Người thông dịch bài hát này là ai?
+    afterword:
+    input_tip: Có thể nhập bất kì, bao gồm cả ô được để trống
+    help_text: 'Người dịch là người viết bài nhạc này, nó cũng có thể là bạn!'
+  notes_file:
+    foreword:
+    question: 'Nhập, hoặc dán nốt vào, hoặc nhập tên tệp (trong thư mục {songs_in}/)'
+    afterword:
+    input_tip: Tên nốt như dạng C1 D1F1, hoặc tên tệp như song.txt
+    help_text: |
+      Dạng nốt nhạc được chấp nhận: {input_modes}
+    
+      - Khi viết hợp âm phải dính các phím lại với nhau (VD: A1B1C1).
+      - Tách các hợp âm bằng: "{icon_delimiter}".
+      - Sử dụng "{pause}" để ngắt quãng (nghỉ), except for Jianpu where '0' is the official pause character.
+      - Sử dụng "{quaver_delimiter}" để nối nốt trong một biểu tượng (liên ba, láy rền/hát rung,...) (VD: {quaver_example}). With Jianpu, use "{jianpu_quaver_delimiter}" instead of "-" to avoid confusion with the octave.
+      - Thêm "{repeat_indicator}" sau một hợp âm để biểu thị sự lập lại (repetition).
+      - Dấu thăng "#" và dấu giáng "b" (nửa cung) được hỗ trợ cho hệ kí tự Phương Tây và Jianpu.
+  file:
+    foreword:
+    question: 'Nhập tên tệp (trong {songs_in}/)'
+    afterword:
+    input_tip: any text file containing one or several musical notes.
+    help_text:
+  notes:
+    foreword:
+    question: Hãy nhập hoặc cắt-dán nốt vào
+    afterword:
+    input_tip: bất kì kí tự với một hoặc nhiều nốt nhạc 
+    help_text: |
+      Dạng nốt nhạc được chấp nhận: {input_modes}
+    
+      - Khi viết hợp âm phải dính các phím lại với nhau (VD: A1B1C1).
+      - Tách các hợp âm bằng: "{icon_delimiter}".
+      - Sử dụng "{pause}" để ngắt quãng (nghỉ), except for Jianpu where '0' is the official pause character.
+      - Sử dụng "{quaver_delimiter}" để nối nốt trong một biểu tượng (liên ba, láy rền/hát rung,...) (VD: {quaver_example}). With Jianpu, use "{jianpu_quaver_delimiter}" instead of "-" to avoid confusion with the octave.
+      - Thêm "{repeat_indicator}" sau một hợp âm để biểu thị sự lập lại (repetition).
+      - Dấu thăng "#" và dấu giáng "b" (nửa cung) được hỗ trợ cho hệ kí tự Phương Tây và Jianpu.
+  one_input_mode:
+    foreword:
+    question: |
+      Nhận dạng là bạn đang sử dụng hệ kí tự: '{input_mode}'.
+    afterword:
+    input_tip: Bấm OK để tiếp tục
+    help_text:
+  musical_notation:
+    foreword: Dù đã cố gắng nhưng tôi không thể đoán được hệ kí tự nốt bạn đang sử dụng.
+    question: Hãy chọn dạng hệ kí tự mà bạn đang sử dụng
+    afterword:
+    input_tip: Unique choice button
+    help_text: |
+      Trong câu hỏi trước, bạn đã nhập nốt nhạc của bạn. Tôi đã cố đoán hệ kí tự bạn đang sử dụng.
+      Dù đã cố gắng như nó có vẻ còn mơ hồ. Hãy chọn hệ kí tự mà bạn đang sử dụng trong danh sách.
+  no_possible_key:
+    foreword:
+    question: |
+      Bài hát của bạn không thể chuyển đúng sang Sky.
+      Phím mặc định sẽ được đặt là C.
+    afterword:
+    input_tip: Bấm OK để tiếp tục
+    help_text:
+  one_possible_key:
+    foreword:
+    question: 'Bài hát của bạn có thể chuyển đúng sang Sky với phím: {song_key}'
+    afterword:
+    input_tip: Bấm OK để tiếp tục
+    help_text:
+  possible_keys:
+    foreword: 'Bài hát của bạn có thể chuyển đúng sang Sky với những phím sau: {song_key}.'
+    question: Hãy chọn phím nhạc bạn muốn sử dụng
+    afterword:
+    input_tip: Nhập số (giữa 0 và n-1)
+    help_text: |
+      Hệ thống nhạc của Sky không bao gồm các phím thăng hay dấu giáng b nên bạn không thể chơi bài này từ thế giới bên ngoài.
+      Tôi nhận dạng được bài hát của bạn có thể chơi với nhiều nốt. Hãy chọn tùy chọn mà bạn cảm thấy được nhất.
+  recommended_key:
+    foreword: Hệ kí tự nhạc của bạn có sử dụng độ cao thấp (pitch) tương đối.
+    question: Phím được đề xuất để chơi trong Sky (mặc định là C) 
+    afterword:
+    input_tip: Để trống hoặc nhâp tên nốt (C trong hệ tiếng Anh)
+    help_text: |
+      Bạn đã sử dụng hệ kí tự nhạc mà cho phép bạn có thể xác định độ cao thấp chính xác của nốt nhạc.
+      Tuy nhiên thì bảng nhạc trực quan có thể có âm khác tùy vào tùy nơi trong Sky.
+  octave_shift:
+    foreword: Bạn có muốn chỉnh độ cao thấp của nốt nhạc không?
+    question: Chỉnh quãng tám (để trống hoặc nhập 0 để bỏ qua)
+    afterword:
+    input_tip: chỉnh quãng tám bằng số nguyên từ -6 đến +6
+    help_text: |
+      'Một nốt nhạc được xác định bởi tên và số quãng tám của nó. Hệ thống nhạc trong Sky có ít hơn 3 quãng tám.
+      Nếu bạn không ghi rõ só quãng tám sau một nốt, tôi sẽ nghĩ rằng nó là quãng tám đầu tiên trong Sky, nên nốt nhạc của bạn chủ yếu sẽ được chơi ngang nốt trầm.
+      Bạn có thể chỉnh nốt của bạn lên độ cao hơn bằng cách đặt số dương trong mục này.
+      Nếu bạn đã ghi rõ số quãng tám và nó quá cao để có thể chơi trong hệ thống nhạc của Sky, bạn có thể giảm xuống bằng cách nhập số âm.'  
+  no_song_file:
+    foreword: ---------------------------------------
+    question: 'Bài hát {render_mode} của bạn không được lưu vào tệp.'
+    afterword:
+    input_tip: Bấm OK để tiếp tục
+    help_text:
+  one_song_file:
+    foreword: ---------------------------------------
+    question: 'Bài hát {render_mode} của bạn được lưu vào: {song_file}'
+    afterword:
+    input_tip: Bấm OK để tiếp tục
+    help_text:
+  several_song_files:
+    foreword: ---------------------------------------
+    question: 'Bài hát {render_mode}} của bạn được lưu vào: {songs_out}'
+    afterword: 'Bài hát của bạn được chia thành {num_files} tệp giữa"{first_file}" và "{last_file}"'
+    input_tip: Bấm OK để tiếp tục
+    help_text:
+  few_errors:
+    foreword:
+    question: 'Bài hát được nhập thành công với vài lỗi nhỏ.'
+    afterword:
+    input_tip: Bấm OK để tiếp tục
+    help_text:
+  many_errors:
+    foreword:
+    question: '*LƯU Ý:* Bài hát của bạn chứa quá nhiều lỗi'
+    afterword: |
+      'Vui lòng kiểm tra những lỗi sau:
+
+      - Tất cả các nốt nhạc phải ở từ 1 đến 3 quãng tám. Nếu không, hãy thử lại với nốt quãng tám.
+      - Bài hát của bạn không có lỗi chính tả. Vui lòng xem hướng dẫn đầy đủ ở trang web này: 
+
+      https://sky-music.github.io/make-your-own-sheet.html (tiếng Anh)'
+    input_tip: Bấm OK để tiếp tục
+    help_text:

@@ -10,6 +10,8 @@ do1re1 mi1fa1sol1
 do1-re1-mi1-fa1 sol1-la1si1do1
 #Pauses:
 do1 . re1 . . mi1
+#Repetitions:
+do1*2 re1*14 .*2 mi1*1 .*1
 #Notes #without #octave:
 do re mi fa sol la si
 #Chords #without #octaves:
