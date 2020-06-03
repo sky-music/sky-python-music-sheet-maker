@@ -105,16 +105,16 @@ class Note:
         return self.png_size
 
     def get_silentsymbol_svg(self, highlighted_classes):
-        return '<circle cx="45.4" cy="45.4" r="26" class="button-icon OFF' + ' '.join(highlighted_classes).rstrip() + '"/>'
+        return '<circle cx="45.4" cy="45.4" r="26" class="icon OFF' + ' '.join(highlighted_classes).rstrip() + '"/>'
 
     def get_dead_svg(self, highlighted_classes):
-        return '<circle cx="45.4" cy="45.4" r="12" class="button-icon OFF' + ' '.join(highlighted_classes).rstrip() + '"/>'
+        return '<circle cx="45.4" cy="45.4" r="12" class="icon OFF' + ' '.join(highlighted_classes).rstrip() + '"/>'
 
     def get_harpbroken_svg(self, highlighted_classes):
         return '<text x="45.4" y="81" class="broken">?</text>'
 
     def get_unhighlighted_svg(self, highlighted_classes):
-        return '<circle cx="45.4" cy="45.4" r="12" class="button-icon OFF' + ' '.join(highlighted_classes).rstrip() + '"/>'
+        return '<circle cx="45.4" cy="45.4" r="12" class="icon OFF' + ' '.join(highlighted_classes).rstrip() + '"/>'
 
     def get_dead_png(self):
         """Renders a PNG of a grey note placeholder, in case we want to display an empty harp when it is broken"""
@@ -172,7 +172,7 @@ class Note:
                     class_unhighlighted = ''
                     note_core_render = self.get_svg(highlighted_classes)
                     
-        note_render = f'\n<svg x="{x}" y="{y}" class="{self.svgclass}{class_unhighlighted} {self.instrument_type}-button-{self.get_index()}"'
+        note_render = f'\n<svg x="{x}" y="{y}" class="{self.svgclass}{class_unhighlighted} button-{self.get_index()}"'
         
         if width:
             note_render += f' width="{width}" height="{width}" viewBox="0 0 91 91">\n'
@@ -236,14 +236,14 @@ class NoteCircle(Note):
     def __init__(self, chord, pos):
         super().__init__(chord, pos)
         self.type = 'note_circle'
-        self.svgclass = 'note-circle'
+        self.svgclass = 'circle'
 
     def get_svg(self, highlighted_classes):
         
         highlighted_classes_str = ' '.join(highlighted_classes).rstrip()
-        note_render = (f'<path class="instrument-button {highlighted_classes_str}"'
+        note_render = (f'<path class="button {highlighted_classes_str}"'
                       f' d="M90.7 76.5c0 7.8-6.3 14.2-14.2 14.2H14.2C6.3 90.7 0 84.4 0 76.5V14.2C0 6.3 6.3 0 14.2 0h62.3c7.8 0 14.2 6.3 14.2 14.2V76.5z"/>\n '
-                      f'<circle cx="45.4" cy="45.4" r="25.5" class="button-icon {highlighted_classes_str}"/>'
+                      f'<circle cx="45.4" cy="45.4" r="25.5" class="icon {highlighted_classes_str}"/>'
                       )
         
         return note_render
@@ -271,16 +271,16 @@ class NoteDiamond(Note):
     def __init__(self, chord, pos):
         super().__init__(chord, pos)
         self.type = 'note_diamond'
-        self.svgclass = 'note-diamond'
+        self.svgclass = 'diamond'
 
     def get_svg(self, highlighted_classes):
 
         highlighted_classes_str = ' '.join(highlighted_classes).rstrip()     
-        note_render = (f'<path class="instrument-button {highlighted_classes_str}"'
+        note_render = (f'<path class="button {highlighted_classes_str}"'
                        f' d="M90.7 76.5c0 7.8-6.3 14.2-14.2 14.2H14.2C6.3 90.7 0 84.4 0 76.5V14.2C0 6.3 6.3 0 14.2'
                        f' 0h62.3c7.8 0 14.2 6.3 14.2 14.2V76.5z"/>\n '
                        f'<rect x="22.6" y="22.7" transform="matrix(-0.7071 -0.7071 0.7071 -0.7071 45.3002 109.5842)"'
-                       f' width="45.4" height="45.4" class="button-icon {highlighted_classes_str}"/> '
+                       f' width="45.4" height="45.4" class="icon {highlighted_classes_str}"/> '
                       )     
                                
         return note_render
@@ -308,16 +308,16 @@ class NoteRoot(Note):
     def __init__(self, chord, pos):
         super().__init__(chord, pos)
         self.type = 'note_root'
-        self.svgclass = 'note-root'
+        self.svgclass = 'root'
 
     def get_svg(self, highlighted_classes):
     
         highlighted_classes_str = ' '.join(highlighted_classes).rstrip() 
-        note_render = (f'<path class="instrument-button {highlighted_classes_str}" d="M90.7 76.5c0 7.8-6.3 14.2-14.2 14.2H14.2C6.3 90.7 0 84.4 0'
+        note_render = (f'<path class="button {highlighted_classes_str}" d="M90.7 76.5c0 7.8-6.3 14.2-14.2 14.2H14.2C6.3 90.7 0 84.4 0'
                        f' 76.5V14.2C0 6.3 6.3 0 14.2 0h62.3c7.8 0 14.2 6.3 14.2 14.2V76.5z"/>\n '
-                       f'<circle cx="45.5" cy="45.4" r="26" class="button-icon {highlighted_classes_str}"/>'
+                       f'<circle cx="45.5" cy="45.4" r="26" class="icon {highlighted_classes_str}"/>'
                        f'<rect x="19.5" y="19.3" transform="matrix(-0.7071 0.7071 -0.7071 -0.7071 109.7415 45.2438)"'
-                       f' width="52" height="52" class="button-icon {highlighted_classes_str}"/>\n'
+                       f' width="52" height="52" class="icon {highlighted_classes_str}"/>\n'
                        )
         return note_render
 

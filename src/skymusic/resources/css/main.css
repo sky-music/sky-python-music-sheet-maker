@@ -17,18 +17,18 @@ body {
 /* <!-- Song title --> */
 h1, svg text.title {
     font-family: "Noto Sans", "Noto Sans CJK JP", "Noto Sans CJK KR", "Noto Sans CJK SC", "Noto Sans CJK TC", "Avenir", Arial, sans-serif;
-	font-size: 1.3em;
-	font: bold;
+    font-size: 1.3em;
+    font: bold;
 }
 
 /* <!-- Song headers (HTML only) --> */
 p, svg text.headers {
     font-family: "Noto Sans", "Noto Sans CJK JP", "Noto Sans CJK KR", "Noto Sans CJK SC", "Noto Sans CJK TC", "Avenir", Arial, sans-serif;
-	font-size: 0.8em;
-	line-height: 50%;
+    font-size: 0.8em;
+    line-height: 50%;
 }
 
-.note-root, .note-diamond, .note-circle {
+.root, .diamond, .circle {
   transform: scale(1.0);
   -ms-transform: scale(1.0);
   -webkit-transform: scale(1.0);
@@ -36,7 +36,7 @@ p, svg text.headers {
 
 /* <!-- Alignment of SVG (HTML only) --> */
 /* <!-- Seems to have no effect ? --> */
-.note-root svg, .note-diamond svg, .note-circle svg {
+.root svg, .diamond svg, .circle svg {
   display: inline-block;
   vertical-align: middle;
 }
@@ -164,49 +164,35 @@ hr {
 }
 
 svg line.divide {
-	stroke: grey;
-	stroke-width: 1.0px;
+    stroke: grey;
+    stroke-width: 1.0px;
 }
 
-
-/* <!-- TODO: Check if this has no effect ??? --> */
-/*
-path.instrument-button{
-	fill:#FF0000;
-	opacity:0.4;
-}
- */
-
-/* <!-- TODO: Check if this has no effect ??? --> */
-#transcript {
-  margin: 0 0;
-}
-
-table svg.harp-button-0,
-table svg.harp-button-1,
-table svg.harp-button-2,
-table svg.harp-button-3,
-table svg.harp-button-4,
-table svg.harp-button-5,
-table svg.harp-button-6,
-table svg.harp-button-7,
-table svg.harp-button-8,
-table svg.harp-button-9,
-table svg.harp-button-10,
-table svg.harp-button-111,
-table svg.harp-button-12,
-table svg.harp-button-13,
-table svg.harp-button-14 {
+table svg.button-0,
+table svg.button-1,
+table svg.button-2,
+table svg.button-3,
+table svg.button-4,
+table svg.button-5,
+table svg.button-6,
+table svg.button-7,
+table svg.button-8,
+table svg.button-9,
+table svg.button-10,
+table svg.button-111,
+table svg.button-12,
+table svg.button-13,
+table svg.button-14 {
   width: 1em;
   height: 1em;
 }
 
 /* <!-- Small buttons showing notes positions --> */
-svg.harp-button-0 .OFF.button-icon,
-svg.harp-button-1 .OFF.button-icon,
-svg.harp-button-2 .OFF.button-icon,
-svg.harp-button-3 .OFF.button-icon,
-svg.harp-button-4 .OFF.button-icon {
+svg.button-0 .OFF.icon,
+svg.button-1 .OFF.icon,
+svg.button-2 .OFF.icon,
+svg.button-3 .OFF.icon,
+svg.button-4 .OFF.icon {
   stroke-width: 0;
   stroke: white;
   fill: rgb(194,240,194);
@@ -214,11 +200,11 @@ svg.harp-button-4 .OFF.button-icon {
 }
 
 /* <!-- Small buttons showing notes positions --> */
-svg.harp-button-5 .OFF.button-icon,
-svg.harp-button-6 .OFF.button-icon,
-svg.harp-button-7 .OFF.button-icon,
-svg.harp-button-8 .OFF.button-icon,
-svg.harp-button-9 .OFF.button-icon {
+svg.button-5 .OFF.icon,
+svg.button-6 .OFF.icon,
+svg.button-7 .OFF.icon,
+svg.button-8 .OFF.icon,
+svg.button-9 .OFF.icon {
   stroke-width: 0;
   stroke: white;
   fill: rgb(179,236,255);
@@ -226,11 +212,11 @@ svg.harp-button-9 .OFF.button-icon {
 }
 
 /* <!-- Small buttons showing notes positions --> */
-svg.harp-button-10 .OFF.button-icon,
-svg.harp-button-11 .OFF.button-icon,
-svg.harp-button-12 .OFF.button-icon,
-svg.harp-button-13 .OFF.button-icon,
-svg.harp-button-14 .OFF.button-icon {
+svg.button-10 .OFF.icon,
+svg.button-11 .OFF.icon,
+svg.button-12 .OFF.icon,
+svg.button-13 .OFF.icon,
+svg.button-14 .OFF.icon {
   stroke-width: 0;
   stroke: white;
   fill: rgb(255,185,223);
@@ -238,33 +224,33 @@ svg.harp-button-14 .OFF.button-icon {
 }
 
 /* <!-- Note background when the chord is or is silent --> */
-table.broken .ON-0.instrument-button,
-table.silent .ON-0.instrument-button {
+table.broken .ON-0.button,
+table.silent .ON-0.button {
   stroke-width: 0;
   stroke: white;
   fill: none;
 }
 
 /* <!-- Small note buttons when the chord is broken --> */
-table.broken .OFF.button-icon,
-svg.broken .OFF.button-icon {
+table.broken .OFF.icon,
+svg.broken .OFF.icon {
   stroke-width: 0;
   stroke: white;
   fill: none;
 }
 
 /* <!-- Small note buttons when the chord is silent --> */
-table.silent .OFF.button-icon,
-svg.silent .OFF.button-icon {
+table.silent .OFF.icon,
+svg.silent .OFF.icon {
   stroke-width: 0;
   stroke: white;
   fill: none;
 }
 
 /* <!-- Middle note button when the chord is silent --> */
-table.silent svg.harp-button-7 .OFF.button-icon,
-svg.silent svg.harp-button-7 .OFF.button-icon,
-svg.silent.harp-button-7 .OFF.button-icon {
+table.silent svg.button-7 .OFF.icon,
+svg.silent svg.button-7 .OFF.icon,
+svg.silent.button-7 .OFF.icon {
   stroke-width: 0;
   stroke: white;
   fill: #BBBBBB;
@@ -283,38 +269,38 @@ svg.broken text {
 
 
 /* <!-- Note decoration (circle, diamond) --> */
-.ON-0.button-icon {
+.ON-0.icon {
   stroke-width: 5;
   stroke: white;
   fill: none;
 }
 
 /* <!-- Note background color in first row --> */
-svg.harp-button-0 path.ON-0,
-svg.harp-button-1 path.ON-0,
-svg.harp-button-2 path.ON-0,
-svg.harp-button-3 path.ON-0,
-svg.harp-button-4 path.ON-0 {
+svg.button-0 path.ON-0,
+svg.button-1 path.ON-0,
+svg.button-2 path.ON-0,
+svg.button-3 path.ON-0,
+svg.button-4 path.ON-0 {
   fill: limegreen;
   opacity: 1.0;
 }
 
 /* <!-- Note background color in second row --> */
-svg.harp-button-5 path.ON-0,
-svg.harp-button-6 path.ON-0,
-svg.harp-button-7 path.ON-0,
-svg.harp-button-8 path.ON-0,
-svg.harp-button-9 path.ON-0 {
+svg.button-5 path.ON-0,
+svg.button-6 path.ON-0,
+svg.button-7 path.ON-0,
+svg.button-8 path.ON-0,
+svg.button-9 path.ON-0 {
   fill: deepskyblue;
   opacity: 1.0;
 }
 
 /* <!-- Note background color in third row --> */
-svg.harp-button-10 path.ON-0,
-svg.harp-button-11 path.ON-0,
-svg.harp-button-12 path.ON-0,
-svg.harp-button-13 path.ON-0,
-svg.harp-button-14 path.ON-0 {
+svg.button-10 path.ON-0,
+svg.button-11 path.ON-0,
+svg.button-12 path.ON-0,
+svg.button-13 path.ON-0,
+svg.button-14 path.ON-0 {
   fill: deeppink;
   opacity: 1.0;
 }
@@ -324,11 +310,11 @@ Set to none to have a transparent SVG, and a transparent PNG with alpha layer (R
 Set to white to make the background white in RGB mode, and the PNG background white when converted to RGB
 --> */
 svg rect.harp-background {
-	fill:white;
+  fill:white;
 }
 
 svg rect.note-background {
-	fill:white;
+  fill:white;
 }
 
 /* <!-- Below the styles for buttons in a quaver --> */
@@ -337,7 +323,7 @@ svg rect.note-background {
   opacity: 1.0;
 }
 
-.ON-7.button-icon {
+.ON-7.icon {
   stroke-width: 3;
   stroke: white;
   fill: none;
@@ -348,7 +334,7 @@ svg rect.note-background {
   opacity: 1.0;
 }
 
-.ON-6.button-icon {
+.ON-6.icon {
   stroke-width: 3;
   stroke: white;
   fill: none;
@@ -359,7 +345,7 @@ svg rect.note-background {
   opacity: 1.0;
 }
 
-.ON-5.button-icon {
+.ON-5.icon {
   stroke-width: 3;
   stroke: white;
   fill: none;
@@ -371,7 +357,7 @@ svg rect.note-background {
   opacity: 1.0;
 }
 
-.ON-4.button-icon {
+.ON-4.icon {
   stroke-width: 3;
   stroke: white;
   fill: none;
@@ -382,7 +368,7 @@ svg rect.note-background {
   opacity: 1.0;
 }
 
-.ON-3.button-icon {
+.ON-3.icon {
   stroke-width: 3;
   stroke: white;
   fill: none;
@@ -393,7 +379,7 @@ svg rect.note-background {
   opacity: 1.0;
 }
 
-.ON-2.button-icon {
+.ON-2.icon {
   stroke-width: 3;
   stroke: white;
   fill: none;
@@ -404,7 +390,7 @@ svg rect.note-background {
   opacity: 1.0;
 }
 
-.ON-1.button-icon {
+.ON-1.icon {
   stroke-width: 3;
   stroke: white;
   fill: none;
@@ -414,19 +400,6 @@ svg rect.note-background {
   border: none;
 }
 
-/* <!-- Button styles if chord has en broken --> */
-/* <!-- TODO: Check if this has no effect ??? --> */
-/*
-.button-icon.silent {
-  fill: red;
-  stroke: red;
+#transcript {
+  margin: 0 0;
 }
-
-.note-diamond.silent {
-  fill: red;
-  stroke: red;
-}
- */
-
-
-

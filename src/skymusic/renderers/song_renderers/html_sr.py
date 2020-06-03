@@ -42,7 +42,7 @@ class HtmlSongRenderer(song_renderer.SongRenderer):
 
         for k in meta:
             if k != 'title':
-                html_buffer.write(f"\n<p> <b>{meta[k][0]}</b>{meta[k][1]}</p>")
+                html_buffer.write(f"\n<p><b>{meta[k][0]}</b>{meta[k][1]}</p>")
 
         html_buffer.write('\n<div id="transcript">\n')
         
