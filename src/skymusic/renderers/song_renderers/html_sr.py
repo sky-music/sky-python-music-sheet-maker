@@ -9,7 +9,7 @@ class HtmlSongRenderer(song_renderer.SongRenderer):
     def __init__(self, locale=None):
         
         super().__init__(locale)
-        self.HTML_note_width = '1em'
+        #self.HTML_note_width = '1em'
 
     def write_headers(self, html_buffer, song, css_mode, rel_css_path):
         
@@ -80,7 +80,7 @@ class HtmlSongRenderer(song_renderer.SongRenderer):
                 for instrument in line:
                     instrument.set_index(instrument_index)
                     #instrument_render = instrument.render_in_html(self.HTML_note_width)
-                    instrument_render = instrument_renderer.render(instrument, self.HTML_note_width)
+                    instrument_render = instrument_renderer.render(instrument)
                     instrument_render += ' '
                     instrument_index += 1
                     line_render += instrument_render
