@@ -7,7 +7,7 @@ except ImportError:
 from src.skymusic.resources import fonts, elements, css
 
 
-A_root_png = io.BytesIO(importlib_resources.read_binary(elements, 'A-circle.png'))
+A_root_png = io.BytesIO(importlib_resources.read_binary(elements, 'A-root.png'))
 A_diamond_png = io.BytesIO(importlib_resources.read_binary(elements, 'A-diamond.png'))
 A_circle_png = io.BytesIO(importlib_resources.read_binary(elements, 'A-circle.png'))
 B_root_png = io.BytesIO(importlib_resources.read_binary(elements, 'B-root.png'))

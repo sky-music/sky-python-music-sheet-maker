@@ -1,5 +1,5 @@
 from . import instrument_renderer
-
+from src.skymusic.renderers.note_renderers.svg_nr import SvgNoteRenderer
 
 class SvgInstrumentRenderer(instrument_renderer.InstrumentRenderer):
     
@@ -29,6 +29,8 @@ class SvgInstrumentRenderer(instrument_renderer.InstrumentRenderer):
         else:
             class_suffix = ''
 
+        note_renderer = SvgNoteRenderer()
+
         # The chord SVG container
         harp_render = f'\n<svg x="{x :.2f}" y="0" width="{harp_width}" height="{harp_height}" class="instrument-harp harp-{instrument.get_index()} {class_suffix}">'
 
@@ -45,8 +47,9 @@ class SvgInstrumentRenderer(instrument_renderer.InstrumentRenderer):
                 yn = 0.15 + row * (1 - 2 * 0.16) / (instrument.get_row_count() - 1) - note_width / 2.0
 
                 # NOTE RENDER
-                harp_render += note.render_in_svg(f"{100*note_width :.2f}%", f"{100*xn :.2f}%", f"{100*yn :.2f}%")
-
+                #harp_render += note.render_in_svg(f"{100*note_width :.2f}%", f"{100*xn :.2f}%", f"{100*yn :.2f}%")
+                harp_render += note_renderer.render(note, x=f"{100*xn :.2f}%", y=f"{100*yn :.2f}%", width=f"{100*note_width :.2f}%")
+                
         harp_render += '</svg>'
 
         return harp_render

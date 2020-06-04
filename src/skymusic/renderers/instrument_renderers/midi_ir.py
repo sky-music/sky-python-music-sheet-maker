@@ -1,4 +1,5 @@
 from . import instrument_renderer
+from src.skymusic.renderers.note_renderers import midi_nr
 
 try:
     import mido
@@ -40,7 +41,8 @@ class MidiInstrumentRenderer(instrument_renderer.InstrumentRenderer):
                         note = instrument.get_note_from_position((row, col))
                         frames = note.get_highlighted_frames()
 
-                        note_render = note.render_in_midi(event_type, t, music_key)
+                        note_renderer = midi_nr.MidiNoteRenderer()
+                        note_render = note_renderer.render(note, event_type, t, music_key)
 
                         if isinstance(note_render, mido.Message):
                             harp_render.append(note_render)
