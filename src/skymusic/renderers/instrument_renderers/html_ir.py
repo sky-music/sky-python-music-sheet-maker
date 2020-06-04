@@ -7,7 +7,7 @@ class HtmlInstrumentRenderer(instrument_renderer.InstrumentRenderer):
     def __init__(self, locale=None):
         super().__init__(locale)
 
-    def render_harp(self, instrument, note_width='1em'):
+    def render_harp(self, instrument):
         """
         Renders the Instrument in HTML
         """
@@ -15,20 +15,20 @@ class HtmlInstrumentRenderer(instrument_renderer.InstrumentRenderer):
         harp_broken = instrument.get_is_broken()
 
         if harp_broken:
-            class_suffix = "broken"
+            class_suffix = " broken"
         elif harp_silent:
-            class_suffix = "silent"
+            class_suffix = " silent"
         else:
-            class_suffix = ''
+            class_suffix = ""
 
-        harp_render = f'<table class="harp harp-{instrument.get_index()} {class_suffix}">'
+        harp_render = f'<table class="harp harp-{instrument.get_index()}{class_suffix}">'
 
         for row in range(instrument.get_row_count()):
 
             harp_render += '<tr>'
             for col in range(instrument.get_column_count()):
                 note = instrument.get_note_from_position((row, col))
-                note_render = note.render_in_html(note_width)                
+                note_render = note.render_in_html()                
                 harp_render += f'<td>{note_render}</td>'
             harp_render += '</tr>'
 
@@ -41,7 +41,7 @@ class HtmlInstrumentRenderer(instrument_renderer.InstrumentRenderer):
 
         return harp_render
 
-    def render_voice(self, instrument, note_width):
+    def render_voice(self, instrument):
         """Renders the lyrics text in HTML inside an invisible table"""
         chord_render = f'<table class="voice"><tr><td>{instrument.lyric}</td></tr></table>'
         return chord_render

@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import os
 import re
 import json
@@ -30,7 +29,7 @@ class SongParser:
 
         #Delimiters must be character or strings
         #The backslash character is forbidden
-        #Only regex with the following format are supported: \x, where x is [a-zA-Z]
+        #Only regex with the following format are supported: \x, where x is s, t, w, d, n, r, a, r, f, v, or R
         self.input_mode = None
         self.note_parser = None
         self.icon_delimiter = Resources.ICON_DELIMITER
@@ -39,6 +38,7 @@ class SongParser:
         self.comment_delimiter = Resources.COMMENT_DELIMITER
         self.repeat_indicator = Resources.REPEAT_INDICATOR
         self.skyjson_chord_delay = Resources.SKYJSON_CHORD_DELAY #Delay in ms below which 2 notes are considered a chord
+        self.allowed_regex = ['\s', '\t', '\w', '\d', '\n', '\r', '\a', '\e', '\f', '\v', '\R']
         self.maker = maker
         self.music_theory = music_theory.MusicTheory(self)
         try:
@@ -177,7 +177,7 @@ class SongParser:
         """
         if delimiter is None:
             delimiter = self.quaver_delimiter
-            if re.match('\\\\',re.escape(delimiter)):
+            if delimiter in self.allowed_regex:
                 return re.compile(delimiter).split(icon)
             else:
                 return icon.split(delimiter)
@@ -269,7 +269,7 @@ class SongParser:
         line = re.sub('(\s){2,}', '\\1', line)  # removes surnumerous blank characters
         line = line.strip()
         
-        if re.match('\\\\',re.escape(self.icon_delimiter)):
+        if self.icon_delimiter in self.allowed_regex:
             delimiter = self.icon_delimiter
         else:
             delimiter = re.escape(self.icon_delimiter)       
@@ -389,7 +389,7 @@ class SongParser:
                 else:
                     delimiter = self.icon_delimiter
                 
-            if re.match('\\\\',re.escape(delimiter)):
+            if delimiter in self.allowed_regex:
                 return re.compile(delimiter).split(line)
             else:
                 return line.split(delimiter)        

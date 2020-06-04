@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import io
 try:
     from importlib import resources as importlib_resources

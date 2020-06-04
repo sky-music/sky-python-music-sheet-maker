@@ -1,6 +1,6 @@
 *.html
 *.pyc
 /songs_out
-/songs
+.DS_Store
 /venv
 .idea
