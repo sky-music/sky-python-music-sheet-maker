@@ -167,6 +167,7 @@ class Communicator:
 
         sanitized_title = re.sub(r'[\\/:"*?<>|]', '', re.escape(song_bundle.get_meta()['title'])).strip()
         sanitized_title = re.sub('(\s)+', '_', sanitized_title)  # replaces spaces by underscore
+        sanitized_title = sanitized_title[:31]
         if len(sanitized_title) == 0 or sanitized_title == '_':
             sanitized_title = Lang.get_string("song_meta/untitled", self.locale)
 

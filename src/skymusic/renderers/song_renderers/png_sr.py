@@ -1,4 +1,5 @@
 import io
+import textwrap
 from . import song_renderer
 from src.skymusic.renderers.instrument_renderers.png_ir import PngInstrumentRenderer
 from src.skymusic.resources import Resources
@@ -35,7 +36,7 @@ class PngSongRenderer(song_renderer.SongRenderer):
                                        int(self.harp_relspacings[1] * self.png_harp_size0[1]))
             self.png_harp_size = None
             self.png_harp_spacings = None
-            self.png_line_width = int(self.png_size[0] - self.png_margins[0])  # self.png_lyric_relheight = instruments.Voice().lyric_relheight
+            self.png_line_width = int(self.png_size[0] - 2*self.png_margins[0])  # self.png_lyric_relheight = instruments.Voice().lyric_relheight
             self.png_lyric_size0 = (self.png_harp_size0[0], png_instrument_renderer.get_lyric_height())
             self.png_lyric_size = None
             self.png_dpi = (96 * 2, 96 * 2)
@@ -89,6 +90,14 @@ class PngSongRenderer(song_renderer.SongRenderer):
                 bg.paste(fg, box)
                 return bg
 
+    def wrap_text(self, text, width, target_width):
+        
+        if width < target_width:
+            return text, 1
+        else:
+            maxlen = int((target_width/width)*len(text))
+            splitted = textwrap.wrap(text, width=maxlen, break_long_words=True)
+            return "\n".join(splitted), len(splitted)
 
     def write_header(self, song_render, filenum, song, x_in_png, y_in_png):
     
@@ -97,30 +106,34 @@ class PngSongRenderer(song_renderer.SongRenderer):
     
         if filenum == 0:
 
+            title = meta['title'][1]
             fnt = ImageFont.truetype(self.png_font, self.png_title_font_size)
+            title, numlines = self.wrap_text(title, fnt.getsize(title)[0], int(self.png_line_width/harp_rescale))               
             h = self.get_png_text_height(fnt)
-            title_header = Image.new('RGBA', (int(self.png_line_width), int(h)))
+            title_header = Image.new('RGBA', (int(self.png_line_width/harp_rescale), int(h*numlines)))
             draw = ImageDraw.Draw(title_header)
-            draw.text((0, 0), meta['title'][1], font=fnt, fill=self.font_color)
+            draw.text((0, 0), title, font=fnt, fill=self.font_color)
             if harp_rescale != 1:
                 title_header = title_header.resize(
                     (int(title_header.size[0] * harp_rescale), int(title_header.size[1] * harp_rescale)),
                     resample=Image.LANCZOS)
             song_render = self.trans_paste(song_render, title_header, (int(x_in_png), int(y_in_png)))
-            y_in_png += h * 2 * harp_rescale
+            y_in_png += (h+1) * numlines * harp_rescale
 
             for k in meta:
                 if k != 'title':
+                    meta_text = meta[k][0] + ' ' + meta[k][1]
                     fnt = ImageFont.truetype(self.png_font, self.png_font_size)
+                    meta_text, numlines = self.wrap_text(meta_text, fnt.getsize(meta_text)[0], int(self.png_line_width/harp_rescale))
                     h = self.get_png_text_height(fnt)
-                    header = Image.new('RGBA', (int(self.png_line_width), int(h)))
+                    header = Image.new('RGBA', (int(self.png_line_width/harp_rescale), int(h*numlines)))
                     draw = ImageDraw.Draw(header)
-                    draw.text((0, 0), meta[k][0] + ' ' + meta[k][1], font=fnt, fill=self.font_color)
+                    draw.text((0, 0), meta_text, font=fnt, fill=self.font_color)
                     if harp_rescale != 1:
                         header = header.resize((int(header.size[0] * harp_rescale), int(header.size[1] * harp_rescale)),
                                                resample=Image.LANCZOS)
                     song_render = self.trans_paste(song_render, header, (int(x_in_png), int(y_in_png)))
-                    y_in_png += h * 2 * harp_rescale
+                    y_in_png += (h+1) * numlines * harp_rescale
         else:
             fnt = ImageFont.truetype(self.png_font, self.png_font_size)
             h = self.get_png_text_height(fnt)
@@ -132,7 +145,7 @@ class PngSongRenderer(song_renderer.SongRenderer):
                     (int(title_header.size[0] * harp_rescale), int(title_header.size[1] * harp_rescale)),
                     resample=Image.LANCZOS)
             song_render = self.trans_paste(song_render, title_header, (int(x_in_png), int(y_in_png)))
-            y_in_png += 2 * h + self.png_harp_spacings[1]    
+            y_in_png += 2 * h * harp_rescale + self.png_harp_spacings[1]    
     
         return (song_render, x_in_png, y_in_png)
     
@@ -201,7 +214,7 @@ class PngSongRenderer(song_renderer.SongRenderer):
 
             # Creating a new instrument image, starting at x=0 (in line) and y=0 (in line)
             if min([ncols, self.maxIconsPerLine])*(self.png_harp_size[0] + self.png_harp_spacings[0]) > self.png_line_width:
-                nsublines_predict = 2
+                nsublines_predict = 1
             else:
                 nsublines_predict = 1
             sub_line = 0
@@ -215,8 +228,10 @@ class PngSongRenderer(song_renderer.SongRenderer):
                 #NEW
                 if linetype.lower().strip() == 'voice':
                     ypredict = yline_in_song + (self.png_lyric_size[1] + self.png_harp_spacings[1] / 2.0)* nsublines_predict + self.png_harp_spacings[1] / 2.0
+                    ypredict += self.png_lyric_size[1]
                 else:
                     ypredict = yline_in_song + (self.png_harp_size[1] + self.png_harp_spacings[1])*nsublines_predict + self.png_harp_spacings[1] / 2.0
+                    ypredict += self.png_harp_size[1]
     
                 if ypredict > (self.png_size[1] - self.png_margins[1]):
                     page_break = True
