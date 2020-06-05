@@ -215,8 +215,10 @@ class PngSongRenderer(song_renderer.SongRenderer):
                 #NEW
                 if linetype.lower().strip() == 'voice':
                     ypredict = yline_in_song + (self.png_lyric_size[1] + self.png_harp_spacings[1] / 2.0)* nsublines_predict + self.png_harp_spacings[1] / 2.0
+                    ypredict += self.png_lyric_size[1]
                 else:
                     ypredict = yline_in_song + (self.png_harp_size[1] + self.png_harp_spacings[1])*nsublines_predict + self.png_harp_spacings[1] / 2.0
+                    ypredict += self.png_harp_size[1]
     
                 if ypredict > (self.png_size[1] - self.png_margins[1]):
                     page_break = True
