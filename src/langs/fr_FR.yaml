@@ -152,8 +152,8 @@ stock_queries:
     foreword:
     question: Qui sont les artistes d'origine de la chanson ?
     afterword:
-    input_tip: texte
-    help_text: Original artists include the composer, musician, singer, etc.
+    input_tip: du texte (obligatoire)
+    help_text: Les artistes incluent le compositeur, l'interprète, etc. Une réponse vide n'est pas acceptable.
   transcript_writer:
     foreword:
     question: Qui est le transcripteur ?

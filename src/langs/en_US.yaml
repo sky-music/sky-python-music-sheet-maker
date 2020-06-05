@@ -156,7 +156,7 @@ stock_queries:
     question: What is(are) the Original artist(s)?
     afterword:
     input_tip: any non-empty text
-    help_text: Original artists include the composer, musician, singer, etc.
+    help_text: Original artists include the composer, musician, singer, etc. An empty answer is NOT allowed.
   transcript_writer:
     foreword:
     question: What is the transcript writer?
