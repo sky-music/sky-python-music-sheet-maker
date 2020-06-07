@@ -130,9 +130,9 @@ stock_queries:
       Sur le site web, cochez les cases.
   aspect_ratio:
     foreword: Par défaut le format d'image PNG est en paysage 16:9.
-    question: Vous pouvez choisir un rapport d'aspect différent, ou {skip} pour passer
+    question: "Vous pouvez choisir un rapport d'aspect différent, ou {skip} pour passer"
     afterword:
-    input_tip: 'un choix dans la liste. {skip_number} pour passer.'
+    input_tip: 'un choix dans la liste. {skip} pour passer.'
     help_text: |
       Par défaut le format d'image PNG est en paysage 16:9. Vous pouvez choisir un rapport d'aspect différent, ou {skip} pour passer    
   song_bpm:

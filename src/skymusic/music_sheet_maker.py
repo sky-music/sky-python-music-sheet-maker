@@ -611,7 +611,7 @@ class MusicSheetMaker:
         if not any([mode.get_is_image() for mode in render_modes]):
             return None, AspectRatio.WIDESCREEN
         else:
-            replacements = {'skip_number': Lang.get_string(f"recipient_specifics/skip_number/{recipient.get_name()}", self.locale)}
+            replacements = {'skip': Lang.get_string(f"recipient_specifics/skip/{recipient.get_name()}", self.locale)}
             q_aspect = self.communicator.send_stock_query('aspect_ratio', recipient=recipient, 
                                                           replacements=replacements, prerequisites=prerequisites)
     

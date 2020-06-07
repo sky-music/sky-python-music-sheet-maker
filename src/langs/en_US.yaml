@@ -133,9 +133,9 @@ stock_queries:
       On the website, check the boxes.
   aspect_ratio:
     foreword: By default the visual sheet is a 16:9 image in landscape orientation.
-    question: 'Please choose a different aspect ratio in the list, or {skip_number} to skip'
+    question: 'Please choose a different aspect ratio in the list, or {skip} to skip'
     afterword:
-    input_tip: 'an aspect ratio in the list. {skip_number} to skip'
+    input_tip: 'an aspect ratio in the list. {skip} to skip'
     help_text: |
       By default the visual sheet is a 16:9 image in landscape orientation. Please choose a different aspect ratio if you like.
   song_bpm:
