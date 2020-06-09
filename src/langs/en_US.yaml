@@ -2,11 +2,11 @@ recipient_specifics:
   skip:
     command_line: leave blank and type enter
     music_cog: answer with - (dash)
-    sky_music_website: leave blank and press answer
+    sky_music_website: press answer
   skip_number:
     command_line: leave blank or 0 and type enter
     music_cog: answer with - (dash) or 0
-    sky_music_website: leave blank or 0 and press answer
+    sky_music_website: press answer
 input_mode:
   skykeyboard:
     short_desc: Sky keyboard

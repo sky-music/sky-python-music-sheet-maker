@@ -2,11 +2,11 @@ recipient_specifics:
   skip:
     command_line: laissez vide et tapez entrée
     music_cog: répondez avec un espace
-    sky_music_website: laissez vide et appuyez sur answer
+    sky_music_website: appuyez sur answer
   skip_number:
     command_line: laissez blanc ou '0' et tapez entrée
     music_cog: répondez avec un espace ou '0'
-    sky_music_website: laissez blanc ou '0' et appuyez sur answer
+    sky_music_website: appuyez sur answer
 input_mode:
   skykeyboard:
     short_desc: Clavier
