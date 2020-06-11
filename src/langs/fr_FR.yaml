@@ -1,3 +1,6 @@
+warnings:
+  jianpu_pause: "Jianpu notation is used: setting '0' as the pause character instead of '{pause}'. Please make sure your input follows this convention."
+  jianpu_quaver_delimiter: "Jianpu notation is used: setting '{jianpu_quaver_delimiter}' as the quaver delimiter instead of '{quaver_delimiter}'. Please make sure your input follows this convention."
 recipient_specifics:
   skip:
     command_line: laissez vide et tapez entrée
@@ -279,6 +282,7 @@ stock_queries:
       'Veuillez vérifier les points suivants:
     
       - Si vous avez spécifié l'octave, il doit être entre 1 et 3. Sinon, recommencez en utilisant le décalage d'octave.
+      - En notation Jianpu, les pauses sont marquées par '0' (zéro)
       - Que votre chanson ne contient pas d'erreur de frappe. Veuillez consulter ce site web pour plus d'infos: 
     
       https://sky-music.github.io/make-your-own-sheet.html'

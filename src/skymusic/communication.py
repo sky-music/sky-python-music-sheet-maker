@@ -612,6 +612,7 @@ class Query:
             result = '\n'.join(filter(None, result))
         except:
             pass
+
         self.result = result
         return result
     
@@ -755,7 +756,7 @@ class QueryChoice(Query):
        
         result += [self.get_afterword()]
 
-        self.result = '\n'.join(filter(None, result)) + '\n'
+        self.result = '\n'.join(filter(None, result))
 
         return self.result
 

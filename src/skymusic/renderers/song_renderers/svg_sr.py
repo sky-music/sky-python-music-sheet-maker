@@ -56,7 +56,7 @@ class SvgSongRenderer(song_renderer.SongRenderer):
                 with open(css_path, 'r', encoding='utf-8', errors='ignore') as css_file:
                     css_file = css_file.read()
             except:
-                print("\n***Warning: could not open CSS file to embed it in SVG.\n")
+                print("\n***Warning: could not open CSS file to embed it in SVG.")
                 css_file = ''
                 pass
             svg_buffer.write('\n<defs><style type="text/css"><![CDATA[\n')
@@ -76,7 +76,7 @@ class SvgSongRenderer(song_renderer.SongRenderer):
         if buffer_list is None:
             buffer_list = []
         if len(buffer_list) >= self.maxFiles:
-            print(f"\nYour song is too long. Stopping at {self.maxFiles} files.")
+            print(f"\n***WARNING: Your song is too long. Stopping at {self.maxFiles} files.")
             return buffer_list
 
         instrument_renderer = SvgInstrumentRenderer(self.locale)
@@ -197,7 +197,6 @@ class SvgSongRenderer(song_renderer.SongRenderer):
                     sub_line += 1
                     x = 0
 
-                     # print('max reached at row=' + str(row) + ' col=' + str(col))
                     # New Line SVG placeholder
                     if linetype.lower().strip() == 'voice':
                         line_render += (f'\n<svg x="0" y="{y :.2f}" width="{self.SVG_line_width :.2f}" height="{self.SVG_text_height :.2f}"'

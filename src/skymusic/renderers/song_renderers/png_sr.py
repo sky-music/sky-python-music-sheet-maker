@@ -157,12 +157,12 @@ class PngSongRenderer(song_renderer.SongRenderer):
         global no_PIL_module
 
         if no_PIL_module:
-            print("\n***WARNING: PNG was not rendered because PIL module was not found. ***\n")
+            print("\n***WARNING: PNG was not rendered because PIL module was not found. ***")
             return None
      
         filenum = len(buffer_list)
         if len(buffer_list) >= self.maxFiles:
-            print(f"\nYour song is too long. Stopping at {self.maxFiles} files.")
+            print(f"\n***WARNING: Your song is too long. Stopping at {self.maxFiles} files.")
             return buffer_list
         
         instrument_renderer = PngInstrumentRenderer(self.locale)
@@ -247,7 +247,6 @@ class PngSongRenderer(song_renderer.SongRenderer):
                         yline_in_song += self.png_harp_spacings[1] / 2.0
 
                     sub_line += 1
-                    # print('max reached at row=' + str(row) + ' col=' + str(col))
                     # New Line
                     if linetype.lower().strip() == 'voice':
                         line_render = Image.new('RGBA', (int(self.png_line_width), int(self.png_lyric_size[1])),

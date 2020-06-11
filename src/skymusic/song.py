@@ -1,6 +1,7 @@
 from src.skymusic import instruments, Lang
 from src.skymusic.renderers.song_renderers import html_sr, svg_sr, png_sr, midi_sr, skyjson_sr, ascii_sr
 from src.skymusic.modes import RenderMode
+from src.skymusic.resources import Resources
 
 class Song():
 
@@ -9,8 +10,8 @@ class Song():
         if isinstance(music_key, str):
             self.music_key = music_key
         else:
-            print("\n***Warning: Invalid song key: using C instead\n")
-            self.music_key = 'C'
+            self.music_key = Resources.DEFAULT_KEY
+            print("\n***Warning: Invalid song key: using {self.music_key} instead")            
 
         self.locale = locale
 
