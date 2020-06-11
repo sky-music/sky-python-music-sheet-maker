@@ -218,7 +218,7 @@ stock_queries:
     foreword:
     question: |
       Your song cannot be transposed exactly in Sky.
-      Default key will be set to C.
+      Default key will be set to {song_key}.
     afterword:
     input_tip: click OK to acknowledge
     help_text:
@@ -238,7 +238,7 @@ stock_queries:
       We detected that your song can be played with several notes as the song key. Please choose the one that is most convenient for you.'
   recommended_key:
     foreword: Your musical notation uses relative pitch.
-    question: 'What is the recommended key to play in Sky (default is C). {skip} to skip'
+    question: 'What is the recommended key to play in Sky (default is {song_key}). {skip} to skip'
     afterword:
     input_tip: '{skip}, or type a note name (e.g. C in English notation)'
     help_text: |

@@ -214,7 +214,7 @@ stock_queries:
     foreword:
     question: |
       Bài hát của bạn không thể chuyển đúng sang Sky.
-      Phím mặc định sẽ được đặt là C.
+      Phím mặc định sẽ được đặt là {song_key}.
     afterword:
     input_tip: Bấm OK để tiếp tục
     help_text:
@@ -234,9 +234,9 @@ stock_queries:
       Tôi nhận dạng được bài hát của bạn có thể chơi với nhiều nốt. Hãy chọn tùy chọn mà bạn cảm thấy được nhất.
   recommended_key:
     foreword: Hệ kí tự nhạc của bạn có sử dụng độ cao thấp (pitch) tương đối.
-    question: Phím được đề xuất để chơi trong Sky (mặc định là C) 
+    question: Phím được đề xuất để chơi trong Sky (mặc định là {song_key}) 
     afterword:
-    input_tip: Để trống hoặc nhâp tên nốt (C trong hệ tiếng Anh)
+    input_tip: Để trống hoặc nhâp tên nốt ({song_key} trong hệ tiếng Anh)
     help_text: |
       Bạn đã sử dụng hệ kí tự nhạc mà cho phép bạn có thể xác định độ cao thấp chính xác của nốt nhạc.
       Tuy nhiên thì bảng nhạc trực quan có thể có âm khác tùy vào tùy nơi trong Sky.

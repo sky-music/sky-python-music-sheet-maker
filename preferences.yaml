@@ -6,6 +6,6 @@ render_modes: all # all to activate all modes, otherwise a comma-separated list 
 #    redemption.txt
 #notes: # Unless a file name has been supplied, this question must be answered with a blank for complete automation
 musical_notation: SKY # Default value if not detected automatically. An input_mode short name, among ENGLISH, JIANPU, DOREMI, DOREMIJP, SKY, SKYKEYBOARD, ENGLISHCHORDS
-recommended_key: C # The key in case your notation does not use octaves
+#recommended_key: C # The key in case your notation does not use octaves
 #transcript_writer: me # Person who transcribed the notes
 #original_artist: Me # Artist

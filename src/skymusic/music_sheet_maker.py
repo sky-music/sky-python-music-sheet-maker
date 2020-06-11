@@ -509,18 +509,23 @@ class MusicSheetMaker:
 
         song_key = None
         possible_keys = self.get_song_parser().find_key(notes)
+        
+        try:
+            default_key = self.get_song_parser().get_default_key()
+        except AttributeError:
+            default_key = 'C'
 
         if possible_keys is None:
             # Asks for any text string
+            replacements={'skip': Lang.get_string(f"recipient_specifics/skip/{recipient.get_name()}", self.locale), 'song_key': default_key}
             q_key = self.communicator.send_stock_query('recommended_key', recipient=recipient,
-                                                       replacements={'skip': Lang.get_string(f"recipient_specifics/skip/{recipient.get_name()}", self.locale)},
-                                                       prerequisites=prerequisites)
+            replacements=replacements, prerequisites=prerequisites)
 
         elif len(possible_keys) == 0:
             # Sends information that there is no possible key
             q_key = self.communicator.send_stock_query('no_possible_key', recipient=recipient,
-                                                       prerequisites=prerequisites)
-            possible_keys = ['C']
+            replacements={'song_key': default_key}, prerequisites=prerequisites)
+            possible_keys = [default_key]
 
         elif len(possible_keys) == 1:
             # Sends information that there is only 1 possible key
@@ -539,7 +544,7 @@ class MusicSheetMaker:
             if possible_keys is None:
                 song_key = q_key.get_reply().get_result()
                 if len(song_key.strip()) == 0:
-                    song_key = 'C'
+                    song_key = default_key
             elif len(possible_keys) == 1:
                 song_key = possible_keys[0]
             elif len(possible_keys) > 1:

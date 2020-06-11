@@ -38,6 +38,7 @@ class SongParser:
         self.comment_delimiter = Resources.COMMENT_DELIMITER
         self.repeat_indicator = Resources.REPEAT_INDICATOR
         self.skyjson_chord_delay = Resources.SKYJSON_CHORD_DELAY #Delay in ms below which 2 notes are considered a chord
+        self.default_key = Resources.DEFAULT_KEY
         self.allowed_regex = ['\s', '\t', '\w', '\d', '\n', '\r', '\a', '\e', '\f', '\v', '\R']
         self.maker = maker
         self.music_theory = music_theory.MusicTheory(self)
@@ -78,6 +79,13 @@ class SongParser:
 
         return self.repeat_indicator
 
+    def get_default_key(self):
+        
+        key = self.english_note_name(note_name=self.default_key, reverse=True)
+        if not key:
+            key = self.default_key
+        return key
+
     def get_maker(self):
 
         return self.maker
@@ -86,10 +94,10 @@ class SongParser:
 
         if self.input_mode == InputMode.JIANPU or isinstance(self.note_parser, src.skymusic.parsers.noteparsers.jianpu.Jianpu):
             if self.pause != Resources.JIANPU_PAUSE:
-                print(f"***WARNING: Jianpu notation is used: setting 0 as the pause character instead of {self.pause}. Please make sure your input follows this convention.")
+                print(f"***WARNING: Jianpu notation is used: setting '0' as the pause character instead of '{self.pause}'. Please make sure your input follows this convention.")
                 self.pause = Resources.JIANPU_PAUSE
             if self.quaver_delimiter == '-':
-                print(f"***WARNING: Jianpu notation is used: setting {Resources.JIANPU_QUAVER_DELIMITER} as the quaver delimiter instead of {self.quaver_delimiter}. Please make sure your input follows this convention.")
+                print(f"***WARNING: Jianpu notation is used: setting '{Resources.JIANPU_QUAVER_DELIMITER}' as the quaver delimiter instead of '{self.quaver_delimiter}'. Please make sure your input follows this convention.")
                 self.quaver_delimiter = Resources.JIANPU_QUAVER_DELIMITER
 
         delims = [self.icon_delimiter, self.pause, self.quaver_delimiter, self.comment_delimiter, self.repeat_indicator]

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import math
-
+from src.skymusic.resources import Resources 
 
 class NoteParser:
     """
@@ -252,7 +252,7 @@ class NoteParser:
         # Find the major scale interval from the song_key to the note_name
         # Find the semitone interval from the song_key to the note_name first
         if song_key is None:
-            song_key = 'C'
+            song_key = Resources.DEFAULT_KEY
         try:
             song_key_chromatic_equivalent = self.convert_note_name_into_chromatic_position(song_key)
         except (KeyError, SyntaxError):

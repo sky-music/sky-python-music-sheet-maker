@@ -212,7 +212,7 @@ stock_queries:
     foreword:
     question: |
       Votre chanson contient des notes non transposables dans le jeu Sky.
-      La clef musicale sera mise à C (do) par défaut.
+      La clef musicale sera mise à {song_key} par défaut.
     afterword:
     input_tip: cliquez sur OK pour passer
     help_text:
@@ -232,9 +232,9 @@ stock_queries:
       Heureusement, nous avons trouvé plusieurs clefs permettant de jouer votre chanson. Merci de choisir celle qui vous convient le mieux.
   recommended_key:
     foreword: "Votre notation musicale n'utilise pas la notion d'octave."
-    question: 'Quelle clef recommenderiez vous pour jouer dans Sky ? (do par défaut). {skip} pour passer'
+    question: 'Quelle clef recommenderiez vous pour jouer dans Sky ? ({song_key} par défaut). {skip} pour passer'
     afterword:
-    input_tip: '{skip} pour garder do, ou tapez un nom de clef'
+    input_tip: '{skip} pour garder {song_key}, ou tapez un nom de clef'
     help_text: |
       Votre notation musicale n'utilise pas la notion d'octave : la hauteur de vos notes est donc indéterminée.
       Votre partition risque de sonner différement à différents endroits du jeu. Indiquez une clef pour obliger les joueurs à respecter votre chanson.
