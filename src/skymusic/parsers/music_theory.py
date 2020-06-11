@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os, re
 from operator import truediv, itemgetter
+from collections import OrderedDict
 import json
 from src.skymusic.modes import InputMode 
 
@@ -105,16 +106,20 @@ class MusicTheory():
 
         song_parser = self.song_parser
         note_parser = song_parser.get_note_parser()
+        is_note_regex = note_parser.note_name_regex
+        not_note_regex = note_parser.not_note_name_regex
 
-        try:
-            possible_keys = [k for k in note_parser.CHROMATIC_SCALE_DICT.keys()]
-            if len(possible_keys) == 0:
-                return None 
-            is_note_regex = note_parser.note_name_regex
-            not_note_regex = note_parser.not_note_name_regex
+        try:           
+            chromatic_dict = note_parser.CHROMATIC_SCALE_DICT
+            if not chromatic_dict:
+                return None #When case note_parser is undefined, default chromatic_dict is empty
         except AttributeError:
             # Parsers not having a chromatic scale keys should return None, eg Sky and Skykeyboard
-            return None
+            return None       
+
+        # Removing synonyms
+        inv_dict = OrderedDict({v: k for k, v in reversed(OrderedDict(chromatic_dict).items())})
+        possible_keys = list(reversed(inv_dict.values()))
         
         scores = [0] * len(possible_keys)
         num_notes = [0] * len(possible_keys)
@@ -140,10 +145,10 @@ class MusicTheory():
         scores = list(map(truediv, scores, num_notes))
         scores = [(1 - score) for score in scores]
 
-        return self.most_likely(scores, possible_keys, 0.9, note_parser.CHROMATIC_SCALE_DICT)
+        return self.most_likely(scores, possible_keys, 0.9)
 
 
-    def most_likely(self, scores, items, threshold=0.9, duplicates_dict=None):
+    def most_likely(self, scores, items, threshold=0.9):
         """
         Returns the items with scores above threshold, removing duplicates defined in the dict       
         
@@ -153,40 +158,26 @@ class MusicTheory():
         if len(scores) == 1:
             return [items[0]]
 
-        sorted_idx, sorted_scores = zip(
-            *sorted([(i, e) for i, e in enumerate(scores)], key=itemgetter(1), reverse=True))
+        sorted_idx, sorted_scores = zip(*sorted([(i, e) for i, e in enumerate(scores)],
+                                                 key=itemgetter(1), reverse=True))
 
         sorted_items = [items[i] for i in sorted_idx]
 
-        if sorted_scores[0] == 1 and sorted_scores[1] < 1:
+        if sorted_scores[0] == 1 and sorted_scores[1] < 1: # 100% match
             return [sorted_items[0]]
 
-        if sorted_scores[0] == 1 and sorted_scores[1] == 1:
-            if duplicates_dict is not None:
-                try:
-                    if sorted_scores[2] < 1 and duplicates_dict[sorted_items[0]] == duplicates_dict[sorted_items[1]]:
-                        return [sorted_items[0]]
-                except (IndexError, KeyError):
-                    pass
+        if sorted_scores[0] == 1 and sorted_scores[1] == 1: # 2 perfect matches: undecidable case
             return [k for i, k in enumerate(sorted_items) if sorted_scores[i] == 1]
 
-        if sorted_scores[0] < threshold:
-            sorted_items = [k for i, k in enumerate(sorted_items) if sorted_scores[i] > threshold / 2]
+        if sorted_scores[0] < threshold: # Best candidate is below threshold
+            sorted_items = [k for i, k in enumerate(sorted_items) if sorted_scores[i] > (3/4.0)*threshold]
         else:
             sorted_scores = list(map(truediv, sorted_scores, [max(sorted_scores)] * len(sorted_scores)))
             over_items = [k for i, k in enumerate(sorted_items) if sorted_scores[i] > threshold]
             if len(over_items) != 0:
                 sorted_items = over_items
 
-        if duplicates_dict is not None:
-            # Remove synonyms
-            for i in range(1, len(sorted_items), 2):
-                if duplicates_dict[sorted_items[i]] == duplicates_dict[sorted_items[i - 1]]:
-                    sorted_items[i] = None
             sorted_items = [item for item in sorted_items if item is not None]
 
-        if len(sorted_items) == 0:
-            return items
-        else:
-            return sorted_items
+        return sorted_items
 

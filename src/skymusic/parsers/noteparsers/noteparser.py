@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import math
-
+from src.skymusic.resources import Resources 
 
 class NoteParser:
     """
@@ -207,14 +207,14 @@ class NoteParser:
             note_name = self.sanitize_note_name(note_name)
         else:
             # Error: note is not formatted right, output broken harp
-            raise SyntaxError('Note ' + str(note_name) + ' was not formatted correctly.')
+            raise SyntaxError('ParsingError: Note ' + str(note_name) + ' was not formatted correctly.')
 
         chromatic_scale_dict = self.get_chromatic_scale_dict()
 
         if note_name in chromatic_scale_dict.keys():
             return chromatic_scale_dict[note_name]
         else:
-            raise KeyError('Note ' + str(note_name) + ' was not found in the chromatic scale.')
+            raise KeyError('ParsingError: Note ' + str(note_name) + ' was not found in the chromatic scale.')
 
     def convert_semitone_interval_to_major_scale_interval(self, semitone_interval):
 
@@ -223,7 +223,7 @@ class NoteParser:
         if semitone_interval in conversion_dict.keys():
             return conversion_dict[semitone_interval]
         else:
-            raise KeyError('Interval ' + str(semitone_interval) + ' is not in the major scale.')
+            raise KeyError('ParsingError: Interval ' + str(semitone_interval) + ' is not in the major scale.')
 
     def calculate_coordinate_for_note(self, note, song_key='C', note_shift=0, is_finding_key=False):
 
@@ -252,7 +252,7 @@ class NoteParser:
         # Find the major scale interval from the song_key to the note_name
         # Find the semitone interval from the song_key to the note_name first
         if song_key is None:
-            song_key = 'C'
+            song_key = Resources.DEFAULT_KEY
         try:
             song_key_chromatic_equivalent = self.convert_note_name_into_chromatic_position(song_key)
         except (KeyError, SyntaxError):

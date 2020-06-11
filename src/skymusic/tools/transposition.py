@@ -161,9 +161,6 @@ else:
 
 song_parser.set_input_mode(song_notation)
 
-if song_notation == InputMode.JIANPU and PAUSE != '0':
-    print('\nWarning: pause in Jianpu has been reset to ''0''.\n')
-    PAUSE = '0'
 
 # Attempts to detect key for input written in absolute musical scales (western, Jianpu)
 possible_keys = []

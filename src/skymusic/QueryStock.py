@@ -125,7 +125,8 @@ def load(locale):
                                 'input_tip': Lang.get_string("stock_queries/original_artist/input_tip", locale),
                                 'help_text': Lang.get_string("stock_queries/original_artist/help_text", locale),
                                 'reply_type': ReplyType.TEXT,
-                                'limits': None
+                                'limits': None,
+                                'default': None #Required by Discord
                                 },
         
             'transcript_writer': {'class': QueryOpen,

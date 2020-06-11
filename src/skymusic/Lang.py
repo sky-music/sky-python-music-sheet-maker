@@ -23,7 +23,7 @@ def check_locale(locale):
     if locale not in locales:
         substitute = find_substitute(locale)
         if not loaded[substitute]:
-            print(f"\n***WARNING: locale '{locale}' not found. Will replace with '{substitute}'\n")
+            print(f"\n***WARNING: locale '{locale}' not found. Will replace with '{substitute}'")
         return substitute
 
     return locale
@@ -51,7 +51,7 @@ def load(locale):
     file_path = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "langs", "%s.yaml" % locale))
     
     if not os.path.isfile(file_path):
-        print(f"\n***WARNING: missing .yaml file for locale '{locale}'. Replacing with {locales[0]}\n")        
+        print(f"\n***WARNING: missing .yaml file for locale '{locale}'. Replacing with {locales[0]}")        
         file_path = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "langs", "%s.yaml" % locales[0]))
     
     with open(file_path, mode='r', encoding='utf-8', errors='ignore') as file:
@@ -85,7 +85,7 @@ def get_string(key, locale=None, replacements=()):
     if not locale in locales:
         substitute = find_substitute(locale)
         if not loaded[substitute]:
-            print(f"\n***WARNING: missing locale '{locale}' for key '{key}'. Replacing with {substitute}\n")
+            print(f"\n***WARNING: missing locale '{locale}' for key '{key}'. Replacing with {substitute}")
         locale = substitute
 
     if not loaded[locale]:
@@ -97,7 +97,7 @@ def get_string(key, locale=None, replacements=()):
     for i in key_list:
         if not (i in obj):
             if warn_count < 10:
-                print(f"\n***WARNING: could not find lang key '{i}' for locale '{locale}'\n")
+                print(f"\n***WARNING: could not find lang key '{i}' for locale '{locale}'")
                 warn_count += 1
             return ''
             # raise KeyError(f"Unknown lang key: {i}")

@@ -1,6 +1,7 @@
 from . import instrument_renderer
-from src.skymusic import notes
 from src.skymusic.resources import Resources
+from src.skymusic.renderers.note_renderers import png_nr
+
 
 try:
     from PIL import Image, ImageDraw, ImageFont
@@ -110,13 +111,17 @@ class PngInstrumentRenderer(instrument_renderer.InstrumentRenderer):
         harp_silent = instrument.get_is_silent()
         harp_broken = instrument.get_is_broken()
 
+        note_renderer = png_nr.PngNoteRenderer()
+
         harp_file = Image.open(self.unhighlighted_chord_png)  # loads default harp image into memory
         harp_size = harp_file.size
 
         harp_render = Image.new('RGB', harp_file.size, self.song_bkg)  # Empty image
 
         # Get a typical note to check that the size of the note png is consistent with the harp png                  
-        note_size = notes.Note(instrument).get_png_size()
+        #note_size = notes.Note(instrument).get_png_size()
+        note_size = png_nr.PngNoteRenderer().get_png_size()
+        
         note_rel_width = note_size[0] / harp_size[0]  # percentage of harp
         if note_rel_width > 1.0 / instrument.get_column_count() or note_rel_width < 0.05:
             note_rescale = 0.153 / note_rel_width
@@ -145,7 +150,7 @@ class PngInstrumentRenderer(instrument_renderer.InstrumentRenderer):
                             0] / 2.0
                         yn = (0.17 + row * (1 - 2 * 0.17) / (instrument.get_row_count() - 1)) * harp_size[1] - note_size[
                             1] / 2.0
-                        note_render = note.render_in_png(note_rescale)
+                        note_render = note_renderer.render(note=note, rescale=note_rescale)
                         harp_render = self.trans_paste(harp_render, note_render, (int(round(xn)), int(round(yn))))
 
         if rescale != 1:

@@ -224,15 +224,17 @@ class Communicator:
                     choices_dicts = [{'number': i, 'text': str(limit).strip()} for i, limit in enumerate(limits)]
             else:
                 choices_dicts = []
-
+                
             # Answer keyword arguments dictionary
             try:
                 answer_text = query.get_reply().get_answer()
-                if answer_text is None:
-                    answer_text = ''
             except AttributeError:
+                answer_text = query.get_default_answer()
+                #answer_text = ''
+            
+            if answer_text is None:
                 answer_text = ''
-
+            
             if query.expect_long_answer:  # FIXME: this trick is a bit ugly (not very robust)
                 answer_dict = {'answer_length': 'long', 'long_text': str(answer_text), 'short_text': ''}
             else:

@@ -1,11 +1,11 @@
 aspect_ratio: WIDESCREEN # an aspect ratio short name among WIDESCREEN, OLDTV, SQUARE, A4, VERTPANEL
 song_bpm: 120 # an integer value between 12 and 1200
-#octave_shift: 0 # an integer between -12 and +12
-#render_modes: all # all to activate all modes, otherwise a comma-separated list of modes names among SVG, HTML, PNG, MIDI, SKYJSON, SKYASCII
+octave_shift: 0 # an integer between -12 and +12
+render_modes: all # all to activate all modes, otherwise a comma-separated list of modes names among SVG, HTML, PNG, MIDI, SKYJSON, SKYASCII
 #notes_file: | # a file name or notes...
 #    redemption.txt
-#notes: #This question must be answered with a blank for complete automation
-#musical_notation: ENGLISH # An input_mode short name, among ENGLISH, JIANPU, DOREMI, DOREMIJP, SKY, SKYKEYBOARD, ENGLISHCHORDS
+#notes: # Unless a file name has been supplied, this question must be answered with a blank for complete automation
+musical_notation: SKY # Default value if not detected automatically. An input_mode short name, among ENGLISH, JIANPU, DOREMI, DOREMIJP, SKY, SKYKEYBOARD, ENGLISHCHORDS
 #recommended_key: C # The key in case your notation does not use octaves
 #transcript_writer: me # Person who transcribed the notes
-#original_artist: Me
+#original_artist: Me # Artist

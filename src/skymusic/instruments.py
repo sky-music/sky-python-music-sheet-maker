@@ -112,6 +112,10 @@ class Harp(Instrument):
     def get_note_from_position(self, pos):
         """Returns the note type Root, Diamond, Circle from the position in Sky grid"""
         # Calculate the note's overall index in the harp (0 to 14)              
+        
+        return notes.Note(self, pos)
+        
+        """
         note_index = (pos[0] * self.get_column_count()) + pos[1]
 
         if note_index % 7 == 0:  # the 7 comes from the heptatonic scale of Sky's music (no semitones)
@@ -123,3 +127,4 @@ class Harp(Instrument):
         else:
             # Note is in an even column, so it is a diamond
             return notes.NoteDiamond(self, pos)
+        """

@@ -1,6 +1,7 @@
 #import os
 #import io
 from . import instrument_renderer
+from src.skymusic.renderers.note_renderers.html_nr import HtmlNoteRenderer
 
 class HtmlInstrumentRenderer(instrument_renderer.InstrumentRenderer):
     
@@ -13,6 +14,8 @@ class HtmlInstrumentRenderer(instrument_renderer.InstrumentRenderer):
         """
         harp_silent = instrument.get_is_silent()
         harp_broken = instrument.get_is_broken()
+
+        note_renderer = HtmlNoteRenderer()
 
         if harp_broken:
             class_suffix = " broken"
@@ -28,7 +31,7 @@ class HtmlInstrumentRenderer(instrument_renderer.InstrumentRenderer):
             harp_render += '<tr>'
             for col in range(instrument.get_column_count()):
                 note = instrument.get_note_from_position((row, col))
-                note_render = note.render_in_html()                
+                note_render = note_renderer.render(note)                
                 harp_render += f'<td>{note_render}</td>'
             harp_render += '</tr>'
 

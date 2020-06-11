@@ -169,7 +169,7 @@ class CommandLinePlayer:
                         q.reply_to(answer)
                     reply_valid = q.get_reply_validity()
                 else:                  
-                    print(question)
+                    print('\n'+question)
                     q.reply_to('ok')
                     reply_valid = q.get_reply_validity()
 
