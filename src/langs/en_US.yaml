@@ -253,10 +253,10 @@ stock_queries:
     afterword:
     input_tip: octave shift as an integer between -6 and +6
     help_text: |
-      'A musical note is identified by its name and an octave number. Sky\''s music system spans less than 3 octaves.
+      A musical note is identified by its name and an octave number. Sky's music system spans less than 3 octaves.
       If you do not specify an octave number after a note, we will assume it is the first octave of Sky, so your notes will essential by played near the bass.
       You can shift your notes to a higher pitch by setting a positive number in this field.
-      If you have specified an octave number and it is too high to be played within Sky\''s system, you can downshift the pitch by entering a negative integer'
+      If you have specified an octave number and it is too high to be played within Sky's system, you can downshift the pitch by entering a negative integer
   no_song_file:
     foreword: ---------------------------------------
     question: 'Your {render_mode} was not saved to file.'
@@ -285,12 +285,12 @@ stock_queries:
     foreword:
     question: '*WARNING*: Your song contains many errors.'
     afterword: |
-      'Please check the following:
+      Please check the following:
       
       - If you have specified the octave number, it must be between 1 and 3. If not, try again with an octave shift.
       - In Jianpu, pauses are indicated by '0' (zero)
       - Your song is free of typos. Please check this website for full instructions: 
       
-      https://sky-music.github.io/make-your-own-sheet.html'
+      https://sky-music.github.io/make-your-own-sheet.html
     input_tip: click OK to acknowledge
     help_text:

@@ -249,10 +249,10 @@ stock_queries:
     afterword:
     input_tip: chỉnh quãng tám bằng số nguyên từ -6 đến +6
     help_text: |
-      'Một nốt nhạc được xác định bởi tên và số quãng tám của nó. Hệ thống nhạc trong Sky có ít hơn 3 quãng tám.
+      Một nốt nhạc được xác định bởi tên và số quãng tám của nó. Hệ thống nhạc trong Sky có ít hơn 3 quãng tám.
       Nếu bạn không ghi rõ só quãng tám sau một nốt, tôi sẽ nghĩ rằng nó là quãng tám đầu tiên trong Sky, nên nốt nhạc của bạn chủ yếu sẽ được chơi ngang nốt trầm.
       Bạn có thể chỉnh nốt của bạn lên độ cao hơn bằng cách đặt số dương trong mục này.
-      Nếu bạn đã ghi rõ số quãng tám và nó quá cao để có thể chơi trong hệ thống nhạc của Sky, bạn có thể giảm xuống bằng cách nhập số âm.'  
+      Nếu bạn đã ghi rõ số quãng tám và nó quá cao để có thể chơi trong hệ thống nhạc của Sky, bạn có thể giảm xuống bằng cách nhập số âm.
   no_song_file:
     foreword: ---------------------------------------
     question: 'Bài hát {render_mode} của bạn không được lưu vào tệp.'
@@ -281,12 +281,12 @@ stock_queries:
     foreword:
     question: '*LƯU Ý:* Bài hát của bạn chứa quá nhiều lỗi'
     afterword: |
-      'Vui lòng kiểm tra những lỗi sau:
+      Vui lòng kiểm tra những lỗi sau:
 
       - Tất cả các nốt nhạc phải ở từ 1 đến 3 quãng tám. Nếu không, hãy thử lại với nốt quãng tám.
       - In Jianpu, pauses are indicated by '0' (zero)
       - Bài hát của bạn không có lỗi chính tả. Vui lòng xem hướng dẫn đầy đủ ở trang web này: 
 
-      https://sky-music.github.io/make-your-own-sheet.html (tiếng Anh)'
+      https://sky-music.github.io/make-your-own-sheet.html (tiếng Anh)
     input_tip: Bấm OK để tiếp tục
     help_text:

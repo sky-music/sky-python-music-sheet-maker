@@ -247,10 +247,10 @@ stock_queries:
     afterword:
     input_tip: décalage d'octave vers le haut ou le bas entre -6 et +6
     help_text: |
-      'A musical note is identified by its name and an octave number. Sky\''s music system spans less than 3 octaves.
+      A musical note is identified by its name and an octave number. Sky's music system spans less than 3 octaves.
       If you do not specify an octave number after a note, we will assume it is the first octave of Sky, so your notes will essential by played near the bass.
       You can shift your notes to a higher pitch by setting a positive number in this field.
-      If you have specified an octave number and it is too high to be played within Sky\''s system, you can downshift the pitch by entering a negative integer'
+      If you have specified an octave number and it is too high to be played within Sky's system, you can downshift the pitch by entering a negative integer
   no_song_file:
     foreword: ---------------------------------------
     question: "Votre {render_mode} n'a pas été sauvegardée."
@@ -279,12 +279,12 @@ stock_queries:
     foreword:
     question: "*ATTENTION*: Le décodage de votre chanson a généré beaucoup d'erreurs."
     afterword: |
-      'Veuillez vérifier les points suivants:
+      Veuillez vérifier les points suivants:
     
       - Si vous avez spécifié l'octave, il doit être entre 1 et 3. Sinon, recommencez en utilisant le décalage d'octave.
       - En notation Jianpu, les pauses sont marquées par '0' (zéro)
       - Que votre chanson ne contient pas d'erreur de frappe. Veuillez consulter ce site web pour plus d'infos: 
     
-      https://sky-music.github.io/make-your-own-sheet.html'
+      https://sky-music.github.io/make-your-own-sheet.html
     input_tip: cliquez sur OK pour passer
     help_text:
