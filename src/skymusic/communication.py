@@ -756,7 +756,7 @@ class QueryChoice(Query):
        
         result += [self.get_afterword()]
 
-        self.result = '\n'.join(filter(None, result))
+        self.result = '\n'.join(filter(None, result)) + '\n'
 
         return self.result
 
