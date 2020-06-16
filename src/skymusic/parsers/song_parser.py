@@ -207,7 +207,8 @@ class SongParser:
         try:
             chord = note_parser.note_name_regex.sub(' \\1', chord).split()
         except AttributeError as err:
-            print(err)
+            pass
+            #print(err)
 
         return repeat, chord
 
@@ -255,7 +256,7 @@ class SongParser:
                         highlighted_note_position = self.note_parser.calculate_coordinate_for_note(note, song_key,
                                                                                                    note_shift, False)
                 except (KeyError, SyntaxError) as err:
-                    print(err)
+                    #print(err)
                     harp_broken = True
                 else:
                     chord_skygrid[highlighted_note_position] = {}
@@ -425,7 +426,6 @@ class SongParser:
                 
                 for icon in icons:
                     chords = self.split_icon(icon)
-                    #print(chords)
                     # From here, real chords are still glued, quavers have been split in different list slots
                     chord_skygrid, harp_broken, harp_silent, repeat = self.parse_chords(chords, song_key, note_shift)
                     harp = instruments.Harp()
