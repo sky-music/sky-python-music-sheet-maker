@@ -3,7 +3,7 @@
 """
 Created on Fri Dec 13 11:11:46 2019
 
-@author: lagaffe
+@author: jmmelko
 """
 import mido
 import re

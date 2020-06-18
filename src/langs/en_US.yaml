@@ -76,7 +76,7 @@ open_file: |
 stock_queries:
   instructions_command_line:
     foreword: "===== VISUAL MUSIC SHEETS FOR SKY:CHILDREN OF THE LIGHT =====\n"
-    question: |
+    question: |      
       Accepted music notes formats:{input_modes}
       
       Pay attention to these special characters:
@@ -87,13 +87,15 @@ stock_queries:
       - Add "{repeat_indicator}" after a chord to indicate repetition.
       - Sharps "#" and flats "b" (semitones) are supported for Western and Jianpu notations.
       
+      *** Keep your notes in a text file to be able to correct your song later! ***
+        
       Type '?' to get help for a particular question
     afterword: =======================================
     input_tip:
     help_text:
   instructions_sky_music_website:
     foreword:
-    question: |
+    question: |      
       Accepted music notes formats:{input_modes}
       
       Pay attention to these special characters:
@@ -103,6 +105,8 @@ stock_queries:
       - Use "{quaver_delimiter}" to link notes within an icon, for triplets, quavers... (e.g. {quaver_example}). With Jianpu, use "{jianpu_quaver_delimiter}" instead of "-" to avoid confusion with the octave.
       - Add "{repeat_indicator}" after a chord to indicate repetition.
       - Sharps "#" and flats "b" (semitones) are supported for Western and Jianpu notations.
+      
+      *** Keep your notes in a text file to be able to correct your song later! ***
     afterword:
     input_tip: click OK to acknowledge
     help_text:
@@ -111,6 +115,7 @@ stock_queries:
     question: |
       Welcome to the Visual Song Sheet creator!
       I am going to ask you several questions to build your song sheet.
+      **Hint: keep your notes in a text file to be able to correct your song later.**
       Type '?' to get help for a particular question.
     afterword:
     input_tip:

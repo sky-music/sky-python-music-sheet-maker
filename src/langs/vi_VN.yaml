@@ -77,7 +77,7 @@ open_file: |
 stock_queries:
   instructions_command_line:
     foreword: "===== BẢNG NHẠC TRỰC QUAN CHO TỰA GAME: SKY: CHILDREN OF THE LIGHT =====\n"
-    question: |
+    question: |      
       Dạng nốt nhạc được chấp nhận: {input_modes}
     
       - Khi viết hợp âm phải dính các phím lại với nhau (VD: A1B1C1).
@@ -86,14 +86,16 @@ stock_queries:
       - Sử dụng "{quaver_delimiter}" để nối nốt trong một biểu tượng (liên ba, láy rền/hát rung,...) (VD: {quaver_example}). With Jianpu, use "{jianpu_quaver_delimiter}" instead of "-" to avoid confusion with the octave.
       - Thêm "{repeat_indicator}" sau một hợp âm để biểu thị sự lập lại (repetition).
       - Dấu thăng "#" và dấu giáng "b" (nửa cung) được hỗ trợ cho hệ kí tự Phương Tây và Jianpu.
-    
+      
+      **Keep your notes in a text file to be able to correct your song later!**
+      
       Nhập '?' để được trợ giúp cho câu hỏi cụ thể
     afterword: =======================================
     input_tip:
     help_text:
   instructions_sky_music_website:
     foreword:
-    question: |
+    question: |      
       Dạng nốt nhạc được chấp nhận: {input_modes}
     
       - Khi viết hợp âm phải dính các phím lại với nhau (VD: A1B1C1).
@@ -102,6 +104,8 @@ stock_queries:
       - Sử dụng "{quaver_delimiter}" để nối nốt trong một biểu tượng (liên ba, láy rền/hát rung,...) (VD: {quaver_example}). With Jianpu, use "{jianpu_quaver_delimiter}" instead of "-" to avoid confusion with the octave.
       - Thêm "{repeat_indicator}" sau một hợp âm để biểu thị sự lập lại (repetition).
       - Dấu thăng "#" và dấu giáng "b" (nửa cung) được hỗ trợ cho hệ kí tự Phương Tây và Jianpu.
+      
+      ** Keep your notes in a text file to be able to correct your song later! **
     afterword:
     input_tip: Bấm OK để tiếp tục
     help_text:
@@ -110,6 +114,7 @@ stock_queries:
     question: |
       Welcome to the Visual Song Sheet creator!
       I am going to ask you several questions to build your song sheet.
+      **Hint: Keep your notes in a text file to be able to correct your song later.**      
       Nhập '?' để được trợ giúp cho câu hỏi cụ thể
     afterword:
     input_tip:

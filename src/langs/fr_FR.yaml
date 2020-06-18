@@ -85,7 +85,9 @@ stock_queries:
       - Tapez "{quaver_delimiter}" pour relier les notes entre elles, pour les triplets... (e.g. {quaver_example}). En Jianpu, utilisez "{jianpu_quaver_delimiter}" au lieu de '-' pour éviter la confusion avec l'octave.
       - Tapez "{repeat_indicator}" après un groupe de notes pour indiquer la répétition.
       - Les dièses "#" et les bémoles "b" (demi-tons) sont possibles pour les notations autres que Sky ABC-15.
-    
+ 
+      ** Gardez vos notes dans un fichier texte pour pouvoir modifier la chanson plus tard ! **   
+          
       Tapez '?' pour obtenir de l'aide après une question
     afterword: =======================================
     input_tip:
@@ -101,6 +103,8 @@ stock_queries:
       - Tapez "{quaver_delimiter}" pour relier les notes entre elles, pour les triplets... (e.g. {quaver_example}). En Jianpu, utilisez "{jianpu_quaver_delimiter}" au lieu de '-' pour éviter la confusion avec l'octave.
       - Tapez "{repeat_indicator}" après un groupe de notes pour indiquer la répétition.
       - Les dièses "#" et les bémoles "b" (demi-tons) sont possibles pour les notations autres que Sky ABC-15.
+      
+      ** Gardez vos notes dans un fichier texte pour pouvoir modifier la chanson plus tard ! **         
     afterword:
     input_tip: cliquez sur OK pour passer
     help_text:
@@ -109,6 +113,7 @@ stock_queries:
     question: |
       Bienvenue dans le créateur de portée visuelles pour Sky!
       Je vais vous posez plusieurs questions afin de construire votre portée.
+      **Astuce : conservez vos notes dans un fichier texte pour pouvoir modifier la chanson plus tard**
       Tapez '?' après une question pour de l'aide supplémentaire.
     afterword:
     input_tip:

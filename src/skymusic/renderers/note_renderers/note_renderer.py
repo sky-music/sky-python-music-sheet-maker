@@ -12,7 +12,7 @@ class NoteRenderer:
         note_index = note.get_index()
 
         if not note.is_highlighted():
-            return 'unhighlighted'
+            return 'OFF'
 
         if note_index % 7 == 0:  # the 7 comes from the heptatonic scale of Sky's music (no semitones)
             # Note is a root note

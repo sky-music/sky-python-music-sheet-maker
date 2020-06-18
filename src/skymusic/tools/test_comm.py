@@ -1,6 +1,11 @@
-#import os
-import sys
-sys.path.append('..')
+'''
+A tool to test the communication.py module
+Not every feature is tested (for instance the expect_reply, default, properties are not used)
+'''
+import sys, os
+PROJECT_ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), '../../../'))
+if PROJECT_ROOT not in sys.path:
+    sys.path.append(PROJECT_ROOT)
 from src.skymusic.modes import InputMode, ReplyType
 from src.skymusic.communication import QueryOpen, QueryChoice, QueryBoolean, QueryMemory
 
