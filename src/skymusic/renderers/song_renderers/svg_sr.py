@@ -56,7 +56,7 @@ class SvgSongRenderer(song_renderer.SongRenderer):
                 with open(css_path, 'r', encoding='utf-8', errors='ignore') as css_file:
                     css_file = css_file.read()
             except:
-                print("\n***Warning: could not open CSS file to embed it in SVG.")
+                print("\n***ERROR: could not open CSS file to embed it in SVG.")
                 css_file = ''
                 pass
             svg_buffer.write('\n<defs><style type="text/css"><![CDATA[\n')

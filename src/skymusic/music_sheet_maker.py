@@ -170,9 +170,13 @@ class MusicSheetMaker:
     def get_song_parser(self):
         return self.song_parser
 
-    def set_song_parser(self, song_parser=None):
+    def set_song_parser(self, song_parser=None, recipient=None):
+        if self.is_command_line(recipient):
+            silent_warnings = False
+        else:
+            silent_warnings = True
         if song_parser is None:
-            song_parser = SongParser(self)
+            song_parser = SongParser(maker=self, silent_warnings=silent_warnings)
         self.song_parser = song_parser
 
     def get_render_modes_enabled(self):
@@ -234,7 +238,7 @@ class MusicSheetMaker:
             # ======= NEW SONG =======
 
         # 1. Set Song Parser
-        self.set_song_parser()
+        self.set_song_parser(recipient=recipient)
 
         # 2. Display instructions
         (i_instr, res) = self.ask_instructions(recipient=recipient)
@@ -807,7 +811,7 @@ class MusicSheetMaker:
                  self.display_error_ratio, self.ask_song_metadata, self.set_song_metadata]
               
         if step_number == 0:
-            res = self.set_song_parser()
+            res = self.set_song_parser(recipient=recipient)
         elif step_number > 1 and step_number < len(steps) + 1:
             res = steps[step_number](recipient)
         else:

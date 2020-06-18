@@ -11,7 +11,7 @@ class Song():
             self.music_key = music_key
         else:
             self.music_key = Resources.DEFAULT_KEY
-            print("\n***Warning: Invalid song key: using {self.music_key} instead")            
+            print("\n***ERROR: Invalid song key passed to Song(): using {self.music_key} instead")            
 
         self.locale = locale
 

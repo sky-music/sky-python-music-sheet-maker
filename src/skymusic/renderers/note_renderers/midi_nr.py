@@ -26,7 +26,7 @@ class MidiNoteRenderer(note_renderer.NoteRenderer):
         except KeyError:
             default_key = Resources.DEFAULT_KEY
             root_pitch = Resources.MIDI_PITCHES[default_key]
-            print(f"***WARNING: Invalid music key passed to the MIDI renderer: assuming {default_key} instead.")
+            print(f"***ERROR: Invalid music key passed to the MIDI renderer: assuming {default_key} instead.")
             
         note_pitch = root_pitch + octave * 12 + semi
 

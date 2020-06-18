@@ -26,7 +26,7 @@ class HtmlSongRenderer(song_renderer.SongRenderer):
                     css_file = css_file.read()
             except FileNotFoundError as e:
                 print(e)
-                print("\n***WARNING: could not open CSS file to embed it in HTML.")
+                print("\n***ERROR: could not open CSS file to embed it in HTML.")
                 css_file = ''
             html_buffer.write('\n<style type="text/css">\n')
             html_buffer.write(css_file)

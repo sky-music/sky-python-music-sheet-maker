@@ -25,8 +25,10 @@ class SongParser:
     For parsing a text format into a Song object
     """
 
-    def __init__(self, maker):
+    def __init__(self, maker, silent_warnings=True):
 
+        self.maker = maker
+        self.silent_warnings = silent_warnings
         #Delimiters must be character or strings
         #The backslash character is forbidden
         #Only regex with the following format are supported: \x, where x is s, t, w, d, n, r, a, r, f, v, or R
@@ -40,13 +42,13 @@ class SongParser:
         self.skyjson_chord_delay = Resources.SKYJSON_CHORD_DELAY #Delay in ms below which 2 notes are considered a chord
         self.default_key = Resources.DEFAULT_KEY
         self.allowed_regex = ['\s', '\t', '\w', '\d', '\n', '\r', '\a', '\e', '\f', '\v', '\R']
-        self.maker = maker
+        
         self.music_theory = music_theory.MusicTheory(self)
         try:
             self.locale = self.maker.get_locale()
         except AttributeError:  # Should never happen
             self.locale = Lang.guess_locale()
-            print(f"**WARNING: SongParser self.maker has no locale. Reverting to {self.locale}")
+            print(f"**ERROR: SongParser self.maker has no locale. Reverting to {self.locale}")
 
     """
     def set_delimiters(self, icon_delimiter=Resources.ICON_DELIMITER, pause=Resources.PAUSE, quaver_delimiter=Resources.QUAVER_DELIMITER, comment_delimiter=Resources.COMMENT_DELIMITER,
@@ -94,31 +96,35 @@ class SongParser:
 
         if self.input_mode == InputMode.JIANPU or isinstance(self.note_parser, src.skymusic.parsers.noteparsers.jianpu.Jianpu):
             if self.pause != Resources.JIANPU_PAUSE:
-                print('\n'+Lang.get_string("warnings/jianpu_pause", self.locale).format(pause=self.pause))
+                
+                if not self.silent_warnings:
+                    print('\n'+Lang.get_string("warnings/jianpu_pause", self.locale).format(pause=self.pause))
                 self.pause = Resources.JIANPU_PAUSE
             if self.quaver_delimiter == '-':
-                print('\n'+Lang.get_string("warnings/jianpu_quaver_delimiter", self.locale).format(jianpu_quaver_delimiter=Resources.JIANPU_QUAVER_DELIMITER, quaver_delimiter=self.quaver_delimiter))
+                
+                if not self.silent_warnings:
+                    print('\n'+Lang.get_string("warnings/jianpu_quaver_delimiter", self.locale).format(jianpu_quaver_delimiter=Resources.JIANPU_QUAVER_DELIMITER, quaver_delimiter=self.quaver_delimiter))
                 self.quaver_delimiter = Resources.JIANPU_QUAVER_DELIMITER
 
         delims = [self.icon_delimiter, self.pause, self.quaver_delimiter, self.comment_delimiter, self.repeat_indicator]
 
 
         if self.quaver_delimiter == '\s' or re.match('\s', self.quaver_delimiter):
-            print("\n***WARNING: You cannot use a blank delimiter to separate notes in a quaver")
+            print("\n***ERROR: You cannot use a blank delimiter to separate notes in a quaver")
         if self.pause == '\s' or re.match('\s', self.pause):
-            print("\n***WARNING: You cannot use a blank delimiter to indicate a pause")
+            print("\n***ERROR: You cannot use a blank delimiter to indicate a pause")
         if self.comment_delimiter == '\s' or re.match('\s', self.comment_delimiter):
-            print("\n***WARNING: You cannot use a blank delimiter to indicate comments")
+            print("\n***ERROR: You cannot use a blank delimiter to indicate comments")
         if self.comment_delimiter == '\s' or re.match('\s', self.repeat_indicator):
-            print("\n***WARNING: You cannot use a blank delimiter to indicate repetition")
+            print("\n***ERROR: You cannot use a blank delimiter to indicate repetition")
 
         parser = self.get_note_parser()
         if parser is not None:
             for delim in delims:
                 if (parser.not_note_name_regex.match(delim) is None or parser.not_octave_regex.match(delim) is None) and delim != self.comment_delimiter:
-                    print(f"\n***WARNING: You chose an invalid delimiter for notation {self.input_mode.get_short_desc(self.locale)}: {delim}")
+                    print(f"\n***ERROR: You chose an invalid delimiter for notation {self.input_mode.get_short_desc(self.locale)}: {delim}")
                 if delims.count(delim) > 1:
-                    print("\n***WARNING: You used the same delimiter for different purposes.")
+                    print("\n***ERROR: You used the same delimiter for different purposes.")
 
     def get_possible_modes(self, song_lines=None):
         """
@@ -173,7 +179,7 @@ class SongParser:
 
     def english_note_name(self, note_name, reverse=False):
         if self.note_parser is None:
-            print("\n***WARNING: no note parser defined.")
+            #print("\n***WARNING: no note parser defined.")
             return ''
         else:
             return self.note_parser.english_note_name(note_name, reverse)
@@ -207,8 +213,8 @@ class SongParser:
         try:
             chord = note_parser.note_name_regex.sub(' \\1', chord).split()
         except AttributeError as err:
-            pass
-            #print(err)
+            if not self.silent_warnings:
+                print(err)
 
         return repeat, chord
 
@@ -256,8 +262,9 @@ class SongParser:
                         highlighted_note_position = self.note_parser.calculate_coordinate_for_note(note, song_key,
                                                                                                    note_shift, False)
                 except (KeyError, SyntaxError) as err:
-                    #print(err)
                     harp_broken = True
+                    if not self.silent_warnings:
+                        print(err)
                 else:
                     chord_skygrid[highlighted_note_position] = {}
                     chord_skygrid[highlighted_note_position][idx0 + chord_idx] = True
