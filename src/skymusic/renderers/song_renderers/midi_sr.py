@@ -18,7 +18,7 @@ class MidiSongRenderer(song_renderer.SongRenderer):
         super().__init__(locale)
         
         if not no_mido_module:
-            # WARNING: instrument codes correspond to General Midi codes (see Wikipedia) minus 1
+            # CAUTION: instrument codes correspond to General Midi codes (see Wikipedia) minus 1
             # An instrument will sound very strange if played outside its natural pitch range
             midi_instruments = {'piano': 0, 'guitar': 24, 'flute': 73, 'pan': 75}
             self.midi_note_duration = 0.3  # note duration is seconds for 120 bpm
@@ -37,12 +37,12 @@ class MidiSongRenderer(song_renderer.SongRenderer):
         try:
             track.append(mido.MetaMessage('key_signature', key=self.midi_key))
         except ValueError:
-            print("\n***WARNING: invalid key passed to MIDI renderer. Using C instead.")
+            print("\n***ERROR: invalid key passed to MIDI renderer. Using C instead.")
             track.append(mido.MetaMessage('key_signature', key='C'))
         try:
             track.append(mido.Message('program_change', program=self.midi_instrument, time=0))
         except ValueError:
-            print("\n***WARNING: invalid instrument passed to MIDI renderer. Using piano instead.")
+            print("\n***ERROR: invalid instrument passed to MIDI renderer. Using piano instead.")
             track.append(mido.Message('program_change', program=1, time=0))      
 
 
@@ -57,12 +57,12 @@ class MidiSongRenderer(song_renderer.SongRenderer):
             self.midi_key = re.sub(r'#', '#m', song.get_music_key())  # For mido sharped keys are minor
         except TypeError:
             self.midi_key = Resources.DEFAULT_KEY
-            print(f"\n***Warning: Invalid music key passed to the MIDI renderer: using {self.midi_key} instead.")
+            print(f"\n***ERROR: Invalid music key passed to the MIDI renderer: using {self.midi_key} instead.")
 
         try:
             tempo = mido.bpm2tempo(self.midi_bpm)
         except ValueError:
-            print("\n***Warning: invalid tempo passed to MIDI renderer. Using 120 bpm instead.")
+            print("\n***ERROR: invalid tempo passed to MIDI renderer. Using 120 bpm instead.")
             tempo = mido.bpm2tempo(120)
 
         mid = mido.MidiFile(type=0)

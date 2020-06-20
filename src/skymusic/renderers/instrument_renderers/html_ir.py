@@ -28,7 +28,7 @@ class HtmlInstrumentRenderer(instrument_renderer.InstrumentRenderer):
 
         for row in range(instrument.get_row_count()):
 
-            harp_render += '<tr>'
+            harp_render += '\n<tr>'
             for col in range(instrument.get_column_count()):
                 note = instrument.get_note_from_position((row, col))
                 note_render = note_renderer.render(note)                

@@ -10,7 +10,7 @@ class SvgInstrumentRenderer(instrument_renderer.InstrumentRenderer):
         """Renders the lyrics text in SVG"""
         voice_render = (f'\n<svg x="{x :.2f}" y="0" width="100%" height="{height}" class="voice voice-{instrument.get_index()}">'
                         f'\n<text x="0%" y="50%" class="voice voice-{instrument.get_index()}">{instrument.lyric}</text>'
-                        f'\n</svg>')
+                        f'</svg>')
 
         return voice_render
 
@@ -32,10 +32,10 @@ class SvgInstrumentRenderer(instrument_renderer.InstrumentRenderer):
         note_renderer = SvgNoteRenderer()
 
         # The chord SVG container
-        harp_render = f'\n<svg x="{x :.2f}" y="0" width="{harp_width}" height="{harp_height}" class="instrument-harp harp-{instrument.get_index()} {class_suffix}">'
+        harp_render = f'\n<svg x="{x :.2f}" y="0" width="{harp_width}" height="{harp_height}" class="harp-{instrument.get_index()} {class_suffix}">'
 
         # The chord rectangle with rounded edges
-        harp_render += f'\n<rect x="0.7%" y="0.7%" width="98.6%" height="98.6%" rx="7.5%" ry="{7.5 * aspect_ratio :.2f}%" class="harp harp-{instrument.get_index()}"/>'
+        harp_render += f'<rect x="0.7%" y="0.7%" width="98.6%" height="98.6%" rx="7.5%" ry="{7.5 * aspect_ratio :.2f}%" class="harp harp-{instrument.get_index()}"/>'
 
         for row in range(instrument.get_row_count()):
             for col in range(instrument.get_column_count()):
@@ -50,6 +50,6 @@ class SvgInstrumentRenderer(instrument_renderer.InstrumentRenderer):
                 #harp_render += note.render_in_svg(f"{100*note_width :.2f}%", f"{100*xn :.2f}%", f"{100*yn :.2f}%")
                 harp_render += note_renderer.render(note, x=f"{100*xn :.2f}%", y=f"{100*yn :.2f}%", width=f"{100*note_width :.2f}%")
                 
-        harp_render += '</svg>'
+        harp_render += '/n</svg>'
 
         return harp_render

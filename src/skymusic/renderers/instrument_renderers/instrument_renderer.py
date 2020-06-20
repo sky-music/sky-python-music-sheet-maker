@@ -7,7 +7,7 @@ class InstrumentRenderer():
         
         if locale is None:
             self.locale = Lang.guess_locale()
-            print(f"**WARNING: Song self.maker has no locale. Reverting to: {self.locale}")
+            print(f"**ERROR: Song self.maker has no locale. Reverting to: {self.locale}")
         else:
             self.locale = locale
 

@@ -26,7 +26,7 @@ class HtmlSongRenderer(song_renderer.SongRenderer):
                     css_file = css_file.read()
             except FileNotFoundError as e:
                 print(e)
-                print("\n***WARNING: could not open CSS file to embed it in HTML.")
+                print("\n***ERROR: could not open CSS file to embed it in HTML.")
                 css_file = ''
             html_buffer.write('\n<style type="text/css">\n')
             html_buffer.write(css_file)
@@ -81,7 +81,7 @@ class HtmlSongRenderer(song_renderer.SongRenderer):
                     instrument.set_index(instrument_index)
                     #instrument_render = instrument.render_in_html(self.HTML_note_width)
                     instrument_render = instrument_renderer.render(instrument)
-                    instrument_render += ' '
+                    instrument_render += '\n'
                     instrument_index += 1
                     line_render += instrument_render
 
