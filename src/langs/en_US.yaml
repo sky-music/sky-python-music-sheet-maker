@@ -43,17 +43,17 @@ render_mode:
   png:
     short_desc: PNG visual sheet
   midi:
-    short_desc: Midi song file
+    short_desc: Midi file
   skyjson:
     short_desc: Sky-Music recording (JSON text file)
   skyascii:
-    short_desc: song in Sky notation
+    short_desc: text file in Sky notation
   englishascii:
-    short_desc: song in English notation
+    short_desc: text file in English notation
   jianpuascii:
-    short_desc: song in Jianpu notation
+    short_desc: text file in Jianpu notation
   doremiascii:
-    short_desc: song in do-re-mi notation
+    short_desc: text file in do-re-mi notation
 aspect_ratio:
   widescreen:
     short_desc: Widescreen TV (16:9)
@@ -76,7 +76,7 @@ open_file: |
 stock_queries:
   instructions_command_line:
     foreword: "===== VISUAL MUSIC SHEETS FOR SKY:CHILDREN OF THE LIGHT =====\n"
-    question: |      
+    question: |
       Accepted music notes formats:{input_modes}
       
       Pay attention to these special characters:
@@ -95,7 +95,7 @@ stock_queries:
     help_text:
   instructions_sky_music_website:
     foreword:
-    question: |      
+    question: |
       Accepted music notes formats:{input_modes}
       
       Pay attention to these special characters:
@@ -133,10 +133,11 @@ stock_queries:
     foreword:
     question: Please choose one or several output rendering formats
     afterword:
-    input_tip: check or uncheck one or several boxes
+    input_tip: check or uncheck one or several boxes. Add a text format to edit your song notes later. 
     help_text: |
       The visual sheet can be rendered in several file formats.
       Please select the ones you want to generate (or deselect some).
+      Text files can be edited and fed to the program again.
       On the command-line, enter a comma-separated list of choices numbers, such as 0, 1, 3.
       On the website, check the boxes.
   aspect_ratio:
@@ -196,7 +197,7 @@ stock_queries:
     foreword:
     question: 'Please type or copy-paste notes ({skip} to skip)'
     afterword:
-    input_tip: 'any text with one or several musical notes ({skip} to skip)'
+    input_tip: 'any text with one or several musical notes ({skip} to skip). Keep your notes safe in a text file in your computer.'
     help_text: |
       Accepted music notes formats:{input_modes}
       

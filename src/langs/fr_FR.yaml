@@ -47,13 +47,13 @@ render_mode:
   skyjson:
     short_desc: Enregistrement Sky-Music (texte JSON)
   skyascii:
-    short_desc: Transcription en notation Sky
+    short_desc: Fichier texte en notation Sky
   englishascii:
-    short_desc: Transcription en notation anglo-saxone
+    short_desc: Fichier texte en notation anglo-saxone
   jianpuascii:
-    short_desc: Transcription en Jianpu
+    short_desc: Fichier texte en Jianpu
   doremiascii:
-    short_desc: Transcription en format traditionnel
+    short_desc: Fichier texte en format traditionnel
 aspect_ratio:
   widescreen:
     short_desc: Widescreen TV (16:9)
@@ -130,10 +130,11 @@ stock_queries:
     foreword:
     question: Merci de choisir les formats d'exportation de la chanson
     afterword:
-    input_tip: cochez ou décochez les différents choix
+    input_tip: sélectionnez les différents choix. Ajoutez un format texte pour conserver les notes dans un format modifiable.
     help_text: |
       La portée visuelle peut être savegardée sous différents formats.
       Cochez ceux que vous souhaitez garder.
+      Le format texte peut être modifié et reutilisé dans le programme.
       A l'invite de commande, entrez une liste de choix séparés par des virgules, par exemple 0, 1, 3
       Sur le site web, cochez les cases.
   aspect_ratio:
@@ -192,7 +193,7 @@ stock_queries:
     foreword:
     question: Merci de taper ou de coller vos notes de musique
     afterword:
-    input_tip: du texte contenant des notes de musique
+    input_tip: du texte contenant des notes de musique. Gardez vos notes à l'abri dans un fichier texte sur votre ordinateur.
     help_text: |
       Formats de notes acceptés :{input_modes}
     
