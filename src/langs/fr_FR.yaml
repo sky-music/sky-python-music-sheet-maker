@@ -192,7 +192,7 @@ stock_queries:
     foreword:
     question: Merci de taper ou de coller vos notes de musique
     afterword:
-    input_tip: du texte contenant des notes de musique
+    input_tip: du texte contenant des notes de musique. Gardez vos notes à l'abri dans un fichier texte sur votre ordinateur.
     help_text: |
       Formats de notes acceptés :{input_modes}
     

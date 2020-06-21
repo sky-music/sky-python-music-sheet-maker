@@ -193,7 +193,7 @@ stock_queries:
     foreword:
     question: Hãy nhập hoặc cắt-dán nốt vào
     afterword:
-    input_tip: bất kì kí tự với một hoặc nhiều nốt nhạc 
+    input_tip: bất kì kí tự với một hoặc nhiều nốt nhạc. Keep your notes safe in a text file in your computer. 
     help_text: |
       Dạng nốt nhạc được chấp nhận: {input_modes}
     

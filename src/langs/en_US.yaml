@@ -76,7 +76,7 @@ open_file: |
 stock_queries:
   instructions_command_line:
     foreword: "===== VISUAL MUSIC SHEETS FOR SKY:CHILDREN OF THE LIGHT =====\n"
-    question: |      
+    question: |
       Accepted music notes formats:{input_modes}
       
       Pay attention to these special characters:
@@ -95,7 +95,7 @@ stock_queries:
     help_text:
   instructions_sky_music_website:
     foreword:
-    question: |      
+    question: |
       Accepted music notes formats:{input_modes}
       
       Pay attention to these special characters:
@@ -196,7 +196,7 @@ stock_queries:
     foreword:
     question: 'Please type or copy-paste notes ({skip} to skip)'
     afterword:
-    input_tip: 'any text with one or several musical notes ({skip} to skip)'
+    input_tip: 'any text with one or several musical notes ({skip} to skip). Keep your notes safe in a text file in your computer.'
     help_text: |
       Accepted music notes formats:{input_modes}
       
