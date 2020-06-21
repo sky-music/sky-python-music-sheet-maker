@@ -133,10 +133,11 @@ stock_queries:
     foreword:
     question: Please choose one or several output rendering formats
     afterword:
-    input_tip: check or uncheck one or several boxes
+    input_tip: check or uncheck one or several boxes. Add a text format to edit your song notes later. 
     help_text: |
       The visual sheet can be rendered in several file formats.
       Please select the ones you want to generate (or deselect some).
+      Text files can be edited and fed to the program again.
       On the command-line, enter a comma-separated list of choices numbers, such as 0, 1, 3.
       On the website, check the boxes.
   aspect_ratio:
