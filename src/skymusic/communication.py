@@ -215,14 +215,14 @@ class Query:
         try:
             return self.get_sender().get_locale()
         except AttributeError:
-            pass
+            return None
 
     def get_recipient_locale(self):
         
         try:
-            return self.get_sender().get_locale()
+            return self.get_recipient().get_locale()
         except AttributeError:
-            pass
+            return None
 
     def get_question(self):
         if self.question is None:

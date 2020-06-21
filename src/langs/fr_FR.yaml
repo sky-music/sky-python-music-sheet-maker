@@ -47,13 +47,13 @@ render_mode:
   skyjson:
     short_desc: Enregistrement Sky-Music (texte JSON)
   skyascii:
-    short_desc: Transcription en notation Sky
+    short_desc: Fichier texte en notation Sky
   englishascii:
-    short_desc: Transcription en notation anglo-saxone
+    short_desc: Fichier texte en notation anglo-saxone
   jianpuascii:
-    short_desc: Transcription en Jianpu
+    short_desc: Fichier texte en Jianpu
   doremiascii:
-    short_desc: Transcription en format traditionnel
+    short_desc: Fichier texte en format traditionnel
 aspect_ratio:
   widescreen:
     short_desc: Widescreen TV (16:9)
