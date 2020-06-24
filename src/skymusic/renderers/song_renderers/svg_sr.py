@@ -36,9 +36,10 @@ class SvgSongRenderer(song_renderer.SongRenderer):
         """Tries to predict the height of the lyrics text when rendered in SVG"""
         return self.fontpt * self.pt2px
 
-    def write_headers(self, svg_buffer, filenum, song, css_mode, rel_css_path):
+    def write_headers(self, svg_buffer, filenum, song, css_mode):
          
-        css_path = Resources.css_path
+        css_buffer = Resources.css_buffer
+        rel_css_path = Resources.rel_css_path
         meta = song.get_meta()                 
         # SVG/XML headers
         svg_buffer.write('<?xml version="1.0" encoding="utf-8" ?>')
@@ -51,15 +52,8 @@ class SvgSongRenderer(song_renderer.SongRenderer):
                          f' viewBox="{self.SVG_viewPort[0] :.2f} {self.SVG_viewPort[1] :.2f} {self.SVG_viewPort[2] :.2f} {self.SVG_viewPort[3] :.2f}" preserveAspectRatio="xMinYMin">')
 
         if css_mode == CSSMode.EMBED:
-            try:
-                with open(css_path, 'r', encoding='utf-8', errors='ignore') as css_file:
-                    css_file = css_file.read()
-            except:
-                print("\n***ERROR: could not open CSS file to embed it in SVG.")
-                css_file = ''
-                pass
             svg_buffer.write('\n<defs><style type="text/css"><![CDATA[\n')
-            svg_buffer.write(css_file)
+            svg_buffer.write(css_buffer.getvalue())
             svg_buffer.write('\n]]></style></defs>')
         elif css_mode == CSSMode.IMPORT:
             svg_buffer.write('\n<defs><style type="text/css">')
@@ -70,7 +64,7 @@ class SvgSongRenderer(song_renderer.SongRenderer):
         svg_buffer.write(f"\n<title>{meta['title'][1]}-{filenum}</title>")        
 
 
-    def write_buffers(self, song, css_mode=CSSMode.EMBED, rel_css_path='css/main.css', start_row=0, start_col=0, buffer_list=None):
+    def write_buffers(self, song, css_mode=CSSMode.EMBED, start_row=0, start_col=0, buffer_list=None):
 
         if buffer_list is None:
             buffer_list = []
@@ -84,7 +78,7 @@ class SvgSongRenderer(song_renderer.SongRenderer):
         filenum = len(buffer_list)
         meta = song.get_meta()
 
-        self.write_headers(svg_buffer, filenum, song, css_mode, rel_css_path)             
+        self.write_headers(svg_buffer, filenum, song, css_mode)             
        
         # Header SVG container
         song_header = (f'\n<svg x="{self.SVG_viewPortMargins[0] :.2f}" y="{self.SVG_viewPortMargins[1] :.2f}"'
@@ -212,7 +206,6 @@ class SvgSongRenderer(song_renderer.SongRenderer):
                         y += self.SVG_harp_size[1] + self.SVG_harp_spacings[1] / 2.0
 
                 # INSTRUMENT RENDER
-#                instrument_render = instrument.render_in_svg(x, f"{(100.0 * self.SVG_harp_size[0] / self.SVG_line_width)}%", "100%", self.harp_AspectRatio)
                 instrument_render = instrument_renderer.render(instrument, x, f"{(100.0 * self.SVG_harp_size[0] / self.SVG_line_width) :.2f}%", "100%", self.harp_AspectRatio)
 
                 # REPEAT
@@ -249,6 +242,6 @@ class SvgSongRenderer(song_renderer.SongRenderer):
         
         # Open new file
         if end_row < song.get_num_lines() or 0 < end_col < ncols:
-            buffer_list = self.write_buffers(song, css_mode, rel_css_path, end_row, end_col, buffer_list)
+            buffer_list = self.write_buffers(song, css_mode, end_row, end_col, buffer_list)
 
         return buffer_list

@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
-import io
+import io, os
 try:
     from importlib import resources as importlib_resources
 except ImportError:
     import importlib_resources
-from src.skymusic.resources import fonts, elements, css
-
+from src.skymusic.resources import fonts, elements, css, js, html
 
 A_root_png = io.BytesIO(importlib_resources.read_binary(elements, 'A-root.png'))
 A_diamond_png = io.BytesIO(importlib_resources.read_binary(elements, 'A-diamond.png'))
@@ -29,11 +28,32 @@ unhighlighted_chord_png = io.BytesIO(importlib_resources.read_binary(elements, '
 broken_png = io.BytesIO(importlib_resources.read_binary(elements, 'broken-symbol.png'))
 silent_png = io.BytesIO(importlib_resources.read_binary(elements, 'silent-symbol.png'))
 
-with importlib_resources.path(css, 'main.css') as fp:
-    css_path = str(fp)
-
 with importlib_resources.path(fonts, 'NotoSansCJKjp-Regular.otf') as fp:
     font_path = str(fp)
+    if not os.path.isfile(font_path):
+        raise FileNotFoundError(f"Could not find fonts/{os.path.relpath(font_path, start=os.path.dirname(fonts.__file__))}")
+
+try:
+    css_buffer = io.StringIO(importlib_resources.read_text(css, 'main.css'))
+except FileNotFoundError:
+    print(f"\n***ERROR: could not find CSS file to embed it in HTML.\n")
+    css_buffer = io.StringIO()
+
+try:
+    nav_html_buffer = io.StringIO(importlib_resources.read_text(html, 'navigation.html'))
+except FileNotFoundError:
+    print(f"\n***WARNING: could not find html navigation file to embed it in HTML.\n")
+    nav_html_buffer = io.StringIO()
+
+try:
+    nav_js_buffer = io.StringIO(importlib_resources.read_text(js, 'navigation.js'))
+except FileNotFoundError:
+    print(f"\n***WARNING: could not find javascript navigation file to embed it in HTML.\n")
+    nav_js_buffer = io.StringIO()
+    
+rel_css_path = '../css/main.css'
+navigation_id = 'navigation'
+SKY_MUSIC_URL = 'sky-music.github.io'
 
 harp_font_size = 38
 voice_font_size = 32

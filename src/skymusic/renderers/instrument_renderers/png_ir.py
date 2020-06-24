@@ -26,7 +26,7 @@ class PngInstrumentRenderer(instrument_renderer.InstrumentRenderer):
         self.song_bkg = (255, 255, 255)  # White paper sheet
         self.font_color = (0, 0, 0)
         
-        self.font = Resources.font_path
+        self.font_path = Resources.font_path
         self.harp_font_size = Resources.harp_font_size
         self.repeat_height = None
 
@@ -65,7 +65,7 @@ class PngInstrumentRenderer(instrument_renderer.InstrumentRenderer):
         repeat_im = Image.new('RGBA', (int(max_rescaled_width / rescale), int(self.get_png_chord_size()[1])),
                               color=self.text_bkg)
         draw = ImageDraw.Draw(repeat_im)
-        fnt = ImageFont.truetype(self.font, self.harp_font_size)
+        fnt = ImageFont.truetype(self.font_path, self.harp_font_size)
         draw.text((0, repeat_im.size[1] - 1.05 * fnt.getsize(str(instrument.get_repeat()))[1]), 'x' + str(instrument.get_repeat()), font=fnt,
                   fill=self.font_color)
 
@@ -78,7 +78,7 @@ class PngInstrumentRenderer(instrument_renderer.InstrumentRenderer):
 
     def get_lyric_height(self):
         """Calculates the height of the lyrics based on a standard text and the font size"""
-        fnt = ImageFont.truetype(self.font, self.voice_font_size)
+        fnt = ImageFont.truetype(self.font_path, self.voice_font_size)
         return fnt.getsize('HQfgjyp')[1] #Uppercase H and characters with tails
    
 
@@ -86,7 +86,7 @@ class PngInstrumentRenderer(instrument_renderer.InstrumentRenderer):
         """Renders the lyrics text in PNG"""
         lyric = instrument.get_lyric()
         chord_size = self.get_png_chord_size()
-        fnt = ImageFont.truetype(self.font, int(self.voice_font_size))
+        fnt = ImageFont.truetype(self.font_path, int(self.voice_font_size))
         lyric_width = fnt.getsize(lyric)[0]
 
         lyric_im = Image.new('RGBA', (int(max(chord_size[0], lyric_width)), int(self.get_lyric_height())),

@@ -111,9 +111,9 @@ class Song():
             aspect_ratio = 16/9.0
         
         if render_mode == RenderMode.HTML:
-            buffers = html_sr.HtmlSongRenderer(self.locale).write_buffers(song=self, css_mode=kwargs['css_mode'], rel_css_path=kwargs['rel_css_path'])
+            buffers = html_sr.HtmlSongRenderer(self.locale).write_buffers(song=self, css_mode=kwargs['css_mode'])
         elif render_mode == RenderMode.SVG:
-            buffers = svg_sr.SvgSongRenderer(self.locale, aspect_ratio).write_buffers(song=self, css_mode=kwargs['css_mode'], rel_css_path=kwargs['rel_css_path'])
+            buffers = svg_sr.SvgSongRenderer(self.locale, aspect_ratio).write_buffers(song=self, css_mode=kwargs['css_mode'])
         elif render_mode == RenderMode.PNG:
             buffers = png_sr.PngSongRenderer(self.locale, aspect_ratio).write_buffers(song=self)
         elif render_mode == RenderMode.MIDI:
