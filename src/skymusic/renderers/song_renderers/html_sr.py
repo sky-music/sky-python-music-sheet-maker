@@ -1,4 +1,4 @@
-import io
+import io, re
 from . import song_renderer
 from src.skymusic.renderers.instrument_renderers.html_ir import HtmlInstrumentRenderer
 from src.skymusic.resources import Resources
@@ -23,7 +23,7 @@ class HtmlSongRenderer(song_renderer.SongRenderer):
                           f'\n<head>\n<meta charset="utf-8"/>'
                           f"\n<title>{meta['title'][1]}</title>")
 
-        nav_js_value = nav_js_buffer.getvalue().replace('{SKY_MUSIC_URL}', Resources.SKY_MUSIC_URL)
+        nav_js_value = nav_js_buffer.getvalue().replace('{SKY_MUSIC_URL}', re.escape(Resources.SKY_MUSIC_URL))
 
         html_buffer.write('\n<script style="text/javascript" language="javascript">\n')
         html_buffer.write(nav_js_value)
