@@ -25,7 +25,7 @@ class PngSongRenderer(song_renderer.SongRenderer):
 
         self.aspect_ratio = aspect_ratio
         self.maxIconsPerLine = round(10*aspect_ratio/(16/9.0))
-        self.maxFiles = 10
+        self.maxFiles = Resources.MAX_NUM_FILES
 
         if not no_PIL_module:
             png_instrument_renderer = PngInstrumentRenderer(self.locale)

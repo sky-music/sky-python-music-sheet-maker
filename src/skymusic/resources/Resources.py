@@ -34,10 +34,22 @@ with importlib_resources.path(fonts, 'NotoSansCJKjp-Regular.otf') as fp:
         raise FileNotFoundError(f"Could not find fonts/{os.path.relpath(font_path, start=os.path.dirname(fonts.__file__))}")
 
 try:
-    css_buffer = io.StringIO(importlib_resources.read_text(css, 'main.css'))
+    svg_css_buffer = io.StringIO(importlib_resources.read_text(css, 'svg.css'))
 except FileNotFoundError:
-    print(f"\n***ERROR: could not find CSS file to embed it in HTML.\n")
-    css_buffer = io.StringIO()
+    print(f"\n***ERROR: could not find svg.css file to embed it in HTML.\n")
+    svg_css_buffer = io.StringIO()
+
+try:
+    html_css_buffer = io.StringIO(importlib_resources.read_text(css, 'html.css'))
+except FileNotFoundError:
+    print(f"\n***ERROR: could not find html.css file to embed it in HTML.\n")
+    html_css_buffer = io.StringIO()
+    
+try:
+    common_css_buffer = io.StringIO(importlib_resources.read_text(css, 'common.css'))
+except FileNotFoundError:
+    print(f"\n***ERROR: could not find common.css file to embed it.\n")
+    common_css_buffer = io.StringIO()
 
 try:
     nav_html_buffer = io.StringIO(importlib_resources.read_text(html, 'navigation.html'))
@@ -60,6 +72,8 @@ voice_font_size = 32
 png_font_size = 36
 png_title_font_size = 48
 png_compress = 6
+
+MAX_NUM_FILES = 15
 
 ICON_DELIMITER = '\s'
 PAUSE = '.'

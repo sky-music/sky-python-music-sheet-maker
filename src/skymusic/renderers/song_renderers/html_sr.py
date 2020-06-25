@@ -14,7 +14,6 @@ class HtmlSongRenderer(song_renderer.SongRenderer):
     def write_headers(self, html_buffer, song, css_mode):
         
         meta = song.get_meta()
-        css_buffer = Resources.css_buffer
         rel_css_path = Resources.rel_css_path
         nav_js_buffer = Resources.nav_js_buffer
         nav_html_buffer = Resources.nav_html_buffer
@@ -32,7 +31,8 @@ class HtmlSongRenderer(song_renderer.SongRenderer):
 
         if css_mode == CSSMode.EMBED:
             html_buffer.write('\n<style type="text/css">\n')
-            html_buffer.write(css_buffer.getvalue())
+            html_buffer.write(Resources.common_css_buffer.getvalue())
+            html_buffer.write(Resources.html_css_buffer.getvalue())
             html_buffer.write('\n</style>')
            
         elif css_mode == CSSMode.IMPORT:

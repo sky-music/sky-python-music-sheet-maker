@@ -15,8 +15,7 @@ class SvgSongRenderer(song_renderer.SongRenderer):
 
         self.aspect_ratio = aspect_ratio
         self.maxIconsPerLine = round(10*aspect_ratio/(16/9.0))
-        self.maxLinesPerFile = 10
-        self.maxFiles = 10
+        self.maxFiles = Resources.MAX_NUM_FILES
 
         self.SVG_viewPort = (0.0, 0.0, 750*self.aspect_ratio, 750.0)
         minDim = self.SVG_viewPort[2] * 0.01
@@ -38,7 +37,6 @@ class SvgSongRenderer(song_renderer.SongRenderer):
 
     def write_headers(self, svg_buffer, filenum, song, css_mode):
          
-        css_buffer = Resources.css_buffer
         rel_css_path = Resources.rel_css_path
         meta = song.get_meta()                 
         # SVG/XML headers
@@ -53,7 +51,8 @@ class SvgSongRenderer(song_renderer.SongRenderer):
 
         if css_mode == CSSMode.EMBED:
             svg_buffer.write('\n<defs><style type="text/css"><![CDATA[\n')
-            svg_buffer.write(css_buffer.getvalue())
+            svg_buffer.write(Resources.common_css_buffer.getvalue())
+            svg_buffer.write(Resources.svg_css_buffer.getvalue())
             svg_buffer.write('\n]]></style></defs>')
         elif css_mode == CSSMode.IMPORT:
             svg_buffer.write('\n<defs><style type="text/css">')
@@ -121,7 +120,6 @@ class SvgSongRenderer(song_renderer.SongRenderer):
         y = 0  # Because we are nested in a new SVG
         x = 0
         instrument_index = 0
-        # end_row = min(start_row+self.maxLinesPerFile,len(self.lines))
         end_row = song.get_num_lines()
         end_col = 0
         ncols = self.maxIconsPerLine

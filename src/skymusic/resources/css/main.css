@@ -106,7 +106,7 @@ table.silent {
   border-width:0;
 }
 
-/* <!-- Silent table  (HTML only)--> */
+/* <!-- Silent table  (SVG only)--> */
 svg.silent rect {
   stroke: grey;
   stroke-width:0;
