@@ -127,3 +127,19 @@ table.silent .ON-0.button {
   stroke: white;
   fill: none;
 }
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: black;
+  }
+  table {
+    border-color: white;
+  }
+  table.broken {
+    border-color: black;
+  }
+  table.broken .ON-0.button,
+  table.silent .ON-0.button {
+    stroke: black;
+  }
+}
