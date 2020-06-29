@@ -140,6 +140,6 @@ table.silent .ON-0.button {
   }
   table.broken .ON-0.button,
   table.silent .ON-0.button {
-  stroke: black;
+    stroke: black;
   }
 }
