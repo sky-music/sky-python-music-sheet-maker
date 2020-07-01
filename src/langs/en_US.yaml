@@ -243,26 +243,25 @@ stock_queries:
     afterword:
     input_tip: Type the key name
     help_text: |
-      'Sky''s musical system does not include Sharps "#" and flats "b". Hence you cannot play any song from the outside world.
-      We detected that your song can be played with several notes as the song key. Please choose the one that is most convenient for you.'
+      Sky''s musical system does not include semitones. It is like removing all the black keys on the piano. Hence some songs cannot be played in the Home Sanctuary exactly as they sound in the outside world. You have to shift their frequencies before using this program, or play in other locations of Sky where the notes have been shifted on the keyboard. This is called transposition or 'changing the song key'.
+      Hopefully, we have detected that your song can be played in several song keys available in Sky. Please choose the one that is most convenient for you.
   recommended_key:
     foreword: Your musical notation uses relative pitch.
-    question: 'What is the recommended key to play in Sky (default is {song_key}). {skip} to skip'
+    question: 'What is the recommended key to play in Sky (default is {song_key})? {skip} to skip'
     afterword:
     input_tip: '{skip}, or type a note name (e.g. C in English notation)'
     help_text: |
-      You have used a musical notation that does allow to determine the exact pitch of your notes.
-      Hence the visual sheet will sound differently in different places in Sky.
+      You have used a musical notation that does impose the exact pitch of the notes.
+      Hence the visual sheet will sound differently in different places in Sky.  This is called transposition.
   octave_shift:
     foreword: Do you want to shift the pitch of your notes?
     question: 'Octave shift ({skip_number} to skip)'
     afterword:
     input_tip: octave shift as an integer between -6 and +6
     help_text: |
-      A musical note is identified by its name and an octave number. Sky's music system spans less than 3 octaves.
+      A musical note is uniquely identified by its name (within an octave), and an octave number. Sky's music system spans less than 3 octaves.
       If you do not specify an octave number after a note, we will assume it is the first octave of Sky, so your notes will essential by played near the bass.
-      You can shift your notes to a higher pitch by setting a positive number in this field.
-      If you have specified an octave number and it is too high to be played within Sky's system, you can downshift the pitch by entering a negative integer
+      You can shift your notes to a higher (lower) pitch by setting a positive (negative) number in this field.
   no_song_file:
     foreword: ---------------------------------------
     question: 'Your {render_mode} was not saved to file.'
