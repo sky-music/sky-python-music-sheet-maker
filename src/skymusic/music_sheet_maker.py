@@ -98,8 +98,8 @@ class MusicSheetMaker:
         self.directory_base = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'))
         self.song_dir_in = song_dir_in if song_dir_in is not None else os.path.join(self.directory_base, 'test_songs')
         self.song_dir_out = song_dir_out if song_dir_out is not None else os.path.join(self.directory_base, 'songs_out')
-        self.css_path = Resources.css_path
-        self.rel_css_path = os.path.relpath(self.css_path, start=self.song_dir_out)
+        #self.css_path = Resources.css_path
+        #self.rel_css_path = os.path.relpath(self.css_path, start=self.song_dir_out)
         self.css_mode = CSSMode.EMBED
         self.render_modes_enabled = [mode for mode in RenderMode]
         # self.render_modes_disabled = [RenderMode.JIANPUASCII, RenderMode.DOREMIASCII]
@@ -744,7 +744,7 @@ class MusicSheetMaker:
         song_bundle.set_meta(self.get_song().get_meta())
 
         for render_mode in render_modes:
-            buffers = self.get_song().render(render_mode=render_mode, aspect_ratio=aspect_ratio, song_bpm=song_bpm, css_mode=self.css_mode, rel_css_path=self.rel_css_path)  # A list of IOString or IOBytes buffers
+            buffers = self.get_song().render(render_mode=render_mode, aspect_ratio=aspect_ratio, song_bpm=song_bpm, css_mode=self.css_mode)  # A list of IOString or IOBytes buffers
             
             if buffers is not None:
                 song_bundle.add_render(render_mode, buffers)

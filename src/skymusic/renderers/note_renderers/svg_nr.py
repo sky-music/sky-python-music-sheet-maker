@@ -6,10 +6,10 @@ class SvgNoteRenderer(note_renderer.NoteRenderer):
         pass
 
     def get_silentsymbol_svg(self, highlighted_classes):
-        return '<circle cx="45.4" cy="45.4" r="26" class="icon OFF' + ' '.join(highlighted_classes).rstrip() + '"/>'
+        return '<circle cx="45.4" cy="45.4" r="26" class="icon silent' + ' '.join(highlighted_classes).rstrip() + '"/>'
 
     def get_dead_svg(self, highlighted_classes):
-        return '<circle cx="45.4" cy="45.4" r="12" class="icon OFF' + ' '.join(highlighted_classes).rstrip() + '"/>'
+        return '<circle cx="45.4" cy="45.4" r="12" class="icon broken' + ' '.join(highlighted_classes).rstrip() + '"/>'
 
     def get_harpbroken_svg(self, highlighted_classes):
         return '<text x="45.4" y="81" class="broken">?</text>'
@@ -40,10 +40,16 @@ class SvgNoteRenderer(note_renderer.NoteRenderer):
             
         else:
             
-            if note.instrument_is_broken or note.instrument_is_silent:                
+            if note.instrument_is_broken:
                 # Draws a small button (will be grey thanks to CSS)
                 highlighted_classes = []
-                class_unhighlighted = ' OFF'
+                class_unhighlighted = ' broken'
+                note_core_render = self.get_dead_svg(highlighted_classes)              
+                
+            elif note.instrument_is_silent:                
+                # Draws a small button (will be grey thanks to CSS)
+                highlighted_classes = []
+                class_unhighlighted = ' silent'
                 note_core_render = self.get_silentsymbol_svg(highlighted_classes)
                 
                 
