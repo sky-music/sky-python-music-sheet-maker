@@ -1,3 +1,5 @@
+# Translation by jmmelko
+# Only developer(s) can add new localization string to this translation.
 warnings:
   jianpu_pause: "Jianpu notation is used: setting '0' as the pause character instead of '{pause}'. Please make sure your input follows this convention."
   jianpu_quaver_delimiter: "Jianpu notation is used: setting '{jianpu_quaver_delimiter}' as the quaver delimiter instead of '{quaver_delimiter}'. Please make sure your input follows this convention."

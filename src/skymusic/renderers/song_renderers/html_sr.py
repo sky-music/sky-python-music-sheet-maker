@@ -23,9 +23,11 @@ class HtmlSongRenderer(song_renderer.SongRenderer):
                           f'\n<head>\n<meta charset="utf-8"/>'
                           f"\n<title>{meta['title'][1]}</title>")
 
+        html_buffer.write(f'\n<script type="text/javascript" src="{Resources.dark_mode_script_url}"></script>\n')
+        
         nav_js_value = nav_js_buffer.getvalue().replace('{SKY_MUSIC_URL}', re.escape(Resources.SKY_MUSIC_URL))
 
-        html_buffer.write('\n<script style="text/javascript" language="javascript">\n')
+        html_buffer.write('\n<script type="text/javascript">\n')
         html_buffer.write(nav_js_value)
         html_buffer.write('</script>')
 
@@ -42,7 +44,7 @@ class HtmlSongRenderer(song_renderer.SongRenderer):
             html_buffer.write(f'\n<link href="{rel_css_path}" rel="stylesheet" />')
 
         html_buffer.write(f'\n<meta charset="utf-8"/></head>'
-                          f'\n<body onload="javascript:showLogo(\'{Resources.navigation_id}\');">\n'
+                          f'\n<body>\n'
                           )
                           
         html_buffer.write(nav_html_buffer.getvalue())

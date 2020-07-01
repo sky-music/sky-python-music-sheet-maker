@@ -64,8 +64,8 @@ except FileNotFoundError:
     nav_js_buffer = io.StringIO()
     
 rel_css_path = '../css/main.css'
-navigation_id = 'navigation'
 SKY_MUSIC_URL = 'sky-music.github.io'
+dark_mode_script_url = '/js/sheetDarkModeScript.js'
 
 harp_font_size = 38
 voice_font_size = 32

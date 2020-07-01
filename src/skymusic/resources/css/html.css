@@ -69,8 +69,7 @@ table.broken {
 
 /* <!-- Silent table  (HTML only)--> */
 table.silent {
-  border-color:#BBBBBB;
-  border-width:0;
+  border-color:transparent;
 }
 
 /* <!-- Lyrics table  (HTML only)--> */
@@ -130,7 +129,7 @@ table.silent .ON-0.button {
 
 @media (prefers-color-scheme: dark) {
   body {
-    background-color: black;
+    background-color: #121212;
   }
   table {
     border-color: white;
@@ -141,5 +140,8 @@ table.silent .ON-0.button {
   table.broken .ON-0.button,
   table.silent .ON-0.button {
     stroke: black;
+  }
+  p, body, td, text.headers {
+  color: white;  
   }
 }

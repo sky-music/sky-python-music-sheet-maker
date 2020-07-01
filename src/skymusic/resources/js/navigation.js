@@ -8,3 +8,5 @@ function showLogo(elementId) {
         navTable.style.display = "inline";	
     }    
 }
+
+window.addEventListener("load", function(){showLogo('navigation')}, false);
