@@ -33,8 +33,11 @@ input_mode:
     short_desc: 日本語イタリアドレミ
     long_desc: "Japanese do re mi: ド、ド#／レb、レ、レ#／ミb、ミ、ファ、ファ#／ソb、ソ、ソ#／ラb、ラ、ラ#／シb、シ"
   skyjson:
-    short_desc: 'Sky-Music recording (JSON text)'
+    short_desc: Sky-Music recording (JSON text)
     long_desc: "Dictionary with time in ms and key number 0-14 used by SkyStudio app and https://sky-music.herokuapp.com"
+  skyhtml:
+    short_desc: HTML visual sheet
+    long_desc: HTML visual sheet
 render_mode:
   html:
     short_desc: HTML visual sheet
@@ -189,10 +192,10 @@ stock_queries:
       - Sharps "#" and flats "b" (semitones) are supported for Western and Jianpu notations.
   file:
     foreword:
-    question: 'Enter a valid file name (in {songs_in}/)'
+    question: 'Enter a valid file name (case sensitive), in {songs_in}/'
     afterword:
     input_tip: any text file containing one or several musical notes
-    help_text:
+    help_text: "We have detected that you are trying to open a file, but couldn't find it. Please check its name and that it is located in the {songs_in} directory. File names are case sensitive"
   notes:
     foreword:
     question: 'Please type or copy-paste notes ({skip} to skip)'

@@ -1,0 +1,303 @@
+warnings:
+  jianpu_pause: "简谱模式使用中:设定 '0'代替{pause}。请确认您的输入遵守该条件。"
+  jianpu_quaver_delimiter: "简谱模式使用中:设定 '{jianpu_quaver_delimiter}' 为八分音符链接符号 '{quaver_delimiter}'.请确认您的输入遵守该条件."
+recipient_specifics:
+  skip:
+    command_line: 留空以及按下回车键
+    music_cog: 用 -（中划线）回答
+    sky_music_website: 按输入
+  skip_number:
+    command_line: 留空或输入0 再按回车键
+    music_cog: 用 - （中划键）回答或输入0
+    sky_music_website: 按输入
+input_mode:
+  skykeyboard:
+    short_desc: 光遇游戏键盘
+    long_desc: ":像在游戏中一样在键盘上输入，\n   QWERT\n   ASDFG\n   ZXCVB"
+  sky:
+    short_desc: '光遇 ABC1-5'
+    long_desc: "光遇列，行格式:\n   A1 A2 A3 A4 A5\n   B1 B2 B3 B4 B5\n   C1 C2 C3 C4 C5"
+  skyhtml:
+    short_desc: HTML 乐谱
+    long_desc: HTML 乐谱
+  english:
+    short_desc: 英语 CDEFGAB
+    long_desc: "英语 (音符名为 C D E F G A B + 升降号 b/# + 八度数字，举例：Cb4 D#4 E5 ...)"
+  doremi:
+    short_desc: 法式 doremi
+    long_desc: "Doremi (音符名为 do re mi fa sol la si/ti + 升降号 b/# + 八度数字，举例： dob4 re#4 mi5 ...)"
+  jianpu:
+    short_desc: '简谱 1234567+-'
+    long_desc: "简谱 (音符名为 1 2 3 4 5 6 7, 加上升降号 b/# ，再以 + 或 - 来标注降或升八度)"
+  englishchords:
+    short_desc: 和弦 CDEFGABmaj
+    long_desc: "英语和弦名 (举例： C, F, Dm, Bdim, A+, Csus2, Dsus4, C6, Cmaj7, Dm11)"
+  doremijp:
+    short_desc: 日本語イタリアドレミ
+    long_desc: "日语 do re mi: ド、ド#／レb、レ、レ#／ミb、ミ、ファ、ファ#／ソb、ソ、ソ#／ラb、ラ、ラ#／シb、シ"
+  skyjson:
+    short_desc: 'Sky-Music recording/光遇音乐录音 (JSON 格式)'
+    long_desc: " 'SkyStudio app' 或 https://sky-music.herokuapp.com" 使用的文件。该文件需有时间标志 (ms) 和软件中使用的 0-14 数字
+render_mode:
+  html:
+    short_desc: HTML 乐谱
+  svg:
+    short_desc: SVG 乐谱
+  png:
+    short_desc: PNG 乐谱
+  midi:
+    short_desc: Midi 文件
+  skyjson:
+    short_desc: Sky-Music recording/光遇音乐录音 (JSON 格式文字档)
+  skyascii:
+    short_desc: 光遇乐谱格式文字档
+  englishascii:
+    short_desc: 英语格式文字档
+  jianpuascii:
+    short_desc: 简谱格式文字档
+  doremiascii:
+    short_desc: do-re-mi格式文字档
+aspect_ratio:
+  widescreen:
+    short_desc: 宽屏电视 (16:9)
+  oldtv:
+    short_desc: 旧电视 (4:3)
+  square:
+    short_desc: 正方形 (1:1)
+  A4:
+    short_desc: A4纸 (1:1.4)
+  vertical_panel:
+    short_desc: 竖屏 (1:2)
+song_meta:
+  title: 歌名
+  artist: 原著作家
+  transcript: 编册作家
+  musical_key: 曲调
+  untitled: Untitled
+open_file: |
+    (Notes imported from {file_path})
+stock_queries:
+  instructions_command_line:
+    foreword: "===== 光遇游戏乐谱 =====\n"
+    question: |
+      该网站接受的格式:{input_modes}
+      
+      请注意以下几点：
+      - 输入和弦时不能有空格 (举例： A1B1C1)
+      - 使用 '{icon_delimiter}' 拆开和弦
+      - 使用 '{pause}' 来标注休息 (休止符), 除了简谱：简谱请使用 '0' 来标注
+      - 使用 '{quaver_delimiter}' 来连接同一个格子里的音符，例如三连音、八分音符、等等...(举例 {quaver_example})。 简谱使用法：请使用 '{jianpu_quaver_delimiter}'，非 '-' 来避免与八度打乱。
+      - 和弦过后加入 '{repeat_indicator}' 以表注重复。
+      - 西方乐谱和简谱支持使用升号 "#" 和降号 "b" (变音记号)。
+      
+      *** 请把您的乐谱文案存入文字档以方便更改 ***
+        
+      输入 '?' 如对以上有疑惑
+    afterword: =======================================
+    input_tip:
+    help_text:
+  instructions_sky_music_website:
+    foreword:
+    question: |
+      该网站接受的格式:{input_modes}
+      
+      请注意以下几点：
+      - 输入和弦时不能有空格 (举例： A1B1C1)
+      - 使用 '{icon_delimiter}' 拆开和弦
+      - 使用 '{pause}' 来标注休息 (休止符), 除了简谱：简谱请使用 '0' 来标注
+      - 使用 '{quaver_delimiter}' 来连接同一个格子里的音符，例如三连音、八分音符、等等...(举例 {quaver_example})。 简谱使用法：请使用 '{jianpu_quaver_delimiter}'，非 '-' 来避免与八度打乱。
+      - 和弦过后加入 '{repeat_indicator}' 以表注重复。
+      - 西方乐谱和简谱支持使用升号 "#" 和降号 "b" (变音记号)。
+      
+      *** 请把您的乐谱文案存入文字档以方便更改 ***
+    afterword:
+    input_tip: 按 OK 确认
+    help_text:
+  instructions_music_cog:
+    foreword:
+    question: |
+      欢迎使用光遇乐谱创建网站！
+      在此会向您询问一些问题为您创建您的乐谱
+      **提示：请把您的乐谱文案存入文字档以方便更改**
+      输入 '?' 如对以上有疑惑
+    afterword:
+    input_tip:
+    help_text: |
+      该网站接受的格式{input_modes}
+      
+      请注意以下几点：
+      - 输入和弦时不能有空格 (举例： A1B1C1)
+      - 使用 '{icon_delimiter}' 拆开和弦
+      - 使用 '{pause}' 来标注休息 (休止符), 除了简谱：简谱请使用 '0' 来标注
+      - 使用 '{quaver_delimiter}' 来连接同一个格子里的音符，例如三连音、八分音符、等等...(举例 {quaver_example})。 简谱使用法：请使用 '{jianpu_quaver_delimiter}'，非 '-' 来避免与八度打乱。
+      - 和弦过后加入 '{repeat_indicator}' 以表注重复。
+      - 西方乐谱和简谱支持使用升号 "#" 和降号 "b" (变音记号)。
+  render_modes:
+    foreword:
+    question: 请选择一个或以上的输出格式
+    afterword:
+    input_tip: 请打勾或取消以上的格子。加入文字档以方便过后更改
+    help_text: |
+      该乐谱可以以几种格式呈现
+      请选择您想要的格式（或者取消一些）
+      该文案能被修改再呈交
+      指令行界面：在已选择的数字中间加入逗号，如 0, 1, 3
+      网站：请打勾一下的格子。
+  aspect_ratio:
+    foreword: 该网站设定 16:9 为光遇乐谱主要图片比例
+    question: '请选择清单里其它的比例，或者选择 {skip} 跳过'
+    afterword:
+    input_tip: '清单中的比例。{skip} 跳过'
+    help_text: |
+      该网站设定 16:9 为光遇乐谱主要图片比例。如果您想要其它的比例，请输入。
+  song_bpm:
+    foreword: 该输出格式中有需要输入节拍信息。
+    question: '请选择该音乐的节拍速度 (BPM, beats per minute/拍子数), 或 {skip_number} 跳过'
+    afterword:
+    input_tip: '输入 12 - 1200 之间的数字，或{skip_number} 跳过'
+    help_text: |
+      您的选择中含有需要弹奏速度的格式（例如 MIDI），皆为拍子数。请输入 12- 1200 之间的整数。
+  song_title:
+    foreword:
+    question: 该乐谱歌名
+    afterword:
+    input_tip: '任何字或词 {skip}，跳过使用 "untitled"'
+    help_text: 
+  original_artist:
+    foreword:
+    question: 该歌曲原著作家名称
+    afterword:
+    input_tip: 任何字，不能留空
+    help_text: 原著作家包括作曲家、歌手、等等。请无留空！
+  transcript_writer:
+    foreword:
+    question: 编册作家名称
+    afterword:
+    input_tip: '任何字或词, {skip} 跳过'
+    help_text: '编册作家是把该歌曲编册为此乐谱的人。那个人也可以是您哟！'
+  notes_file:
+    foreword:
+    question: '请输入或者复制音符，粘贴到以下格子。您也可以输入含有音符的文字档名称 (在 {songs_in}/)'
+    afterword:
+    input_tip: 一系列音符，如 C1 D1F1；或者文字档名称，如 song.txt
+    help_text: |
+      该网站接受的格式:{input_modes}
+      
+      请注意以下几点：
+      - 输入和弦时不能有空格 (举例： A1B1C1)
+      - 使用 '{icon_delimiter}' 拆开和弦
+      - 使用 '{pause}' 来标注休息 (休止符), 除了简谱：简谱请使用 '0' 来标注
+      - 使用 '{quaver_delimiter}' 来连接同一个格子里的音符，例如三连音、八分音符、等等...(举例 {quaver_example})。 简谱使用法：请使用 '{jianpu_quaver_delimiter}'，非 '-' 来避免与八度打乱。
+      - 和弦过后加入 '{repeat_indicator}' 以表注重复。
+      - 西方乐谱和简谱支持使用升号 "#" 和降号 "b" (变音记号)。
+  file:
+    foreword:
+    question: '请输入有效的文字档名称 (在 {songs_in}/)'
+    afterword:
+    input_tip: 任何含有一个音符或以上的文字档
+    help_text:
+  notes:
+    foreword:
+    question: '请输入或复制粘贴 ({skip} 跳过)'
+    afterword:
+    input_tip: '输入一个或以上的音符 ({skip} 跳过). 请把您的乐谱文案存入文字档。'
+    help_text: |
+      该网站接受的格式{input_modes}
+      
+      请注意以下几点：
+      - 输入和弦时不能有空格 (举例： A1B1C1)
+      - 使用 '{icon_delimiter}' 拆开和弦
+      - 使用 '{pause}' 来标注休息 (休止符), 除了简谱：简谱请使用 '0' 来标注
+      - 使用 '{quaver_delimiter}' 来连接同一个格子里的音符，例如三连音、八分音符、等等...(举例 {quaver_example})。 简谱使用法：请使用 '{jianpu_quaver_delimiter}'，非 '-' 来避免与八度打乱。
+      - 和弦过后加入 '{repeat_indicator}' 以表注重复。
+      - 西方乐谱和简谱支持使用升号 "#" 和降号 "b" (变音记号)。
+  one_input_mode:
+    foreword:
+    question: |
+      检测到您使用该格式: '{input_mode}'.
+    afterword:
+    input_tip: 按 OK 确认
+    help_text:
+  musical_notation:
+    foreword: 尽管我们的用心良苦，我们无法检测您使用什么输入格式。
+    question: 请帮我们选择您的输入格式
+    afterword:
+    input_tip: 只能选一个
+    help_text: |
+      您在上个问题中输入了您的音符，我们已尝试检测您使用的格式，但检测失败。请在清单上选择正确的格式。
+  no_possible_key:
+    foreword:
+    question: |
+      您的歌无法精准被转置入游戏。
+      该乐谱的调已设为主要音调 {song_key}.
+    afterword:
+    input_tip: 按 OK 确认
+    help_text:
+  one_possible_key:
+    foreword:
+    question: '您的歌可以以一下的音调转置入游戏: {song_key}'
+    afterword:
+    input_tip: 按 OK 确认
+    help_text:
+  possible_keys:
+    foreword: '您的歌可以以一下的音调转置入游戏: {song_key}。'
+    question: 请选择此歌曲的音调
+    afterword:
+    input_tip: 请输入音调
+    help_text: |
+      '光遇游戏里的音乐设置没有升号 '#'和 'b'。因此，不是每一首歌都能被完美的转置入游戏。
+      我们检测到您的歌里含有一些音调中可被弹的音。请选择靠近您意想的音调。'
+  recommended_key:
+    foreword: 您的格式使用关系小调
+    question: '请问您推荐什么音调 (主要音调为 {song_key})。 {skip} 跳过'
+    afterword:
+    input_tip: '{skip}，或输入音符名称 (举例：英语格式的 C )'
+    help_text: |
+      您使用的格式能定特定的音高。因此，此乐谱在游戏中不同的地点会发出不一样的音高。
+  octave_shift:
+    foreword: 您是否要升音符的音高？
+    question: '升降音高 ({skip_number} 跳过)'
+    afterword:
+    input_tip: 输入-6 到 +6 之间的数字来升降音高
+    help_text: |
+      一个音符拥有自己的名和八度数字。光遇游戏内的音乐设置只有3组八度。
+      如您没标注八度数字，我们会默认该音符是游戏中第一组八度，因此您的音符会被默认为最低音的那组音。
+      您可以使用正数在此把音符升八度。
+      如您的八度数字太高而且在不能在游戏中弹，您可以使用负数降低此音的音高
+  no_song_file:
+    foreword: ---------------------------------------
+    question: '您的 {render_mode} 还未被保存。'
+    afterword:
+    input_tip: 按 OK 确认
+    help_text:
+  one_song_file:
+    foreword: ---------------------------------------
+    question: '您的 {render_mode} 保存于： {song_file}'
+    afterword:
+    input_tip: 按 OK 确认
+    help_text:
+  several_song_files:
+    foreword: ---------------------------------------
+    question: '您的 {render_mode} 保存于： {songs_out}'
+    afterword: '您的歌曲已被拆开成 {num_files} 个文件，处于 "{first_file}" 和 "{last_file}"之间'
+    input_tip: 按 OK 确认
+    help_text:
+  few_errors:
+    foreword:
+    question: '乐谱成功被读取。含有一些错误。'
+    afterword:
+    input_tip: 按 OK 确认
+    help_text:
+  many_errors:
+    foreword:
+    question: '*警告*: 您的乐谱中含有许多错误.'
+    afterword: |
+      请检查以下几点：
+      
+      - 如您以标注八度数字，它必须要在 1-3 之内的数字。如没，请重新输入八度数字。
+      - 简谱中，休息需以 '0' 标注
+      - 您的乐谱中毫无差池。请浏览以下网站了解完整的指示：
+      
+      https://sky-music.github.io/make-your-own-sheet.html
+    input_tip: 按 OK 确认
+    help_text:

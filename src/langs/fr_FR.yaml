@@ -19,6 +19,9 @@ input_mode:
   sky:
     short_desc: 'Sky ABC1-5'
     long_desc: "Notation ligne/colonne:\n   A1 A2 A3 A4 A5\n   B1 B2 B3 B4 B5\n   C1 C2 C3 C4 C5"
+  skyhtml:
+    short_desc: Portée visuelle en HTML
+    long_desc: Portée visuelle en HTML
   english:
     short_desc: Anglaise CDEFGAB
     long_desc: "Notation anglaise (note C D E F G A B + altération b/# + numéro d'octave, par exemple Cb4 D#4 E5 ...)"
@@ -187,10 +190,10 @@ stock_queries:
       - Les dièses "#" et les bémoles "b" (demi-tons) sont possibles pour les notations autres que Sky ABC-15.
   file:
     foreword:
-    question: 'Entrez un nom de fichier valide (dans {songs_in}/)'
+    question: 'Entrez un nom de fichier valide, rangé dans {songs_in}/ (sensible à la casse)'
     afterword:
     input_tip: un fichier texte contenant des notes de musique
-    help_text:
+    help_text: "We have detected that you are trying to open a file, but couldn't find it. Please check its name and that it is located in the {songs_in} directory. File names are case sensitive"
   notes:
     foreword:
     question: Merci de taper ou de coller vos notes de musique
