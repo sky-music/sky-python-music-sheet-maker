@@ -39,7 +39,7 @@ class MusicTheory():
 
         song_parser = self.song_parser
 
-        possible_modes = [mode for mode in InputMode if mode is not InputMode.SKYJSON]
+        possible_modes = [mode for mode in InputMode if mode not in [InputMode.SKYJSON, InputMode.SKYHTML]]
         possible_parsers = [song_parser.get_note_parser(mode) for mode in possible_modes]
         possible_regex = [parser.single_note_name_regex for parser in possible_parsers]
 
