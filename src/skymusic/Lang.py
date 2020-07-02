@@ -41,7 +41,7 @@ def guess_locale():
             return locales[0]
         elif len(locale) < 2:
             return locales[0]
-
+    
     return locale
 
 

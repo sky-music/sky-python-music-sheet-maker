@@ -217,9 +217,9 @@ class Communicator:
             # Choices keyword arguments dictionary
             if isinstance(query, (QueryMultipleChoices, QueryChoice)):
                 if isinstance(limits[0], InputMode):
-                    choices_dicts = [{'number': i, 'text': str(limit)} for i, limit in enumerate(limits)]
+                    choices_dicts = [{'number': i, 'text': limit.get_short_desc(self.locale)} for i, limit in enumerate(limits)]
                 elif isinstance(limits[0], RenderMode):
-                    choices_dicts = [{'number': i, 'text': str(limit)} for i, limit in enumerate(limits)]
+                    choices_dicts = [{'number': i, 'text': limit.get_short_desc(self.locale)} for i, limit in enumerate(limits)]
                 else:
                     choices_dicts = [{'number': i, 'text': str(limit).strip()} for i, limit in enumerate(limits)]
             else:
