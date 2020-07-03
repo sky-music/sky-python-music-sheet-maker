@@ -1,36 +1,56 @@
 # sky-python-music-sheet-maker
-
-## NOTICE:
-
-This program is not being actively maintained by its creator, Tracey. Feel free to take the code/ideas and build upon it.
-In the meantime you can request help from jmmelko
-
 ***
+This program lets you make visual music sheets for Sky: Children of the Light. It will ask you a few questions, and does not require previous knowledge of the command line to run. 
+
+More details at the [Sky-Music website] (https://sky-music.github.io).
+
+**Installation**
 
 The script requires Python >= 3.6 and the following packages:
-* pillow (PIL) (optional: for generating PNG output)
-* importlib_resources (for Python < 3.7)
+
+* pillow (PIL)
+* import_resources (for Python < 3.7)
 * mido (optional: for generating midi output)
+* pyYaml
 
-See here for how to download and use. This currently requires a Desktop computer and is a work-in-progress.
+See [here] (https://sky-music.github.io/make-your-own-sheet.html) for how to download and install.
 
-**Instructions:** https://sky.bloomexperiment.com/t/sky-python-music-sheet-maker/102#how-to-download
+The program can be run on a desktop computer,  or a smartphone if a Python IDE is installed (such as [Pythonista] (http://omz-software.com/pythonista/))
+
+**Website version**
+
+If you’re afraid of the command line, there is a [website] (https://jmmelko.pythonanywhere.com) running this script.
+
+**Running the script**
+
+    cd sky-python-music-sheet-maker/src/skymusic
+    python3 command_line_player.py
 
 ![Flower Dance intro music sheet](https://raw.githubusercontent.com/sky-music/sky-python-music-sheet-maker/master/images/flower_dance_intro.png)
 
-This program lets you make visual music sheets for Sky: Children of the Light. It is written in Python and does not require previous knowledge of the command line to run. 
+As well as using QWERT ASDFG ZXCVB keys on the keyboard (like a piano), there are other supported notations for the notes you provide:
 
-As well as using QWERT ASDFG ZXCVB keys as the keyboard, there are other supported notations:
-
-- Sky notation (A1 A2 A3 A4 A5, B1 B2 B3 B4 B5, C1 C2 C3 C4 C5)
-- English notation (C4, D4, E4, F4, G4, A4, B4)
+- Sky column/row notation (A1 A2 A3 A4 A5, B1 B2 B3 B4 B5, C1 C2 C3 C4 C5)
+- English notation, followed by an optional number for octaves (C1, D1, E1, F1, G1, A1, B1)
 - Jianpu (1 2 3 4 5 6 7, followed by + or - for octaves)
-- French do ré mi
-- Japanese do ré mi
+- French do ré mi + octave number
+- Japanese do ré mi + octave number
 
-You can type these in the command line, or save in a text file and import it. 
+You can type these directly in the command line prompt, but you are strongly advised to save the notes first in a text file.
 
-The output will be HTML, with small icons of the Sky keyboard. If you use Western notation or Jianpu notation, it will also convert to Sky notation for you in a txt file.
+The output will be HTML, SVG, or PNG, with small icons of the Sky keyboard. If you use Western notation or Jianpu notation, it will also convert to Sky notation for you in a text file.
+
+After generating a sheet, you are encouraged to publish the file on https://sky-music.github.io
+
+**Advanced functions**
+
+The command-line version supports functions for faster processing of several songs:
+
+* the default answer to any question can be put in the *preferences.yaml* file. This way, you will no longer be asked this question (for instance the aspect ratio of the visual sheet). You can  even put the notes in there! 
+* songs can be processed in a by batch by placing preference-like *.yaml* files in the *batch\_songs* directory (see the example files in it) and modifying this line in  *command\_line\_player.py*:
+
+        batch_mode = True
+* Visual sheets generated after July, 2020 1st can be read again by the program for further modification. You will have to enter the artist again though.
 
 ***
 
@@ -39,12 +59,15 @@ The output will be HTML, with small icons of the Sky keyboard. If you use Wester
 SVG icons are thanks to [madwurmz](http://madwurmz.com).
 Advices taken from Specy, Jurassimok, Skyventuree
 
+**Re-use and branching:**
+
+This program is not being actively maintained by its original creator Tracey. Assistance is currently provided by jmmelko, but this may not last. Feel free to branch the code and build upon it.
+
 **Translators:**
 
 - jdewfiez (Vietnamese)
 - jmmelko (French)
-- kai00 (Chinese)
+- Kai00 (simplified chinese)
+- we are looking for a japanese translator
 
 ***
-
-Website with music sheets made using this program: https://sky-music.github.io

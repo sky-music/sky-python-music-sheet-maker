@@ -1,8 +1,8 @@
-import io, re
-from . import song_renderer
+import io, re, datetime
+from . import song_renderer, ascii_sr
 from src.skymusic.renderers.instrument_renderers.html_ir import HtmlInstrumentRenderer
 from src.skymusic.resources import Resources
-from src.skymusic.modes import CSSMode
+from src.skymusic.modes import CSSMode, RenderMode
 
 class HtmlSongRenderer(song_renderer.SongRenderer):
 
@@ -20,8 +20,13 @@ class HtmlSongRenderer(song_renderer.SongRenderer):
 
         html_buffer.write(f'<!DOCTYPE html>'
                           f'\n<html xmlns:svg="http://www.w3.org/2000/svg" lang="{self.locale}">'
-                          f'\n<head>\n<meta charset="utf-8"/>'
-                          f"\n<title>{meta['title'][1]}</title>")
+                          )
+        utc_now = str(datetime.datetime.utcnow())
+        html_buffer.write(f'\n<head>'
+                          f'\n<meta charset="utf-8"/>'
+                          f'\n<meta name="date.created" content="{utc_now}"/>'
+                          f"\n<title>{meta['title'][1]}</title>"
+                          )
 
         html_buffer.write(f'\n<script type="text/javascript" src="{Resources.dark_mode_script_url}"></script>\n')
         
@@ -43,7 +48,7 @@ class HtmlSongRenderer(song_renderer.SongRenderer):
         elif css_mode == CSSMode.XML:
             html_buffer.write(f'\n<link href="{rel_css_path}" rel="stylesheet" />')
 
-        html_buffer.write(f'\n<meta charset="utf-8"/></head>'
+        html_buffer.write(f'</head>'
                           f'\n<body>\n'
                           )
                           
@@ -53,26 +58,34 @@ class HtmlSongRenderer(song_renderer.SongRenderer):
         for k in meta:
             if k != 'title':
                 html_buffer.write(f"\n<p><b>{meta[k][0]}</b>{meta[k][1]}</p>")
-
-        html_buffer.write('\n<div id="transcript">\n')
         
         return html_buffer
 
 
     def write_footer(self, html_buffer):
         
-        html_buffer.write('\n</div>'
-                          '\n</body>'
+        html_buffer.write('\n</body>'
                           '\n</html>')
        
         return html_buffer        
+
+    def write_ascii(self, html_buffer, song):
+        
+        ascii_buffers = ascii_sr.AsciiSongRenderer(self.locale).write_buffers(song, RenderMode.SKYASCII)
+        html_buffer.write('\n<div id="ascii" style="display:none;" hidden>')
+        for ascii_buffer in ascii_buffers:
+            html_buffer.write('\n'+ascii_buffer.getvalue())
+        html_buffer.write('\n</div>')       
 
 
     def write_buffers(self, song, css_mode=CSSMode.EMBED):    
         
         html_buffer = io.StringIO()
 
-        self.write_headers(html_buffer, song, css_mode)      
+        self.write_headers(html_buffer, song, css_mode)
+        self.write_ascii(html_buffer, song)
+
+        html_buffer.write('\n<div id="transcript">')
 
         song_render = ''
         instrument_index = 0
@@ -98,6 +111,7 @@ class HtmlSongRenderer(song_renderer.SongRenderer):
                 song_render += line_render
 
         html_buffer.write(song_render)
+        html_buffer.write('\n</div>')
 
         self.write_footer(html_buffer)
         

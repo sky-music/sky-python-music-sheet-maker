@@ -27,6 +27,9 @@ input_mode:
   sky:
     short_desc: 'Sky ABC1-5'
     long_desc: "Hệ kí tự dòng/cột trong Sky:\n   A1 A2 A3 A4 A5\n   B1 B2 B3 B4 B5\n   C1 C2 C3 C4 C5"
+  skyhtml:
+    short_desc: bảng nhạc trực quan HTML
+    long_desc: bảng nhạc trực quan HTML
   english:
     short_desc: Nốt nhạc trong Tiếng Anh CDEFGAB
     long_desc: "Nốt nhạc dạng C D E F G A B + biến tấu b/# + số quãng tám, VD: Cb4 D#4 E5 ..."
@@ -47,7 +50,7 @@ input_mode:
     long_desc: "Tệp bao gồm thời gian (ms) và thứ tự phím 0-14 để sử dụng trong ứng dụng SkyStudio và https://sky-music.herokuapp.com"
 render_mode:
   html:
-    short_desc: bảng nhạc trực quan HTML 
+    short_desc: bảng nhạc trực quan HTML
   svg:
     short_desc: bảng nhạc trực quan SVG
   png:
@@ -78,7 +81,7 @@ aspect_ratio:
 song_meta:
    title: Tiêu đề
    artist: Nghệ sĩ gốc
-   transcript: Người dịch
+   transcript: Arranger, Người dịch
    musical_key: Phím nhạc
    untitle: Không tên
 open_file: |
@@ -175,10 +178,10 @@ stock_queries:
     help_text: 'Nghệ sĩ gốc bao gồm nhà soạn nhạc, nghệ sĩ, người hát,...'
   transcript_writer:
     foreword:
-    question: Người thông dịch bài hát này là ai?
+    question: Who is the arranger? Người thông dịch bài hát này là ai?
     afterword:
     input_tip: Có thể nhập bất kì, bao gồm cả ô được để trống
-    help_text: 'Người dịch là người viết bài nhạc này, nó cũng có thể là bạn!'
+    help_text: 'The arranger is the musician who found the notes and chords that sound right in Sky. The transcriber is the person who wrote down the notes. It can be the same person: you maybe?'
   notes_file:
     foreword:
     question: 'Nhập, hoặc dán nốt vào, hoặc nhập tên tệp (trong thư mục {songs_in}/)'
@@ -303,3 +306,14 @@ stock_queries:
       https://sky-music.github.io/make-your-own-sheet.html (tiếng Anh)
     input_tip: Bấm OK để tiếp tục
     help_text:
+  empty_song:
+    foreword:
+    question: '*WARNING*: Your song is empty'
+    afterword: |
+      Please check the following:
+      
+      - You have entered at least one valid note
+      - If you entered an HTML visual sheet file, make sure it has been generated after the 1st July 2020 and contains the tag <div id='ascii' hidden>
+      
+    input_tip: click OK to acknowledge
+    help_text:  

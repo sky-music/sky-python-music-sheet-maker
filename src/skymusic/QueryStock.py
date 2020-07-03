@@ -294,5 +294,14 @@ def load(locale):
                              'input_tip': Lang.get_string("stock_queries/many_errors/input_tip", locale),
                              'help_text': Lang.get_string("stock_queries/many_errors/help_text", locale)
                              },
-        
-            }    
+                             
+            'empty_song': {'class': Information,
+                             'handler': 'None',
+                             'foreword': Lang.get_string("stock_queries/empty_song/foreword", locale),
+                             'question': Lang.get_string("stock_queries/empty_song/question", locale),
+                             'afterword': Lang.get_string("stock_queries/empty_song/afterword", locale),
+                             'input_tip': Lang.get_string("stock_queries/empty_song/input_tip", locale),
+                             'help_text': Lang.get_string("stock_queries/empty_song/help_text", locale)
+                             }
+                  
+            }

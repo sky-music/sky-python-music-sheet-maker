@@ -1,17 +1,17 @@
 # Translation by jmmelko
-# Only developer(s) can add new localization string to this translation.
+# Only developer(s) can add new localization strings to this translation.
 warnings:
-  jianpu_pause: "Jianpu notation is used: setting '0' as the pause character instead of '{pause}'. Please make sure your input follows this convention."
-  jianpu_quaver_delimiter: "Jianpu notation is used: setting '{jianpu_quaver_delimiter}' as the quaver delimiter instead of '{quaver_delimiter}'. Please make sure your input follows this convention."
+  jianpu_pause: "Notation Jianpu: j'utilise '0' pour marquer la pause au lieu de '{pause}'. Merci de respecter cette convention."
+  jianpu_quaver_delimiter: "Notation Jianpu: j'utilise '{jianpu_quaver_delimiter}' pour séparer les croches au lieu de '{quaver_delimiter}'. Merci de respecter cette convention."
 recipient_specifics:
   skip:
     command_line: laissez vide et tapez entrée
     music_cog: répondez avec un espace
-    sky_music_website: appuyez sur answer
+    sky_music_website: appuyez sur 'send answer'
   skip_number:
     command_line: laissez blanc ou '0' et tapez entrée
     music_cog: répondez avec un espace ou '0'
-    sky_music_website: appuyez sur answer
+    sky_music_website: appuyez sur 'send answer'
 input_mode:
   skykeyboard:
     short_desc: Clavier
@@ -19,6 +19,9 @@ input_mode:
   sky:
     short_desc: 'Sky ABC1-5'
     long_desc: "Notation ligne/colonne:\n   A1 A2 A3 A4 A5\n   B1 B2 B3 B4 B5\n   C1 C2 C3 C4 C5"
+  skyhtml:
+    short_desc: Portée visuelle en HTML
+    long_desc: Portée visuelle en HTML
   english:
     short_desc: Anglaise CDEFGAB
     long_desc: "Notation anglaise (note C D E F G A B + altération b/# + numéro d'octave, par exemple Cb4 D#4 E5 ...)"
@@ -58,19 +61,19 @@ render_mode:
     short_desc: Fichier texte en format traditionnel
 aspect_ratio:
   widescreen:
-    short_desc: Widescreen TV (16:9)
+    short_desc: Ecran cinéma (16:9)
   oldtv:
-    short_desc: Old TV (4:3)
+    short_desc: Vieille télé (4:3)
   square:
-    short_desc: Square (1:1)
+    short_desc: Carré (1:1)
   A4:
-    short_desc: A4 paper sheet (1:1.4)
+    short_desc: Feuille A4 (1:1.4)
   vertical_panel:
-    short_desc: Vertical panel (1:2)
+    short_desc: Panneau vertical (1:2)
 song_meta:
   title: Titre
   artist: Artiste(s) d'origine
-  transcript: Transcripteur
+  transcript: Arrangeur, transcripteur
   musical_key: Clef musicale
   untitled: Sans titre
 open_file: |
@@ -167,10 +170,10 @@ stock_queries:
     help_text: Les artistes incluent le compositeur, l'interprète, etc. Une réponse vide n'est pas acceptable.
   transcript_writer:
     foreword:
-    question: Qui est le transcripteur ?
+    question: Qui est l'arrangeur ? Qui est le transcripteur ?
     afterword:
     input_tip: 'texte facultatif, {skip} pour passer'
-    help_text: 'Le transcripteur est la personne qui a déchiffré la chanson. C''est peut-être vous!'
+    help_text: 'L'arrangeur est la personne qui a trouvé les bonnes notes ou accorss pour que la chanson sonne juste dans Sky. C''est peut-être vous!'
   notes_file:
     foreword:
     question: 'Tapez ou collez vos notes ci-dessous. Vous pouvez aussi entrer un nom de fichier texte contenant les notes (à placer dans {songs_in}/)'
@@ -187,10 +190,10 @@ stock_queries:
       - Les dièses "#" et les bémoles "b" (demi-tons) sont possibles pour les notations autres que Sky ABC-15.
   file:
     foreword:
-    question: 'Entrez un nom de fichier valide (dans {songs_in}/)'
+    question: 'Entrez un nom de fichier valide, rangé dans {songs_in}/ (sensible à la casse)'
     afterword:
     input_tip: un fichier texte contenant des notes de musique
-    help_text:
+    help_text: "We have detected that you are trying to open a file, but couldn't find it. Please check its name and that it is located in the {songs_in} directory. File names are case sensitive"
   notes:
     foreword:
     question: Merci de taper ou de coller vos notes de musique
@@ -295,4 +298,15 @@ stock_queries:
     
       https://sky-music.github.io/make-your-own-sheet.html
     input_tip: cliquez sur OK pour passer
+    help_text:
+  empty_song:
+    foreword:
+    question: '*WARNING*: Your song is empty'
+    afterword: |
+      Please check the following:
+      
+      - You have entered at least one valid note
+      - If you entered an HTML visual sheet file, make sure it has been generated after the 1st July 2020 and contains the tag <div id='ascii' hidden>
+      
+    input_tip: click OK to acknowledge
     help_text:
