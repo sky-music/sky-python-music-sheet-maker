@@ -1,5 +1,4 @@
 # Translation by jmmelko
-# Only developer(s) can add new localization strings to this translation.
 warnings:
   jianpu_pause: "Notation Jianpu: j'utilise '0' pour marquer la pause au lieu de '{pause}'. Merci de respecter cette convention."
   jianpu_quaver_delimiter: "Notation Jianpu: j'utilise '{jianpu_quaver_delimiter}' pour séparer les croches au lieu de '{quaver_delimiter}'. Merci de respecter cette convention."
@@ -12,6 +11,10 @@ recipient_specifics:
     command_line: laissez blanc ou '0' et tapez entrée
     music_cog: répondez avec un espace ou '0'
     sky_music_website: appuyez sur 'send answer'
+  all_modes:
+    command_line: tapez 'all' pour sélectionner tous les formats
+    music_cog:
+    sky_music_website:
 input_mode:
   skykeyboard:
     short_desc: Clavier
@@ -133,7 +136,7 @@ stock_queries:
       - Les dièses "#" et les bémoles "b" (demi-tons) sont possibles pour les notations autres que Sky ABC-15.
   render_modes:
     foreword:
-    question: Merci de choisir les formats d'exportation de la chanson
+    question: Merci de choisir les formats d'exportation de la chanson. {all_modes}
     afterword:
     input_tip: sélectionnez les différents choix. Ajoutez un format texte pour conserver les notes dans un format modifiable.
     help_text: |
@@ -173,7 +176,7 @@ stock_queries:
     question: Qui est l'arrangeur ? Qui est le transcripteur ?
     afterword:
     input_tip: 'texte facultatif, {skip} pour passer'
-    help_text: 'L'arrangeur est la personne qui a trouvé les bonnes notes ou accorss pour que la chanson sonne juste dans Sky. C''est peut-être vous!'
+    help_text: L'arrangeur est la personne qui a trouvé les bonnes notes ou accorss pour que la chanson sonne juste dans Sky. C'est peut-être vous!
   notes_file:
     foreword:
     question: 'Tapez ou collez vos notes ci-dessous. Vous pouvez aussi entrer un nom de fichier texte contenant les notes (à placer dans {songs_in}/)'

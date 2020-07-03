@@ -1,3 +1,4 @@
+# Translation by Kai00 03/07/2020
 warnings:
   jianpu_pause: "简谱模式使用中:设定 '0'代替{pause}。请确认您的输入遵守该条件。"
   jianpu_quaver_delimiter: "简谱模式使用中:设定 '{jianpu_quaver_delimiter}' 为八分音符链接符号 '{quaver_delimiter}'.请确认您的输入遵守该条件."
@@ -10,6 +11,10 @@ recipient_specifics:
     command_line: 留空或输入0 再按回车键
     music_cog: 用 - （中划键）回答或输入0
     sky_music_website: 按输入
+  all_modes:
+    command_line: Type 'all' to select all formats
+    music_cog:
+    sky_music_website:
 input_mode:
   skykeyboard:
     short_desc: 光遇游戏键盘

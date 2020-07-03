@@ -10,6 +10,10 @@ recipient_specifics:
     command_line: leave blank or 0 and type enter
     music_cog: answer with - (dash) or 0
     sky_music_website: press answer
+  all_modes:
+    command_line: Type 'all' to select all formats
+    music_cog:
+    sky_music_website:
 input_mode:
   skykeyboard:
     short_desc: Sky keyboard

@@ -20,6 +20,10 @@ recipient_specifics:
     command_line: bỏ trống hoặc nhập số 0 và bấm Enter
     music_cog: trả lời với phím Space hoặc số 0
     sky_music_website: bở trống hoặc nhập số 0 và bấm trả lời
+  all_modes:
+    command_line: Type 'all' to select all formats
+    music_cog:
+    sky_music_website:
 input_mode:
   skykeyboard:
     short_desc: Bàn phím Sky 
