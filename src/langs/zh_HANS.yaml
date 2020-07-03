@@ -71,7 +71,7 @@ aspect_ratio:
 song_meta:
   title: 歌名
   artist: 原著作家
-  transcript: Arranger, 编册作家
+  transcript: 编册作家
   musical_key: 曲调
   untitled: Untitled
 open_file: |
@@ -171,10 +171,10 @@ stock_queries:
     help_text: 原著作家包括作曲家、歌手、等等。请无留空！
   transcript_writer:
     foreword:
-    question: Who is the arranger? 编册作家名称
+    question:  编册作家名称
     afterword:
     input_tip: '任何字或词, {skip} 跳过'
-    help_text: 'The arranger is the musician who found the notes and chords that sound right in Sky. The transcriber is the person who wrote down the notes. It can be the same person: you maybe?'
+    help_text: '编册作家是把该歌曲编册为此乐谱的人。那个人也可以是您哟！'
   notes_file:
     foreword:
     question: '请输入或者复制音符，粘贴到以下格子。您也可以输入含有音符的文字档名称 (在 {songs_in}/)'
@@ -303,12 +303,11 @@ stock_queries:
     help_text:
   empty_song:
     foreword:
-    question: '*WARNING*: Your song is empty'
+    question: '*警告*: 您输入了空白的乐谱'
     afterword: |
-      Please check the following:
+      请检查以下几点：
+      - 您输入了至少一个可通的音符
+      - 如果您输入了HTML乐谱文件，请确保文件是于2020年7月1号之后生成以及含有此代码：<div id='ascii' hidden>
       
-      - You have entered at least one valid note
-      - If you entered an HTML visual sheet file, make sure it has been generated after the 1st July 2020 and contains the tag <div id='ascii' hidden>
-      
-    input_tip: click OK to acknowledge
+    input_tip: 按 OK 确认
     help_text:

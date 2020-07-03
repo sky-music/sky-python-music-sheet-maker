@@ -18,8 +18,8 @@ notes_file: | # ... OR song notes, left indent of 4 spaces
     # I'll # give # it # to # some - # one # spe - # cial
     D2 EAC#2 D2 D2 C#2 D2 C#2 A
 notes: #This question must be answered with a blank for complete automation
-musical_notation: ENGLISH # An input_mode short name among SKY, SKYKEYBOARD, ENGLISH, JIANPU, DOREMI, DOREMIJP, ENGLISHCHORDS
+musical_notation: ENGLISH # An input_mode short name among SKY, SKYKEYBOARD, ENGLISH, JIANPU, DOREMI, DOREMIJP, ENGLISHCHORDS, SKYHTML
 song_title: Last Christmas # song title
 recommended_key: C # The key in case your notation does not use octaves
 original_artist: Popular # Artist name
-transcript_writer: me # Person who transcribed the notes
+transcript_writer: me # Persons who arranged and transcribed the notes
