@@ -2,7 +2,8 @@
 
 ## NOTICE:
 
-This program is not being actively maintained by Tracey. Feel free to take the code/ideas and build upon it.
+This program is not being actively maintained by its creator, Tracey. Feel free to take the code/ideas and build upon it.
+In the meantime you can request help from jmmelko
 
 ***
 
@@ -36,11 +37,13 @@ The output will be HTML, with small icons of the Sky keyboard. If you use Wester
 **Co-authors:** Tracey L, jmmelko
 
 SVG icons are thanks to [madwurmz](http://madwurmz.com).
+Advices taken from Specy, Jurassimok, Skyventuree
 
 **Translators:**
 
 - jdewfiez (Vietnamese)
 - jmmelko (French)
+- kai00 (Chinese)
 
 ***
 
