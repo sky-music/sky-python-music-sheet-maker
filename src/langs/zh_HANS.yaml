@@ -37,7 +37,7 @@ input_mode:
     long_desc: "日语 do re mi: ド、ド#／レb、レ、レ#／ミb、ミ、ファ、ファ#／ソb、ソ、ソ#／ラb、ラ、ラ#／シb、シ"
   skyjson:
     short_desc: 'Sky-Music recording/光遇音乐录音 (JSON 格式)'
-    long_desc: " 'SkyStudio app' 或 https://sky-music.herokuapp.com" 使用的文件。该文件需有时间标志 (ms) 和软件中使用的 0-14 数字
+    long_desc: 'SkyStudio app 或 https://sky-music.herokuapp.com 使用的文件。该文件需有时间标志 (ms) 和软件中使用的 0-14 数字'
 render_mode:
   html:
     short_desc: HTML 乐谱
@@ -300,4 +300,15 @@ stock_queries:
       
       https://sky-music.github.io/make-your-own-sheet.html
     input_tip: 按 OK 确认
+    help_text:
+  empty_song:
+    foreword:
+    question: '*WARNING*: Your song is empty'
+    afterword: |
+      Please check the following:
+      
+      - You have entered at least one valid note
+      - If you entered an HTML visual sheet file, make sure it has been generated after the 1st July 2020 and contains the tag <div id='ascii' hidden>
+      
+    input_tip: click OK to acknowledge
     help_text:

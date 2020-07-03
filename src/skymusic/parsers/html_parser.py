@@ -62,10 +62,14 @@ class HtmlSongParser(html.parser.HTMLParser):
                 self.feed(line)
             if self.finished:
                 break
-                
-        song_lines = self.ascii.strip().split(os.linesep)     
-        headers_skip = len(Song().get_meta())
-        return song_lines[headers_skip:]
+        
+        self.ascii = self.ascii.strip()
+        if not self.ascii:
+            return []
+        else:
+            song_lines = self.ascii.split(os.linesep)     
+            headers_skip = len(Song().get_meta())
+            return song_lines[headers_skip:]
 
     def handle_decl(self, decl):
         

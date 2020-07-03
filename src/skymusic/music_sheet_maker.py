@@ -604,6 +604,10 @@ class MusicSheetMaker:
             i_error = self.communicator.send_stock_query('many_errors', recipient=recipient,
                                                          prerequisites=prerequisites)
 
+        if len(self.get_song()) == 0:
+            i_error = self.communicator.send_stock_query('empty_song', recipient=recipient,
+                                                         prerequisites=prerequisites)
+
         if execute and i_error is not None:
             recipient.execute_queries(i_error)
             error_message = i_error.get_reply().get_result()

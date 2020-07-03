@@ -306,3 +306,14 @@ stock_queries:
       https://sky-music.github.io/make-your-own-sheet.html (tiếng Anh)
     input_tip: Bấm OK để tiếp tục
     help_text:
+  empty_song:
+    foreword:
+    question: '*WARNING*: Your song is empty'
+    afterword: |
+      Please check the following:
+      
+      - You have entered at least one valid note
+      - If you entered an HTML visual sheet file, make sure it has been generated after the 1st July 2020 and contains the tag <div id='ascii' hidden>
+      
+    input_tip: click OK to acknowledge
+    help_text:  

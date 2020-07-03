@@ -30,6 +30,7 @@ def check_locale(locale):
 
 
 def guess_locale():
+    return 'zh_HANS'
     try:
         import ctypes
         windll = ctypes.windll.kernel32
