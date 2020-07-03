@@ -1,4 +1,4 @@
-import io, re
+import io, re, datetime
 from . import song_renderer, ascii_sr
 from src.skymusic.renderers.instrument_renderers.html_ir import HtmlInstrumentRenderer
 from src.skymusic.resources import Resources
@@ -20,8 +20,13 @@ class HtmlSongRenderer(song_renderer.SongRenderer):
 
         html_buffer.write(f'<!DOCTYPE html>'
                           f'\n<html xmlns:svg="http://www.w3.org/2000/svg" lang="{self.locale}">'
-                          f'\n<head>\n<meta charset="utf-8"/>'
-                          f"\n<title>{meta['title'][1]}</title>")
+                          )
+        utc_now = str(datetime.datetime.utcnow())
+        html_buffer.write(f'\n<head>'
+                          f'\n<meta charset="utf-8"/>'
+                          f'\n<meta name="date.created" content="{utc_now}"/>'
+                          f"\n<title>{meta['title'][1]}</title>"
+                          )
 
         html_buffer.write(f'\n<script type="text/javascript" src="{Resources.dark_mode_script_url}"></script>\n')
         
@@ -43,7 +48,7 @@ class HtmlSongRenderer(song_renderer.SongRenderer):
         elif css_mode == CSSMode.XML:
             html_buffer.write(f'\n<link href="{rel_css_path}" rel="stylesheet" />')
 
-        html_buffer.write(f'\n<meta charset="utf-8"/></head>'
+        html_buffer.write(f'</head>'
                           f'\n<body>\n'
                           )
                           
@@ -80,7 +85,7 @@ class HtmlSongRenderer(song_renderer.SongRenderer):
         self.write_headers(html_buffer, song, css_mode)
         self.write_ascii(html_buffer, song)
 
-        html_buffer.write('\n<div id="transcript">\n')
+        html_buffer.write('\n<div id="transcript">')
 
         song_render = ''
         instrument_index = 0
