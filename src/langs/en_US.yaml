@@ -71,7 +71,7 @@ aspect_ratio:
 song_meta:
   title: Title
   artist: Original artist(s)
-  transcript: Transcript writer
+  transcript: Arranger, Transcriber
   musical_key: Musical key
   untitled: Untitled
 open_file: |
@@ -171,10 +171,10 @@ stock_queries:
     help_text: Original artists include the composer, musician, singer, etc. An empty answer is NOT allowed.
   transcript_writer:
     foreword:
-    question: What is the transcript writer?
+    question: Who is the arranger? Who is the transcriber?
     afterword:
     input_tip: 'any text, {skip} to skip'
-    help_text: 'The transcript writer is the person who found the notes you typed earlier. It could be yourself!'
+    help_text: 'The arranger is the musician who found the notes and chords that sound right in Sky. The transcriber is the person who wrote down the notes. It can be the same person: you maybe?'
   notes_file:
     foreword:
     question: 'Type or copy-paste notes below. You can also enter a text file name containing the notes (in {songs_in}/)'

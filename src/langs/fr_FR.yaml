@@ -73,7 +73,7 @@ aspect_ratio:
 song_meta:
   title: Titre
   artist: Artiste(s) d'origine
-  transcript: Transcripteur
+  transcript: Arrangeur, transcripteur
   musical_key: Clef musicale
   untitled: Sans titre
 open_file: |
@@ -170,10 +170,10 @@ stock_queries:
     help_text: Les artistes incluent le compositeur, l'interprète, etc. Une réponse vide n'est pas acceptable.
   transcript_writer:
     foreword:
-    question: Qui est le transcripteur ?
+    question: Qui est l'arrangeur ? Qui est le transcripteur ?
     afterword:
     input_tip: 'texte facultatif, {skip} pour passer'
-    help_text: 'Le transcripteur est la personne qui a déchiffré la chanson. C''est peut-être vous!'
+    help_text: 'L'arrangeur est la personne qui a trouvé les bonnes notes ou accorss pour que la chanson sonne juste dans Sky. C''est peut-être vous!'
   notes_file:
     foreword:
     question: 'Tapez ou collez vos notes ci-dessous. Vous pouvez aussi entrer un nom de fichier texte contenant les notes (à placer dans {songs_in}/)'

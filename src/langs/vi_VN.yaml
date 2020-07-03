@@ -81,7 +81,7 @@ aspect_ratio:
 song_meta:
    title: Tiêu đề
    artist: Nghệ sĩ gốc
-   transcript: Người dịch
+   transcript: Arranger, Người dịch
    musical_key: Phím nhạc
    untitle: Không tên
 open_file: |
@@ -178,10 +178,10 @@ stock_queries:
     help_text: 'Nghệ sĩ gốc bao gồm nhà soạn nhạc, nghệ sĩ, người hát,...'
   transcript_writer:
     foreword:
-    question: Người thông dịch bài hát này là ai?
+    question: Who is the arranger? Người thông dịch bài hát này là ai?
     afterword:
     input_tip: Có thể nhập bất kì, bao gồm cả ô được để trống
-    help_text: 'Người dịch là người viết bài nhạc này, nó cũng có thể là bạn!'
+    help_text: 'The arranger is the musician who found the notes and chords that sound right in Sky. The transcriber is the person who wrote down the notes. It can be the same person: you maybe?'
   notes_file:
     foreword:
     question: 'Nhập, hoặc dán nốt vào, hoặc nhập tên tệp (trong thư mục {songs_in}/)'
