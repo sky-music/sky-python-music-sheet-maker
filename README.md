@@ -57,6 +57,7 @@ The command-line version supports functions for faster processing of several son
 **Co-authors:** Tracey L, jmmelko
 
 SVG icons are thanks to [madwurmz](http://madwurmz.com).
+Advices taken from Specy, Jurassimok, Skyventuree
 
 **Re-use and branching:**
 

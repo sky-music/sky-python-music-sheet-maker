@@ -214,7 +214,7 @@ class PngSongRenderer(song_renderer.SongRenderer):
 
             # Creating a new instrument image, starting at x=0 (in line) and y=0 (in line)
             if min([ncols, self.maxIconsPerLine])*(self.png_harp_size[0] + self.png_harp_spacings[0]) > self.png_line_width:
-                nsublines_predict = 1
+                nsublines_predict = 1 # changed
             else:
                 nsublines_predict = 1
             sub_line = 0
