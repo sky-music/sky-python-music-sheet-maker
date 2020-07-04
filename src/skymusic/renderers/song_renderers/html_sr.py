@@ -1,4 +1,4 @@
-import io, re, datetime
+import io, datetime
 from . import song_renderer, ascii_sr
 from src.skymusic.renderers.instrument_renderers.html_ir import HtmlInstrumentRenderer
 from src.skymusic.resources import Resources
@@ -15,8 +15,7 @@ class HtmlSongRenderer(song_renderer.SongRenderer):
         
         meta = song.get_meta()
         rel_css_path = Resources.rel_css_path
-        nav_js_buffer = Resources.nav_js_buffer
-        nav_html_buffer = Resources.nav_html_buffer
+        script_buffers = Resources.script_buffers
 
         html_buffer.write(f'<!DOCTYPE html>'
                           f'\n<html xmlns:svg="http://www.w3.org/2000/svg" lang="{self.locale}">'
@@ -27,14 +26,15 @@ class HtmlSongRenderer(song_renderer.SongRenderer):
                           f'\n<meta name="date.created" content="{utc_now}"/>'
                           f"\n<title>{meta['title'][1]}</title>"
                           )
-
-        html_buffer.write(f'\n<script type="text/javascript" src="{Resources.dark_mode_script_url}"></script>\n')
+        # Includes links to javascript that only appear online @ sky-music.github.io
+        for script_url in Resources.online_scripts_urls:
+            html_buffer.write(f'\n<script type="text/javascript" src="{script_url}"></script>')
         
-        nav_js_value = nav_js_buffer.getvalue().replace('{SKY_MUSIC_URL}', re.escape(Resources.SKY_MUSIC_URL))
-
-        html_buffer.write('\n<script type="text/javascript">\n')
-        html_buffer.write(nav_js_value)
-        html_buffer.write('</script>')
+        # Includes javascripts that can be run offline
+        for script_buffer in script_buffers:
+            html_buffer.write('\n<script type="text/javascript">\n')
+            html_buffer.write(script_buffer.getvalue())
+            html_buffer.write('</script>')
 
         if css_mode == CSSMode.EMBED:
             html_buffer.write('\n<style type="text/css">\n')
@@ -51,8 +51,7 @@ class HtmlSongRenderer(song_renderer.SongRenderer):
         html_buffer.write(f'</head>'
                           f'\n<body>\n'
                           )
-                          
-        html_buffer.write(nav_html_buffer.getvalue())
+                
         html_buffer.write(f"<h1>{meta['title'][1]}</h1>")
 
         for k in meta:

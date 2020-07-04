@@ -20,6 +20,10 @@ recipient_specifics:
     command_line: bỏ trống hoặc nhập số 0 và bấm Enter
     music_cog: trả lời với phím Space hoặc số 0
     sky_music_website: bở trống hoặc nhập số 0 và bấm trả lời
+  all_modes:
+    command_line: nhập các lựa chọn đặc cách nhau bởi dấu phẩy, or 'all' to select all formats
+    music_cog:
+    sky_music_website:
 input_mode:
   skykeyboard:
     short_desc: Bàn phím Sky 
@@ -47,7 +51,7 @@ input_mode:
     long_desc: "Do re mi Nhật Bản: ド、ド#／レb、レ、レ#／ミb、ミ、ファ、ファ#／ソb、ソ、ソ#／ラb、ラ、ラ#／シb、シ"
   skyjson:
     short_desc: 'Bản ghi âm nhạc trên Sky (tệp văn bản JSON)'
-    long_desc: "Tệp bao gồm thời gian (ms) và thứ tự phím 0-14 để sử dụng trong ứng dụng SkyStudio và https://sky-music.herokuapp.com"
+    long_desc: "Tệp bao gồm thời gian (ms) và thứ tự phím 0-14 để sử dụng trong ứng dụng SkyStudio và <https://sky-music.herokuapp.com>"
 render_mode:
   html:
     short_desc: bảng nhạc trực quan HTML
@@ -141,15 +145,13 @@ stock_queries:
       - Dấu thăng "#" và dấu giáng "b" (nửa cung) được hỗ trợ cho hệ kí tự Phương Tây và Jianpu.
   render_modes:
     foreword:
-    question: Hãy chọn các định dạng xuất bản đầu ra (rendering formats) 
+    question: Hãy chọn các định dạng xuất bản đầu ra (rendering formats). {all_modes}
     afterword:
     input_tip: Chọn một hoặc nhiều hộp thoại. Add a text format to edit your song notes later.
     help_text: |
       Bảng nhạc trực quan có thể xuất ra thành nhiều định dạng.
       Hãy chọn những tùy chọn bạn muốn.
-      Tệp văn bản có thể chỉnh sửa và cho vào phần mềm lại.
-      Trên dải lệnh, nhập các lựa chọn đặc cách nhau bởi dấu phẩy, ví dụ như 0, 1, 3
-      Trên trang web, hãy chọn vào các ô.
+      Tệp văn bản có thể chỉnh sửa và cho vào phần mềm lại. {all_modes}
   aspect_ratio:
     foreword: Cứ mặc định, bảng nhạc trực quan là ảnh ngang với tỉ lệ 16:9.
     question: 'Hãy chọn một tỉ lệ khác trong danh sách, hoặc {skip_number} để bỏ qua'
@@ -303,7 +305,7 @@ stock_queries:
       - Tất cả các nốt nhạc phải ở từ 1 đến 3 quãng tám. Nếu không, hãy thử lại với nốt quãng tám.
       - In Jianpu, pauses are indicated by '0' (zero)
       - Bài hát của bạn không có lỗi chính tả. Vui lòng xem hướng dẫn đầy đủ ở trang web này: 
-      https://sky-music.github.io/make-your-own-sheet.html (tiếng Anh)
+      <https://sky-music.github.io/make-your-own-sheet.html> (tiếng Anh)
     input_tip: Bấm OK để tiếp tục
     help_text:
   empty_song:

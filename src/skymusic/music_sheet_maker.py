@@ -671,8 +671,10 @@ class MusicSheetMaker:
 
         else:
 
+            replacements = {'all_modes': Lang.get_string(f"recipient_specifics/all_modes/{recipient.get_name()}", self.locale)}
+
             q_render = self.communicator.send_stock_query('render_modes', recipient=recipient, limits=render_modes,
-                                                          prerequisites=prerequisites)
+                                                          replacements=replacements, prerequisites=prerequisites)
 
             if execute:
                 recipient.execute_queries(q_render)

@@ -158,7 +158,6 @@ class SvgSongRenderer(song_renderer.SongRenderer):
 
                 y += self.SVG_harp_size[1] + self.SVG_harp_spacings[1] / 2.0
 
-
             line_render = ''
             sub_line = 0
             x = 0
@@ -167,21 +166,8 @@ class SvgSongRenderer(song_renderer.SongRenderer):
                 instrument = song.get_instrument(row, col)
                 instrument.set_index(instrument_index)
 
-                #NEW
-                if linetype.lower().strip() == 'voice':
-                    ypredict = y + ysong + (self.SVG_text_height + self.SVG_harp_spacings[1] / 2.0) + self.SVG_harp_spacings[1] / 2.0                
-                else:
-                    ypredict = y + ysong + (self.SVG_harp_size[1] + self.SVG_harp_spacings[1]) + self.SVG_harp_spacings[1] / 2.0
-
-                if ypredict > (self.SVG_viewPort[3] - self.SVG_viewPortMargins[1]):
-                    page_break = True
-                    end_col = col
-                    break
-
-
                 # Creating a new line if max number is exceeded
-                if (int(1.0 * (col-start_col+1) / self.maxIconsPerLine) - sub_line) > 0:
-
+                if (int(1.0 * (col-start_col) / self.maxIconsPerLine) - sub_line) > 0:
                     
                     # Closing previous instrument-line
                     line_render += '\n</svg>'
@@ -202,6 +188,16 @@ class SvgSongRenderer(song_renderer.SongRenderer):
                                         )
 
                         y += self.SVG_harp_size[1] + self.SVG_harp_spacings[1] / 2.0
+
+                #NEW
+                if linetype.lower().strip() == 'voice':
+                    ypredict = y + ysong
+                else:
+                    ypredict = y + ysong
+                if ypredict > (self.SVG_viewPort[3] - self.SVG_viewPortMargins[1]):
+                    page_break = True
+                    end_col = col
+                    break
 
                 # INSTRUMENT RENDER
                 instrument_render = instrument_renderer.render(instrument, x, f"{(100.0 * self.SVG_harp_size[0] / self.SVG_line_width) :.2f}%", "100%", self.harp_AspectRatio)

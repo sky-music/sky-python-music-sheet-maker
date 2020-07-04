@@ -4,7 +4,7 @@ try:
     from importlib import resources as importlib_resources
 except ImportError:
     import importlib_resources
-from src.skymusic.resources import fonts, elements, css, js, html
+from src.skymusic.resources import fonts, elements, css, js
 
 A_root_png = io.BytesIO(importlib_resources.read_binary(elements, 'A-root.png'))
 A_diamond_png = io.BytesIO(importlib_resources.read_binary(elements, 'A-diamond.png'))
@@ -51,21 +51,26 @@ except FileNotFoundError:
     print(f"\n***ERROR: could not find common.css file to embed it.\n")
     common_css_buffer = io.StringIO()
 
+'''
 try:
     nav_html_buffer = io.StringIO(importlib_resources.read_text(html, 'navigation.html'))
 except FileNotFoundError:
     print(f"\n***WARNING: could not find html navigation file to embed it in HTML.\n")
     nav_html_buffer = io.StringIO()
-
-try:
-    nav_js_buffer = io.StringIO(importlib_resources.read_text(js, 'navigation.js'))
-except FileNotFoundError:
-    print(f"\n***WARNING: could not find javascript navigation file to embed it in HTML.\n")
-    nav_js_buffer = io.StringIO()
+'''
     
 rel_css_path = '../css/main.css'
-SKY_MUSIC_URL = 'sky-music.github.io'
-dark_mode_script_url = '/js/sheetDarkModeScript.js'
+offline_scripts_urls = []
+online_scripts_urls = ['/js/navigationTableScript.js', '/js/sheetDarkModeScript.js', '/js/sheetDownloadScript.js']
+
+script_buffers = []
+for script in offline_scripts_urls:
+    try:
+        script_buffers.append(io.StringIO(importlib_resources.read_text(js, script)))
+    except FileNotFoundError:
+        print(f"\n***WARNING: could not find javascript {script} file to embed it in HTML.\n")
+        script_buffers.append(io.StringIO())
+    
 
 harp_font_size = 38
 voice_font_size = 32
