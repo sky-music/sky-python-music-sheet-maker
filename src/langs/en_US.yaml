@@ -38,7 +38,7 @@ input_mode:
     long_desc: "Japanese do re mi: ド、ド#／レb、レ、レ#／ミb、ミ、ファ、ファ#／ソb、ソ、ソ#／ラb、ラ、ラ#／シb、シ"
   skyjson:
     short_desc: Sky-Music recording (JSON text)
-    long_desc: "Dictionary with time in ms and key number 0-14 used by SkyStudio app and https://sky-music.herokuapp.com"
+    long_desc: "Dictionary with time in ms and key number 0-14 used by SkyStudio app and <https://sky-music.herokuapp.com>"
   skyhtml:
     short_desc: HTML visual sheet
     long_desc: HTML visual sheet
@@ -301,7 +301,7 @@ stock_queries:
       - In Jianpu, pauses are indicated by '0' (zero)
       - Your song is free of typos. Please check this website for full instructions: 
       
-      https://sky-music.github.io/make-your-own-sheet.html
+      <https://sky-music.github.io/make-your-own-sheet.html>
     input_tip: click OK to acknowledge
     help_text:
   empty_song:

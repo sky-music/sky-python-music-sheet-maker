@@ -42,7 +42,7 @@ input_mode:
     long_desc: "do re mi en japonais: ド、ド#／レb、レ、レ#／ミb、ミ、ファ、ファ#／ソb、ソ、ソ#／ラb、ラ、ラ#／シb、シ"
   skyjson:
     short_desc: 'Enregistrement Sky-Music  (JSON text)'
-    long_desc: "Dictionaire avec le temps en ms et la touche 0-14 comme sur l'app SkyStudio et https://sky-music.herokuapp.com"
+    long_desc: "Dictionaire avec le temps en ms et la touche 0-14 comme sur l'app SkyStudio et <https://sky-music.herokuapp.com>"
 render_mode:
   html:
     short_desc: partition graphique en HTML
@@ -297,7 +297,7 @@ stock_queries:
       - En notation Jianpu, les pauses sont marquées par '0' (zéro)
       - Que votre chanson ne contient pas d'erreur de frappe. Veuillez consulter ce site web pour plus d'infos: 
     
-      https://sky-music.github.io/make-your-own-sheet.html
+      <https://sky-music.github.io/make-your-own-sheet.html>
     input_tip: cliquez sur OK pour passer
     help_text:
   empty_song:
