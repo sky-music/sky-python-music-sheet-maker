@@ -15,7 +15,6 @@ class HtmlSongRenderer(song_renderer.SongRenderer):
         
         meta = song.get_meta()
         rel_css_path = Resources.rel_css_path
-        nav_html_buffer = Resources.nav_html_buffer
         script_buffers = Resources.script_buffers
 
         html_buffer.write(f'<!DOCTYPE html>'
@@ -52,10 +51,7 @@ class HtmlSongRenderer(song_renderer.SongRenderer):
         html_buffer.write(f'</head>'
                           f'\n<body>\n'
                           )
-        
-        # Includes html code for the navigation bar of sky-music.github.io                  
-        html_buffer.write(nav_html_buffer.getvalue())
-        
+                
         html_buffer.write(f"<h1>{meta['title'][1]}</h1>")
 
         for k in meta:
