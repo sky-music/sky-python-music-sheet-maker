@@ -746,11 +746,16 @@ class MusicSheetMaker:
         if self.is_command_line(recipient):
             print("=" * 40)
 
+        if self.is_music_cog(recipient):
+            theme = 'dark'
+        else:
+            theme = Resources.get_default_theme()
+
         song_bundle = SongBundle()
         song_bundle.set_meta(self.get_song().get_meta())
 
         for render_mode in render_modes:
-            buffers = self.get_song().render(render_mode=render_mode, aspect_ratio=aspect_ratio, song_bpm=song_bpm, css_mode=self.css_mode)  # A list of IOString or IOBytes buffers
+            buffers = self.get_song().render(render_mode=render_mode, aspect_ratio=aspect_ratio, song_bpm=song_bpm, css_mode=self.css_mode, theme=theme)  # A list of IOString or IOBytes buffers
             
             if buffers is not None:
                 song_bundle.add_render(render_mode, buffers)

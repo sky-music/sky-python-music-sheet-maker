@@ -115,7 +115,7 @@ class Song():
         elif render_mode == RenderMode.SVG:
             buffers = svg_sr.SvgSongRenderer(self.locale, aspect_ratio).write_buffers(song=self, css_mode=kwargs['css_mode'])
         elif render_mode == RenderMode.PNG:
-            buffers = png_sr.PngSongRenderer(self.locale, aspect_ratio).write_buffers(song=self)
+            buffers = png_sr.PngSongRenderer(self.locale, aspect_ratio, theme=kwargs['theme']).write_buffers(song=self)
         elif render_mode == RenderMode.MIDI:
             buffers = midi_sr.MidiSongRenderer(self.locale, kwargs['song_bpm']).write_buffers(song=self)
         elif render_mode == RenderMode.SKYJSON:

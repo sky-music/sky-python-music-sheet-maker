@@ -1,32 +1,44 @@
 # -*- coding: utf-8 -*-
-import io, os
+import io, os, importlib
 try:
     from importlib import resources as importlib_resources
 except ImportError:
     import importlib_resources
+
 from src.skymusic.resources import fonts, elements, css, js
 
-A_root_png = io.BytesIO(importlib_resources.read_binary(elements, 'A-root.png'))
-A_diamond_png = io.BytesIO(importlib_resources.read_binary(elements, 'A-diamond.png'))
-A_circle_png = io.BytesIO(importlib_resources.read_binary(elements, 'A-circle.png'))
-B_root_png = io.BytesIO(importlib_resources.read_binary(elements, 'B-root.png'))
-B_diamond_png = io.BytesIO(importlib_resources.read_binary(elements, 'B-diamond.png'))
-B_circle_png = io.BytesIO(importlib_resources.read_binary(elements, 'B-circle.png'))
-C_root_png = io.BytesIO(importlib_resources.read_binary(elements, 'C-root.png'))
-C_diamond_png = io.BytesIO(importlib_resources.read_binary(elements, 'C-diamond.png'))
-C_circle_png = io.BytesIO(importlib_resources.read_binary(elements, 'C-circle.png'))
-dead_png = io.BytesIO(importlib_resources.read_binary(elements, 'dead-note.png'))
-A_unhighlighted_png = io.BytesIO(importlib_resources.read_binary(elements, 'A-unhighlighted.png'))   
-B_unhighlighted_png = io.BytesIO(importlib_resources.read_binary(elements, 'B-unhighlighted.png'))   
-C_unhighlighted_png = io.BytesIO(importlib_resources.read_binary(elements, 'C-unhighlighted.png'))
-root_highlighted_pngs = [io.BytesIO(importlib_resources.read_binary(elements, 'root-highlighted-' + str(i) + '.png')) for i in range(1, 8)]
-diamond_highlighted_pngs = [io.BytesIO(importlib_resources.read_binary(elements, 'diamond-highlighted-' + str(i) + '.png')) for i in range(1, 8)]
-circle_highlighted_pngs = [io.BytesIO(importlib_resources.read_binary(elements, 'circle-highlighted-' + str(i) + '.png')) for i in range(1, 8)]
+THEMES = {'light': False, 'dark': False}
 
-empty_chord_png = io.BytesIO(importlib_resources.read_binary(elements, 'empty-chord.png'))  # blank harp
-unhighlighted_chord_png = io.BytesIO(importlib_resources.read_binary(elements, 'unhighlighted-chord.png'))  # harp with unhighlighted notes
-broken_png = io.BytesIO(importlib_resources.read_binary(elements, 'broken-symbol.png'))
-silent_png = io.BytesIO(importlib_resources.read_binary(elements, 'silent-symbol.png'))
+PNGS = dict()
+
+font_color = (0, 0, 0)
+png_color = (255, 255, 255)
+text_bkg = (255, 255, 255, 0)  # Transparent white
+song_bkg = (255, 255, 255)  # White paper sheet
+
+def get_default_theme():
+    return list(THEMES)[0]
+
+def load_theme(theme):
+    global PNGS
+    global font_color, png_color, text_bkg, song_bkg
+    if theme not in THEMES:
+        load_theme(get_default_theme())
+    else:
+        theme_module = importlib.import_module('.'+theme, 'src.skymusic.resources.elements')
+        THEMES[theme] = True
+        
+        resources_names = importlib_resources.contents(theme_module)
+        
+        for name in resources_names:
+            PNGS[os.path.splitext(name)[0]] =  io.BytesIO(importlib_resources.read_binary(theme_module, name))
+        
+        if theme == 'dark':
+            font_color = (255, 255, 255)   #Discord colors
+            png_color = (54, 57, 63)
+            text_bkg = (54, 57, 63, 0)  # Transparent dark
+            song_bkg = (54, 57, 63)  # White paper sheet
+        
 
 with importlib_resources.path(fonts, 'NotoSansCJKjp-Regular.otf') as fp:
     font_path = str(fp)
@@ -99,3 +111,4 @@ DEFAULT_KEY = 'C'
 
 MIDI_PITCHES = {'C': 60, 'C#': 61, 'Db': 61, 'D': 62, 'D#': 63, 'Eb': 63, 'E': 64, 'F': 65, 'F#': 66, 'Gb': 66, 'G': 67, 'G#': 68, 'Ab': 68, 'A': 69, 'A#': 70, 'Bb': 70, 'B': 71}
 MIDI_SEMITONES = [0, 2, 4, 5, 7, 9, 11]  # May no longer be used when Western_scales is merged
+
