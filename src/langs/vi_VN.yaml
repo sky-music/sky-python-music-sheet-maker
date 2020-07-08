@@ -85,7 +85,7 @@ aspect_ratio:
 song_meta:
    title: Tiêu đề
    artist: Nghệ sĩ gốc
-   transcript: Arranger, Người dịch
+   transcript: Người sắp xếp, Người dịch
    musical_key: Phím nhạc
    untitle: Không tên
 open_file: |
@@ -93,7 +93,7 @@ open_file: |
 stock_queries:
   instructions_command_line:
     foreword: "===== BẢNG NHẠC TRỰC QUAN CHO TỰA GAME: SKY: CHILDREN OF THE LIGHT =====\n"
-    question: |      
+    question: |
       Dạng nốt nhạc được chấp nhận: {input_modes}
     
       - Khi viết hợp âm phải dính các phím lại với nhau (VD: A1B1C1).
@@ -111,7 +111,7 @@ stock_queries:
     help_text:
   instructions_sky_music_website:
     foreword:
-    question: |      
+    question: |
       Dạng nốt nhạc được chấp nhận: {input_modes}
     
       - Khi viết hợp âm phải dính các phím lại với nhau (VD: A1B1C1).
@@ -180,10 +180,10 @@ stock_queries:
     help_text: 'Nghệ sĩ gốc bao gồm nhà soạn nhạc, nghệ sĩ, người hát,...'
   transcript_writer:
     foreword:
-    question: Who is the arranger? Người thông dịch bài hát này là ai?
+    question: Người thông dịch/sắp xếp bài hát này là ai?
     afterword:
     input_tip: Có thể nhập bất kì, bao gồm cả ô được để trống
-    help_text: 'The arranger is the musician who found the notes and chords that sound right in Sky. The transcriber is the person who wrote down the notes. It can be the same person: you maybe?'
+    help_text: 'Người sắp xếp là người nhạc sĩ đã tìm các nốt và hợp âm nghe hợp lí trong Sky. Người thông dịch là người đã viết bản nhạc này. Nó cũng có thể là cùng một người: có thể là bạn?'
   notes_file:
     foreword:
     question: 'Nhập, hoặc dán nốt vào, hoặc nhập tên tệp (trong thư mục {songs_in}/)'
@@ -229,7 +229,8 @@ stock_queries:
     foreword: Dù đã cố gắng nhưng tôi không thể đoán được hệ kí tự nốt bạn đang sử dụng.
     question: Hãy chọn dạng hệ kí tự mà bạn đang sử dụng
     afterword:
-    input_tip: Unique choice button
+    input_tip: Kiểu chọn nút độc đáo 
+    # not accurate
     help_text: |
       Trong câu hỏi trước, bạn đã nhập nốt nhạc của bạn. Tôi đã cố đoán hệ kí tự bạn đang sử dụng.
       Dù đã cố gắng như nó có vẻ còn mơ hồ. Hãy chọn hệ kí tự mà bạn đang sử dụng trong danh sách.
@@ -310,12 +311,10 @@ stock_queries:
     help_text:
   empty_song:
     foreword:
-    question: '*WARNING*: Your song is empty'
+    question: '*LƯU Ý:* Bài hát của bạn để trống'
     afterword: |
-      Please check the following:
-      
-      - You have entered at least one valid note
-      - If you entered an HTML visual sheet file, make sure it has been generated after the 1st July 2020 and contains the tag <div id='ascii' hidden>
-      
-    input_tip: click OK to acknowledge
+      Vui lòng kiểm tra những lỗi sau:
+      - Bạn đã nhập được ít nhất một nốt hợp lệ.
+      - Nếu bạn vừa nhập một tệp bản nhạc trực quan HTML, hãy chắc chắn rằng nó được tạo ra sau 1/7/2020 và có thẻ <div id='ascii' hidden>
+    input_tip: Bấm OK để tiếp tục
     help_text:  
