@@ -17,14 +17,16 @@ try:
 except ModuleNotFoundError:
     pass  # probably Windows
 
+#============================
+#SETTINGS FOR ADVANCED USERS
 SONG_DIR_IN = os.path.normpath(PROJECT_ROOT + '/test_songs') # Overrides defaut input song folder
 SONG_DIR_OUT = os.path.normpath(PROJECT_ROOT + '/songs_out') # Overrides defaut output song folder
 BATCH_MODE = False # To process songs in a batch,stored as .yaml files
 BATCH_DIR = os.path.normpath(PROJECT_ROOT + '/batch_songs')
 PREFERENCES_PATH = os.path.normpath(PROJECT_ROOT + '/preferences.yaml')
+#============================
 
 class CommandLinePlayer:
-
     """
     A puppet to work with the Music Sheet Maker.
     CAUTION: All puppets must have the following methods:

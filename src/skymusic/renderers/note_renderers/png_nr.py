@@ -1,4 +1,4 @@
-#import os
+import re
 from src.skymusic.resources import Resources
 from . import note_renderer
 
@@ -13,22 +13,22 @@ except (ImportError, ModuleNotFoundError):
 class PngNoteRenderer(note_renderer.NoteRenderer):
 
     def __init__(self):
-        self.A_root_png = Resources.A_root_png
-        self.A_diamond_png = Resources.A_diamond_png 
-        self.A_circle_png = Resources.A_circle_png 
-        self.B_root_png = Resources.B_root_png 
-        self.B_diamond_png = Resources.B_diamond_png 
-        self.B_circle_png = Resources.B_circle_png 
-        self.C_root_png = Resources.C_root_png 
-        self.C_diamond_png = Resources.C_diamond_png 
-        self.C_circle_png = Resources.C_circle_png 
-        self.dead_png = Resources.dead_png 
-        self.A_unhighlighted_png = Resources.A_unhighlighted_png 
-        self.B_unhighlighted_png = Resources.B_unhighlighted_png 
-        self.C_unhighlighted_png = Resources.C_unhighlighted_png 
-        self.root_highlighted_pngs = Resources.root_highlighted_pngs 
-        self.diamond_highlighted_pngs = Resources.diamond_highlighted_pngs 
-        self.circle_highlighted_pngs = Resources.circle_highlighted_pngs 
+        self.A_root_png = Resources.PNGS['A-root']
+        self.A_diamond_png = Resources.PNGS['A-diamond']
+        self.A_circle_png = Resources.PNGS['A-circle']
+        self.B_root_png = Resources.PNGS['B-root']
+        self.B_diamond_png = Resources.PNGS['B-diamond']
+        self.B_circle_png = Resources.PNGS['B-circle']
+        self.C_root_png = Resources.PNGS['C-root']
+        self.C_diamond_png = Resources.PNGS['C-diamond']
+        self.C_circle_png = Resources.PNGS['C-circle']
+        self.dead_png = Resources.PNGS['dead-note']
+        self.A_unhighlighted_png = Resources.PNGS['A-unhighlighted']
+        self.B_unhighlighted_png = Resources.PNGS['B-unhighlighted']
+        self.C_unhighlighted_png = Resources.PNGS['C-unhighlighted']
+        self.root_highlighted_pngs = [Resources.PNGS[name] for name in Resources.PNGS if re.match(r'root\-highlighted\-[\d]+', name)]
+        self.diamond_highlighted_pngs = [Resources.PNGS[name] for name in Resources.PNGS if re.match(r'diamond\-highlighted\-[\d]+', name)]
+        self.circle_highlighted_pngs = [Resources.PNGS[name] for name in Resources.PNGS if re.match(r'circle\-highlighted\-[\d]+', name)]
         self.rows_names = ['A', 'B', 'C']
         self.png_size = None
 

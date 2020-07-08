@@ -604,6 +604,10 @@ class MusicSheetMaker:
             i_error = self.communicator.send_stock_query('many_errors', recipient=recipient,
                                                          prerequisites=prerequisites)
 
+        if len(self.get_song()) == 0:
+            i_error = self.communicator.send_stock_query('empty_song', recipient=recipient,
+                                                         prerequisites=prerequisites)
+
         if execute and i_error is not None:
             recipient.execute_queries(i_error)
             error_message = i_error.get_reply().get_result()
@@ -667,8 +671,10 @@ class MusicSheetMaker:
 
         else:
 
+            replacements = {'all_modes': Lang.get_string(f"recipient_specifics/all_modes/{recipient.get_name()}", self.locale)}
+
             q_render = self.communicator.send_stock_query('render_modes', recipient=recipient, limits=render_modes,
-                                                          prerequisites=prerequisites)
+                                                          replacements=replacements, prerequisites=prerequisites)
 
             if execute:
                 recipient.execute_queries(q_render)
@@ -740,11 +746,16 @@ class MusicSheetMaker:
         if self.is_command_line(recipient):
             print("=" * 40)
 
+        if self.is_music_cog(recipient):
+            theme = 'dark'
+        else:
+            theme = Resources.get_default_theme()
+
         song_bundle = SongBundle()
         song_bundle.set_meta(self.get_song().get_meta())
 
         for render_mode in render_modes:
-            buffers = self.get_song().render(render_mode=render_mode, aspect_ratio=aspect_ratio, song_bpm=song_bpm, css_mode=self.css_mode)  # A list of IOString or IOBytes buffers
+            buffers = self.get_song().render(render_mode=render_mode, aspect_ratio=aspect_ratio, song_bpm=song_bpm, css_mode=self.css_mode, theme=theme)  # A list of IOString or IOBytes buffers
             
             if buffers is not None:
                 song_bundle.add_render(render_mode, buffers)

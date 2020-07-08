@@ -51,3 +51,4 @@ class Note:
 
     def __str__(self):
         return f"<{self.index}, pos={self.position}, highlighted frames={self.get_highlighted_frames()}>"
+

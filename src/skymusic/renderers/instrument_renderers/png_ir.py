@@ -16,24 +16,21 @@ class PngInstrumentRenderer(instrument_renderer.InstrumentRenderer):
     def __init__(self, locale=None):
         super().__init__(locale)
         
-        self.empty_chord_png = Resources.empty_chord_png
-        self.unhighlighted_chord_png = Resources.unhighlighted_chord_png
-        self.broken_png = Resources.broken_png
-        self.silent_png = Resources.silent_png
+        self.broken_png = Resources.PNGS['broken-symbol']
+        self.silent_png = Resources.PNGS['silent-symbol']
 
         self.png_chord_size = None
-        self.text_bkg = (255, 255, 255, 0)  # Transparent white
-        self.song_bkg = (255, 255, 255)  # White paper sheet
-        self.font_color = (0, 0, 0)
+        self.empty_chord_png = Resources.PNGS['empty-chord']
+        self.unhighlighted_chord_png = Resources.PNGS['unhighlighted-chord']
+        self.text_bkg = Resources.text_bkg  # Transparent white
+        self.song_bkg = Resources.song_bkg # White paper sheet
+        self.font_color = Resources.font_color
         
         self.font_path = Resources.font_path
         self.harp_font_size = Resources.harp_font_size
         self.repeat_height = None
 
         self.voice_font_size = Resources.voice_font_size
-        # self.text_bkg = (255, 255, 255, 0)#Uncomment to make it different from the inherited class
-        # self.font_color = (255,255,255)#Uncomment to make it different from the inherited class
-        # self.font = 'fonts/NotoSansCJKjp-Regular.otf'
 
     def trans_paste(self, bg, fg, box=(0, 0)):
         if fg.mode == 'RGBA':

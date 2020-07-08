@@ -16,7 +16,7 @@ except (ImportError, ModuleNotFoundError):
 
 class PngSongRenderer(song_renderer.SongRenderer):
 
-    def __init__(self, locale=None, aspect_ratio=16/9.0):
+    def __init__(self, locale=None, aspect_ratio=16/9.0, theme='light'):
         
         super().__init__(locale)
         
@@ -28,6 +28,7 @@ class PngSongRenderer(song_renderer.SongRenderer):
         self.maxFiles = Resources.MAX_NUM_FILES
 
         if not no_PIL_module:
+            Resources.load_theme(theme)
             png_instrument_renderer = PngInstrumentRenderer(self.locale)
             self.png_size = (round(self.aspect_ratio*750 * 2), 750 * 2)  # must be an integer tuple
             self.png_margins = (13, 7)
@@ -41,10 +42,8 @@ class PngSongRenderer(song_renderer.SongRenderer):
             self.png_lyric_size = None
             self.png_dpi = (96 * 2, 96 * 2)
             self.png_compress = Resources.png_compress
-            self.font_color = (0, 0, 0)
-            self.png_color = (255, 255, 255)
-            # self.font_color = (0, 0, 0)   #Discord colors
-            # self.png_color = (54, 57, 63)    #Discord colors
+            self.font_color = Resources.font_color
+            self.png_color = Resources.png_color
             self.png_font_size = Resources.png_font_size
             self.png_title_font_size = Resources.png_title_font_size
             self.png_font_path = Resources.font_path
@@ -189,6 +188,7 @@ class PngSongRenderer(song_renderer.SongRenderer):
         end_col = 0
         ncols = self.maxIconsPerLine
         page_break = False
+        
         # Creating a new song image, located at x_in_song, yline_in_song
         xline_in_song = x_in_png
         yline_in_song = ysong
@@ -200,7 +200,7 @@ class PngSongRenderer(song_renderer.SongRenderer):
             linetype = line[0].get_type()
             ncols = len(line) - start_col
             end_col = len(line)
-
+            
             # Line
             if linetype.lower().strip() == 'voice':
                 line_render = Image.new('RGBA', (int(self.png_line_width), int(self.png_lyric_size[1])), self.png_color)
@@ -212,11 +212,7 @@ class PngSongRenderer(song_renderer.SongRenderer):
 
                 line_render = Image.new('RGBA', (int(self.png_line_width), int(self.png_harp_size[1])), self.png_color)
 
-            # Creating a new instrument image, starting at x=0 (in line) and y=0 (in line)
-            if min([ncols, self.maxIconsPerLine])*(self.png_harp_size[0] + self.png_harp_spacings[0]) > self.png_line_width:
-                nsublines_predict = 1
-            else:
-                nsublines_predict = 1
+            # Creating a new instrument image, starting at x=0 (in line) and y=0 (in line)           
             sub_line = 0
             x = 0
             y = 0
@@ -225,19 +221,6 @@ class PngSongRenderer(song_renderer.SongRenderer):
                 instrument = song.get_instrument(row, col)
                 instrument.set_index(instrument_index)
                 
-                #NEW
-                if linetype.lower().strip() == 'voice':
-                    ypredict = yline_in_song + (self.png_lyric_size[1] + self.png_harp_spacings[1] / 2.0)* nsublines_predict + self.png_harp_spacings[1] / 2.0
-                    ypredict += self.png_lyric_size[1]
-                else:
-                    ypredict = yline_in_song + (self.png_harp_size[1] + self.png_harp_spacings[1])*nsublines_predict + self.png_harp_spacings[1] / 2.0
-                    ypredict += self.png_harp_size[1]
-    
-                if ypredict > (self.png_size[1] - self.png_margins[1]):
-                    page_break = True
-                    end_col = col
-                    break
-
                 # Creating a new line if max number is exceeded
                 if x + self.png_harp_size[0] + self.png_harp_spacings[0] / 2.0 > self.png_line_width:
                     x = 0
@@ -255,8 +238,18 @@ class PngSongRenderer(song_renderer.SongRenderer):
                         line_render = Image.new('RGBA', (int(self.png_line_width), int(self.png_harp_size[1])),
                                                 self.png_color)
 
+                #NEW
+                if linetype.lower().strip() == 'voice':
+                    ypredict = yline_in_song + (self.png_lyric_size[1] + self.png_harp_spacings[1] )
+                else:
+                    ypredict = yline_in_song + (self.png_harp_size[1] + self.png_harp_spacings[1])
+
+                if ypredict > (self.png_size[1] - self.png_margins[1]):
+                    page_break = True
+                    end_col = col
+                    break
+
                 # INSTRUMENT RENDER
-                #instrument_render = instrument.render_in_png(harp_rescale)
                 instrument_render = instrument_renderer.render(instrument, harp_rescale)
                 line_render = self.trans_paste(line_render, instrument_render, (int(x), int(y)))
 

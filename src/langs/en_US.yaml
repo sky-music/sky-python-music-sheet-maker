@@ -10,6 +10,10 @@ recipient_specifics:
     command_line: leave blank or 0 and type enter
     music_cog: answer with - (dash) or 0
     sky_music_website: press answer
+  all_modes:
+    command_line: Type choice numbers, or 'all' to select all formats
+    music_cog:
+    sky_music_website:
 input_mode:
   skykeyboard:
     short_desc: Sky keyboard
@@ -33,8 +37,11 @@ input_mode:
     short_desc: 日本語イタリアドレミ
     long_desc: "Japanese do re mi: ド、ド#／レb、レ、レ#／ミb、ミ、ファ、ファ#／ソb、ソ、ソ#／ラb、ラ、ラ#／シb、シ"
   skyjson:
-    short_desc: 'Sky-Music recording (JSON text)'
-    long_desc: "Dictionary with time in ms and key number 0-14 used by SkyStudio app and https://sky-music.herokuapp.com"
+    short_desc: Sky-Music recording (JSON text)
+    long_desc: "Dictionary with time in ms and key number 0-14 used by SkyStudio app and <https://sky-music.herokuapp.com>"
+  skyhtml:
+    short_desc: HTML visual sheet
+    long_desc: HTML visual sheet
 render_mode:
   html:
     short_desc: HTML visual sheet
@@ -68,7 +75,7 @@ aspect_ratio:
 song_meta:
   title: Title
   artist: Original artist(s)
-  transcript: Transcript writer
+  transcript: Arranger, Transcriber
   musical_key: Musical key
   untitled: Untitled
 open_file: |
@@ -131,15 +138,13 @@ stock_queries:
       - Sharps "#" and flats "b" (semitones) are supported for Western and Jianpu notations.
   render_modes:
     foreword:
-    question: Please choose one or several output rendering formats
+    question: Please choose one or several output rendering formats. {all_modes}
     afterword:
-    input_tip: check or uncheck one or several boxes. Add a text format to edit your song notes later. 
+    input_tip: check or uncheck one or several boxes. Add a text format to facilitate sharing the notes.
     help_text: |
       The visual sheet can be rendered in several file formats.
       Please select the ones you want to generate (or deselect some).
-      Text files can be edited and fed to the program again.
-      On the command-line, enter a comma-separated list of choices numbers, such as 0, 1, 3.
-      On the website, check the boxes.
+      Text formats can be easily edited and fed to the program again. {all_modes}
   aspect_ratio:
     foreword: By default the visual sheet is a 16:9 image in landscape orientation.
     question: 'Please choose a different aspect ratio in the list, or {skip} to skip'
@@ -168,10 +173,10 @@ stock_queries:
     help_text: Original artists include the composer, musician, singer, etc. An empty answer is NOT allowed.
   transcript_writer:
     foreword:
-    question: What is the transcript writer?
+    question: Who is the arranger? Who is the transcriber?
     afterword:
     input_tip: 'any text, {skip} to skip'
-    help_text: 'The transcript writer is the person who found the notes you typed earlier. It could be yourself!'
+    help_text: 'The arranger is the musician who found the notes and chords that sound right in Sky. The transcriber is the person who wrote down the notes. It can be the same person: you maybe?'
   notes_file:
     foreword:
     question: 'Type or copy-paste notes below. You can also enter a text file name containing the notes (in {songs_in}/)'
@@ -189,10 +194,10 @@ stock_queries:
       - Sharps "#" and flats "b" (semitones) are supported for Western and Jianpu notations.
   file:
     foreword:
-    question: 'Enter a valid file name (in {songs_in}/)'
+    question: 'Enter a valid file name (case sensitive), in {songs_in}/'
     afterword:
     input_tip: any text file containing one or several musical notes
-    help_text:
+    help_text: "We have detected that you are trying to open a file, but couldn't find it. Please check its name and that it is located in the {songs_in} directory. File names are case sensitive"
   notes:
     foreword:
     question: 'Please type or copy-paste notes ({skip} to skip)'
@@ -243,26 +248,25 @@ stock_queries:
     afterword:
     input_tip: Type the key name
     help_text: |
-      'Sky''s musical system does not include Sharps "#" and flats "b". Hence you cannot play any song from the outside world.
-      We detected that your song can be played with several notes as the song key. Please choose the one that is most convenient for you.'
+      Sky''s musical system does not include semitones. It is like removing all the black keys on the piano. Hence some songs cannot be played in the Home Sanctuary exactly as they sound in the outside world. You have to shift their frequencies before using this program, or play in other locations of Sky where the notes have been shifted on the keyboard. This is called transposition or 'changing the song key'.
+      Hopefully, we have detected that your song can be played in several song keys available in Sky. Please choose the one that is most convenient for you.
   recommended_key:
     foreword: Your musical notation uses relative pitch.
-    question: 'What is the recommended key to play in Sky (default is {song_key}). {skip} to skip'
+    question: 'What is the recommended key to play in Sky (default is {song_key})? {skip} to skip'
     afterword:
     input_tip: '{skip}, or type a note name (e.g. C in English notation)'
     help_text: |
-      You have used a musical notation that does allow to determine the exact pitch of your notes.
-      Hence the visual sheet will sound differently in different places in Sky.
+      You have used a musical notation that does impose the exact pitch of the notes.
+      Hence the visual sheet will sound differently in different places in Sky.  This is called transposition.
   octave_shift:
     foreword: Do you want to shift the pitch of your notes?
     question: 'Octave shift ({skip_number} to skip)'
     afterword:
     input_tip: octave shift as an integer between -6 and +6
     help_text: |
-      A musical note is identified by its name and an octave number. Sky's music system spans less than 3 octaves.
+      A musical note is uniquely identified by its name (within an octave), and an octave number. Sky's music system spans less than 3 octaves.
       If you do not specify an octave number after a note, we will assume it is the first octave of Sky, so your notes will essential by played near the bass.
-      You can shift your notes to a higher pitch by setting a positive number in this field.
-      If you have specified an octave number and it is too high to be played within Sky's system, you can downshift the pitch by entering a negative integer
+      You can shift your notes to a higher (lower) pitch by setting a positive (negative) number in this field.
   no_song_file:
     foreword: ---------------------------------------
     question: 'Your {render_mode} was not saved to file.'
@@ -297,6 +301,17 @@ stock_queries:
       - In Jianpu, pauses are indicated by '0' (zero)
       - Your song is free of typos. Please check this website for full instructions: 
       
-      https://sky-music.github.io/make-your-own-sheet.html
+      <https://sky-music.github.io/make-your-own-sheet.html>
+    input_tip: click OK to acknowledge
+    help_text:
+  empty_song:
+    foreword:
+    question: '*WARNING*: Your song is empty'
+    afterword: |
+      Please check the following:
+      
+      - You have entered at least one valid note
+      - If you entered an HTML visual sheet file, make sure it has been generated after the 1st July 2020 and contains the tag <div id='ascii' hidden>
+      
     input_tip: click OK to acknowledge
     help_text:

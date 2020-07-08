@@ -4,8 +4,8 @@ import re
 import locale as localepy
 
 LANG = dict()
-locales = ['en_US', 'fr_FR', 'vi_VN']
-substitutes = {'fr': 'fr_FR', 'en': 'en_US', 'vn': 'vi_VN'}
+locales = ['en_US', 'fr_FR', 'vi_VN', 'zh_HANS']
+substitutes = {'fr': 'fr_FR', 'en': 'en_US', 'vn': 'vi_VN', 'zh': 'zh_HANS', 'zh_CN': 'zh_HANS'}
 loaded = dict((locale, False) for locale in locales)
 warn_count = 0
 
@@ -41,7 +41,7 @@ def guess_locale():
             return locales[0]
         elif len(locale) < 2:
             return locales[0]
-
+    
     return locale
 
 

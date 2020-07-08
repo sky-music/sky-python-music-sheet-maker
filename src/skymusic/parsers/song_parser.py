@@ -1,6 +1,4 @@
-import os
-import re
-import json
+import os, re, json
 
 from src.skymusic import instruments, Lang
 from src.skymusic.modes import InputMode
@@ -8,7 +6,7 @@ from src.skymusic.song import Song
 import src.skymusic.parsers.noteparsers
 from src.skymusic.parsers import music_theory
 from src.skymusic.resources import Resources
-
+from src.skymusic.parsers.html_parser import HtmlSongParser
 
 class SongParserError(Exception):
     def __init__(self, explanation):
@@ -452,6 +450,9 @@ class SongParser:
         """
         if isinstance(song_lines, str):  # Break newlines and make sure the result is a List
             song_lines = song_lines.split(os.linesep)
+            
+        if self.input_mode == InputMode.SKYHTML:
+            song_lines = HtmlSongParser().parse_html(song_lines)
 
         english_song_key = self.english_note_name(song_key)
 

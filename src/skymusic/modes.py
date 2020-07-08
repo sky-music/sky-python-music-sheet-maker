@@ -5,6 +5,7 @@ from src.skymusic import Lang
 class InputMode(Enum):
     SKYKEYBOARD = (False, "input_mode/skykeyboard/short_desc", "input_mode/skykeyboard/long_desc", src.skymusic.parsers.noteparsers.skykeyboard.SkyKeyboard)
     SKY = (False, "input_mode/sky/short_desc", "input_mode/sky/long_desc", src.skymusic.parsers.noteparsers.skyabc15.SkyABC15)
+    SKYHTML = (False, "input_mode/skyhtml/short_desc", "input_mode/skyhtml/long_desc", src.skymusic.parsers.noteparsers.skyabc15.SkyABC15)
     SKYJSON = (False, "input_mode/skyjson/short_desc", "input_mode/skyjson/long_desc", src.skymusic.parsers.noteparsers.skyjson.SkyJson)
     ENGLISH = (True, "input_mode/english/short_desc", "input_mode/english/long_desc", src.skymusic.parsers.noteparsers.english.English)
     DOREMI = (True, "input_mode/doremi/short_desc", "input_mode/doremi/long_desc", src.skymusic.parsers.noteparsers.doremi.Doremi)
