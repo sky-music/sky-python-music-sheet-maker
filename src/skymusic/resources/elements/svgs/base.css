@@ -1,0 +1,218 @@
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* <!-- Song title --> */
+h1, svg text.title {
+    font-family: "Noto Sans", "Noto Sans CJK JP", "Noto Sans CJK KR", "Noto Sans CJK SC", "Noto Sans CJK TC", "Avenir", Arial, sans-serif;
+    font-size: 1.3em;
+    font: bold;
+}
+
+.root, .diamond, .circle {
+  transform: scale(1.0);
+  -ms-transform: scale(1.0);
+  -webkit-transform: scale(1.0);
+}
+
+/* <!-- Small buttons showing notes positions --> */
+svg.button-0 .OFF.icon,
+svg.button-1 .OFF.icon,
+svg.button-2 .OFF.icon,
+svg.button-3 .OFF.icon,
+svg.button-4 .OFF.icon {
+  stroke-width: 0;
+  stroke: white;
+  fill: rgb(194,240,194);
+  opacity: 1;
+}
+
+/* <!-- Small buttons showing notes positions --> */
+svg.button-5 .OFF.icon,
+svg.button-6 .OFF.icon,
+svg.button-7 .OFF.icon,
+svg.button-8 .OFF.icon,
+svg.button-9 .OFF.icon {
+  stroke-width: 0;
+  stroke: white;
+  fill: rgb(179,236,255);
+  opacity: 1;
+}
+
+/* <!-- Small buttons showing notes positions --> */
+svg.button-10 .OFF.icon,
+svg.button-11 .OFF.icon,
+svg.button-12 .OFF.icon,
+svg.button-13 .OFF.icon,
+svg.button-14 .OFF.icon {
+  stroke-width: 0;
+  stroke: white;
+  fill: rgb(255,185,223);
+  opacity: 1;
+}
+
+/* <!-- Small note buttons when the chord is broken --> */
+table.broken .broken.icon,
+svg.broken .broken.icon {
+  stroke-width: 0;
+  stroke: white;
+  fill: none;
+}
+
+/* <!-- Small note buttons when the chord is silent --> */
+table.silent .silent.icon,
+svg.silent .silent.icon {
+  stroke-width: 0;
+  stroke: white;
+  fill: none;
+}
+
+/* <!-- Middle note button when the chord is silent --> */
+table.silent svg.button-7 .silent.icon,
+svg.silent svg.button-7 .silent.icon,
+svg.silent.button-7 .silent.icon {
+  stroke-width: 0;
+  stroke: white;
+  fill: #BBBBBB;
+  opacity: 1;
+}
+
+/* <!-- Red question mark when table is broken --> */
+table.broken text,
+svg.broken text {
+  fill: red;
+  text-anchor:middle;
+  font-size:600%;
+  stroke-width:0.05em;
+  stroke:red;
+}
+
+/* <!-- Note decoration (circle, diamond) --> */
+.ON-0.icon {
+  stroke-width: 5;
+  stroke: white;
+  fill: none;
+}
+
+/* <!-- Note background color in first row --> */
+svg.button-0 path.ON-0,
+svg.button-1 path.ON-0,
+svg.button-2 path.ON-0,
+svg.button-3 path.ON-0,
+svg.button-4 path.ON-0 {
+  fill: limegreen;
+  opacity: 1.0;
+}
+
+/* <!-- Note background color in second row --> */
+svg.button-5 path.ON-0,
+svg.button-6 path.ON-0,
+svg.button-7 path.ON-0,
+svg.button-8 path.ON-0,
+svg.button-9 path.ON-0 {
+  fill: deepskyblue;
+  opacity: 1.0;
+}
+
+/* <!-- Note background color in third row --> */
+svg.button-10 path.ON-0,
+svg.button-11 path.ON-0,
+svg.button-12 path.ON-0,
+svg.button-13 path.ON-0,
+svg.button-14 path.ON-0 {
+  fill: deeppink;
+  opacity: 1.0;
+}
+
+/* <!-- Element background color for icons in ../elements
+Set to none to have a transparent SVG, and a transparent PNG with alpha layer (RGBA) later
+Set to white to make the background white in RGB mode, and the PNG background white when converted to RGB
+--> */
+svg rect.harp-background {
+  fill:white;
+}
+
+svg rect.note-background {
+  fill:white;
+}
+
+/* <!-- Below the styles for buttons in a quaver --> */
+.ON-7 {
+  fill: rgb(68,1,84);
+  opacity: 1.0;
+}
+
+.ON-7.icon {
+  stroke-width: 3;
+  stroke: white;
+  fill: none;
+}
+
+.ON-6 {
+  fill: rgb(68,57,130);
+  opacity: 1.0;
+}
+
+.ON-6.icon {
+  stroke-width: 3;
+  stroke: white;
+  fill: none;
+}
+
+.ON-5 {
+  fill: rgb(48,103,141);
+  opacity: 1.0;
+}
+
+.ON-5.icon {
+  stroke-width: 3;
+  stroke: white;
+  fill: none;
+}
+
+.ON-4 {
+  fill: rgb(32,144,140);
+  opacity: 1.0;
+}
+
+.ON-4.icon {
+  stroke-width: 3;
+  stroke: white;
+  fill: none;
+}
+
+.ON-3 {
+  fill: rgb(53,183,120);
+  opacity: 1.0;
+}
+
+.ON-3.icon {
+  stroke-width: 3;
+  stroke: white;
+  fill: none;
+}
+
+.ON-2 {
+  fill: rgb(144,214,67);
+  opacity: 1.0;
+}
+
+.ON-2.icon {
+  stroke-width: 3;
+  stroke: white;
+  fill: none;
+}
+
+.ON-1 {
+  fill: rgb(253,231,36);
+  opacity: 1.0;
+}
+
+.ON-1.icon {
+  stroke-width: 3;
+  stroke: white;
+  fill: none;
+}
+
