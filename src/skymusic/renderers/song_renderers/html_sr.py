@@ -6,9 +6,10 @@ from src.skymusic.modes import CSSMode, RenderMode
 
 class HtmlSongRenderer(song_renderer.SongRenderer):
 
-    def __init__(self, locale=None):
+    def __init__(self, locale=None, theme=list(Resources.THEMES)[0]):
         
         super().__init__(locale)
+        Resources.load_theme(theme)
         #self.HTML_note_width = '1em'
 
     def write_headers(self, html_buffer, song, css_mode):
@@ -38,8 +39,8 @@ class HtmlSongRenderer(song_renderer.SongRenderer):
 
         if css_mode == CSSMode.EMBED:
             html_buffer.write('\n<style type="text/css">\n')
-            html_buffer.write(Resources.common_css_buffer.getvalue())
-            html_buffer.write(Resources.html_css_buffer.getvalue())
+            html_buffer.write(Resources.CSS['common'].getvalue())
+            html_buffer.write(Resources.CSS['html'].getvalue())
             html_buffer.write('\n</style>')
            
         elif css_mode == CSSMode.IMPORT:

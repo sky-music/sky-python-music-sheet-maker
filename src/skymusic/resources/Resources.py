@@ -5,11 +5,15 @@ try:
 except ImportError:
     import importlib_resources
 
-from src.skymusic.resources import fonts, elements, css, js
+from src.skymusic.resources import fonts, png, css, js
 
+# Must be initialized with the theme names, which must correspond to directories in tue css and png folders
 THEMES = {'light': False, 'dark': False}
 
 PNGS = dict()
+# Must be initialiazed with the base names of the CSS files inside the theme directory
+# At the moment the svg renderer needs svg.css, the html one htl.css, and both need  common.css 
+CSS = {'svg': io.StringIO(), 'html': io.StringIO(), 'common': io.StringIO()}
 
 font_color = (0, 0, 0)
 png_color = (255, 255, 255)
@@ -19,49 +23,52 @@ song_bkg = (255, 255, 255)  # White paper sheet
 def get_default_theme():
     return list(THEMES)[0]
 
+def detect_themes():
+    
+    css_dir = os.path.dirname(css.__file__)
+    contents = os.listdir(css_dir)
+    themes = [content for content in contents if os.path.isdir(os.path.join(css_dir, content))]
+    return themes
+
 def load_theme(theme):
+    '''
+    Loads CSS and PNG files as string and bytes buffers respectively, for a theme whose name 'theme' must be defined in the THEMES dictionary
+    '''
     global PNGS
-    global font_color, png_color, text_bkg, song_bkg
+    global font_color, png_color, text_bkg, song_bkg, svg_css_buffer, html_css_buffer, common_css_buffer
+    
     if theme not in THEMES:
         load_theme(get_default_theme())
     else:
-        theme_module = importlib.import_module('.'+theme, 'src.skymusic.resources.elements')
+        png_module = importlib.import_module('.'+theme, png.__name__)
         THEMES[theme] = True
         
-        resources_names = importlib_resources.contents(theme_module)
+        png_files = importlib_resources.contents(png_module)
         
-        for name in resources_names:
-            PNGS[os.path.splitext(name)[0]] =  io.BytesIO(importlib_resources.read_binary(theme_module, name))
+        for png_file in png_files:
+            PNGS[os.path.splitext(png_file)[0]] =  io.BytesIO(importlib_resources.read_binary(png_module, png_file))
+
+        css_module = importlib.import_module('.'+theme, css.__name__)        
         
+        css_files = importlib_resources.contents(css_module)
+        
+        for css_file in css_files:
+            try:
+                CSS[os.path.splitext(css_file)[0]] =  io.StringIO(importlib_resources.read_text(css_module, css_file))
+            except FileNotFoundError:
+                print(f"\n***ERROR: could not find {css_file} file to embed it.\n")     
+                                               
         if theme == 'dark':
             font_color = (255, 255, 255)   #Discord colors
             png_color = (54, 57, 63)
             text_bkg = (54, 57, 63, 0)  # Transparent dark
-            song_bkg = (54, 57, 63)  # White paper sheet
-        
+            song_bkg = (54, 57, 63)  # White paper sheet                 
+                        
 
 with importlib_resources.path(fonts, 'NotoSansCJKjp-Regular.otf') as fp:
     font_path = str(fp)
     if not os.path.isfile(font_path):
         raise FileNotFoundError(f"Could not find fonts/{os.path.relpath(font_path, start=os.path.dirname(fonts.__file__))}")
-
-try:
-    svg_css_buffer = io.StringIO(importlib_resources.read_text(css, 'svg.css'))
-except FileNotFoundError:
-    print(f"\n***ERROR: could not find svg.css file to embed it in HTML.\n")
-    svg_css_buffer = io.StringIO()
-
-try:
-    html_css_buffer = io.StringIO(importlib_resources.read_text(css, 'html.css'))
-except FileNotFoundError:
-    print(f"\n***ERROR: could not find html.css file to embed it in HTML.\n")
-    html_css_buffer = io.StringIO()
-    
-try:
-    common_css_buffer = io.StringIO(importlib_resources.read_text(css, 'common.css'))
-except FileNotFoundError:
-    print(f"\n***ERROR: could not find common.css file to embed it.\n")
-    common_css_buffer = io.StringIO()
 
 '''
 try:
@@ -71,7 +78,7 @@ except FileNotFoundError:
     nav_html_buffer = io.StringIO()
 '''
     
-rel_css_path = '../css/main.css'
+rel_css_path = '../css/main.css' # For IMPORT and HREF methods of embedding css files
 offline_scripts_urls = []
 online_scripts_urls = ['/js/navigationTableScript.js', '/js/sheetDarkModeScript.js', '/js/sheetDownloadScript.js']
 

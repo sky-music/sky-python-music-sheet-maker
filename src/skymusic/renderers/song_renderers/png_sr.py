@@ -16,7 +16,7 @@ except (ImportError, ModuleNotFoundError):
 
 class PngSongRenderer(song_renderer.SongRenderer):
 
-    def __init__(self, locale=None, aspect_ratio=16/9.0, theme='light'):
+    def __init__(self, locale=None, aspect_ratio=16/9.0, theme=list(Resources.THEMES)[0]):
         
         super().__init__(locale)
         

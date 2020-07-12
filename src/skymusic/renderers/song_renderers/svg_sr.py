@@ -6,9 +6,10 @@ from src.skymusic.resources import Resources
 
 class SvgSongRenderer(song_renderer.SongRenderer):
 
-    def __init__(self, locale=None, aspect_ratio=16/9.0):
+    def __init__(self, locale=None, aspect_ratio=16/9.0, theme=list(Resources.THEMES)[0]):
         
         super().__init__(locale)
+        Resources.load_theme(theme)
 
         self.harp_AspectRatio = 1.455
         self.harp_relspacings = (0.13, 0.1)  # Fraction of the harp width that will be allocated to the spacing between harps
@@ -51,8 +52,8 @@ class SvgSongRenderer(song_renderer.SongRenderer):
 
         if css_mode == CSSMode.EMBED:
             svg_buffer.write('\n<defs><style type="text/css"><![CDATA[\n')
-            svg_buffer.write(Resources.common_css_buffer.getvalue())
-            svg_buffer.write(Resources.svg_css_buffer.getvalue())
+            svg_buffer.write(Resources.CSS['common'].getvalue())
+            svg_buffer.write(Resources.CSS['svg'].getvalue())
             svg_buffer.write('\n]]></style></defs>')
         elif css_mode == CSSMode.IMPORT:
             svg_buffer.write('\n<defs><style type="text/css">')
