@@ -21,6 +21,7 @@ html {
 body {
   font-family: "Noto Sans", "Noto Sans CJK JP", "Noto Sans CJK KR", "Noto Sans CJK SC", "Noto Sans CJK TC", "Avenir", Arial, sans-serif;
   font-size: 12pt;
+  color: white;
 }
 
 /* <!-- Song headers (HTML only) --> */
@@ -28,6 +29,7 @@ p, svg text.headers {
     font-family: "Noto Sans", "Noto Sans CJK JP", "Noto Sans CJK KR", "Noto Sans CJK SC", "Noto Sans CJK TC", "Avenir", Arial, sans-serif;
     font-size: 0.8em;
     line-height: 50%;
+    color: white;
 }
 
 /* <!-- Alignment of svg (HTML only) --> */
@@ -48,7 +50,7 @@ table {
   border-style: solid;
   border-radius: 5px;
   border-width: 1px;
-  border-color: black;
+  border-color: white+;
   border-spacing: 0 auto;
 }
 
@@ -58,11 +60,12 @@ td {
   padding-bottom: 0px;
   margin: 0px;
   font-size: 1.0em;
+  color: white;
 }
 
 /* <!-- Makes the table disappear in case of broken chord  (HTML only)--> */
 table.broken {
-  border-color: white;
+  border-color: #121212;
   border-width: 0;
 }
 
@@ -122,7 +125,7 @@ table svg[class*="button-"] {
 table.broken .ON-0.button,
 table.silent .ON-0.button {
   stroke-width: 0;
-  stroke: white;
+  stroke: #121212;
   fill: none;
 }
 

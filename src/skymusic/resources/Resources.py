@@ -45,18 +45,20 @@ def load_theme(theme):
         
         png_files = importlib_resources.contents(png_module)
         
+        if not png_files:
+            print(f"\n*** ERROR: could not find any PNG file to embed. ***\n")   
+        
         for png_file in png_files:
             PNGS[os.path.splitext(png_file)[0]] =  io.BytesIO(importlib_resources.read_binary(png_module, png_file))
 
         css_module = importlib.import_module('.'+theme, css.__name__)        
         
         css_files = importlib_resources.contents(css_module)
+        if not css_files:
+            print(f"\n*** ERROR: could not find any CSS file to embed. ***\n")     
         
         for css_file in css_files:
-            try:
-                CSS[os.path.splitext(css_file)[0]] =  io.StringIO(importlib_resources.read_text(css_module, css_file))
-            except FileNotFoundError:
-                print(f"\n***ERROR: could not find {css_file} file to embed it.\n")     
+            CSS[os.path.splitext(css_file)[0]] =  io.StringIO(importlib_resources.read_text(css_module, css_file))
                                                
         if theme == 'dark':
             font_color = (255, 255, 255)   #Discord colors

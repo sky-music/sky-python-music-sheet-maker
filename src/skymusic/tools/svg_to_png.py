@@ -17,17 +17,16 @@ from PIL import Image
 
 transparency = True  # If yes, then PNG have an alpha channel
 max_num_notes = 7  # Maximum number of note images in triplets and quavers, starting from 1
-quavers_overwrite = False # Force creation of xxx-highlighted-1 files
+quavers_overwrite = False # Force creation of circle-highlighted-1.svg type files
 
-base_css_name = 'base.css'
-theme_css_name = 'theme.css'
-themes_dir = "../resources/elements"
-main_css_path = '../resources/css/svg.css'
-svg_dir = "../resources/elements/svgs"
+include_css = ['common.css', 'svg.css']
+css_dir = "../resources/css"
+svg_dir = "../resources/png/svg"
+png_dir = "../resources/png"
 generic_quaver_names = ['circle-highlighted-n', 'diamond-highlighted-n', 'root-highlighted-n']
 generic_quaver_class = 'highlighted-n'
 
-def get_svg_paths(svg_dir, exclude=[]):
+def get_svg_paths(svg_dir, exclude_svg=[]):
     '''
     Get SVG file paths to convert
     '''
@@ -35,23 +34,29 @@ def get_svg_paths(svg_dir, exclude=[]):
     for (dirpath, dirnames, filenames) in os.walk(svg_dir):
         for filename in filenames:
             (basename, ext) = os.path.splitext(filename)
-            if ext.lower() == '.svg' and basename not in exclude:
+            if ext.lower() == '.svg' and basename not in exclude_svg:
                 svg_paths.append(os.path.join(dirpath, filename))
 
     return svg_paths
 
 
-def get_theme_css(themes_dir):
+def get_theme_css(themes_dir, include=[]):
     '''
     Get themes directories
     A theme directory must contain at least one .css file
     '''
-    css_paths = []
+    css_paths = {}
     for (dirpath, dirnames, filenames) in os.walk(themes_dir):
+
         for filename in filenames:
-            if os.path.splitext(filename)[1].lower() == '.css':
-                css_paths.append(os.path.join(dirpath, filename))
-                break
+            if filename.lower() in include or include == []:
+                
+                (k, path) = (os.path.split(dirpath)[-1], os.path.join(dirpath, filename))
+                try:
+                    css_paths[k] += [path]
+                except KeyError:
+                    css_paths[k] = [path]
+                
     return css_paths
 
 def create_quavers_svgs(svg_paths, max_num_notes=7, quavers_overwrite=False):
@@ -81,53 +86,50 @@ def create_quavers_svgs(svg_paths, max_num_notes=7, quavers_overwrite=False):
                     
     return wrote_svg    
 
-def convert_svg_to_png(svg_paths, css_path, main_css_path=None, exclude=[]):
-    
-    global base_css_name, theme_css_name
-    
-    (css_dir, css_filename) = os.path.split(css_path)
-    (css_basename, css_ext) = os.path.splitext(css_filename)
+def convert_svg_to_png(svg_paths, exclude_svg=[], css_paths=[], png_dir=png_dir):
+
     (svg_dir, _) = os.path.split(svg_paths[0])
     
-    if main_css_path:
-        shutil.copyfile(main_css_path, os.path.join(svg_dir, base_css_name))
-    shutil.copyfile(css_path, os.path.join(svg_dir, theme_css_name))
+    copied_css_files = []
+    for css_path in css_paths:
+        (css_dir, css_filename) = os.path.split(css_path)
+        copy_path = os.path.join(svg_dir, css_filename)
+        #(css_basename, css_ext) = os.path.splitext(css_filename)
+        copied_css_files.append(copy_path)
+        shutil.copyfile(css_path, copy_path)
 
-    converted = 0
+    png_paths = []
     for svg_path in svg_paths:
 
         (svg_dir, svg_filename) = os.path.split(svg_path)
         (svg_basename, svg_ext) = os.path.splitext(svg_filename)
 
-        if svg_basename not in exclude:
-
+        if svg_basename not in exclude_svg:
+            png_path = os.path.join(png_dir, svg_basename+'.png')
             if iscairo:
-                svg2png(url=svg_path, write_to=os.path.join(css_dir, svg_basename+'.png'))
+                svg2png(url=svg_path, write_to=png_path)
             else:
                 print(f'Simulating svg2png conversion to {svg_basename}.png')
-            converted += 1
+            png_paths.append(png_path)
             
     #Removed copied css files       
-    try:
-        if main_css_path:
-            os.remove(os.path.join(svg_dir, base_css_name))
-        os.remove(os.path.join(svg_dir, the))
-    except FileNotFoundError as err:
-        print(err)
+    for copy_path in copied_css_files:
+        os.remove(copy_path)
         
-    return converted
+    return png_paths
 
-'''
-for file_path in filepaths:
-    (name, ext) = os.path.splitext(file_path)
-    if ext == '.png':
-        im = Image.open(file_path)
-        if transparency:
-            im = im.convert('RGBA')
-        else:
-            im = im.convert('RGB')
-        im.save(file_path, dpi=(96, 96), compress_level=0)
-'''
+def set_transparency(png_paths, transparency):
+    
+    for png_path in png_paths:
+        (basename, ext) = os.path.splitext(png_path)
+        if ext == '.png':
+            im = Image.open(png_path)
+            if transparency:
+                im = im.convert('RGBA')
+            else:
+                im = im.convert('RGB')
+            im.save(png_path, dpi=(96, 96), compress_level=0)
+
 
 if __name__ == '__main__':
     
@@ -137,16 +139,21 @@ if __name__ == '__main__':
     if wrote_svg:
         print(f"\n=== Created {wrote_svg} quavers svg files ===")
         
-    svg_paths = get_svg_paths(svg_dir, exclude=generic_quaver_names)
+    svg_paths = get_svg_paths(svg_dir, exclude_svg=generic_quaver_names)
     print(f"\n=== Found {str(len(svg_paths))} SVG files to convert: ===")
     print([os.path.split(svg_path)[1] for svg_path in svg_paths])
     
-    css_paths = get_theme_css(themes_dir)
-    themes_names = [os.path.split(os.path.split(css_path)[0])[-1] for css_path in css_paths]
-    print(f"\n=== Found the following themes directories with a CSS file: ===")
-    print(themes_names)
+    theme_css = get_theme_css(css_dir, include=include_css)
+    
+    print(f"\n=== Found the following themes  with a valid CSS file: ===")
+    print(theme_css)
     print('\n')
     
-    for theme_name, css_path in zip(themes_names, css_paths):
-        converted = convert_svg_to_png(svg_paths, css_path, main_css_path, generic_quaver_names)
-        print(f"\n==> Converted {converted} PNGs for theme '{theme_name}'\n")
+    png_paths = []
+    for theme in theme_css:
+        theme_png_dir = os.path.join(png_dir, theme)
+        theme_png_paths = convert_svg_to_png(svg_paths=svg_paths, exclude_svg=generic_quaver_names, css_paths=theme_css[theme], png_dir=theme_png_dir)
+        png_paths += theme_png_paths
+        print(f"\n==> Converted {len(theme_png_paths)} PNGs for theme '{theme}'\n")
+        
+    set_transparency(png_paths, transparency)
