@@ -75,12 +75,15 @@ class SongBundle:
         self.renders.update({render_mode: buffers})
 
 
-    def get_render(self, render_mode):
+    def get_renders(self, render_modes):
         
-        if render_mode in self.renders:
-            return self.renders[render_mode]
-        else:
-            return None
+        if not isinstance(render_modes, (list, tuple, set)):
+            render_modes = [render_modes]
+        renders = []
+        for render_mode in render_modes:
+            if render_mode in self.renders:
+                renders.append(self.renders[render_mode])
+        return renders
 
     def get_all_renders(self):
         
