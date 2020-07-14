@@ -101,7 +101,7 @@ def load(locale):
                              'help_text': Lang.get_string("stock_queries/song_bpm/help_text", locale),
                              'reply_type': ReplyType.NUMBER,
                              'limits': [12, 1200],
-                             'default': 120
+                             'default': 220
                              },
         
         

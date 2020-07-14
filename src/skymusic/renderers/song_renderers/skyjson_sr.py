@@ -2,17 +2,17 @@ import io
 import json
 from . import song_renderer
 from src.skymusic.renderers.instrument_renderers.skyjson_ir import SkyjsonInstrumentRenderer
-
+from src.skymusic.resources import Resources
 
 class SkyjsonSongRenderer(song_renderer.SongRenderer):
 
-    def __init__(self, locale=None, song_bpm=120):
+    def __init__(self, locale=None, song_bpm=Resources.DEFAULT_BPM):
         
         super().__init__(locale)
         if isinstance(song_bpm, (int, float)):
             self.song_bpm = song_bpm  # Beats per minute
         else:
-            self.song_bpm = 120
+            self.song_bpm = Resources.DEFAULT_BPM
 
     def write_buffers(self, song):
 

@@ -644,7 +644,7 @@ class MusicSheetMaker:
 
         time_modes = [RenderMode.MIDI] #TODO: add SkyJSON
         if not any([mode in render_modes for mode in time_modes]):
-            return None, 120
+            return None, Resources.DEFAULT_BPM
         else:
             replacements = {'skip_number': Lang.get_string(f"recipient_specifics/skip_number/{recipient.get_name()}", self.locale)}
             q_song_bpm = self.communicator.send_stock_query('song_bpm', recipient=recipient,
@@ -727,7 +727,7 @@ class MusicSheetMaker:
         return
 
 
-    def render_song(self, recipient, render_modes=None, aspect_ratio=AspectRatio.WIDESCREEN, song_bpm=120):
+    def render_song(self, recipient, render_modes=None, aspect_ratio=AspectRatio.WIDESCREEN, song_bpm=Resources.DEFAULT_BPM):
 
         if render_modes is None:
             if self.is_music_cog(recipient):
@@ -736,7 +736,7 @@ class MusicSheetMaker:
                 render_modes = self.render_modes_enabled
         
         if not isinstance(song_bpm, (float, int)):
-            song_bpm = 120
+            song_bpm = Resources.DEFAULT_BPM
 
         if not isinstance(aspect_ratio, AspectRatio):
             aspect_ratio = AspectRatio.WIDESCREEN
