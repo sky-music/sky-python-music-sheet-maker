@@ -98,15 +98,13 @@ class MusicSheetMaker:
         self.directory_base = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'))
         self.song_dir_in = song_dir_in if song_dir_in is not None else os.path.join(self.directory_base, 'test_songs')
         self.song_dir_out = song_dir_out if song_dir_out is not None else os.path.join(self.directory_base, 'songs_out')
-        #self.css_path = Resources.css_path
-        #self.rel_css_path = os.path.relpath(self.css_path, start=self.song_dir_out)
         self.css_mode = CSSMode.EMBED
         self.render_modes_enabled = [mode for mode in RenderMode]
         # self.render_modes_disabled = [RenderMode.JIANPUASCII, RenderMode.DOREMIASCII]
         self.render_modes_disabled = []
         self.render_modes_enabled = [mode for mode in self.render_modes_enabled if
                                      mode not in self.render_modes_disabled]
-        self.music_cog_render_modes = [RenderMode.PNG]
+        self.music_cog_render_modes = [RenderMode.PNG, RenderMode.SKYJSON]
 
     def __getattr__(self, attr_name):
         """
@@ -747,7 +745,7 @@ class MusicSheetMaker:
             print("=" * 40)
 
         if self.is_music_cog(recipient):
-            theme = 'dark'
+            theme = Resources.MUSIC_COG_THEME
         else:
             theme = Resources.get_default_theme()
 
