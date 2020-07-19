@@ -84,6 +84,9 @@ rel_css_path = '../css/main.css' # For IMPORT and HREF methods of embedding css 
 offline_scripts_urls = []
 online_scripts_urls = ['/js/navigationTableScript.js', '/js/sheetDarkModeScript.js', '/js/sheetDownloadScript.js']
 
+skyjson_api_url = "https://sky-music.herokuapp.com/api/generateTempSong"
+skyjson_api_key = '{{ API_KEY }}'
+
 script_buffers = []
 for script in offline_scripts_urls:
     try:

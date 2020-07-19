@@ -11,6 +11,7 @@
 warnings:
   jianpu_pause: "Ký hiệu Jianpu được sử dụng: đặt '0' như là ký tự ngắt quãng thay vì '{pause}'. Hãy chắc chắn rằng nốt bạn nhập vào tuân theo quy luật này."
   jianpu_quaver_delimiter: "Ký hiệu Jianpu được sử dụng: đặt '{jianpu_quaver_delimiter}' như là vùng phân định run nôt nhạc Quaver thay vì '{quaver_delimiter}'. Hãy chắc chắn rằng nốt bạn nhập vào tuân theo quy luật này."
+  skyjson_url_connection: "Connection error when trying to get url from sky-music.herokuapp.com"  
 recipient_specifics:
   skip:
     command_line: bỏ trống và bấm Enter
@@ -318,3 +319,9 @@ stock_queries:
       - Nếu bạn vừa nhập một tệp bản nhạc trực quan HTML, hãy chắc chắn rằng nó được tạo ra sau 1/7/2020 và có thẻ <div id='ascii' hidden>
     input_tip: Bấm OK để tiếp tục
     help_text:  
+  skyjson_url:
+    foreword:
+    question: 'You can listen to your song being played by our partner website at: <{url}>'
+    afterword:
+    input_tip: click OK to acknowledge
+    help_text:

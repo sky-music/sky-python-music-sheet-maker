@@ -19,6 +19,7 @@ except ModuleNotFoundError:
 
 #============================
 #SETTINGS FOR ADVANCED USERS
+SKYJSON_URL = False # To generate a temporary song link at sky-music.herokuapp.com. By default will be enabled on the Discord Music Cog but disabled on the command line (to avoid spamming this server)
 SONG_DIR_IN = os.path.normpath(PROJECT_ROOT + '/test_songs') # Overrides defaut input song folder
 SONG_DIR_OUT = os.path.normpath(PROJECT_ROOT + '/songs_out') # Overrides defaut output song folder
 BATCH_MODE = False # To process songs in a batch,stored as .yaml files
@@ -178,7 +179,7 @@ class CommandLinePlayer:
 try:
     
     player = CommandLinePlayer(locale=Lang.guess_locale(), preferences_path=PREFERENCES_PATH)
-    maker = MusicSheetMaker(locale=Lang.guess_locale(), song_dir_in=SONG_DIR_IN, song_dir_out=SONG_DIR_OUT)
+    maker = MusicSheetMaker(locale=Lang.guess_locale(), song_dir_in=SONG_DIR_IN, song_dir_out=SONG_DIR_OUT, enable_skyjson_url=SKYJSON_URL)
 
     if BATCH_MODE:
         

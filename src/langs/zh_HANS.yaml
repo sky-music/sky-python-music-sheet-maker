@@ -2,6 +2,7 @@
 warnings:
   jianpu_pause: "简谱模式使用中:设定 '0'代替{pause}。请确认您的输入遵守该条件。"
   jianpu_quaver_delimiter: "简谱模式使用中:设定 '{jianpu_quaver_delimiter}' 为八分音符链接符号 '{quaver_delimiter}'.请确认您的输入遵守该条件."
+  skyjson_url_connection: "Connection error when trying to get url from sky-music.herokuapp.com"
 recipient_specifics:
   skip:
     command_line: 留空以及按下回车键
@@ -314,4 +315,10 @@ stock_queries:
       - 如果您输入了HTML乐谱文件，请确保文件是于2020年7月1号之后生成以及含有此代码：<div id='ascii' hidden>
       
     input_tip: 按 OK 确认
+    help_text:
+  skyjson_url:
+    foreword:
+    question: 'You can listen to your song being played by our partner website at: <{url}>'
+    afterword:
+    input_tip: click OK to acknowledge
     help_text:

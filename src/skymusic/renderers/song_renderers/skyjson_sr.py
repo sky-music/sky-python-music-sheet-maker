@@ -1,6 +1,10 @@
-import io
-import json
+import io, json
+#from urllib import parse, request
+import requests
+#from urllib.error import HTTPError, URLError
+import socket
 from . import song_renderer
+from src.skymusic import Lang
 from src.skymusic.renderers.instrument_renderers.skyjson_ir import SkyjsonInstrumentRenderer
 from src.skymusic.resources import Resources
 
@@ -17,7 +21,7 @@ class SkyjsonSongRenderer(song_renderer.SongRenderer):
     def write_buffers(self, song):
 
         meta = song.get_meta()
-        dt = (60000/self.song_bpm) / 4
+        dt = (60000/self.song_bpm)
         
         json_buffer = io.StringIO()
 
@@ -46,3 +50,53 @@ class SkyjsonSongRenderer(song_renderer.SongRenderer):
         
         return [json_buffer]
 
+    def generate_url(self, json_buffer):
+        
+        json_buffer.seek(0)
+        json_dict = json.load(json_buffer)
+        json_dict = {'API_KEY': Resources.skyjson_api_key, 'song': json_dict}
+        #json_post_data = json.dumps(json_dict)
+        
+        headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+        #req = requests.post(url, data=json.dumps(data), headers=headers)
+        #req = request.Request(url=Resources.skyjson_api_url, data=json_post_data.encode('ascii'), headers=headers, method='POST')
+        #response = request.urlopen(req, timeout=10)
+        #url = response.geturl()
+        try:
+            rep = requests.post(url=Resources.skyjson_api_url, json=json_dict, headers=headers, timeout=5)
+            url = rep.text
+
+        except (requests.ConnectionError, requests.HTTPError) as err:
+            print('\n*** WARNING:'+Lang.get_string("warnings/skyjson_url_connection", self.locale)+':')
+            print(err)
+            url = None
+        #print(rep)
+        #print(rep.url)
+        #print(rep.text)
+        '''
+        
+        params = parse.urlencode(json_post_data)
+        headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}
+        
+        # Request, POST by default if data is provided
+        #req = request.Request("https://sky-music.herokuapp.com/api/generateTempSong", params.encode('ascii'), headers)
+        print(params)
+        req = request.Request(url=Resources.skyjson_api_url, data=params.encode('ascii'), headers=headers, method='POST')
+        '''
+        '''
+        try:
+            url = rep.url
+            #response = request.urlopen(req, timeout=10)
+            #url = response.geturl()
+        except (URLError, socket.timeout) as err:
+            print('\n*** WARNING:'+Lang.get_string("warnings/skyjson_url_connection", self.locale)+':')
+            print(err)
+            url = None
+        except HTTPError:
+            print(err)
+            print(err.code)
+            url = None
+        '''
+        
+        return url
+        

@@ -3,6 +3,7 @@ from src.skymusic.modes import InputMode, CSSMode, RenderMode, ReplyType, Aspect
 from src.skymusic.communicator import Communicator, QueriesExecutionAbort
 from src.skymusic.parsers.song_parser import SongParser
 from src.skymusic.renderers.song_renderers.song_renderer import SongRenderer
+from src.skymusic.renderers.song_renderers import skyjson_sr
 from src.skymusic import Lang
 from src.skymusic.resources import Resources
 
@@ -92,7 +93,7 @@ class SongBundle:
 
 class MusicSheetMaker:
 
-    def __init__(self, locale='en_US', song_dir_in=None, song_dir_out=None):
+    def __init__(self, locale='en_US', song_dir_in=None, song_dir_out=None, enable_skyjson_url=False):
         self.name = Resources.MUSIC_MAKER_NAME
         self.locale = self.set_locale(locale)
         self.communicator = Communicator(owner=self, locale=self.locale)
@@ -108,6 +109,7 @@ class MusicSheetMaker:
         self.render_modes_enabled = [mode for mode in self.render_modes_enabled if
                                      mode not in self.render_modes_disabled]
         self.music_cog_render_modes = [RenderMode.PNG, RenderMode.SKYJSON]
+        self.enable_skyjson_url = enable_skyjson_url
 
     def __getattr__(self, attr_name):
         """
@@ -289,10 +291,43 @@ class MusicSheetMaker:
 
         # 13. Renders Song
         song_bundle = self.render_song(recipient=recipient, render_modes=render_modes, aspect_ratio=aspect_ratio, song_bpm=song_bpm)
-
-        # 14. Sends result back (required for website)
+        
+        # 14. Sends an url from sky-music.herokuapp.com
+        if self.enable_skyjson_url:
+            self.send_json_url(recipient=recipient, song_bundle=song_bundle)
+        
+        # 15. Sends result back (required for website)
         return song_bundle
 
+
+    def send_json_url(self, recipient, song_bundle, prerequisites=None, execute=True):
+        
+        json_buffer = song_bundle.get_renders([RenderMode.SKYJSON])
+        
+        if json_buffer:
+            
+            json_buffer = json_buffer[0][0]
+            
+            url = skyjson_sr.SkyjsonSongRenderer(locale=self.locale).generate_url(json_buffer)
+            
+            replacements={'url': url}
+            
+            if url:
+                i_url = self.communicator.send_stock_query('skyjson_url', recipient=recipient,
+                                                             replacements=replacements, prerequisites=prerequisites)
+            else:
+                i_url = None
+        else:
+            i_url = None
+            
+        
+        if execute and i_url is not None:
+            recipient.execute_queries(i_url)
+            ok = i_url.get_reply().get_result()
+            return i_url, ok
+        else:
+            return i_url, None
+        
 
     def ask_instructions(self, recipient, prerequisites=None, execute=True):
 
@@ -315,8 +350,8 @@ class MusicSheetMaker:
                                                          replacements=replacements, prerequisites=prerequisites)
         if execute:
             recipient.execute_queries(i_instr)
-            instructions = i_instr.get_reply().get_result()
-            return i_instr, instructions
+            ok = i_instr.get_reply().get_result()
+            return i_instr, ok
         else:
             return i_instr, None
 
@@ -611,8 +646,8 @@ class MusicSheetMaker:
 
         if execute and i_error is not None:
             recipient.execute_queries(i_error)
-            error_message = i_error.get_reply().get_result()
-            return i_error, error_message
+            ok = i_error.get_reply().get_result()
+            return i_error, ok
         else:
             return i_error, None
 
@@ -905,7 +940,10 @@ class MusicSheetMaker:
 
 
     def retrieve_render_modes(self, recipient):
-
+        """
+        Retrieves render modes from previous answered queries.
+        Should work, but not fully tested
+        """       
         if self.is_music_cog(recipient):
             return self.music_cog_render_modes
 

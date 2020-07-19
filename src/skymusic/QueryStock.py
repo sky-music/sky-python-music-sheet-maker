@@ -296,12 +296,20 @@ def load(locale):
                              },
                              
             'empty_song': {'class': Information,
-                             'handler': 'None',
+                           'handler': 'None',
                              'foreword': Lang.get_string("stock_queries/empty_song/foreword", locale),
                              'question': Lang.get_string("stock_queries/empty_song/question", locale),
                              'afterword': Lang.get_string("stock_queries/empty_song/afterword", locale),
                              'input_tip': Lang.get_string("stock_queries/empty_song/input_tip", locale),
                              'help_text': Lang.get_string("stock_queries/empty_song/help_text", locale)
-                             }
-                  
+                             },
+                             
+            'skyjson_url': {'class': Information,
+                             'handler': 'None',
+                             'foreword': Lang.get_string("stock_queries/skyjson_url/foreword", locale),
+                             'question': Lang.get_string("stock_queries/skyjson_url/question", locale),
+                             'afterword': Lang.get_string("stock_queries/skyjson_url/afterword", locale),
+                             'input_tip': Lang.get_string("stock_queries/skyjson_url/input_tip", locale),
+                             'help_text': Lang.get_string("stock_queries/skyjson_url/help_text", locale)
+                             }                  
             }
