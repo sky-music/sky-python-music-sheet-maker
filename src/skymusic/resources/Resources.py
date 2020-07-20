@@ -48,6 +48,8 @@ def load_theme(theme):
         if not png_files:
             print(f"\n*** ERROR: could not find any PNG file to embed. ***\n")   
         
+        png_files = [file for file in png_files if os.path.splitext(file)[1] == '.png']
+        
         for png_file in png_files:
             PNGS[os.path.splitext(png_file)[0]] =  io.BytesIO(importlib_resources.read_binary(png_module, png_file))
 
@@ -56,6 +58,8 @@ def load_theme(theme):
         css_files = importlib_resources.contents(css_module)
         if not css_files:
             print(f"\n*** ERROR: could not find any CSS file to embed. ***\n")     
+        
+        css_files = [file for file in css_files if os.path.splitext(file)[1] == '.css']
         
         for css_file in css_files:
             CSS[os.path.splitext(css_file)[0]] =  io.StringIO(importlib_resources.read_text(css_module, css_file))
