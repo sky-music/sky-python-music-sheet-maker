@@ -125,23 +125,23 @@ table svg[class*="button-"] {
 table.broken .ON-0.button,
 table.silent .ON-0.button {
   stroke-width: 0;
-  stroke: #121212;
+  stroke: #545763;
   fill: none;
 }
 
 @media (prefers-color-scheme: dark) {
   body {
-    background-color: #121212;
+    background-color: #545763;
   }
   table {
     border-color: white;
   }
   table.broken {
-    border-color: #121212;
+    border-color: #545763;
   }
   table.broken .ON-0.button,
   table.silent .ON-0.button {
-    stroke: #121212;
+    stroke: #545763;
   }
   p, body, td, text.headers {
   color: white;  

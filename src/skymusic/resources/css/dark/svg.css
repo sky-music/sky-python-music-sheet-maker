@@ -1,3 +1,15 @@
+/* <!-- Element background color for icons in ../elements
+Set to none to have a transparent SVG, and a transparent PNG with alpha layer (RGBA) later
+Set to white to make the background white in RGB mode, and the PNG background white when converted to RGB
+--> */
+svg rect.harp-background {
+  fill:rgb(54, 57, 63);
+}
+
+svg rect.note-background {
+  fill:rgb(54, 57, 63);
+}
+
 /* <!-- Sky chord chart: a table with rounded edges (SVG only) --> */
 svg rect.harp {
   fill:rgb(54, 57, 63);
@@ -13,14 +25,14 @@ svg rect.harp-png {
 }
 
 /* <!-- Makes the table disappear in case of broken chord  (SVG only)--> */
-svg.broken rect{
+svg.broken rect {
   fill:none;
   stroke-width:0;
   stroke:white;
 }
 
 /* <!-- Silent table  (SVG only)--> */
-svg.silent rect {
+svg.silent rect:not([class*="harp-background"]) {
   stroke: grey;
   stroke-width:0;
   fill:none;
@@ -52,7 +64,7 @@ svg line.divide {
 
 
 /* <!-- Small buttons showing notes positions --> */
-svg:not([silent].button-0 .OFF.icon,
+svg.button-0 .OFF.icon,
 svg.button-1 .OFF.icon,
 svg.button-2 .OFF.icon,
 svg.button-3 .OFF.icon,

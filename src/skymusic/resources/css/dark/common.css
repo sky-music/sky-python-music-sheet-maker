@@ -126,18 +126,6 @@ svg.button-14 path.ON-0 {
   opacity: 1.0;
 }
 
-/* <!-- Element background color for icons in ../elements
-Set to none to have a transparent SVG, and a transparent PNG with alpha layer (RGBA) later
-Set to white to make the background white in RGB mode, and the PNG background white when converted to RGB
---> */
-svg rect.harp-background {
-  fill:white;
-}
-
-svg rect.note-background {
-  fill:white;
-}
-
 /* <!-- Below the styles for buttons in a quaver --> */
 .ON-7 {
   fill: rgb(68,1,84);
