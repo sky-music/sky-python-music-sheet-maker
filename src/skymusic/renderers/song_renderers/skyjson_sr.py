@@ -1,8 +1,8 @@
 import io, json
-#from urllib import parse, request
 import requests
 #from urllib.error import HTTPError, URLError
-import socket
+#from urllib import parse, request
+#import socket
 from . import song_renderer
 from src.skymusic import Lang
 from src.skymusic.renderers.instrument_renderers.skyjson_ir import SkyjsonInstrumentRenderer
@@ -58,10 +58,6 @@ class SkyjsonSongRenderer(song_renderer.SongRenderer):
         #json_post_data = json.dumps(json_dict)
         
         headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
-        #req = requests.post(url, data=json.dumps(data), headers=headers)
-        #req = request.Request(url=Resources.skyjson_api_url, data=json_post_data.encode('ascii'), headers=headers, method='POST')
-        #response = request.urlopen(req, timeout=10)
-        #url = response.geturl()
         try:
             rep = requests.post(url=Resources.skyjson_api_url, json=json_dict, headers=headers, timeout=5)
             url = rep.text
@@ -70,31 +66,17 @@ class SkyjsonSongRenderer(song_renderer.SongRenderer):
             print('\n*** WARNING:'+Lang.get_string("warnings/skyjson_url_connection", self.locale)+':')
             print(err)
             url = None
-        #print(rep)
-        #print(rep.url)
-        #print(rep.text)
         '''
-        
-        params = parse.urlencode(json_post_data)
-        headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}
-        
-        # Request, POST by default if data is provided
-        #req = request.Request("https://sky-music.herokuapp.com/api/generateTempSong", params.encode('ascii'), headers)
-        print(params)
-        req = request.Request(url=Resources.skyjson_api_url, data=params.encode('ascii'), headers=headers, method='POST')
-        '''
-        '''
+        #req = request.Request(url=Resources.skyjson_api_url, data=json_dict.encode('ascii'), headers=headers, method='POST')
         try:
-            url = rep.url
-            #response = request.urlopen(req, timeout=10)
-            #url = response.geturl()
+            response = request.urlopen(req, timeout=10)
+            url = str(response.read())
         except (URLError, socket.timeout) as err:
             print('\n*** WARNING:'+Lang.get_string("warnings/skyjson_url_connection", self.locale)+':')
             print(err)
             url = None
         except HTTPError:
             print(err)
-            print(err.code)
             url = None
         '''
         
