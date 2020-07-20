@@ -19,16 +19,17 @@ transparency = True  # If yes, then PNG have an alpha channel
 max_num_notes = 7  # Maximum number of note images in triplets and quavers, starting from 1
 quavers_overwrite = False # Force creation of circle-highlighted-1.svg type files
 
-include_css = ['common.css', 'svg.css']
+include_css = ['common.css', 'svg.css'] #css files to copy inside the svg directory before converting to PNG
 css_dir = "../resources/css"
 svg_dir = "../resources/png/svg"
 png_dir = "../resources/png"
 generic_quaver_names = ['circle-highlighted-n', 'diamond-highlighted-n', 'root-highlighted-n']
-generic_quaver_class = 'highlighted-n'
+generic_quaver_class = 'ON-n'
 
 def get_svg_paths(svg_dir, exclude_svg=[]):
     '''
     Get SVG file paths to convert
+    Should be all the .svg files in svg_dir
     '''
     svg_paths = []
     for (dirpath, dirnames, filenames) in os.walk(svg_dir):
@@ -40,13 +41,13 @@ def get_svg_paths(svg_dir, exclude_svg=[]):
     return svg_paths
 
 
-def get_theme_css(themes_dir, include=[]):
+def get_theme_css(css_dir, include=[]):
     '''
-    Get themes directories
+    Returns a dictionary of themes where the values are links to the css files of this theme
     A theme directory must contain at least one .css file
     '''
     css_paths = {}
-    for (dirpath, dirnames, filenames) in os.walk(themes_dir):
+    for (dirpath, dirnames, filenames) in os.walk(css_dir):
 
         for filename in filenames:
             if filename.lower() in include or include == []:
@@ -62,8 +63,7 @@ def get_theme_css(themes_dir, include=[]):
 def create_quavers_svgs(svg_paths, max_num_notes=7, quavers_overwrite=False):
     '''
     Creates SVG file for quavers
-    '''
-    
+    '''    
     wrote_svg = 0
     
     for svg_path in svg_paths:
@@ -87,7 +87,13 @@ def create_quavers_svgs(svg_paths, max_num_notes=7, quavers_overwrite=False):
     return wrote_svg    
 
 def convert_svg_to_png(svg_paths, exclude_svg=[], css_paths=[], png_dir=png_dir):
-
+    '''
+    For a fixed theme:
+    - copies the css files pointed by css_paths in the directory of svg_paths[0]
+    - converts all the SVG files in svg_paths to PNGs
+    - saves the PNGs in png_dir
+    - SVG files listed in exclude_svg are not converted
+    '''
     (svg_dir, _) = os.path.split(svg_paths[0])
     
     copied_css_files = []
@@ -119,7 +125,9 @@ def convert_svg_to_png(svg_paths, exclude_svg=[], css_paths=[], png_dir=png_dir)
     return png_paths
 
 def set_transparency(png_paths, transparency):
-    
+    '''
+    Sets the transparency of the given PNGs
+    '''
     for png_path in png_paths:
         (basename, ext) = os.path.splitext(png_path)
         if ext == '.png':
@@ -133,27 +141,34 @@ def set_transparency(png_paths, transparency):
 
 if __name__ == '__main__':
     
+    # Gets the SVGs files
     svg_paths = get_svg_paths(svg_dir)
     
+    # Create SVGs for quavers based on generic SVG files
     wrote_svg = create_quavers_svgs(svg_paths, max_num_notes, quavers_overwrite)
     if wrote_svg:
         print(f"\n=== Created {wrote_svg} quavers svg files ===")
-        
+    
+    # Gets the SVG files again after creating the quavers
     svg_paths = get_svg_paths(svg_dir, exclude_svg=generic_quaver_names)
     print(f"\n=== Found {str(len(svg_paths))} SVG files to convert: ===")
     print([os.path.split(svg_path)[1] for svg_path in svg_paths])
     
+    # Gets installed themes
+    # Returns a dictionary of themes names with links to associated css files
     theme_css = get_theme_css(css_dir, include=include_css)
     
     print(f"\n=== Found the following themes  with a valid CSS file: ===")
     print(theme_css)
     print('\n')
     
+    # Creates PNGs theme by theme
     png_paths = []
     for theme in theme_css:
         theme_png_dir = os.path.join(png_dir, theme)
         theme_png_paths = convert_svg_to_png(svg_paths=svg_paths, exclude_svg=generic_quaver_names, css_paths=theme_css[theme], png_dir=theme_png_dir)
         png_paths += theme_png_paths
         print(f"\n==> Converted {len(theme_png_paths)} PNGs for theme '{theme}'\n")
-        
+
+    # Sets the transparency for all created PNGs   
     set_transparency(png_paths, transparency)
