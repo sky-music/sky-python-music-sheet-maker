@@ -784,6 +784,10 @@ class MusicSheetMaker:
 
         if self.is_music_cog(recipient):
             theme = Resources.MUSIC_COG_THEME
+        elif self.is_command_line(recipient):
+            theme = Resources.COMMAND_LINE_THEME
+        elif self.is_sky_music_website(recipient):
+            theme = Resources.SKY_MUSIC_WEBSITE_THEME
         else:
             theme = Resources.get_default_theme()
 

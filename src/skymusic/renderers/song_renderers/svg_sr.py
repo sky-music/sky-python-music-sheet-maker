@@ -6,7 +6,7 @@ from src.skymusic.resources import Resources
 
 class SvgSongRenderer(song_renderer.SongRenderer):
 
-    def __init__(self, locale=None, aspect_ratio=16/9.0, theme=list(Resources.THEMES)[0]):
+    def __init__(self, locale=None, aspect_ratio=16/9.0, theme=Resources.get_default_theme()):
         
         super().__init__(locale)
         Resources.load_theme(theme)

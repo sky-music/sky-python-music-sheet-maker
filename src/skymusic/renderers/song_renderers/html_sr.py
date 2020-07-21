@@ -6,7 +6,7 @@ from src.skymusic.modes import CSSMode, RenderMode
 
 class HtmlSongRenderer(song_renderer.SongRenderer):
 
-    def __init__(self, locale=None, theme=list(Resources.THEMES)[0]):
+    def __init__(self, locale=None, theme=Resources.get_default_theme()):
         
         super().__init__(locale)
         Resources.load_theme(theme)

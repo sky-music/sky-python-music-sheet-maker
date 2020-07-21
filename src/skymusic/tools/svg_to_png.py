@@ -68,7 +68,7 @@ def create_quavers_svgs(svg_paths, max_num_notes=7, quavers_overwrite=False):
     
     for svg_path in svg_paths:
         (basepath, filename) = os.path.split(svg_path)
-        (basename, ext) = os.path.split(filename)
+        (basename, ext) = os.path.splitext(filename)
         
         if basename in generic_quaver_names:
             for i in range(1, max_num_notes + 1):
@@ -115,7 +115,7 @@ def convert_svg_to_png(svg_paths, exclude_svg=[], css_paths=[], png_dir=png_dir)
             if iscairo:
                 svg2png(url=svg_path, write_to=png_path)
             else:
-                print(f'Simulating svg2png conversion to {svg_basename}.png')
+                print(f"Simulating conversion to '{svg_basename}.png'")
             png_paths.append(png_path)
             
     #Removed copied css files       
@@ -146,8 +146,7 @@ if __name__ == '__main__':
     
     # Create SVGs for quavers based on generic SVG files
     wrote_svg = create_quavers_svgs(svg_paths, max_num_notes, quavers_overwrite)
-    if wrote_svg:
-        print(f"\n=== Created {wrote_svg} quavers svg files ===")
+    print(f"\n=== Created {wrote_svg} quavers svg files ===")
     
     # Gets the SVG files again after creating the quavers
     svg_paths = get_svg_paths(svg_dir, exclude_svg=generic_quaver_names)
@@ -163,12 +162,15 @@ if __name__ == '__main__':
     print('\n')
     
     # Creates PNGs theme by theme
-    png_paths = []
+    theme_png = {}
     for theme in theme_css:
         theme_png_dir = os.path.join(png_dir, theme)
-        theme_png_paths = convert_svg_to_png(svg_paths=svg_paths, exclude_svg=generic_quaver_names, css_paths=theme_css[theme], png_dir=theme_png_dir)
-        png_paths += theme_png_paths
-        print(f"\n==> Converted {len(theme_png_paths)} PNGs for theme '{theme}'\n")
+        theme_png[theme] = convert_svg_to_png(svg_paths=svg_paths, exclude_svg=generic_quaver_names, css_paths=theme_css[theme], png_dir=theme_png_dir)
+        print(f"\n==> Converted {len(theme_png[theme])} PNGs for theme '{theme}'\n")
 
-    # Sets the transparency for all created PNGs   
-    set_transparency(png_paths, transparency)
+    # Sets the transparency for all created PNGs
+    for theme in theme_png:
+        if iscairo:
+            set_transparency(theme_png[theme], transparency)
+        print(f"Transparency set for {len(theme_png[theme])} PNGs in theme '{theme}'.")
+

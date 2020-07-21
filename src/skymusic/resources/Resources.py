@@ -9,7 +9,7 @@ from src.skymusic.resources import fonts, png, css, js
 
 def get_default_theme():
     global THEMES
-    return THEMES[0]
+    return list(THEMES)[0]
 
 def detect_themes():
     '''
@@ -29,7 +29,8 @@ def load_theme(theme):
     
     if theme not in THEMES:
         load_theme(get_default_theme())
-    else:
+    elif THEMES[theme] is False:
+        
         png_module = importlib.import_module('.'+theme, png.__name__)
         
         png_files = importlib_resources.contents(png_module)
@@ -57,9 +58,11 @@ def load_theme(theme):
             font_color = (255, 255, 255)   #Discord colors
             png_color = (54, 57, 63)
             text_bkg = (54, 57, 63, 0)  # Transparent dark
-            song_bkg = (54, 57, 63)  # White paper sheet                 
+            song_bkg = (54, 57, 63)  # White paper sheet
+            
+        THEMES[theme] = True
 
-THEMES = ['light', 'dark']
+THEMES = {'light': False, 'dark': False}
 # THEMES = detect_themes()
 # Must be initialized with the theme names, which must correspond to directories in tue css and png folders
 
@@ -121,6 +124,8 @@ SKY_MUSIC_WEBSITE_NAME = 'sky_music_website'
 COMMAND_LINE_NAME = 'command_line'
 
 MUSIC_COG_THEME = 'dark'
+SKY_MUSIC_WEBSITE_THEME = 'light'
+COMMAND_LINE_THEME = 'light'
 
 DEFAULT_KEY = 'C'
 

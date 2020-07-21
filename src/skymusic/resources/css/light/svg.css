@@ -32,7 +32,7 @@ svg.broken rect{
 }
 
 /* <!-- Silent table  (SVG only)--> */
-svg.silent rect:not([class*="harp-background"]) {
+svg.silent rect:not([class*="-background"]) {
   stroke: grey;
   stroke-width:0;
   fill:none;
