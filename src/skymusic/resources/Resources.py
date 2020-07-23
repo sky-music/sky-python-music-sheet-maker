@@ -61,7 +61,7 @@ except FileNotFoundError:
     
 rel_css_path = '../css/main.css'
 offline_scripts_urls = []
-online_scripts_urls = ['/js/navigationTableScript.js', '/js/sheetDarkModeScript.js', '/js/sheetDownloadScript.js']
+online_scripts_urls = ['/js/navigationTableScript.js', '/js/sheetDarkModeScript.js', '/js/sheetDownloaderScript.js']
 
 script_buffers = []
 for script in offline_scripts_urls:
