@@ -78,7 +78,7 @@ png_color = (255, 255, 255)
 text_bkg = (255, 255, 255, 0)  # Transparent white
 song_bkg = (255, 255, 255)  # White paper sheet                                                                        
 
-with importlib_resources.path(fonts, 'NotoSansCJKjp-Regular.otf') as fp:
+with importlib_resources.path(fonts, 'NotoSansCJKjp-Bold.otf') as fp:
     font_path = str(fp)
     if not os.path.isfile(font_path):
         raise FileNotFoundError(f"Could not find fonts/{os.path.relpath(font_path, start=os.path.dirname(fonts.__file__))}")
