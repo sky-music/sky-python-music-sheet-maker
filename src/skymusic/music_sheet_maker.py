@@ -682,7 +682,7 @@ class MusicSheetMaker:
         if render_modes is None:
             render_modes = self.retrieve_render_modes(recipient)
 
-        time_modes = [RenderMode.MIDI] #TODO: add SkyJSON
+        time_modes = [RenderMode.MIDI, RenderMode.SKYJSON]
         if not any([mode in render_modes for mode in time_modes]):
             return None, Resources.DEFAULT_BPM
         else:

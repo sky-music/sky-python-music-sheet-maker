@@ -246,7 +246,6 @@ class Communicator:
     def query_to_discord(self, query):
         """
         Returns a text that can be sent to a Discord utils.Question model
-        TODO: send just a text or a dictionary of arguments?
         """
         result = {}
         
@@ -265,11 +264,4 @@ class Communicator:
         result.update({'result': query.get_result()})
 
         return result
-    
 
-    def discord_to_query(self, utils_question):
-
-        # TODO: This is the tricky part: how do we transform a free-text question in a precise Query?
-        # => Requires interpreting strings or finding key strings within a sentence
-        # This is usually done in the Cog, note here
-        return
