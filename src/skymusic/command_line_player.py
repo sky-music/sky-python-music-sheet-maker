@@ -17,15 +17,15 @@ try:
 except ModuleNotFoundError:
     pass  # probably Windows
 
-#============================
+#=========================================
 #SETTINGS FOR ADVANCED USERS
-SKYJSON_URL = False # To generate a temporary song link at sky-music.herokuapp.com. By default will be enabled on the Discord Music Cog but disabled on the command line (to avoid spamming this server)
+SKYJSON_URL = False # To generate a temporary song link at sky-music.herokuapp.com. By default will be enabled on the Discord Music Cog but disabled on the command line (to avoid spamming this server). Always disabled if batch_mode is True
 SONG_DIR_IN = os.path.normpath(PROJECT_ROOT + '/test_songs') # Overrides defaut input song folder
 SONG_DIR_OUT = os.path.normpath(PROJECT_ROOT + '/songs_out') # Overrides defaut output song folder
 BATCH_MODE = False # To process songs in a batch,stored as .yaml files
 BATCH_DIR = os.path.normpath(PROJECT_ROOT + '/batch_songs')
 PREFERENCES_PATH = os.path.normpath(PROJECT_ROOT + '/preferences.yaml')
-#============================
+#==========================================
 
 class CommandLinePlayer:
     """

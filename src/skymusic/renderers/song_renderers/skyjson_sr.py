@@ -62,7 +62,7 @@ class SkyjsonSongRenderer(song_renderer.SongRenderer):
             rep = requests.post(url=Resources.skyjson_api_url, json=json_dict, headers=headers, timeout=5)
             url = rep.text
 
-        except (requests.ConnectionError, requests.HTTPError) as err:
+        except (requests.ConnectionError, requests.HTTPError, requests.exceptions.ReadTimeout) as err:
             print('\n*** WARNING:'+Lang.get_string("warnings/skyjson_url_connection", self.locale)+':')
             print(err)
             url = None
