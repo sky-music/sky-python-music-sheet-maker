@@ -27,7 +27,7 @@ class SongRenderer():
         return
         
     
-    def write_buffers_to_files(self, song, render_mode, buffers, dir_out):
+    def write_buffers_to_files(self, song_title, render_mode, buffers, dir_out):
         """
         Writes the content of an IOString or IOBytes buffer list to one or several files.
         Command line only
@@ -38,7 +38,7 @@ class SongRenderer():
             buffers = [buffers]
             numfiles = 1
 
-        file_paths = self.build_file_paths(song, render_mode, numfiles, dir_out)
+        file_paths = self.build_file_paths(song_title, render_mode, numfiles, dir_out)
         
         # Creates output directory if did not exist
         for file_path in file_paths:
@@ -66,20 +66,14 @@ class SongRenderer():
         return written_paths
 
 
-    def build_file_paths(self, song, render_mode, numfiles, dir_out):
+    def build_file_paths(self, song_title, render_mode, numfiles, dir_out):
         """
         Command line only : generates a list of file paths for a given input mode.
         """
         if numfiles == 0:
             return []
-        
-        sanitized_title = re.sub(r'[\\/:"*?<>|]', '', re.escape(song.get_title())).strip()
-        sanitized_title = re.sub('(\s)+', '_', sanitized_title)  # replaces spaces by underscore
-        sanitized_title = sanitized_title[:31]
-        if len(sanitized_title) == 0 or sanitized_title == '_':
-            sanitized_title = Lang.get_string("song_meta/untitled", self.locale)
-        
-        file_base = os.path.join(dir_out, sanitized_title)
+                
+        file_base = os.path.join(dir_out, song_title)
         file_ext = render_mode.extension
 
         file_paths = []

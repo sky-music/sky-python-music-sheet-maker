@@ -48,10 +48,14 @@ class SongBundle:
         
         self.meta.update(meta)
 
-    def get_song_title(self):
+    def get_sanitized_song_title(self):
         
         try:
-            return self.meta['title']
+            title = self.meta['title']
+            sanitized_title = re.sub(r'[\\/:"*?<>|]', '', re.escape(title)).strip()
+            sanitized_title = re.sub('(\s)+', '_', sanitized_title)  # replaces spaces by underscore
+            sanitized_title = sanitized_title[:31]
+            return sanitized_title
         except KeyError:
             return ''
         
@@ -70,25 +74,28 @@ class SongBundle:
         if any([not isinstance(buffer, (io.StringIO, io.BytesIO)) for buffer in buffers]):
             raise MusicSheetMakerError('An invalid buffer type was passed to SongBundle')
 
-        #for buffer in buffers:
-        #    buffer.seek(0)
-        
         self.renders.update({render_mode: buffers})
 
 
-    def get_renders(self, render_modes):
-        
-        if not isinstance(render_modes, (list, tuple, set)):
-            render_modes = [render_modes]
-        renders = []
-        for render_mode in render_modes:
-            if render_mode in self.renders:
-                renders.append(self.renders[render_mode])
-        return renders
+    def get_renders(self, render_modes=[]):
+        """
+        Returns a fraction or the whole renders dictionary        
+        """
+        if not render_modes:
+            return self.renders
+        else:        
+            if not isinstance(render_modes, (list, tuple, set)):
+                render_modes = [render_modes]
+            return { key:value for key, value in self.renders.items() if key in render_modes }
 
-    def get_all_renders(self):
-        
-        return self.renders
+    def get_buffers(self, render_mode):
+        """
+        Returns the buffer list for a given RenderMode
+        """
+        try:
+            return self.renders[render_mode]
+        except KeyError:
+            return []
 
 
 class MusicSheetMaker:
@@ -300,15 +307,13 @@ class MusicSheetMaker:
         return song_bundle
 
 
-    def send_json_url(self, recipient, song_bundle, prerequisites=None, execute=True):
+    def send_json_url(self, recipient, song_bundle, skyjson_api_key=None, prerequisites=None, execute=True):
         
-        json_buffer = song_bundle.get_renders([RenderMode.SKYJSON])
+        json_buffers = song_bundle.get_buffers(RenderMode.SKYJSON)
         
-        if json_buffer:
-            
-            json_buffer = json_buffer[0][0]
-            
-            url = skyjson_sr.SkyjsonSongRenderer(locale=self.locale).generate_url(json_buffer)
+        if json_buffers:
+                        
+            url = skyjson_sr.SkyjsonSongRenderer(locale=self.locale).generate_url(json_buffers[0], skyjson_api_key)
             
             replacements={'url': url}
             
@@ -800,19 +805,20 @@ class MusicSheetMaker:
             if buffers is not None:
                 song_bundle.add_render(render_mode, buffers)
                 if self.is_command_line(recipient):
-                    self.send_buffers_to_files(render_mode, buffers, recipient=recipient)
+                    song_title = song_bundle.get_sanitized_song_title()
+                    self.send_buffers_to_files(song_title, render_mode, buffers, recipient=recipient)
                         
         return song_bundle
 
 
-    def send_buffers_to_files(self, render_mode, buffers, recipient, prerequisites=None, execute=True):
+    def send_buffers_to_files(self, song_title, render_mode, buffers, recipient, prerequisites=None, execute=True):
         """
         Writes the content of an IOString or IOBytes buffer list to one or several files.
         Command line only
         """
         song_renderer = SongRenderer(self.locale)
         
-        file_paths = song_renderer.write_buffers_to_files(self.get_song(), render_mode, buffers, self.song_dir_out)
+        file_paths = song_renderer.write_buffers_to_files(song_title, render_mode, buffers, self.song_dir_out)
         
         numfiles = len(file_paths)
         

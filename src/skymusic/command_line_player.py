@@ -125,7 +125,7 @@ class CommandLinePlayer:
                 self.yaml_song = yaml.safe_load(file)
                 return self.yaml_song
         except (FileNotFoundError, PermissionError):
-            return None               
+            return None
         
 
     def receive(self, *args, **kwargs):

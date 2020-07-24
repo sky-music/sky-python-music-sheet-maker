@@ -97,7 +97,7 @@ for script in offline_scripts_urls:
 
 # To generate a link by sky-musiv.herokuapp.com
 skyjson_api_url = "https://sky-music.herokuapp.com/api/generateTempSong"
-skyjson_api_key = '{{ API_KEY }}'    
+skyjson_api_key = ""    
 
 harp_font_size = 38
 voice_font_size = 32
