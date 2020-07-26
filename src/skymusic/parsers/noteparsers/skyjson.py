@@ -7,14 +7,14 @@ class SkyJson(noteparser.NoteParser):
     def __init__(self, **kwargs):
 
         super().__init__(**kwargs)
-
+        #The numbers should have 2 digits and not 1 to ease splitting of glued chords. The input notes with only 1 digit will be sanitized to have two
         self.position_map = {
             '.': (-1, -1),
             'Key00': (0, 0), 'Key01': (0, 1), 'Key02': (0, 2), 'Key03': (0, 3), 'Key04': (0, 4),
             'Key05': (1, 0), 'Key06': (1, 1), 'Key07': (1, 2), 'Key08': (1, 3), 'Key09': (1, 4),
             'Key10': (2, 0), 'Key11': (2, 1), 'Key12': (2, 2), 'Key13': (2, 3), 'Key14': (2, 4)
         }
-
+        #Only one digit because it is the format chosen by Specy
         self.inverse_position_map = {
             (-1, -1): '.',
             (0, 0): '1Key0', (0, 1): '1Key1', (0, 2): '1Key2', (0, 3): '1Key3', (0, 4): '1Key4',
@@ -67,7 +67,10 @@ class SkyJson(noteparser.NoteParser):
         return note_name
 
     def sanitize_digits(self, note):
-        
+        '''
+        Reformats notes from 0Key2 to 01Key02
+        to avoid confusion between 1 and 10 when splitting chords with glued notes, e.g. 01Key0101Key02
+        '''
         sanitized_note = re.sub(r'\b(\d)([^\d])', r'0\g<1>\g<2>', note)
 
         sanitized_note = re.sub(r'([^\d])(\d)\b', r'\g<1>0\g<2>', sanitized_note)

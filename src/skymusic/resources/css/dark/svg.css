@@ -1,0 +1,100 @@
+/* <!-- Element background color for icons in ../elements
+Set to none to have a transparent SVG, and a transparent PNG with alpha layer (RGBA) later
+Set to white to make the background white in RGB mode, and the PNG background white when converted to RGB
+--> */
+svg rect.harp-background {
+  fill:rgb(54, 57, 63);
+}
+
+svg rect.note-background {
+  fill:rgb(54, 57, 63);
+}
+
+/* <!-- Sky chord chart: a table with rounded edges (SVG only) --> */
+svg rect.harp {
+  fill:rgb(54, 57, 63);
+  stroke-width:1;
+  stroke:white;
+}
+
+/* <!-- Sky chord chart: a table with rounded edges and thick edges (for rendering PNG from SVG only) --> */
+svg rect.harp-png {
+  fill:rgb(54, 57, 63);
+  stroke-width:3;
+  stroke:white;
+}
+
+/* <!-- Makes the table disappear in case of broken chord  (SVG only)--> */
+svg.broken rect {
+  fill:none;
+  stroke-width:0;
+  stroke:white;
+}
+
+/* <!-- Silent table  (SVG only)--> */
+svg.silent rect:not([class*="-background"]) {
+  stroke: grey;
+  stroke-width:0;
+  fill:none;
+}
+
+/* <!-- Sky voice (SVG only) --> */
+svg text.voice {
+  font-family: "Noto Sans", "Noto Sans CJK JP", "Noto Sans CJK KR", "Noto Sans CJK SC", "Noto Sans CJK TC", "Avenir", Arial, sans-serif;
+  font-size: 0.8em;
+  stroke: none;
+  fill:white;
+  dominant-baseline: middle;
+}
+
+/* <!-- Bottom-left corner repetition mark --> (SVG only) */
+svg.repeat text.repeat {
+  stroke: none;
+  fill:white;
+  dominant-baseline: baseline;
+  font-size: 0.9em;
+  font-family: "Noto Sans", "Noto Sans CJK JP", "Noto Sans CJK KR", "Noto Sans CJK SC", "Noto Sans CJK TC", "Avenir", Arial, sans-serif;
+}
+
+/* <!-- (SVG) only)--> */
+svg line.divide {
+    stroke: white;
+    stroke-width: 1.0px;
+}
+
+
+/* <!-- Small buttons showing notes positions --> */
+svg.button-0 .OFF.icon,
+svg.button-1 .OFF.icon,
+svg.button-2 .OFF.icon,
+svg.button-3 .OFF.icon,
+svg.button-4 .OFF.icon {
+  stroke-width: 0;
+  stroke: white;
+  fill: rgb(194,240,194);
+  opacity: 1;
+}
+
+/* <!-- Small buttons showing notes positions --> */
+svg.button-5 .OFF.icon,
+svg.button-6 .OFF.icon,
+svg.button-7 .OFF.icon,
+svg.button-8 .OFF.icon,
+svg.button-9 .OFF.icon {
+  stroke-width: 0;
+  stroke: white;
+  fill: rgb(179,236,255);
+  opacity: 1;
+}
+
+/* <!-- Small buttons showing notes positions --> */
+svg.button-10 .OFF.icon,
+svg.button-11 .OFF.icon,
+svg.button-12 .OFF.icon,
+svg.button-13 .OFF.icon,
+svg.button-14 .OFF.icon {
+  stroke-width: 0;
+  stroke: white;
+  fill: rgb(255,185,223);
+  opacity: 1;
+}

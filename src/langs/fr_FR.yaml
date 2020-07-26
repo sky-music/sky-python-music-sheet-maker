@@ -2,6 +2,7 @@
 warnings:
   jianpu_pause: "Notation Jianpu: j'utilise '0' pour marquer la pause au lieu de '{pause}'. Merci de respecter cette convention."
   jianpu_quaver_delimiter: "Notation Jianpu: j'utilise '{jianpu_quaver_delimiter}' pour séparer les croches au lieu de '{quaver_delimiter}'. Merci de respecter cette convention."
+  skyjson_url_connection: "Connection error when trying to get url from sky-music.herokuapp.com"
 recipient_specifics:
   skip:
     command_line: laissez vide et tapez entrée
@@ -309,5 +310,11 @@ stock_queries:
       - You have entered at least one valid note
       - If you entered an HTML visual sheet file, make sure it has been generated after the 1st July 2020 and contains the tag <div id='ascii' hidden>
       
+    input_tip: click OK to acknowledge
+    help_text:
+  skyjson_url:
+    foreword:
+    question: 'You can listen to your song being played by our partner website at: <{url}>'
+    afterword:
     input_tip: click OK to acknowledge
     help_text:

@@ -13,7 +13,7 @@ except (ImportError, ModuleNotFoundError):
 
 class MidiSongRenderer(song_renderer.SongRenderer):
 
-    def __init__(self, locale=None, song_bpm=120):
+    def __init__(self, locale=None, song_bpm=Resources.DEFAULT_BPM):
         
         super().__init__(locale)
         
@@ -21,11 +21,11 @@ class MidiSongRenderer(song_renderer.SongRenderer):
             # CAUTION: instrument codes correspond to General Midi codes (see Wikipedia) minus 1
             # An instrument will sound very strange if played outside its natural pitch range
             midi_instruments = {'piano': 0, 'guitar': 24, 'flute': 73, 'pan': 75}
-            self.midi_note_duration = 0.3  # note duration is seconds for 120 bpm
+            self.midi_note_duration = 0.3*Resources.DEFAULT_BPM/120  # note duration is 0.3 seconds for 120 bpm
             if isinstance(song_bpm, (int, float)):
                 self.midi_bpm = song_bpm  # Beats per minute
             else:
-                self.midi_bpm = 120
+                self.midi_bpm = Resources.DEFAULT_BPM
             self.midi_instrument = midi_instruments['piano']
             self.midi_key = None
 
@@ -62,15 +62,15 @@ class MidiSongRenderer(song_renderer.SongRenderer):
         try:
             tempo = mido.bpm2tempo(self.midi_bpm)
         except ValueError:
-            print("\n***ERROR: invalid tempo passed to MIDI renderer. Using 120 bpm instead.")
-            tempo = mido.bpm2tempo(120)
+            print(f"\n***ERROR: invalid tempo passed to MIDI renderer. Using {Resources.DEFAULT_BPM} bpm instead.")
+            tempo = mido.bpm2tempo(Resources.DEFAULT_BPM)
 
         mid = mido.MidiFile(type=0)
         track = mido.MidiTrack()
         mid.tracks.append(track)
 
         sec = mido.second2tick(1, ticks_per_beat=mid.ticks_per_beat, tempo=tempo)  # 1 second in ticks
-        note_ticks = self.midi_note_duration * sec * 120 / self.midi_bpm  # note duration in ticks
+        note_ticks = self.midi_note_duration * sec * Resources.DEFAULT_BPM / self.midi_bpm  # note duration in ticks
                         
         self.write_header(mid, track, tempo)
 

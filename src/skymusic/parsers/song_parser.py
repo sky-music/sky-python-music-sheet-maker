@@ -1,5 +1,4 @@
 import os, re, json
-
 from src.skymusic import instruments, Lang
 from src.skymusic.modes import InputMode
 from src.skymusic.song import Song

@@ -25,7 +25,7 @@ class AsciiSongRenderer(song_renderer.SongRenderer):
                 ascii_buffer.write(f"{Resources.COMMENT_DELIMITER}{meta[k][0]}{meta[k][1]}\n")
 
         if render_mode.get_is_chromatic():
-            ascii_buffer.write(Resources.COMMENT_DELIMITER+'\nCAUTION: Conversion to a text file with a song key different from C (do, 1) is not supported yet. We assumed it was C.')
+            ascii_buffer.write('\n'+Resources.COMMENT_DELIMITER+'CAUTION: Conversion to a text file with a song key different from C (do, 1) is not supported yet. We assumed it was C.'+'\n')
         song_render = ''
         instrument_index = 0
         for line in song.get_lines():

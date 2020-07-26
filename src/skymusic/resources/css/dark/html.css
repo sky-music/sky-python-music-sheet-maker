@@ -1,0 +1,149 @@
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* <!-- Navigation table (HTML only) --> */
+#navigation {
+  border: none;
+}
+/* <!-- Song table (HTML only) --> */
+#transcript {
+  margin: 0 0;
+}
+
+/* <!-- Defines the em unit (HTML only) --> */
+body {
+  font-family: "Noto Sans", "Noto Sans CJK JP", "Noto Sans CJK KR", "Noto Sans CJK SC", "Noto Sans CJK TC", "Avenir", Arial, sans-serif;
+  font-size: 12pt;
+  color: white;
+}
+
+/* <!-- Song headers (HTML only) --> */
+p, svg text.headers {
+    font-family: "Noto Sans", "Noto Sans CJK JP", "Noto Sans CJK KR", "Noto Sans CJK SC", "Noto Sans CJK TC", "Avenir", Arial, sans-serif;
+    font-size: 0.8em;
+    line-height: 50%;
+    color: white;
+}
+
+/* <!-- Alignment of svg (HTML only) --> */
+/* <!-- Seems to have no effect ? --> */
+.root svg, .diamond svg, .circle svg {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* <!-- Sky chord chart: a table with rounded edges (HTML only) --> */
+table {
+  margin-top: 0px;
+  margin-bottom: 0px;
+  margin-left: 4px;
+  margin-right: 0px;
+  padding: 0px;
+  display: inline-block;
+  border-style: solid;
+  border-radius: 5px;
+  border-width: 1px;
+  border-color: white+;
+  border-spacing: 0 auto;
+}
+
+/* <!-- WARNING: The td font size affects the note size! (HTML only)--> */
+td {
+  padding-top: 0px;
+  padding-bottom: 0px;
+  margin: 0px;
+  font-size: 1.0em;
+  color: white;
+}
+
+/* <!-- Makes the table disappear in case of broken chord  (HTML only)--> */
+table.broken {
+  border-color: #121212;
+  border-width: 0;
+}
+
+/* <!-- Silent table  (HTML only)--> */
+table.silent {
+  border-color:transparent;
+}
+
+/* <!-- Lyrics table  (HTML only)--> */
+table.voice {
+  margin-top: 0px;
+  margin-bottom: 0px;
+  margin-left: 4px;
+  margin-right: 0px;
+  padding: 0px;
+  border-radius: 0px;
+  border-width: 0px;
+}
+
+/* <!-- Lyrics table column (HTML only)--> */
+table.voice td {
+  padding-top: 0px;
+  padding-bottom: 0px;
+  margin: 0px;
+  font-size: 0.8em;
+  width: 7.5em;
+  text-align: center;
+}
+
+/* <!-- Invisible table to contain the repetition mark (HTML only) --> */
+table.repeat {
+  margin: 0px;
+  padding: 0px;
+  border-radius: 0px;
+  border-width: 0px;
+  font-size: 0.9em;
+}
+
+/* <!-- Horizontal line (HTML only) --> */
+hr {
+  height: 2px;
+  background-color: #BBBBBB;
+  border: none;
+  opacity: 1;
+  padding: 0;
+  margin-top: 0px;
+  margin-bottom: 4px;
+}
+
+/* <!-- Note width (HTML only)--> */
+table svg[class*="button-"] {
+  width: 1em;
+  height: 1em;
+}
+
+/* <!-- Note background when the chord is or is silent (HTML only) --> */
+table.broken .ON-0.button,
+table.silent .ON-0.button {
+  stroke-width: 0;
+  stroke: #545763;
+  fill: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #545763;
+  }
+  table {
+    border-color: white;
+  }
+  table.broken {
+    border-color: #545763;
+  }
+  table.broken .ON-0.button,
+  table.silent .ON-0.button {
+    stroke: #545763;
+  }
+  p, body, td, text.headers {
+  color: white;  
+  }
+}

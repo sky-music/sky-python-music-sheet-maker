@@ -16,9 +16,10 @@ except (ImportError, ModuleNotFoundError):
 
 class PngSongRenderer(song_renderer.SongRenderer):
 
-    def __init__(self, locale=None, aspect_ratio=16/9.0):
+    def __init__(self, locale=None, aspect_ratio=16/9.0, theme=Resources.get_default_theme()):
         
         super().__init__(locale)
+        Resources.load_theme(theme)
         
         self.harp_AspectRatio = 1.455
         self.harp_relspacings = (0.13, 0.1)  # Fraction of the harp width that will be allocated to the spacing between harps
@@ -28,6 +29,7 @@ class PngSongRenderer(song_renderer.SongRenderer):
         self.maxFiles = Resources.MAX_NUM_FILES
 
         if not no_PIL_module:
+            Resources.load_theme(theme)
             png_instrument_renderer = PngInstrumentRenderer(self.locale)
             self.png_size = (round(self.aspect_ratio*750 * 2), 750 * 2)  # must be an integer tuple
             self.png_margins = (13, 7)
@@ -41,10 +43,8 @@ class PngSongRenderer(song_renderer.SongRenderer):
             self.png_lyric_size = None
             self.png_dpi = (96 * 2, 96 * 2)
             self.png_compress = Resources.png_compress
-            self.font_color = (0, 0, 0)
-            self.png_color = (255, 255, 255)
-            # self.font_color = (0, 0, 0)   #Discord colors
-            # self.png_color = (54, 57, 63)    #Discord colors
+            self.font_color = Resources.font_color
+            self.png_color = Resources.png_color
             self.png_font_size = Resources.png_font_size
             self.png_title_font_size = Resources.png_title_font_size
             self.png_font_path = Resources.font_path

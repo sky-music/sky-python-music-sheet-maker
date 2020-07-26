@@ -3,6 +3,7 @@ from src.skymusic.modes import InputMode, CSSMode, RenderMode, ReplyType, Aspect
 from src.skymusic.communicator import Communicator, QueriesExecutionAbort
 from src.skymusic.parsers.song_parser import SongParser
 from src.skymusic.renderers.song_renderers.song_renderer import SongRenderer
+from src.skymusic.renderers.song_renderers import skyjson_sr
 from src.skymusic import Lang
 from src.skymusic.resources import Resources
 
@@ -47,10 +48,14 @@ class SongBundle:
         
         self.meta.update(meta)
 
-    def get_song_title(self):
+    def get_sanitized_song_title(self):
         
         try:
-            return self.meta['title']
+            title = self.meta['title']
+            sanitized_title = re.sub(r'[\\/:"*?<>|]', '', re.escape(title)).strip()
+            sanitized_title = re.sub('(\s)+', '_', sanitized_title)  # replaces spaces by underscore
+            sanitized_title = sanitized_title[:31]
+            return sanitized_title
         except KeyError:
             return ''
         
@@ -69,27 +74,33 @@ class SongBundle:
         if any([not isinstance(buffer, (io.StringIO, io.BytesIO)) for buffer in buffers]):
             raise MusicSheetMakerError('An invalid buffer type was passed to SongBundle')
 
-        #for buffer in buffers:
-        #    buffer.seek(0)
-        
         self.renders.update({render_mode: buffers})
 
 
-    def get_render(self, render_mode):
-        
-        if render_mode in self.renders:
-            return self.renders[render_mode]
-        else:
-            return None
+    def get_renders(self, render_modes=[]):
+        """
+        Returns a fraction or the whole renders dictionary        
+        """
+        if not render_modes:
+            return self.renders
+        else:        
+            if not isinstance(render_modes, (list, tuple, set)):
+                render_modes = [render_modes]
+            return { key:value for key, value in self.renders.items() if key in render_modes }
 
-    def get_all_renders(self):
-        
-        return self.renders
+    def get_buffers(self, render_mode):
+        """
+        Returns the buffer list for a given RenderMode
+        """
+        try:
+            return self.renders[render_mode]
+        except KeyError:
+            return []
 
 
 class MusicSheetMaker:
 
-    def __init__(self, locale='en_US', song_dir_in=None, song_dir_out=None):
+    def __init__(self, locale='en_US', song_dir_in=None, song_dir_out=None, enable_skyjson_url=False):
         self.name = Resources.MUSIC_MAKER_NAME
         self.locale = self.set_locale(locale)
         self.communicator = Communicator(owner=self, locale=self.locale)
@@ -98,15 +109,14 @@ class MusicSheetMaker:
         self.directory_base = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'))
         self.song_dir_in = song_dir_in if song_dir_in is not None else os.path.join(self.directory_base, 'test_songs')
         self.song_dir_out = song_dir_out if song_dir_out is not None else os.path.join(self.directory_base, 'songs_out')
-        #self.css_path = Resources.css_path
-        #self.rel_css_path = os.path.relpath(self.css_path, start=self.song_dir_out)
         self.css_mode = CSSMode.EMBED
         self.render_modes_enabled = [mode for mode in RenderMode]
         # self.render_modes_disabled = [RenderMode.JIANPUASCII, RenderMode.DOREMIASCII]
         self.render_modes_disabled = []
         self.render_modes_enabled = [mode for mode in self.render_modes_enabled if
                                      mode not in self.render_modes_disabled]
-        self.music_cog_render_modes = [RenderMode.PNG]
+        self.music_cog_render_modes = [RenderMode.PNG, RenderMode.SKYJSON]
+        self.enable_skyjson_url = enable_skyjson_url
 
     def __getattr__(self, attr_name):
         """
@@ -288,10 +298,41 @@ class MusicSheetMaker:
 
         # 13. Renders Song
         song_bundle = self.render_song(recipient=recipient, render_modes=render_modes, aspect_ratio=aspect_ratio, song_bpm=song_bpm)
-
-        # 14. Sends result back (required for website)
+        
+        # 14. Sends an url from sky-music.herokuapp.com
+        if self.enable_skyjson_url:
+            self.send_json_url(recipient=recipient, song_bundle=song_bundle)
+        
+        # 15. Sends result back (required for website)
         return song_bundle
 
+
+    def send_json_url(self, recipient, song_bundle, skyjson_api_key=None, prerequisites=None, execute=True):
+        
+        json_buffers = song_bundle.get_buffers(RenderMode.SKYJSON)
+        
+        if json_buffers:
+                        
+            url = skyjson_sr.SkyjsonSongRenderer(locale=self.locale).generate_url(json_buffers[0], skyjson_api_key)
+            
+            replacements={'url': url}
+            
+            if url:
+                i_url = self.communicator.send_stock_query('skyjson_url', recipient=recipient,
+                                                             replacements=replacements, prerequisites=prerequisites)
+            else:
+                i_url = None
+        else:
+            i_url = None
+            
+        
+        if execute and i_url is not None:
+            recipient.execute_queries(i_url)
+            ok = i_url.get_reply().get_result()
+            return i_url, ok
+        else:
+            return i_url, None
+        
 
     def ask_instructions(self, recipient, prerequisites=None, execute=True):
 
@@ -314,8 +355,8 @@ class MusicSheetMaker:
                                                          replacements=replacements, prerequisites=prerequisites)
         if execute:
             recipient.execute_queries(i_instr)
-            instructions = i_instr.get_reply().get_result()
-            return i_instr, instructions
+            ok = i_instr.get_reply().get_result()
+            return i_instr, ok
         else:
             return i_instr, None
 
@@ -610,8 +651,8 @@ class MusicSheetMaker:
 
         if execute and i_error is not None:
             recipient.execute_queries(i_error)
-            error_message = i_error.get_reply().get_result()
-            return i_error, error_message
+            ok = i_error.get_reply().get_result()
+            return i_error, ok
         else:
             return i_error, None
 
@@ -641,9 +682,9 @@ class MusicSheetMaker:
         if render_modes is None:
             render_modes = self.retrieve_render_modes(recipient)
 
-        time_modes = [RenderMode.MIDI] #TODO: add SkyJSON
+        time_modes = [RenderMode.MIDI, RenderMode.SKYJSON]
         if not any([mode in render_modes for mode in time_modes]):
-            return None, 120
+            return None, Resources.DEFAULT_BPM
         else:
             replacements = {'skip_number': Lang.get_string(f"recipient_specifics/skip_number/{recipient.get_name()}", self.locale)}
             q_song_bpm = self.communicator.send_stock_query('song_bpm', recipient=recipient,
@@ -726,7 +767,7 @@ class MusicSheetMaker:
         return
 
 
-    def render_song(self, recipient, render_modes=None, aspect_ratio=AspectRatio.WIDESCREEN, song_bpm=120):
+    def render_song(self, recipient, render_modes=None, aspect_ratio=AspectRatio.WIDESCREEN, song_bpm=Resources.DEFAULT_BPM):
 
         if render_modes is None:
             if self.is_music_cog(recipient):
@@ -735,7 +776,7 @@ class MusicSheetMaker:
                 render_modes = self.render_modes_enabled
         
         if not isinstance(song_bpm, (float, int)):
-            song_bpm = 120
+            song_bpm = Resources.DEFAULT_BPM
 
         if not isinstance(aspect_ratio, AspectRatio):
             aspect_ratio = AspectRatio.WIDESCREEN
@@ -746,28 +787,38 @@ class MusicSheetMaker:
         if self.is_command_line(recipient):
             print("=" * 40)
 
+        if self.is_music_cog(recipient):
+            theme = Resources.MUSIC_COG_THEME
+        elif self.is_command_line(recipient):
+            theme = Resources.COMMAND_LINE_THEME
+        elif self.is_sky_music_website(recipient):
+            theme = Resources.SKY_MUSIC_WEBSITE_THEME
+        else:
+            theme = Resources.get_default_theme()
+
         song_bundle = SongBundle()
         song_bundle.set_meta(self.get_song().get_meta())
 
         for render_mode in render_modes:
-            buffers = self.get_song().render(render_mode=render_mode, aspect_ratio=aspect_ratio, song_bpm=song_bpm, css_mode=self.css_mode)  # A list of IOString or IOBytes buffers
+            buffers = self.get_song().render(render_mode=render_mode, aspect_ratio=aspect_ratio, song_bpm=song_bpm, css_mode=self.css_mode, theme=theme)  # A list of IOString or IOBytes buffers
             
             if buffers is not None:
                 song_bundle.add_render(render_mode, buffers)
                 if self.is_command_line(recipient):
-                    self.send_buffers_to_files(render_mode, buffers, recipient=recipient)
+                    song_title = song_bundle.get_sanitized_song_title()
+                    self.send_buffers_to_files(song_title, render_mode, buffers, recipient=recipient)
                         
         return song_bundle
 
 
-    def send_buffers_to_files(self, render_mode, buffers, recipient, prerequisites=None, execute=True):
+    def send_buffers_to_files(self, song_title, render_mode, buffers, recipient, prerequisites=None, execute=True):
         """
         Writes the content of an IOString or IOBytes buffer list to one or several files.
         Command line only
         """
         song_renderer = SongRenderer(self.locale)
         
-        file_paths = song_renderer.write_buffers_to_files(self.get_song(), render_mode, buffers, self.song_dir_out)
+        file_paths = song_renderer.write_buffers_to_files(song_title, render_mode, buffers, self.song_dir_out)
         
         numfiles = len(file_paths)
         
@@ -899,7 +950,10 @@ class MusicSheetMaker:
 
 
     def retrieve_render_modes(self, recipient):
-
+        """
+        Retrieves render modes from previous answered queries.
+        Should work, but not fully tested
+        """       
         if self.is_music_cog(recipient):
             return self.music_cog_render_modes
 
