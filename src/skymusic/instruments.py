@@ -1,5 +1,4 @@
-#import os
-#import io
+import re
 from src.skymusic import notes
 
 class Instrument():
@@ -66,9 +65,13 @@ class Voice(Instrument):  # Lyrics or comments
         super().__init__()
         self.type = 'voice'
         self.lyric = ''
+        self.TAG_RE = re.compile(r'<[^>]+>')
 
-    def get_lyric(self):
-        return self.lyric
+    def get_lyric(self, strip_html=False):
+        if strip_html:
+            return self.TAG_RE.sub('', self.lyric)
+        else:
+            return self.lyric
 
     def set_lyric(self, lyric):
         self.lyric = lyric

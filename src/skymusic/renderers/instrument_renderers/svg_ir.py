@@ -9,7 +9,7 @@ class SvgInstrumentRenderer(instrument_renderer.InstrumentRenderer):
     def render_voice(self, instrument, x, width: str, height: str, aspect_ratio):
         """Renders the lyrics text in SVG"""
         voice_render = (f'\n<svg x="{x :.2f}" y="0" width="100%" height="{height}" class="voice voice-{instrument.get_index()}">'
-                        f'\n<text x="0%" y="50%" class="voice voice-{instrument.get_index()}">{instrument.lyric}</text>'
+                        f'\n<text x="0%" y="50%" class="voice voice-{instrument.get_index()}">{instrument.get_lyric(strip_html=True)}</text>'
                         f'</svg>')
 
         return voice_render
