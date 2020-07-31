@@ -25,7 +25,9 @@ class MusicTheory():
         """
         try:
             json_dict = json.loads(song_lines[0])
-            json_dict[0]['songNotes']
+            if isinstance(json_dict, list):
+                json_dict = json_dict[0]
+            json_dict['songNotes']
             return [InputMode.SKYJSON]
         except (json.JSONDecodeError, NameError, TypeError):
             pass        

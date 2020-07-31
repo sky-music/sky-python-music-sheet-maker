@@ -352,7 +352,17 @@ class SongParser:
     def split_json(self, line):
         
         json_dict = json.loads(line).copy()
-        notes = json_dict[0]['songNotes']
+        if isinstance(json_dict, list):
+            json_dict = json_dict[0]
+        try:
+            is_encrypted = json_dict['isEncrypted']
+        except KeyError:
+            is_encrypted = False
+            
+        if is_encrypted:
+            raise SongParserError("Cannot parse an encrypted song.")
+            
+        notes = json_dict['songNotes']
 
         times = [note['time'] for note in notes]
         keys = [note['key'] for note in notes]
