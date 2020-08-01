@@ -55,7 +55,6 @@ class SkyjsonSongRenderer(song_renderer.SongRenderer):
         json_buffer.seek(0)
         json_dict = json.load(json_buffer)
         json_dict = {'API_KEY': api_key, 'song': json_dict}
-        #json_post_data = json.dumps(json_dict)
         
         headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
         try:
