@@ -23,8 +23,8 @@ recipient_specifics:
     sky_music_website: bở trống hoặc nhập số 0 và bấm trả lời
   all_modes:
     command_line: nhập các lựa chọn đặc cách nhau bởi dấu phẩy, or 'all' to select all formats
-    music_cog:
-    sky_music_website:
+    music_cog: 
+    sky_music_website: 
 input_mode:
   skykeyboard:
     short_desc: Bàn phím Sky 

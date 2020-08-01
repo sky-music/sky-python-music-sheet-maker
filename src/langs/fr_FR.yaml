@@ -14,8 +14,8 @@ recipient_specifics:
     sky_music_website: appuyez sur 'send answer'
   all_modes:
     command_line: Entrez une liste de nombres, ou 'all' pour sélectionner tous les formats
-    music_cog:
-    sky_music_website:
+    music_cog: 
+    sky_music_website: 
 input_mode:
   skykeyboard:
     short_desc: Clavier

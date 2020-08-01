@@ -102,7 +102,9 @@ def get_string(key, locale=None, replacements=()):
             return ''
             # raise KeyError(f"Unknown lang key: {i}")
 
-        if isinstance(obj[i], str):
+        if obj[i] is None:
+            return ''
+        elif isinstance(obj[i], str):
             if len(replacements) != 0:
                 return obj[i].format(*replacements)
             else:

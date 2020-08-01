@@ -14,8 +14,8 @@ recipient_specifics:
     sky_music_website: 按输入
   all_modes:
     command_line: 在已选择的数字中间加入逗号, or 'all' to select all formats
-    music_cog:
-    sky_music_website:
+    music_cog: 
+    sky_music_website: 
 input_mode:
   skykeyboard:
     short_desc: 光遇游戏键盘

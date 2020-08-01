@@ -13,8 +13,8 @@ recipient_specifics:
     sky_music_website: press answer
   all_modes:
     command_line: Type choice numbers, or 'all' to select all formats
-    music_cog:
-    sky_music_website:
+    music_cog: 
+    sky_music_website: 
 input_mode:
   skykeyboard:
     short_desc: Sky keyboard
