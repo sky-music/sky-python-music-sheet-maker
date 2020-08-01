@@ -16,6 +16,13 @@ recipient_specifics:
     command_line: Entrez une liste de nombres, ou 'all' pour sélectionner tous les formats
     music_cog: 
     sky_music_website: 
+instrument:
+  harp:
+    short_desc: Instrument normal
+    long_desc: "Instrument normal"
+  drum:
+    short_desc: Tambour
+    long_desc: "Tambour"    
 input_mode:
   skykeyboard:
     short_desc: Clavier
@@ -135,6 +142,13 @@ stock_queries:
       - Tapez "{quaver_delimiter}" pour relier les notes entre elles, pour les triplets... (e.g. {quaver_example}). En Jianpu, utilisez "{jianpu_quaver_delimiter}" au lieu de '-' pour éviter la confusion avec l'octave.
       - Tapez "{repeat_indicator}" après un groupe de notes pour indiquer la répétition.
       - Les dièses "#" et les bémoles "b" (demi-tons) sont possibles pour les notations autres que Sky ABC-15.
+  instrument_type:
+    foreword:
+    question: Merci de choisir votre instrument
+    afterword:
+    input_tip: Merci de choisir votre instrument
+    help_text: |
+      The drum is special because it only has 2 rows and 4 columns
   render_modes:
     foreword:
     question: Choisissez les formats d'exportation de la chanson. {all_modes}

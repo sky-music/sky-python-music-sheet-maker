@@ -1,5 +1,5 @@
 import re, os
-from src.skymusic.modes import ReplyType, InputMode, RenderMode, AspectRatio
+from src.skymusic.modes import ReplyType, InputMode, RenderMode, AspectRatio, InstrumentType
 from datetime import datetime
 import hashlib
 from fractions import Fraction
@@ -401,27 +401,21 @@ class Query:
             return True
         else:
             try:
-                return len(limits) == 0
+                if len(limits) == 0:
+                    return True
             except TypeError:
                 pass
-            
+        
+        
+        if self.reply_type is None:
+            raise InvalidQueryTypeError(f"None reply type passed to {self}")
         #From now on limits is an non empty list or a non-None object
-        if self.reply_type in [ReplyType.TEXT, ReplyType.NOTE, ReplyType.FILEPATH] and not isinstance(limits[0], str):
-            raise InvalidQueryTypeError("incorrect limits type", limits[0], str)
-
-        if self.reply_type == ReplyType.NUMBER:
-            if not isinstance(limits[0],(int, float)):
-                raise InvalidQueryTypeError("incorrect limits type", limits[0], int)
-
-        if self.reply_type == ReplyType.INPUTMODE and not isinstance(limits[0], InputMode):
-            raise InvalidQueryTypeError("incorrect limits type", limits[0], InputMode)
-
-        if self.reply_type == ReplyType.RENDERMODES and not isinstance(limits[0], RenderMode):
-            raise InvalidQueryTypeError("incorrect limits type", limits[0], RenderMode)
-
-        if self.reply_type == ReplyType.ASPECTRATIO and not isinstance(limits[0], AspectRatio):
-            raise InvalidQueryTypeError("incorrect limits type", limits[0], AspectRatio)
-
+        
+        valid_classes = self.reply_type.get_classes()
+        if valid_classes:
+            if not isinstance(limits[0], valid_classes):
+                raise InvalidQueryTypeError("incorrect limits type", limits[0], valid_classes)
+        
         if self.reply_type == ReplyType.FILEPATH:
             if os.path.isdir(limits[0]):
                 pass
@@ -434,29 +428,8 @@ class Query:
         if any([type(limit) != type(limits[0]) for limit in limits]):
             raise InvalidQueryError("limits are not all of the same type")
 
-        if self.default is not None and type(self.default) != type(limits[0]):
-            raise InvalidQueryError("default and limits are not of the same type")
-
-        # Smart guess of some common types
-        if self.reply_type is None:
-            if isinstance(limits[0], str):
-                try:
-                    float(limits[0])
-                    self.reply_type = ReplyType.NUMBER
-                except ValueError:
-                    try:
-                        Fraction(limits[0])
-                        self.reply_type = ReplyType.NUMBER
-                    except ValueError:
-                        self.reply_type == ReplyType.TEXT
-            elif isinstance(limits[0], InputMode):
-                self.reply_type = ReplyType.INPUTMODE
-            elif isinstance(limits[0], RenderMode):
-                self.reply_type = ReplyType.RENDERMODES
-            elif isinstance(limits[0], AspectRatio):
-                self.reply_type = ReplyType.ASPECTRATIO
-            else:
-                self.reply_type = ReplyType.OTHER
+        if self.default not in [None, 'all'] and type(self.default) != type(limits[0]):
+            raise InvalidQueryError(f"default and limits are not of the same type: {type(self.default)} vs {type(limits[0])}")
            
         return True     
                 
@@ -518,6 +491,19 @@ class Query:
                         is_reply_valid = True
                     except ValueError:
                         is_reply_valid = False
+
+            elif self.reply_type == ReplyType.OTHER:
+                if all([answer is None for answer in answers]):
+                    is_reply_valid = False
+                elif all([answer == '' for answer in answers]):
+                    is_reply_valid = False
+                else:
+                    is_reply_valid = True
+            
+            #TODO: Shorten these lines
+            elif self.reply_type == ReplyType.ASPECTRATIO:
+                if isinstance(answers[0], AspectRatio) or isinstance(answers[0], (str,int,float)):
+                    is_reply_valid = True #A render mode can be chosen using its order number in a list or its string description
                         
             elif self.reply_type == ReplyType.INPUTMODE:
                 if isinstance(answers[0], InputMode) or isinstance(answers[0], (str,int)):
@@ -527,17 +513,9 @@ class Query:
                 if isinstance(answers[0], RenderMode) or isinstance(answers[0], (str,int)):
                     is_reply_valid = True #A render mode can be chosen using its order number in a list or its string description
 
-            elif self.reply_type == ReplyType.ASPECTRATIO:
-                if isinstance(answers[0], AspectRatio) or isinstance(answers[0], (str,int,float)):
-                    is_reply_valid = True #A render mode can be chosen using its order number in a list or its string description
-            
-            elif self.reply_type == ReplyType.OTHER:
-                if all([answer is None for answer in answers]):
-                    is_reply_valid = False
-                elif all([answer == '' for answer in answers]):
-                    is_reply_valid = False
-                else:
-                    is_reply_valid = True
+            elif self.reply_type == ReplyType.INSTRUMENT:
+                if isinstance(answers[0], InstrumentType) or isinstance(answers[0], (str,int)):
+                    is_reply_valid = True #A render mode can be chosen using its order number in a list or its string description            
             
             else:
                 is_reply_valid = True
@@ -747,7 +725,7 @@ class QueryChoice(Query):
         
         if self.reply_type == ReplyType.NOTE:
             result[-1] += " %s" % ', '.join(list(self.get_limits()))
-        elif self.reply_type in [ReplyType.INPUTMODE, ReplyType.RENDERMODES, ReplyType.ASPECTRATIO]:
+        elif self.reply_type in [ReplyType.INPUTMODE, ReplyType.RENDERMODES, ReplyType.INSTRUMENT, ReplyType.ASPECTRATIO]:
             choices = ["{i:d}) {choice_str}".format(i=i, choice_str=choice.get_short_desc(self.get_recipient_locale())) for i, choice in enumerate(self.get_limits())]
             result[-1] += ":\n\n{choices_str}".format(choices_str='\n'.join(choices))
         else:
@@ -790,7 +768,7 @@ class QueryChoice(Query):
         if isinstance(choices[0], str):
             choices = [c.lower().strip() for c in choices]
 
-        if isinstance(choices[0], (InputMode, RenderMode, AspectRatio)):
+        if isinstance(choices[0], (InputMode, RenderMode, InstrumentType, AspectRatio)):
             try:
                 return choices.index(answer)
             except ValueError:

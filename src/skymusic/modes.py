@@ -1,5 +1,6 @@
 from enum import Enum
 import src.skymusic.parsers.noteparsers
+import src.skymusic.instruments
 from src.skymusic import Lang
 
 class InputMode(Enum):
@@ -78,6 +79,27 @@ class RenderMode(Enum):
     def get_extension(self):
         return self.extension
 
+class InstrumentType(Enum):
+    HARP = ("instrument/harp/short_desc", "instrument/harp/long_desc", src.skymusic.instruments.Harp)
+    DRUM = ("instrument/drum/short_desc", "instrument/drum/long_desc", src.skymusic.instruments.Drum)
+
+    def __init__(self, short_desc_yaml, long_desc_yaml, instrument_class):
+        self.short_desc_yaml = short_desc_yaml
+        self.long_desc_yaml = long_desc_yaml
+        self.instrument_class = instrument_class
+
+    def __str__(self):
+        return self.get_short_desc('en_US')
+
+    def get_short_desc(self, locale='en_US'):
+        return Lang.get_string(self.short_desc_yaml, locale)
+
+    def get_long_desc(self, locale='en_US'):
+        return Lang.get_string(self.long_desc_yaml, locale)
+    
+    def get_instrument(self):
+        return self.instrument_class()
+
 
 class AspectRatio(Enum):
     WIDESCREEN = ("aspect_ratio/widescreen/short_desc", 16/9.0)
@@ -86,8 +108,8 @@ class AspectRatio(Enum):
     A4 = ("aspect_ratio/A4/short_desc", 21/29.7)
     VERTPANEL = ("aspect_ratio/vertical_panel/short_desc", 1/2.0)
 
-    def __init__(self, short_desc, ratio):
-        self.short_desc_yaml = short_desc
+    def __init__(self, short_desc_yaml, ratio):
+        self.short_desc_yaml = short_desc_yaml
         self.ratio = ratio
 
     def __str__(self):
@@ -110,11 +132,20 @@ class CSSMode(Enum):
 
 
 class ReplyType(Enum):
-    TEXT = 1  # str
-    NUMBER = 2  # int
-    NOTE = 3  # str, with possible additional checks
-    INPUTMODE = 4  # modes.InputMode
-    RENDERMODES = 5
-    ASPECTRATIO = 6
-    FILEPATH = 7  # A file path
-    OTHER = 8
+    TEXT = (1, (str))  # str
+    NUMBER = (2, (int, float))  # int
+    NOTE = (3, (str))  # str, with possible additional checks
+    INPUTMODE = (4, (InputMode))  # modes.InputMode
+    RENDERMODES = (5, (RenderMode))
+    ASPECTRATIO = (6, (AspectRatio))
+    INSTRUMENT = (7, (InstrumentType))
+    FILEPATH = (8, (str))  # A file path
+    OTHER = (9, None)
+    
+    def __init__(self, number, enum_classes):
+        self.number = number
+        self.enum_classes = enum_classes
+        
+    def get_classes(self):
+        
+        return self.enum_classes

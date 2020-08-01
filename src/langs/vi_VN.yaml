@@ -25,6 +25,13 @@ recipient_specifics:
     command_line: nhập các lựa chọn đặc cách nhau bởi dấu phẩy, or 'all' to select all formats
     music_cog: 
     sky_music_website: 
+instrument:
+  harp:
+    short_desc: Normal instrument
+    long_desc: "Normal instrument"
+  drum:
+    short_desc: Drums
+    long_desc: "Drums"
 input_mode:
   skykeyboard:
     short_desc: Bàn phím Sky 
@@ -144,6 +151,13 @@ stock_queries:
       - Sử dụng "{quaver_delimiter}" để nối nốt trong một biểu tượng (liên ba, láy rền/hát rung,...) (VD: {quaver_example}). Với Jianpu, sử dụng "{jianpu_quaver_delimiter}" thay vì "-" để không bị nhầm lẫn với quãng tám.
       - Thêm "{repeat_indicator}" sau một hợp âm để biểu thị sự lập lại (repetition).
       - Dấu thăng "#" và dấu giáng "b" (nửa cung) được hỗ trợ cho hệ kí tự Phương Tây và Jianpu.
+  instrument_type:
+    foreword:
+    question: Please choose your instrument
+    afterword:
+    input_tip: choose one instrument
+    help_text: |
+      The drum is special because it only has 2 rows and 4 columns
   render_modes:
     foreword:
     question: Hãy chọn các định dạng xuất bản đầu ra (rendering formats). {all_modes}

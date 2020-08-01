@@ -1,4 +1,4 @@
-from src.skymusic.modes import ReplyType, AspectRatio
+from src.skymusic.modes import ReplyType, AspectRatio, InstrumentType
 from src.skymusic.communication import QueryOpen, QueryChoice, QueryMultipleChoices, Information
 from src.skymusic import Lang
 
@@ -40,6 +40,18 @@ def load(locale):
                             'question': '',
                             'reply_type': ReplyType.TEXT
                             },
+
+            'instrument_type': {'class': QueryChoice,
+                             'handler': 'None',
+                             'foreword': Lang.get_string("stock_queries/instrument_type/foreword", locale),
+                             'question': Lang.get_string("stock_queries/instrument_type/question", locale),
+                             'afterword': Lang.get_string("stock_queries/instrument_type/afterword", locale),
+                             'input_tip': Lang.get_string("stock_queries/instrument_type/input_tip", locale),
+                             'help_text': Lang.get_string("stock_queries/instrument_type/help_text", locale),
+                             'reply_type': ReplyType.INSTRUMENT,
+                             'limits': list(InstrumentType),
+                             'default': InstrumentType.HARP
+                             },
         
             'instructions_command_line': {'class': Information,
                                     'handler': 'None',

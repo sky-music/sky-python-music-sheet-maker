@@ -15,6 +15,13 @@ recipient_specifics:
     command_line: Type choice numbers, or 'all' to select all formats
     music_cog: 
     sky_music_website: 
+instrument:
+  harp:
+    short_desc: Normal instrument
+    long_desc: "Normal instrument"
+  drum:
+    short_desc: Drums
+    long_desc: "Drums"
 input_mode:
   skykeyboard:
     short_desc: Sky keyboard
@@ -137,6 +144,13 @@ stock_queries:
       - Use "{quaver_delimiter}" to link notes within an icon, for triplets, quavers... (e.g. {quaver_example}). With Jianpu, use "{jianpu_quaver_delimiter}" instead of "-" to avoid confusion with the octave.
       - Add "{repeat_indicator}" after a chord to indicate repetition.
       - Sharps "#" and flats "b" (semitones) are supported for Western and Jianpu notations.
+  instrument_type:
+    foreword:
+    question: Please choose your instrument
+    afterword:
+    input_tip: choose one instrument
+    help_text: |
+      The drum is special because it only has 2 rows and 4 columns
   render_modes:
     foreword:
     question: Please choose one or several output rendering formats. {all_modes}

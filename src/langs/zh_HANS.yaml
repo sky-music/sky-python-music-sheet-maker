@@ -16,6 +16,13 @@ recipient_specifics:
     command_line: 在已选择的数字中间加入逗号, or 'all' to select all formats
     music_cog: 
     sky_music_website: 
+instrument:
+  harp:
+    short_desc: Normal instrument
+    long_desc: "Normal instrument"
+  drum:
+    short_desc: Drums
+    long_desc: "Drums"
 input_mode:
   skykeyboard:
     short_desc: 光遇游戏键盘
@@ -138,6 +145,13 @@ stock_queries:
       - 使用 '{quaver_delimiter}' 来连接同一个格子里的音符，例如三连音、八分音符、等等...(举例 {quaver_example})。 简谱使用法：请使用 '{jianpu_quaver_delimiter}'，非 '-' 来避免与八度打乱。
       - 和弦过后加入 '{repeat_indicator}' 以表注重复。
       - 西方乐谱和简谱支持使用升号 "#" 和降号 "b" (变音记号)。
+  instrument_type:
+    foreword:
+    question: Please choose your instrument
+    afterword:
+    input_tip: choose one instrument
+    help_text: |
+      The drum is special because it only has 2 rows and 4 columns
   render_modes:
     foreword:
     question: 请选择一个或以上的输出格式。{all_modes}

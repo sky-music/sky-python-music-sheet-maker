@@ -1,6 +1,6 @@
 import os, re
 from src.skymusic import instruments, Lang
-from src.skymusic.modes import InputMode
+from src.skymusic.modes import InputMode, InstrumentType
 from src.skymusic.song import Song
 import src.skymusic.parsers.noteparsers
 from src.skymusic.resources import Resources
@@ -23,10 +23,10 @@ class SongParser:
     For parsing a text format into a Song object
     """
 
-    def __init__(self, maker, instrument_type=Resources.DEFAULT_INSTRUMENT, silent_warnings=True):
+    def __init__(self, maker, silent_warnings=True):
 
         self.maker = maker
-        self.instrument_type = instrument_type
+        self.instrument_type = InstrumentType.HARP
         self.silent_warnings = silent_warnings
         #Delimiters must be character or strings
         #The backslash character is forbidden
@@ -148,6 +148,14 @@ class SongParser:
     def get_input_mode(self):
 
         return self.input_mode
+
+    def set_instrument_type(self, instrument_type):
+        
+        self.instrument_type = instrument_type
+        
+    def get_instrument_type(self, instrument_type):
+        
+        return self.instrument_type
 
     def find_key(self, song_lines=None):
         
@@ -343,10 +351,8 @@ class SongParser:
                     chords = self.split_icon(icon)
                     # From here, real chords are still glued, quavers have been split in different list slots
                     chord_skygrid, harp_broken, harp_silent, repeat = self.parse_chords(chords, song_key, note_shift)
-                    if self.instrument_type.lower() == 'drum':
-                        harp = instruments.Drum()
-                    else:
-                        harp = instruments.Harp()
+                    
+                    harp = self.instrument_type.get_instrument()
                     harp.set_repeat(repeat)
                     harp.set_is_silent(harp_silent)
                     harp.set_is_broken(harp_broken)

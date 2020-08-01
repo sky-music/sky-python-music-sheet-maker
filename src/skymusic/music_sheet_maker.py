@@ -106,7 +106,6 @@ class MusicSheetMaker:
         self.communicator = Communicator(owner=self, locale=self.locale)
         self.song = None
         self.song_parser = None
-        self.instrument_type = Resources.DEFAULT_INSTRUMENT
         self.directory_base = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'))
         self.song_dir_in = song_dir_in if song_dir_in is not None else os.path.join(self.directory_base, 'test_songs')
         self.song_dir_out = song_dir_out if song_dir_out is not None else os.path.join(self.directory_base, 'songs_out')
@@ -181,16 +180,13 @@ class MusicSheetMaker:
     def get_song_parser(self):
         return self.song_parser
 
-    def set_instrument_type(self, instrument_name):
-        self.instrument_type = instrument_name
-
-    def set_song_parser(self, song_parser=None, recipient=None, instrument_type=Resources.DEFAULT_INSTRUMENT):
+    def set_song_parser(self, song_parser=None, recipient=None):
         if self.is_command_line(recipient):
             silent_warnings = False
         else:
             silent_warnings = True
         if song_parser is None:
-            song_parser = SongParser(maker=self, instrument_type=instrument_type, silent_warnings=silent_warnings)
+            song_parser = SongParser(maker=self, silent_warnings=silent_warnings)
         self.song_parser = song_parser
 
     def get_render_modes_enabled(self):
@@ -252,90 +248,81 @@ class MusicSheetMaker:
             # ======= NEW SONG =======
 
         # 1. Set Song Parser
-        self.set_song_parser(recipient=recipient, instrument_type=self.instrument_type)
+        self.set_song_parser(recipient=recipient)
 
         # 2. Display instructions
         (i_instr, res) = self.ask_instructions(recipient=recipient)
 
-        # 3. Ask for notes
+        # 3. Asks instrument type
+        (q_instr_type, instrument_type) = self.ask_instrument(recipient=recipient)
+
+        self.get_song_parser().set_instrument_type(instrument_type)
+
+        # 4. Ask for notes
         (q_notes, notes) = self.ask_notes_or_file(recipient=recipient, prerequisites=[i_instr])
 
-        # 4. Ask for input mode (or display the one found)
+        # 5. Ask for input mode (or display the one found)
         (q_mode, input_mode) = self.ask_input_mode(recipient=recipient, notes=notes, prerequisites=[q_notes])
         #(q_mode, input_mode) = self.ask_input_mode(recipient=recipient, prerequisites=[q_notes]) # EXPERIMENTAL
         
-        # 4.b Set input mode
+        # 5.b Set input mode
         self.set_parser_input_mode(recipient, input_mode=input_mode)
         #self.set_parser_input_mode(recipient) # EXPERIMENTAL
 
-        # 5. Ask for song key (or display the only one possible)
+        # 6. Ask for song key (or display the only one possible)
         (q_key, song_key) = self.ask_song_key(recipient=recipient, notes=notes, input_mode=input_mode, prerequisites=[q_notes, q_mode])
         #(q_key, song_key) = self.ask_song_key(recipient=recipient, prerequisites=[q_notes, q_mode]) # EXPERIMENTAL
 
-        # 6. Asks for octave shift
+        # 7. Asks for octave shift
         (q_shift, octave_shift) = self.ask_octave_shift(recipient=recipient, input_mode=input_mode)
 
-        # 7. Parses song
+        # 8. Parses song
         self.parse_song(recipient, notes=notes, song_key=song_key, octave_shift=octave_shift)
         #self.parse_song(recipient) # EXPERIMENTAL
 
-        # 8. Displays error ratio
+        # 9. Displays error ratio
         (i_error, res) = self.display_error_ratio(recipient=recipient, prerequisites=[q_notes, q_mode, q_shift])
         
-        # 9 Asks for render modes
+        # 10. Asks for render modes
         (q_render, render_modes) = self.ask_render_modes(recipient=recipient)
 
-        # 10. Asks for aspect ratio
+        # 11. Asks for aspect ratio
         (q_aspect, aspect_ratio) = self.ask_aspect_ratio(recipient=recipient, render_modes=render_modes, prerequisites=[q_render])
         #(q_aspect, aspect_ratio) = self.ask_aspect_ratio(recipient=recipient, prerequisites=[q_render])  # EXPERIMENTAL
 
-        # 11. Ask beats per minutes
+        # 12. Ask beats per minutes
         (q_song_bpm, song_bpm) = self.ask_song_bpm(recipient=recipient, render_modes=render_modes, prerequisites=[q_render])
         #(q_song_bpm, song_bpm) = self.ask_song_bpm(recipient=recipient, prerequisites=[q_render])  # EXPERIMENTAL       
 
-        # 12. Asks for song metadata
+        # 13. Asks for song metadata
         (qs_meta, (title, artist, transcript)) = self.ask_song_metadata(recipient=recipient)
 
-        # 12.b sets song metadata
+        # 13.b sets song metadata
         self.set_song_metadata(recipient=recipient, meta=(title, artist, transcript), song_key=song_key)
         #self.set_song_metadata(recipient=recipient) # EXPERIMENTAL
 
-        # 13. Renders Song
+        # 14. Renders Song
         song_bundle = self.render_song(recipient=recipient, render_modes=render_modes, aspect_ratio=aspect_ratio, song_bpm=song_bpm)
         
-        # 14. Sends an url from sky-music.herokuapp.com
+        # 15. Sends an url from sky-music.herokuapp.com
         if self.enable_skyjson_url:
             self.send_json_url(recipient=recipient, song_bundle=song_bundle)
         
-        # 15. Sends result back (required for website)
+        # 16. Sends result back (required for website)
         return song_bundle
 
 
-    def send_json_url(self, recipient, song_bundle, skyjson_api_key=None, prerequisites=None, execute=True):
-        
-        json_buffers = song_bundle.get_buffers(RenderMode.SKYJSON)
-        
-        if json_buffers:
-                        
-            url = skyjson_sr.SkyjsonSongRenderer(locale=self.locale).generate_url(json_buffers[0], skyjson_api_key)
-            
-            replacements={'url': url}
-            
-            if url:
-                i_url = self.communicator.send_stock_query('skyjson_url', recipient=recipient,
-                                                             replacements=replacements, prerequisites=prerequisites)
-            else:
-                i_url = None
+
+    def ask_instrument(self, recipient, prerequisites=None, execute=True):
+
+        q_instrument = self.communicator.send_stock_query('instrument_type', recipient=recipient, prerequisites=prerequisites)
+
+        if execute:
+            recipient.execute_queries(q_instrument)
+            instrument_name = q_instrument.get_reply().get_result()
+            return q_instrument, instrument_name
         else:
-            i_url = None
-            
-        
-        if execute and i_url is not None:
-            recipient.execute_queries(i_url)
-            ok = i_url.get_reply().get_result()
-            return i_url, ok
-        else:
-            return i_url, None
+            return q_instrument, None
         
 
     def ask_instructions(self, recipient, prerequisites=None, execute=True):
@@ -859,6 +846,31 @@ class MusicSheetMaker:
             return i_song_files, None
 
 
+    def send_json_url(self, recipient, song_bundle, skyjson_api_key=None, prerequisites=None, execute=True):
+        
+        json_buffers = song_bundle.get_buffers(RenderMode.SKYJSON)
+        
+        if json_buffers:
+                        
+            url = skyjson_sr.SkyjsonSongRenderer(locale=self.locale).generate_url(json_buffers[0], skyjson_api_key)
+            
+            replacements={'url': url}
+            
+            if url:
+                i_url = self.communicator.send_stock_query('skyjson_url', recipient=recipient,
+                                                             replacements=replacements, prerequisites=prerequisites)
+            else:
+                i_url = None
+        else:
+            i_url = None
+            
+        
+        if execute and i_url is not None:
+            recipient.execute_queries(i_url)
+            ok = i_url.get_reply().get_result()
+            return i_url, ok
+        else:
+            return i_url, None
     
 
     '''
