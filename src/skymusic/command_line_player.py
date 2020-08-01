@@ -25,6 +25,7 @@ SONG_DIR_OUT = os.path.normpath(PROJECT_ROOT + '/songs_out') # Overrides defaut 
 BATCH_MODE = False # To process songs in a batch,stored as .yaml files
 BATCH_DIR = os.path.normpath(PROJECT_ROOT + '/batch_songs')
 PREFERENCES_PATH = os.path.normpath(PROJECT_ROOT + '/preferences.yaml')
+INSTRUMENT_NAME = 'drum'
 #==========================================
 
 class CommandLinePlayer:
@@ -180,6 +181,7 @@ try:
     
     player = CommandLinePlayer(locale=Lang.guess_locale(), preferences_path=PREFERENCES_PATH)
     maker = MusicSheetMaker(locale=Lang.guess_locale(), song_dir_in=SONG_DIR_IN, song_dir_out=SONG_DIR_OUT, enable_skyjson_url=SKYJSON_URL)
+    maker.set_instrument_type(INSTRUMENT_NAME)
 
     if BATCH_MODE:
         

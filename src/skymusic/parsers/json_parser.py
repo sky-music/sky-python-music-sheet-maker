@@ -8,9 +8,9 @@ class JsonSongParser(song_parser.SongParser):
     For parsing a text format into a Song object
     """
 
-    def __init__(self, maker, silent_warnings=True):
+    def __init__(self, maker, instrument_type=Resources.DEFAULT_INSTRUMENT, silent_warnings=True):
 
-        super().__init__(maker, silent_warnings)
+        super().__init__(maker, instrument_type, silent_warnings)
         self.skyjson_chord_delay = Resources.SKYJSON_CHORD_DELAY #Delay in ms below which 2 notes are considered a chord
         self.music_theory = music_theory.MusicTheory(self)
 

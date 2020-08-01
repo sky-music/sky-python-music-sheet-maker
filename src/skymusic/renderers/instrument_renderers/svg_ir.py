@@ -32,10 +32,10 @@ class SvgInstrumentRenderer(instrument_renderer.InstrumentRenderer):
         note_renderer = SvgNoteRenderer()
 
         # The chord SVG container
-        harp_render = f'\n<svg x="{x :.2f}" y="0" width="{harp_width}" height="{harp_height}" class="harp-{instrument.get_index()} {class_suffix}">'
+        harp_render = f'\n<svg x="{x :.2f}" y="0" width="{harp_width}" height="{harp_height}" class="{instrument.get_type()}-{instrument.get_index()} {class_suffix}">'
 
         # The chord rectangle with rounded edges
-        harp_render += f'<rect x="0.7%" y="0.7%" width="98.6%" height="98.6%" rx="7.5%" ry="{7.5 * aspect_ratio :.2f}%" class="harp harp-{instrument.get_index()}"/>'
+        harp_render += f'<rect x="0.7%" y="0.7%" width="98.6%" height="98.6%" rx="7.5%" ry="{7.5 * aspect_ratio :.2f}%" class="{instrument.get_type()} {instrument.get_type()}-{instrument.get_index()}"/>'
 
         for row in range(instrument.get_row_count()):
             for col in range(instrument.get_column_count()):

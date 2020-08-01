@@ -106,6 +106,7 @@ class MusicSheetMaker:
         self.communicator = Communicator(owner=self, locale=self.locale)
         self.song = None
         self.song_parser = None
+        self.instrument_type = Resources.DEFAULT_INSTRUMENT
         self.directory_base = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'))
         self.song_dir_in = song_dir_in if song_dir_in is not None else os.path.join(self.directory_base, 'test_songs')
         self.song_dir_out = song_dir_out if song_dir_out is not None else os.path.join(self.directory_base, 'songs_out')
@@ -180,13 +181,16 @@ class MusicSheetMaker:
     def get_song_parser(self):
         return self.song_parser
 
-    def set_song_parser(self, song_parser=None, recipient=None):
+    def set_instrument_type(self, instrument_name):
+        self.instrument_type = instrument_name
+
+    def set_song_parser(self, song_parser=None, recipient=None, instrument_type=Resources.DEFAULT_INSTRUMENT):
         if self.is_command_line(recipient):
             silent_warnings = False
         else:
             silent_warnings = True
         if song_parser is None:
-            song_parser = SongParser(maker=self, silent_warnings=silent_warnings)
+            song_parser = SongParser(maker=self, instrument_type=instrument_type, silent_warnings=silent_warnings)
         self.song_parser = song_parser
 
     def get_render_modes_enabled(self):
@@ -241,14 +245,14 @@ class MusicSheetMaker:
 
         # Actually the following is not used but it may be useful to have the triggering query as an argument
         try:
-            q_create_song = kwargs['query']
+            kwargs['query']
         except KeyError:
             raise MusicSheetMakerError('No Query passed to create_song')
 
             # ======= NEW SONG =======
 
         # 1. Set Song Parser
-        self.set_song_parser(recipient=recipient)
+        self.set_song_parser(recipient=recipient, instrument_type=self.instrument_type)
 
         # 2. Display instructions
         (i_instr, res) = self.ask_instructions(recipient=recipient)

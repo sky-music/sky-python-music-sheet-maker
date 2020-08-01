@@ -118,3 +118,12 @@ class Harp(Instrument):
         
         return notes.Note(self, pos)
         
+
+class Drum(Harp):
+    
+    def __init__(self):
+        super().__init__()
+        self.type = 'drum'
+        self.column_count = 4
+        self.row_count = 2
+    
