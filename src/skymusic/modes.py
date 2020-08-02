@@ -80,7 +80,7 @@ class RenderMode(Enum):
         return self.extension
 
 class InstrumentType(Enum):
-    HARP = ("instrument/harp/short_desc", "instrument/harp/long_desc", src.skymusic.instruments.Harp)
+    NORMAL = ("instrument/normal/short_desc", "instrument/normal/long_desc", src.skymusic.instruments.Harp)
     DRUM = ("instrument/drum/short_desc", "instrument/drum/long_desc", src.skymusic.instruments.Drum)
 
     def __init__(self, short_desc_yaml, long_desc_yaml, instrument_class):
@@ -132,14 +132,14 @@ class CSSMode(Enum):
 
 
 class ReplyType(Enum):
-    TEXT = (1, (str))  # str
+    TEXT = (1, (str,))  # str
     NUMBER = (2, (int, float))  # int
-    NOTE = (3, (str))  # str, with possible additional checks
-    INPUTMODE = (4, (InputMode))  # modes.InputMode
-    RENDERMODES = (5, (RenderMode))
-    ASPECTRATIO = (6, (AspectRatio))
-    INSTRUMENT = (7, (InstrumentType))
-    FILEPATH = (8, (str))  # A file path
+    NOTE = (3, (str,))  # str, with possible additional checks
+    INPUTMODE = (4, (InputMode,))  # modes.InputMode
+    RENDERMODES = (5, (RenderMode,))
+    ASPECTRATIO = (6, (AspectRatio,))
+    INSTRUMENT = (7, (InstrumentType,))
+    FILEPATH = (8, (str,))  # A file path
     OTHER = (9, None)
     
     def __init__(self, number, enum_classes):
@@ -149,3 +149,25 @@ class ReplyType(Enum):
     def get_classes(self):
         
         return self.enum_classes
+
+    def get_defined_types():
+        
+        return [reply_type for reply_type in ReplyType if reply_type.get_classes()]
+                        
+    def get_string_types():
+        
+        string_types = [reply_type for reply_type in ReplyType.get_defined_types() if str in reply_type.get_classes()]
+        
+        return string_types
+        
+    def get_number_types():
+        
+        number_types = [reply_type for reply_type in ReplyType.get_defined_types() if (int in reply_type.get_classes() or float in reply_type.get_classes())]
+        
+        return number_types
+        
+    def get_object_types():
+        
+        number_types = ReplyType.get_number_types()
+        string_types = ReplyType.get_string_types()
+        return [reply_type for reply_type in ReplyType.get_defined_types() if reply_type not in (string_types+number_types)]

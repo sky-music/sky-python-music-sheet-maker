@@ -8,15 +8,15 @@ recipient_specifics:
     music_cog: answer with - (dash)
     sky_music_website: press answer
   skip_number:
-    command_line: leave blank or 0 and type enter
-    music_cog: answer with - (dash) or 0
+    command_line: leave blank and type enter
+    music_cog: answer with - (dash)
     sky_music_website: press answer
   all_modes:
     command_line: Type choice numbers, or 'all' to select all formats
     music_cog: 
     sky_music_website: 
 instrument:
-  harp:
+  normal:
     short_desc: Normal instrument
     long_desc: "Normal instrument"
   drum:

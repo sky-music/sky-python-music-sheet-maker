@@ -26,7 +26,7 @@ class SongParser:
     def __init__(self, maker, silent_warnings=True):
 
         self.maker = maker
-        self.instrument_type = InstrumentType.HARP
+        self.instrument_type = InstrumentType.NORMAL
         self.silent_warnings = silent_warnings
         #Delimiters must be character or strings
         #The backslash character is forbidden

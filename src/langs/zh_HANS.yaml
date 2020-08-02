@@ -9,15 +9,15 @@ recipient_specifics:
     music_cog: 用 -（中划线）回答
     sky_music_website: 按输入
   skip_number:
-    command_line: 留空或输入0 再按回车键
-    music_cog: 用 - （中划键）回答或输入0
+    command_line: 留空或输 再按回车键
+    music_cog: 用 - （中划键）回答或输
     sky_music_website: 按输入
   all_modes:
     command_line: 在已选择的数字中间加入逗号, or 'all' to select all formats
     music_cog: 
     sky_music_website: 
 instrument:
-  harp:
+  normal:
     short_desc: Normal instrument
     long_desc: "Normal instrument"
   drum:

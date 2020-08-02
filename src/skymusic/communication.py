@@ -475,13 +475,16 @@ class Query:
             if not blank_accepted and all([answer in self.blanks for answer in answers]):
                 return False
                              
-            # GENERAL CHECKING
-                        
-            if self.reply_type in [ReplyType.TEXT, ReplyType.NOTE, ReplyType.FILEPATH]:
-                if isinstance(answers[0], str):
-                    is_reply_valid = True
-                    
-            elif self.reply_type == ReplyType.NUMBER:
+            # === GENERAL CHECKING ===            
+            
+            number_types = ReplyType.get_number_types()
+            string_types = ReplyType.get_string_types()
+            object_types = ReplyType.get_object_types()
+            
+            #is_reply_valid = True
+                                
+            if self.reply_type in number_types:
+                
                 try:
                     float(answers[0])
                     is_reply_valid = True
@@ -492,7 +495,11 @@ class Query:
                     except ValueError:
                         is_reply_valid = False
 
-            elif self.reply_type == ReplyType.OTHER:
+            elif self.reply_type in object_types + string_types:
+                if isinstance(answers[0], self.reply_type.get_classes()) or isinstance(answers[0], (str,int)):
+                    is_reply_valid = True #An input mode can be chosen using its order number in a list or its string description               
+
+            else:
                 if all([answer is None for answer in answers]):
                     is_reply_valid = False
                 elif all([answer == '' for answer in answers]):
@@ -500,27 +507,8 @@ class Query:
                 else:
                     is_reply_valid = True
             
-            #TODO: Shorten these lines
-            elif self.reply_type == ReplyType.ASPECTRATIO:
-                if isinstance(answers[0], AspectRatio) or isinstance(answers[0], (str,int,float)):
-                    is_reply_valid = True #A render mode can be chosen using its order number in a list or its string description
-                        
-            elif self.reply_type == ReplyType.INPUTMODE:
-                if isinstance(answers[0], InputMode) or isinstance(answers[0], (str,int)):
-                    is_reply_valid = True #An input mode can be chosen using its order number in a list or its string description
-           
-            elif self.reply_type == ReplyType.RENDERMODES:
-                if isinstance(answers[0], RenderMode) or isinstance(answers[0], (str,int)):
-                    is_reply_valid = True #A render mode can be chosen using its order number in a list or its string description
 
-            elif self.reply_type == ReplyType.INSTRUMENT:
-                if isinstance(answers[0], InstrumentType) or isinstance(answers[0], (str,int)):
-                    is_reply_valid = True #A render mode can be chosen using its order number in a list or its string description            
-            
-            else:
-                is_reply_valid = True
-
-            #CHECKING AGAINST LIMITS FOR FILEPATH
+            # == SPECIAL CHECKING FOR FILEPATH ===
             if self.reply_type == ReplyType.FILEPATH and limits is not None:
                 """
                 Checks if the file exist in the directories and with the extensions specified in limits
@@ -538,7 +526,7 @@ class Query:
 
                     is_reply_valid = False
              
-            #CHECKING AGAINST LIMITS FOR NUMBERS
+            # === SPECIAL CHECKING FOR NUMBERS AGAINST LIMITS AS BOUNDS ===
             #In this case only answers[0] is checked
             if self.reply_type == ReplyType.NUMBER and limits is not None and is_reply_valid is True:
                 try:
@@ -557,7 +545,7 @@ class Query:
                         is_reply_valid = False                            
                     if all([isinstance(limit, int) for limit in limits]) and int(num) != num:
                         is_reply_valid = False #If limits are integers, answer must be an integer value
-
+        
         return is_reply_valid
     
 
@@ -723,9 +711,11 @@ class QueryChoice(Query):
             result += [self.get_help_text()]
         result += [self.get_foreword(), self.get_question()]
         
+        object_types = ReplyType.get_object_types()
+        
         if self.reply_type == ReplyType.NOTE:
             result[-1] += " %s" % ', '.join(list(self.get_limits()))
-        elif self.reply_type in [ReplyType.INPUTMODE, ReplyType.RENDERMODES, ReplyType.INSTRUMENT, ReplyType.ASPECTRATIO]:
+        elif self.reply_type in object_types:
             choices = ["{i:d}) {choice_str}".format(i=i, choice_str=choice.get_short_desc(self.get_recipient_locale())) for i, choice in enumerate(self.get_limits())]
             result[-1] += ":\n\n{choices_str}".format(choices_str='\n'.join(choices))
         else:
@@ -768,7 +758,10 @@ class QueryChoice(Query):
         if isinstance(choices[0], str):
             choices = [c.lower().strip() for c in choices]
 
-        if isinstance(choices[0], (InputMode, RenderMode, InstrumentType, AspectRatio)):
+        object_types = [reply_type.get_classes() for reply_type in ReplyType if reply_type.get_classes()]
+        object_types = tuple([item for subl in object_types for item in subl if item not in (int, float, str)])
+
+        if isinstance(choices[0], object_types):
             try:
                 return choices.index(answer)
             except ValueError:

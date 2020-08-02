@@ -18,15 +18,15 @@ recipient_specifics:
     music_cog: trả lời với phím Space
     sky_music_website: bở trống và bấm trả lời
   skip_number:
-    command_line: bỏ trống hoặc nhập số 0 và bấm Enter
-    music_cog: trả lời với phím Space hoặc số 0
-    sky_music_website: bở trống hoặc nhập số 0 và bấm trả lời
+    command_line: bỏ trống hoặc nhập và bấm Enter
+    music_cog: trả lời với phím Space hoặc
+    sky_music_website: bở trống hoặc nhập và bấm trả lời
   all_modes:
     command_line: nhập các lựa chọn đặc cách nhau bởi dấu phẩy, or 'all' to select all formats
     music_cog: 
     sky_music_website: 
 instrument:
-  harp:
+  normal:
     short_desc: Normal instrument
     long_desc: "Normal instrument"
   drum:

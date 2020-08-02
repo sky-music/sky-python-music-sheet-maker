@@ -50,7 +50,7 @@ def load(locale):
                              'help_text': Lang.get_string("stock_queries/instrument_type/help_text", locale),
                              'reply_type': ReplyType.INSTRUMENT,
                              'limits': list(InstrumentType),
-                             'default': InstrumentType.HARP
+                             'default': InstrumentType.NORMAL
                              },
         
             'instructions_command_line': {'class': Information,

@@ -6,18 +6,18 @@ warnings:
 recipient_specifics:
   skip:
     command_line: laissez vide et tapez entrée
-    music_cog: répondez avec un espace
+    music_cog: répondez avec - (tiret)
     sky_music_website: appuyez sur 'send answer'
   skip_number:
-    command_line: laissez blanc ou '0' et tapez entrée
-    music_cog: répondez avec un espace ou '0'
+    command_line: laissez blanc et tapez entrée
+    music_cog: répondez avec - (tiret)
     sky_music_website: appuyez sur 'send answer'
   all_modes:
     command_line: Entrez une liste de nombres, ou 'all' pour sélectionner tous les formats
     music_cog: 
     sky_music_website: 
 instrument:
-  harp:
+  normal:
     short_desc: Instrument normal
     long_desc: "Instrument normal"
   drum:
