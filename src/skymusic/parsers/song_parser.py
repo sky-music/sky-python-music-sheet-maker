@@ -153,7 +153,7 @@ class SongParser:
         
         self.instrument_type = instrument_type
         
-    def get_instrument_type(self, instrument_type):
+    def get_instrument_type(self):
         
         return self.instrument_type
 
@@ -168,8 +168,10 @@ class SongParser:
 
         if input_mode is None:
             input_mode = self.input_mode
-
+        
+        (rows, columns) = self.get_instrument_type().get_instrument().get_dimensions()
         note_parser = input_mode.get_note_parser(locale=self.locale)
+        note_parser.set_dimensions((rows, columns))
 
         return note_parser
 

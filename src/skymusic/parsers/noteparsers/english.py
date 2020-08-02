@@ -13,18 +13,16 @@ class English(noteparser.NoteParser):
         self.CHROMATIC_SCALE_DICT = {'C': 0, 'C#': 1, 'Db': 1, 'D': 2, 'D#': 3, 'Eb': 3, 'E': 4, 'F': 5, 'F#': 6,
                                      'Gb': 6, 'G': 7, 'G#': 8, 'Ab': 8, 'A': 9, 'A#': 10, 'Bb': 10, 'B': 11}
 
-        oct_str = ''
         oct_int = self.get_default_starting_octave()
-        if oct_int > 1:
-            oct_str = str(oct_int)
-
-        self.inverse_position_map = {
-            (0, 0): 'C' + oct_str, (0, 1): 'D', (0, 2): 'E' + oct_str, (0, 3): 'F' + oct_str, (0, 4): 'G' + oct_str,
-            (1, 0): 'A' + oct_str, (1, 1): 'B' + oct_str, (1, 2): 'C' + str(oct_int + 1),
-            (1, 3): 'D' + str(oct_int + 1), (1, 4): 'E' + str(oct_int + 1),
-            (2, 0): 'F' + str(oct_int + 1), (2, 1): 'G' + str(oct_int + 1), (2, 2): 'A' + str(oct_int + 2),
-            (2, 3): 'B' + str(oct_int + 2), (2, 4): 'C' + str(oct_int + 2)
-        }
+        
+        self.MAJOR_NOTES = ['C', 'D', 'E', 'F', 'G', 'A', 'B']
+        self.inverse_position_map = {}
+        for i in range(self.get_row_count()):
+            for j in range(self.get_column_count()):
+                (quotient, remainder) = divmod(i*self.get_column_count()+j, len(self.MAJOR_NOTES))
+                note_name = self.MAJOR_NOTES[remainder]
+                oct_str = str(oct_int + quotient) if (oct_int + quotient) > 1 else ''
+                self.inverse_position_map[(i,j)] = note_name + oct_str
 
         # Compile regexes for notes to save before using
         self.note_name_with_octave_regex = re.compile(r'([ABCDEFGabcdefg][b#♭♯]?\d)')

@@ -13,14 +13,14 @@ class SkyABC15(noteparser.NoteParser):
             'A1': (0, 0), 'A2': (0, 1), 'A3': (0, 2), 'A4': (0, 3), 'A5': (0, 4),
             'B1': (1, 0), 'B2': (1, 1), 'B3': (1, 2), 'B4': (1, 3), 'B5': (1, 4),
             'C1': (2, 0), 'C2': (2, 1), 'C3': (2, 2), 'C4': (2, 3), 'C5': (2, 4)
-        }
+        } # Valid as long as no instrument is larger than this
 
         self.inverse_position_map = {
             (-1, -1): '.',
             (0, 0): 'A1', (0, 1): 'A2', (0, 2): 'A3', (0, 3): 'A4', (0, 4): 'A5',
             (1, 0): 'B1', (1, 1): 'B2', (1, 2): 'B3', (1, 3): 'B4', (1, 4): 'B5',
             (2, 0): 'C1', (2, 1): 'C2', (2, 2): 'C3', (2, 3): 'C4', (2, 4): 'C5'
-        }
+        } # Valid as long as no instrument is larger than this
 
         self.note_name_with_octave_regex = re.compile(r'([ABCabc][1-5])')
         self.note_name_regex = self.note_name_with_octave_regex

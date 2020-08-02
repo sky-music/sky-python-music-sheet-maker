@@ -245,68 +245,75 @@ class MusicSheetMaker:
         except KeyError:
             raise MusicSheetMakerError('No Query passed to create_song')
 
-            # ======= NEW SONG =======
+        # ======= NEW SONG =======
 
-        # 1. Set Song Parser
+        # 0. Set Song Parser # Must be done first!
         self.set_song_parser(recipient=recipient)
 
-        # 2. Display instructions
+        # 1. Display instructions
         (i_instr, res) = self.ask_instructions(recipient=recipient)
 
-        # 3. Asks instrument type
+        # 2. Asks instrument type
         (q_instr_type, instrument_type) = self.ask_instrument(recipient=recipient)
 
+        # 2b. Sets instrument type
         self.get_song_parser().set_instrument_type(instrument_type)
 
-        # 4. Ask for notes
+        # 3. Ask for notes
         (q_notes, notes) = self.ask_notes_or_file(recipient=recipient, prerequisites=[i_instr])
 
-        # 5. Ask for input mode (or display the one found)
+        # 4. Ask for input mode (or display the one found)
         (q_mode, input_mode) = self.ask_input_mode(recipient=recipient, notes=notes, prerequisites=[q_notes])
         #(q_mode, input_mode) = self.ask_input_mode(recipient=recipient, prerequisites=[q_notes]) # EXPERIMENTAL
         
-        # 5.b Set input mode
+        # 4.b Set input mode
         self.set_parser_input_mode(recipient, input_mode=input_mode)
         #self.set_parser_input_mode(recipient) # EXPERIMENTAL
 
-        # 6. Ask for song key (or display the only one possible)
+        # 5. Ask for song key (or display the only one possible)
         (q_key, song_key) = self.ask_song_key(recipient=recipient, notes=notes, input_mode=input_mode, prerequisites=[q_notes, q_mode])
         #(q_key, song_key) = self.ask_song_key(recipient=recipient, prerequisites=[q_notes, q_mode]) # EXPERIMENTAL
 
-        # 7. Asks for octave shift
+        # 6. Asks for octave shift
         (q_shift, octave_shift) = self.ask_octave_shift(recipient=recipient, input_mode=input_mode)
 
-        # 8. Parses song
+        # 7. Parses song
         self.parse_song(recipient, notes=notes, song_key=song_key, octave_shift=octave_shift)
         #self.parse_song(recipient) # EXPERIMENTAL
 
-        # 9. Displays error ratio
+        # 8. Displays error ratio
         (i_error, res) = self.display_error_ratio(recipient=recipient, prerequisites=[q_notes, q_mode, q_shift])
         
-        # 10. Asks for render modes
+        # 9. Asks for render modes
         (q_render, render_modes) = self.ask_render_modes(recipient=recipient)
 
-        # 11. Asks for aspect ratio
+        # 10. Asks for aspect ratio
         (q_aspect, aspect_ratio) = self.ask_aspect_ratio(recipient=recipient, render_modes=render_modes, prerequisites=[q_render])
         #(q_aspect, aspect_ratio) = self.ask_aspect_ratio(recipient=recipient, prerequisites=[q_render])  # EXPERIMENTAL
 
-        # 12. Ask beats per minutes
+        # 11. Ask beats per minutes
         (q_song_bpm, song_bpm) = self.ask_song_bpm(recipient=recipient, render_modes=render_modes, prerequisites=[q_render])
         #(q_song_bpm, song_bpm) = self.ask_song_bpm(recipient=recipient, prerequisites=[q_render])  # EXPERIMENTAL       
 
-        # 13. Asks for song metadata
+        # 12. Asks for song metadata
         (qs_meta, (title, artist, transcript)) = self.ask_song_metadata(recipient=recipient)
 
-        # 13.b sets song metadata
+        # 12.b sets song metadata
         self.set_song_metadata(recipient=recipient, meta=(title, artist, transcript), song_key=song_key)
         #self.set_song_metadata(recipient=recipient) # EXPERIMENTAL
 
-        # 14. Renders Song
+        # 13. Renders Song
         song_bundle = self.render_song(recipient=recipient, render_modes=render_modes, aspect_ratio=aspect_ratio, song_bpm=song_bpm)
         
-        # 15. Sends an url from sky-music.herokuapp.com
+        # 14. Sends an url from sky-music.herokuapp.com
         if self.enable_skyjson_url:
             self.send_json_url(recipient=recipient, song_bundle=song_bundle)
+
+        # 15. Advertises for the Discord version
+        if self.is_command_line(recipient):
+            q_discord = self.communicator.send_stock_query('discord_ad', recipient=recipient)
+            recipient.execute_queries(q_discord)
+
         
         # 16. Sends result back (required for website)
         return song_bundle

@@ -97,6 +97,9 @@ class Harp(Instrument):
     def get_column_count(self):
         return self.column_count
 
+    def get_dimensions(self):
+        return (self.row_count, self.column_count)
+    
     def get_num_highlighted(self):
         num = 0
         for k in self.chord_skygrid.keys():

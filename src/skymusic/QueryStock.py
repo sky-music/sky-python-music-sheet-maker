@@ -323,5 +323,15 @@ def load(locale):
                              'afterword': Lang.get_string("stock_queries/skyjson_url/afterword", locale),
                              'input_tip': Lang.get_string("stock_queries/skyjson_url/input_tip", locale),
                              'help_text': Lang.get_string("stock_queries/skyjson_url/help_text", locale)
+                             },
+             
+            'discord_ad': {'class': Information,
+                             'handler': 'None',
+                             'foreword': Lang.get_string("stock_queries/discord_ad/foreword", locale),
+                             'question': Lang.get_string("stock_queries/discord_ad/question", locale),
+                             'afterword': Lang.get_string("stock_queries/discord_ad/afterword", locale),
+                             'input_tip': Lang.get_string("stock_queries/discord_ad/input_tip", locale),
+                             'help_text': Lang.get_string("stock_queries/discord_ad/help_text", locale)
                              }                  
+
             }
