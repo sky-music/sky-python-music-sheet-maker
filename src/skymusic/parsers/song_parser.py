@@ -36,7 +36,8 @@ class SongParser:
         self.icon_delimiter = Resources.ICON_DELIMITER
         self.pause = Resources.PAUSE
         self.quaver_delimiter = Resources.QUAVER_DELIMITER
-        self.comment_delimiter = Resources.COMMENT_DELIMITER
+        self.lyric_delimiter = Resources.LYRIC_DELIMITER
+        self.metadata_delimiter = Resources.METADATA_DELIMITER
         self.repeat_indicator = Resources.REPEAT_INDICATOR
         self.default_key = Resources.DEFAULT_KEY
         self.allowed_regex = ['\s', '\t', '\w', '\d', '\n', '\r', '\a', '\e', '\f', '\v', '\R']
@@ -47,17 +48,6 @@ class SongParser:
         except AttributeError:  # Should never happen
             self.locale = Lang.guess_locale()
             print(f"**ERROR: SongParser self.maker has no locale. Reverting to {self.locale}")
-
-    """
-    def set_delimiters(self, icon_delimiter=Resources.ICON_DELIMITER, pause=Resources.PAUSE, quaver_delimiter=Resources.QUAVER_DELIMITER, comment_delimiter=Resources.COMMENT_DELIMITER,
-                       repeat_indicator=Resources.REPEAT_INDICATOR):
-
-        self.icon_delimiter = icon_delimiter
-        self.pause = pause
-        self.quaver_delimiter = quaver_delimiter
-        self.comment_delimiter = comment_delimiter
-        self.repeat_indicator = repeat_indicator
-    """
     
     def get_icon_delimiter(self):
 
@@ -71,9 +61,9 @@ class SongParser:
 
         return self.quaver_delimiter
 
-    def get_comment_delimiter(self):
+    def get_lyric_delimiter(self):
 
-        return self.comment_delimiter
+        return self.lyric_delimiter
 
     def get_repeat_indicator(self):
 
@@ -104,22 +94,22 @@ class SongParser:
                     print('\n'+Lang.get_string("warnings/jianpu_quaver_delimiter", self.locale).format(jianpu_quaver_delimiter=Resources.JIANPU_QUAVER_DELIMITER, quaver_delimiter=self.quaver_delimiter))
                 self.quaver_delimiter = Resources.JIANPU_QUAVER_DELIMITER
 
-        delims = [self.icon_delimiter, self.pause, self.quaver_delimiter, self.comment_delimiter, self.repeat_indicator]
+        delims = [self.icon_delimiter, self.pause, self.quaver_delimiter, self.lyric_delimiter, self.repeat_indicator]
 
 
         if self.quaver_delimiter == '\s' or re.match('\s', self.quaver_delimiter):
             print("\n***ERROR: You cannot use a blank delimiter to separate notes in a quaver")
         if self.pause == '\s' or re.match('\s', self.pause):
             print("\n***ERROR: You cannot use a blank delimiter to indicate a pause")
-        if self.comment_delimiter == '\s' or re.match('\s', self.comment_delimiter):
-            print("\n***ERROR: You cannot use a blank delimiter to indicate comments")
-        if self.comment_delimiter == '\s' or re.match('\s', self.repeat_indicator):
+        if self.lyric_delimiter == '\s' or re.match('\s', self.lyric_delimiter):
+            print("\n***ERROR: You cannot use a blank delimiter to indicate lyrics")
+        if self.lyric_delimiter == '\s' or re.match('\s', self.repeat_indicator):
             print("\n***ERROR: You cannot use a blank delimiter to indicate repetition")
 
         parser = self.get_note_parser()
         if parser is not None:
             for delim in delims:
-                if (parser.not_note_name_regex.match(delim) is None or parser.not_octave_regex.match(delim) is None) and delim != self.comment_delimiter:
+                if (parser.not_note_name_regex.match(delim) is None or parser.not_octave_regex.match(delim) is None) and delim != self.lyric_delimiter:
                     print(f"\n***ERROR: You chose an invalid delimiter for notation {self.input_mode.get_short_desc(self.locale)}: {delim}")
                 if delims.count(delim) > 1:
                     print("\n***ERROR: You used the same delimiter for different purposes.")
@@ -319,8 +309,8 @@ class SongParser:
         else:
             
             if delimiter is None:
-                if line[0] == self.comment_delimiter:
-                    delimiter = self.comment_delimiter
+                if line[0] == self.lyric_delimiter:
+                    delimiter = self.lyric_delimiter
                 else:
                     delimiter = self.icon_delimiter
                 
@@ -338,8 +328,7 @@ class SongParser:
         line = self.sanitize_line(line)
 
         if len(line) > 0:
-            if line[0] == self.comment_delimiter:
-                #lyrics = line.split(self.comment_delimiter)
+            if line[0] == self.lyric_delimiter:
                 lyrics = self.split_line(line)
                 for lyric in lyrics:
                     if len(lyric) > 0:

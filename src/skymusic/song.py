@@ -17,7 +17,7 @@ class Song():
 
         self.lines = []        
         self.meta = {
-                    'title': [Lang.get_string("song_meta/title", self.locale) + ':', Lang.get_string("song_meta/untitled", self.locale)],
+                    'title': [Lang.get_string("song_meta/title", self.locale) + ': ', Lang.get_string("song_meta/untitled", self.locale)],
                     'artist': [Lang.get_string("song_meta/artist", self.locale) + ': ', ''],
                     'transcript': [Lang.get_string("song_meta/transcript", self.locale) + ': ', ''],
                     'song_key': [Lang.get_string("song_meta/musical_key", self.locale) + ': ', '']}

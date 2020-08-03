@@ -66,17 +66,17 @@ def parse_chords(song_parser, chords, note_shift=0, song_jet='C'):
 
 
 def parse_line(song_parser, line, note_shift=0, song_key='C'):
-    comment_delimiter = song_parser.get_comment_delimiter()
+    lyric_delimiter = song_parser.get_lyric_delimiter()
 
     line = song_parser.sanitize_line(line)
     
     splitted_line = []
     if len(line) > 0:
-        if line[0] == comment_delimiter:
+        if line[0] == lyric_delimiter:
             lyrics = song_parser.split_line(line)
             for lyric in lyrics:
                 if len(lyric) > 0:
-                    splitted_line.append(Resources.COMMENT_DELIMITER + lyric)
+                    splitted_line.append(Resources.LYRIC_DELIMITER + lyric)
             # splitted_line.append(lyric_line)
         else:
             icons = song_parser.split_line(line)
@@ -101,7 +101,7 @@ def render_transposed_song(song_lines):
             song += '\n'
         for instr_idx, instrument in enumerate(song_line):
             try:
-                if song_line[0][0][0] == Resources.COMMENT_DELIMITER:
+                if song_line[0][0][0] == Resources.LYRIC_DELIMITER:
                     song += str(instrument)
                 else:
                     for icon_idx, icon in enumerate(instrument):

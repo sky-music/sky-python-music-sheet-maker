@@ -59,7 +59,7 @@ class Instrument():
         self.is_silent = is_silent
 
 
-class Voice(Instrument):  # Lyrics or comments
+class Voice(Instrument):  # Lyrics
 
     def __init__(self):
         super().__init__()

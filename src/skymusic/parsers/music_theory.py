@@ -54,7 +54,7 @@ class MusicTheory():
         for line in song_lines:
             line = song_parser.sanitize_line(line)
             if len(line) > 0:
-                if line[0] != song_parser.comment_delimiter:
+                if line[0] != song_parser.lyric_delimiter:
                     icons = song_parser.split_line(line)
                     for icon in icons:
                         chords = song_parser.split_icon(icon)
@@ -130,7 +130,7 @@ class MusicTheory():
         num_notes = [0] * len(possible_keys)
         for line in song_lines:
             if len(line) > 0:
-                if line[0] != song_parser.comment_delimiter:
+                if line[0] != song_parser.lyric_delimiter:
                     notes = is_note_regex.sub(' \\1',
                                               not_note_regex.sub('', line)).split()  # Clean-up, adds space and split
                     for i, k in enumerate(possible_keys):
