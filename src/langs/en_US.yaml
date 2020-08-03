@@ -130,8 +130,9 @@ stock_queries:
     question: |
       Welcome to the Visual Song Sheet creator!
       I am going to ask you several questions to build your song sheet.
-      **Hint: keep your notes in a text file to be able to correct your song later.**
       Type '?' to get help for a particular question.
+      **Hint: keep your notes in a text file to be able to correct your song later.**
+      
     afterword:
     input_tip:
     help_text: |

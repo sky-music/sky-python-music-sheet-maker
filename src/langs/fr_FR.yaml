@@ -129,8 +129,9 @@ stock_queries:
     question: |
       Bienvenue dans le créateur de portée visuelles pour Sky!
       Je vais vous posez plusieurs questions afin de construire votre portée.
-      **Astuce : conservez vos notes dans un fichier texte pour pouvoir modifier la chanson plus tard**
       Tapez '?' après une question pour de l'aide supplémentaire.
+      **Astuce : conservez vos notes dans un fichier texte pour pouvoir modifier la chanson plus tard**
+      
     afterword:
     input_tip:
     help_text: |

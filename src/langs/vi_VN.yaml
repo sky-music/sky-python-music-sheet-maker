@@ -138,8 +138,9 @@ stock_queries:
     question: |
       Chào mừng đến với trình tạo bản nhạc trực quan!
       Tôi sẽ hỏi một số câu hỏi để có thể tạo ra bản nhạc cho bạn.
-      **Mẹo: Lưu nốt của bạn trong một tệp văn bản để có thể sửa lại sau này**
       Nhập '?' để được trợ giúp cho câu hỏi cụ thể
+      **Mẹo: Lưu nốt của bạn trong một tệp văn bản để có thể sửa lại sau này**
+      
     afterword:
     input_tip:
     help_text: |
