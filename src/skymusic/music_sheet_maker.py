@@ -680,8 +680,9 @@ class MusicSheetMaker:
         if render_modes is None:
             render_modes = self.retrieve_render_modes(recipient)
 
-        time_modes = [RenderMode.MIDI, RenderMode.SKYJSON]
-        if not any([mode in render_modes for mode in time_modes]):
+        #time_modes = RenderMode.get_time_modes()
+        #if not any([mode in render_modes for mode in time_modes]):
+        if not any([mode.get_is_time() for mode in render_modes]):   
             return None, Resources.DEFAULT_BPM
         else:
             replacements = {'skip_number': Lang.get_string(f"recipient_specifics/skip_number/{recipient.get_name()}", self.locale)}

@@ -168,18 +168,17 @@ class CommandLinePlayer:
                             q.reply_to(answer)
                             
                     if answer is None: # Else asks the user a question in the prompt
-                        answer = input('%s: '%question)
+                        answer = input(f"{question}: ")
                         q.reply_to(answer)
                     reply_valid = q.get_reply_validity()
                 else:                  
                     print('\n'+question)
-                    q.reply_to('ok')
+                    q.reply_to("ok")
                     reply_valid = q.get_reply_validity()
 
 try:
-    
     player = CommandLinePlayer(locale=Lang.guess_locale(), preferences_path=PREFERENCES_PATH)
-    maker = MusicSheetMaker(locale=Lang.guess_locale(), song_dir_in=SONG_DIR_IN, song_dir_out=SONG_DIR_OUT, enable_skyjson_url=SKYJSON_URL)
+    maker = MusicSheetMaker(locale=Lang.guess_locale(), song_dir_in=SONG_DIR_IN, song_dir_out=SONG_DIR_OUT, enable_skyjson_url=(SKYJSON_URL and not BATCH_MODE))
 
     if BATCH_MODE:
         

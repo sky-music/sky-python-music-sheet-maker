@@ -39,19 +39,20 @@ class InputMode(Enum):
 
 
 class RenderMode(Enum):
-    HTML = (False, False, "render_mode/html/short_desc", 'text/html', '.html', src.skymusic.parsers.noteparsers.skyabc15.SkyABC15)
-    SVG = (True, False, "render_mode/svg/short_desc", 'image/svg+xml', '.svg', src.skymusic.parsers.noteparsers.skyabc15.SkyABC15)
-    PNG = (True, False, "render_mode/png/short_desc", 'image/png', '.png', src.skymusic.parsers.noteparsers.skyabc15.SkyABC15)
-    MIDI = (False, True, "render_mode/midi/short_desc", 'audio/midi', '.mid', src.skymusic.parsers.noteparsers.skyabc15.SkyABC15)
-    SKYJSON = (False, False, "render_mode/skyjson/short_desc", 'application/json', '.json', src.skymusic.parsers.noteparsers.skyjson.SkyJson)
-    SKYASCII = (False, False, "render_mode/skyascii/short_desc", 'text/plain', '_sky.txt', src.skymusic.parsers.noteparsers.skyabc15.SkyABC15)
-    ENGLISHASCII = (False, True, "render_mode/englishascii/short_desc", 'text/plain', '_english.txt', src.skymusic.parsers.noteparsers.english.English)
-    JIANPUASCII = (False, True, "render_mode/jianpuascii/short_desc", 'text/plain', '_jianpu.txt', src.skymusic.parsers.noteparsers.jianpu.Jianpu)
-    DOREMIASCII = (False, True, "render_mode/doremiascii/short_desc", 'text/plain', '_doremi.txt', src.skymusic.parsers.noteparsers.doremi.Doremi)
+    HTML = (False, False, False, "render_mode/html/short_desc", 'text/html', '.html', src.skymusic.parsers.noteparsers.skyabc15.SkyABC15)
+    SVG = (True, False, False, "render_mode/svg/short_desc", 'image/svg+xml', '.svg', src.skymusic.parsers.noteparsers.skyabc15.SkyABC15)
+    PNG = (True, False, False, "render_mode/png/short_desc", 'image/png', '.png', src.skymusic.parsers.noteparsers.skyabc15.SkyABC15)
+    MIDI = (False, True, True, "render_mode/midi/short_desc", 'audio/midi', '.mid', src.skymusic.parsers.noteparsers.skyabc15.SkyABC15)
+    SKYJSON = (False, True, False, "render_mode/skyjson/short_desc", 'application/json', '.json', src.skymusic.parsers.noteparsers.skyjson.SkyJson)
+    SKYASCII = (False, False, False, "render_mode/skyascii/short_desc", 'text/plain', '_sky.txt', src.skymusic.parsers.noteparsers.skyabc15.SkyABC15)
+    ENGLISHASCII = (False, False, True, "render_mode/englishascii/short_desc", 'text/plain', '_english.txt', src.skymusic.parsers.noteparsers.english.English)
+    JIANPUASCII = (False, False, True, "render_mode/jianpuascii/short_desc", 'text/plain', '_jianpu.txt', src.skymusic.parsers.noteparsers.jianpu.Jianpu)
+    DOREMIASCII = (False, False, True, "render_mode/doremiascii/short_desc", 'text/plain', '_doremi.txt', src.skymusic.parsers.noteparsers.doremi.Doremi)
 
 
-    def __init__(self, image_mode, chromatic, short_desc, mime_type, extension, note_parser_method):
+    def __init__(self, image_mode, time_mode, chromatic, short_desc, mime_type, extension, note_parser_method):
         self.image_mode = image_mode
+        self.time_mode = time_mode
         self.chromatic = chromatic
         self.short_desc_yaml = short_desc
         self.mime_type = mime_type
@@ -64,9 +65,24 @@ class RenderMode(Enum):
     def get_is_image(self):
         return self.image_mode
         
+    def get_is_time(self):
+        return self.time_mode
+        
     def get_is_chromatic(self):
         return self.chromatic
+ 
+    def get_time_modes():
         
+          return [mode for mode in RenderMode if RenderMode.get_is_time()]  
+          
+    def get_image_modes():
+        
+          return [mode for mode in RenderMode if RenderMode.get_is_image()]
+
+    def get_chromatic_modes():
+        
+          return [mode for mode in RenderMode if RenderMode.get_is_chromatic()]            
+                              
     def get_short_desc(self, locale='en_US'):
         return Lang.get_string(self.short_desc_yaml, locale)
 
