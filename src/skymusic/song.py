@@ -82,8 +82,7 @@ class Song():
         for line in self.lines:
             instr = line[0]
             try:
-                (rows, cols) = instr.get_dimensions()
-                aspect_ratio = cols/rows
+                aspect_ratio = instr.get_aspect_ratio()
                 break
             except AttributeError:
                 pass
