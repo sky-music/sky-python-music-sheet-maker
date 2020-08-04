@@ -72,6 +72,25 @@ class Song():
             c += len(line)
         return c
 
+    def get_harp_aspect_ratio(self):        
+        
+        aspect_ratio = 1
+        
+        if self.get_num_instruments() == 0:
+            return aspect_ratio
+        
+        for line in self.lines:
+            instr = line[0]
+            try:
+                (rows, cols) = instr.get_dimensions()
+                aspect_ratio = cols/rows
+                break
+            except AttributeError:
+                pass
+                
+        return aspect_ratio
+                
+
     def get_num_broken(self):
         """Returns the number of broken instruments in the Song"""
         b = 0

@@ -2,23 +2,23 @@
 Set to none to have a transparent SVG, and a transparent PNG with alpha layer (RGBA) later
 Set to white to make the background white in RGB mode, and the PNG background white when converted to RGB
 --> */
-svg rect.harp-background {
+svg rect.harp-background, rect.drum-background {
   fill:rgb(54, 57, 63);
 }
 
-svg rect.note-background {
+svg rect.note-background, rect.drum-background {
   fill:rgb(54, 57, 63);
 }
 
 /* <!-- Sky chord chart: a table with rounded edges (SVG only) --> */
-svg rect.harp {
+svg rect.harp, rect.drum {
   fill:rgb(54, 57, 63);
   stroke-width:1;
   stroke:white;
 }
 
 /* <!-- Sky chord chart: a table with rounded edges and thick edges (for rendering PNG from SVG only) --> */
-svg rect.harp-png {
+svg rect.harp-png, rect.drum-png {
   fill:rgb(54, 57, 63);
   stroke-width:3;
   stroke:white;

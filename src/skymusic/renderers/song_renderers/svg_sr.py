@@ -11,27 +11,36 @@ class SvgSongRenderer(song_renderer.SongRenderer):
         super().__init__(locale)
         Resources.load_theme(theme)
 
-        self.harp_AspectRatio = 1.455
-        self.harp_relspacings = (0.13, 0.1)  # Fraction of the harp width that will be allocated to the spacing between harps
-
         self.aspect_ratio = aspect_ratio
         self.maxIconsPerLine = round(10*aspect_ratio/(16/9.0))
-        self.maxFiles = Resources.MAX_NUM_FILES
-
+        
         self.SVG_viewPort = (0.0, 0.0, 750*self.aspect_ratio, 750.0)
-        minDim = self.SVG_viewPort[2] * 0.01
-        self.SVG_viewPortMargins = (13.0, 7.5)
+        self.minDim = self.SVG_viewPort[2] * 0.01
+        self.SVG_viewPortMargins = (13.0, 7.5)       
+        self.SVG_line_width = self.SVG_viewPort[2] - self.SVG_viewPortMargins[0]
+        
         self.pt2px = 96.0 / 72
         self.fontpt = 12
         self.SVG_text_height = self.fontpt * self.pt2px  # In principle this should be in em
-        self.SVG_line_width = self.SVG_viewPort[2] - self.SVG_viewPortMargins[0]
-        SVG_harp_width = max(minDim, (self.SVG_viewPort[2] - self.SVG_viewPortMargins[0]) / (
+        self.maxFiles = Resources.MAX_NUM_FILES
+        
+        self.harp_relspacings = (0.13, 0.1)# Fraction of the harp width that will be allocated to the spacing between harps
+        
+        self.SVG_harp_width = max(self.minDim, (self.SVG_viewPort[2] - self.SVG_viewPortMargins[0]) / (
                 1.0 * self.maxIconsPerLine * (1 + self.harp_relspacings[0])))
-        self.SVG_harp_size = (SVG_harp_width, max(minDim, SVG_harp_width / self.harp_AspectRatio))
-        self.SVG_harp_spacings = (
-            self.harp_relspacings[0] * SVG_harp_width,
-            self.harp_relspacings[1] * SVG_harp_width / self.harp_AspectRatio)
+                
+        self.harp_relAspectRatio = 1.455/(5/3)
+        #self.harp_AspectRatio = 1.455       
+        self.set_harp_AspectRatio(5/3, self.harp_relAspectRatio)
 
+    def set_harp_AspectRatio(self, harp_AspectRatio, harp_relAspectRatio=1):
+        
+        self.harp_AspectRatio = harp_AspectRatio*harp_relAspectRatio
+        self.SVG_harp_size = (self.SVG_harp_width, max(self.minDim, self.SVG_harp_width / self.harp_AspectRatio))
+        self.SVG_harp_spacings = (
+            self.harp_relspacings[0] * self.SVG_harp_width,
+            self.harp_relspacings[1] * self.SVG_harp_width / self.harp_AspectRatio)
+        
     def get_voice_SVG_height(self):
         """Tries to predict the height of the lyrics text when rendered in SVG"""
         return self.fontpt * self.pt2px
@@ -73,6 +82,8 @@ class SvgSongRenderer(song_renderer.SongRenderer):
             return buffer_list
 
         instrument_renderer = SvgInstrumentRenderer(self.locale)
+        self.set_harp_AspectRatio(song.get_harp_aspect_ratio(), self.harp_relAspectRatio)
+        #self.set_harp_AspectRatio(1.455)
 
         svg_buffer = io.StringIO()
         filenum = len(buffer_list)
