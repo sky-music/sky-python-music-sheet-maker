@@ -24,9 +24,9 @@ class SkyJson(noteparser.NoteParser):
         }
 
 
-        self.note_name_with_octave_regex = re.compile(r'\d{2}(Key\d{2})', re.IGNORECASE)
+        self.note_name_with_octave_regex = re.compile(r'\d{,2}(Key\d{2})', re.IGNORECASE)
         self.note_name_regex = self.note_name_with_octave_regex
-        self.single_note_name_regex = re.compile(r'\b\d{2}(Key\d{2}\b)', re.IGNORECASE)
+        self.single_note_name_regex = re.compile(r'\b\d{,2}(Key\d{2}\b)', re.IGNORECASE)
         self.note_octave_regex = re.compile(r'\b\d\d')
         self.not_note_name_regex = re.compile(r'[^Key\d]+', re.IGNORECASE) #not accurate
         self.not_octave_regex = re.compile(r'[^\d]+') #not accurate

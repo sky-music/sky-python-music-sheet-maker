@@ -115,7 +115,7 @@ JIANPU_QUAVER_DELIMITER = '^'
 LYRIC_DELIMITER = '#'
 METADATA_DELIMITER = '#$'
 REPEAT_INDICATOR = '*'
-BROKEN_CHORD = 'X'
+BROKEN_HARP= 'X'
 SKYJSON_CHORD_DELAY = 50 #Delay in ms below which 2 notes are considered a chord
 DEFAULT_BPM = 220
 

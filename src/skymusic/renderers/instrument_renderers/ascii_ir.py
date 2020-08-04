@@ -9,24 +9,24 @@ class AsciiInstrumentRenderer(instrument_renderer.InstrumentRenderer):
 
     def render_harp(self, instrument, note_parser=None):
 
-        ascii_chord = ''
+        ascii_render = ''
 
         if instrument.get_is_broken():
-            ascii_chord = Resources.BROKEN_CHORD
+            ascii_render = Resources.BROKEN_HARP
         elif instrument.get_is_silent():
-            ascii_chord = Resources.PAUSE
+            ascii_render = Resources.PAUSE
         else:
-            chord_skygrid = instrument.get_chord_skygrid()
-            for k in chord_skygrid:  # Cycle over positions in a frame
-                for f in chord_skygrid[k]:  # Cycle over triplets & quavers
-                    if chord_skygrid[k][f]:  # Button is highlighted
-                        ascii_chord += note_parser.get_note_from_coordinate(k) + Resources.QUAVER_DELIMITER
-            ascii_chord = ascii_chord.rstrip(Resources.QUAVER_DELIMITER)
+            skygrid = instrument.get_skygrid()
+            for k in skygrid:  # Cycle over positions in a frame
+                for f in skygrid[k]:  # Cycle over triplets & quavers
+                    if skygrid[k][f]:  # Button is highlighted
+                        ascii_render += note_parser.get_note_from_coordinate(k) + Resources.QUAVER_DELIMITER
+            ascii_render = ascii_render.rstrip(Resources.QUAVER_DELIMITER)
             
-        return ascii_chord
+        return ascii_render
 
 
     def render_voice(self, instrument, render_mode):
-        chord_render = f"{Resources.LYRIC_DELIMITER}{instrument.get_lyric()}"  # Lyrics marked as comments in output text files
-        return chord_render
+        voice_render = f"{Resources.LYRIC_DELIMITER}{instrument.get_lyric()}"  # Lyrics marked as comments in output text files
+        return voice_render
 

@@ -52,6 +52,6 @@ class SvgInstrumentRenderer(instrument_renderer.InstrumentRenderer):
                 # NOTE RENDER
                 harp_render += note_renderer.render(note, x=f"{100*xn :.2f}%", y=f"{100*yn :.2f}%", width=f"{100*note_width :.2f}%")
                 
-        harp_render += '/n</svg>'
+        harp_render += '\n</svg>'
 
         return harp_render

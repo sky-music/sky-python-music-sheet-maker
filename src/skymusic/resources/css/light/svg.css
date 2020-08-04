@@ -10,32 +10,48 @@ svg rect.note-background, svg rect.note-background {
   fill:white;
 }
 
-/* <!-- Sky chord chart: a table with rounded edges (SVG only) --> */
-svg rect.harp, svg rect.drum{
+/* <!-- Sky instrument chart: a table with rounded edges (SVG only) --> */
+svg rect.harp, svg rect.drum {
   fill:white;
   stroke-width:1;
   stroke:black;
 }
 
-/* <!-- Sky chord chart: a table with rounded edges and thick edges (for rendering PNG from SVG only) --> */
-svg rect.harp-png, svg rect.harp-png {
+/* <!-- Sky instrument chart: a table with rounded edges and thick edges (for rendering PNG from SVG only) --> */
+svg rect[class*="-png"] {
   fill:white;
   stroke-width:3;
   stroke:black;
 }
 
-/* <!-- Makes the table disappear in case of broken chord  (SVG only)--> */
-svg.broken rect{
+/* <!-- Makes the table disappear in case of broken instrument  (SVG only)--> */
+svg.broken rect {
   fill:none;
   stroke-width:0;
   stroke:white;
 }
 
-/* <!-- Silent table  (SVG only)--> */
+/* <!-- Silent table (SVG only)--> */
 svg.silent rect:not([class*="-background"]) {
   stroke: grey;
   stroke-width:0;
   fill:none;
+}
+
+/* <!-- Middle note button when the harp is silent (SVG only) --> */
+svg[class*="harp"].silent svg.button-7 .silent.icon {
+  stroke-width: 0;
+  stroke: white;
+  fill: #BBBBBB;
+  opacity: 1;
+}
+
+/* <!-- Middle note button when the drum is silent (SVG only) --> */
+svg[class*="drum"].silent svg.button-5 .silent.icon {
+  stroke-width: 0;
+  stroke: white;
+  fill: #BBBBBB;
+  opacity: 1;
 }
 
 /* <!-- Sky voice (SVG only) --> */
@@ -62,39 +78,3 @@ svg line.divide {
     stroke-width: 1.0px;
 }
 
-
-/* <!-- Small buttons showing notes positions --> */
-svg.button-0 .OFF.icon,
-svg.button-1 .OFF.icon,
-svg.button-2 .OFF.icon,
-svg.button-3 .OFF.icon,
-svg.button-4 .OFF.icon {
-  stroke-width: 0;
-  stroke: white;
-  fill: rgb(194,240,194);
-  opacity: 1;
-}
-
-/* <!-- Small buttons showing notes positions --> */
-svg.button-5 .OFF.icon,
-svg.button-6 .OFF.icon,
-svg.button-7 .OFF.icon,
-svg.button-8 .OFF.icon,
-svg.button-9 .OFF.icon {
-  stroke-width: 0;
-  stroke: white;
-  fill: rgb(179,236,255);
-  opacity: 1;
-}
-
-/* <!-- Small buttons showing notes positions --> */
-svg.button-10 .OFF.icon,
-svg.button-11 .OFF.icon,
-svg.button-12 .OFF.icon,
-svg.button-13 .OFF.icon,
-svg.button-14 .OFF.icon {
-  stroke-width: 0;
-  stroke: white;
-  fill: rgb(255,185,223);
-  opacity: 1;
-}

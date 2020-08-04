@@ -5,25 +5,25 @@ class Instrument():
 
     def __init__(self):
         self.type = 'undefined'
-        self.chord_skygrid = {}
+        self.skygrid = {}
         self.repeat = 1
         self.index = 0
         self.is_silent = True
         self.is_broken = False
 
-    def set_chord_skygrid(self, chord_skygrid):
-        self.chord_skygrid = chord_skygrid
+    def set_skygrid(self, skygrid):
+        self.skygrid = skygrid
 
-    def get_chord_skygrid(self):
+    def get_skygrid(self):
         """
-        Returns the dictionary for the chord:
+        Returns the dictionary for the instrument:
         where each key is the note position (tuple of row/index),
         the value is a dictionary with key=frame, value=True/False,
         where True/False means whether the note is played or not.
         Inactive notes are actually not in the dictionary at all.
         Example: {(0,0):{0:True}, (1,1):{0:True}}
         """
-        return self.chord_skygrid
+        return self.skygrid
 
     def get_type(self):
         return self.type
@@ -32,7 +32,7 @@ class Instrument():
         self.repeat = repeat
 
     def get_repeat(self):
-        """Returns the number of times the chord must be played"""
+        """Returns the number of times the instrument must be played"""
         return self.repeat
 
     def set_index(self, index):
@@ -44,7 +44,7 @@ class Instrument():
 
     def get_is_silent(self):
         """Returns whether the Harp is empty of notes (silent)"""
-        return (len(self.chord_skygrid) == 0 or self.is_silent)
+        return (len(self.skygrid) == 0 or self.is_silent)
 
     def get_is_broken(self):
         """Returns whether the Harp is broken (notes were not recognized by the Parser)"""
@@ -59,7 +59,7 @@ class Instrument():
         self.is_silent = is_silent
 
 
-class Voice(Instrument):  # Lyrics
+class Voice(Instrument):  # Lyrics or comments
 
     def __init__(self):
         super().__init__()
@@ -99,15 +99,15 @@ class Harp(Instrument):
 
     def get_dimensions(self):
         return (self.row_count, self.column_count)
-    
+
     def get_aspect_ratio(self):
         return self.column_count/self.row_count
     
     def get_num_highlighted(self):
         num = 0
-        for k in self.chord_skygrid.keys():
-            for kk in self.chord_skygrid[k].keys():
-                if self.chord_skygrid[k][kk]:
+        for k in self.skygrid.keys():
+            for kk in self.skygrid[k].keys():
+                if self.skygrid[k][kk]:
                     num += 1
         return num
 

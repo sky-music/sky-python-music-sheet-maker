@@ -21,7 +21,7 @@ class SvgNoteRenderer(note_renderer.NoteRenderer):
         try:
             highlighted_frames = note.get_highlighted_frames()
             highlighted_classes = [f'ON-{frame}' for frame in highlighted_frames]
-        except KeyError:  # Note is not in the chord_skygrid dictionary: so it is not highlighted
+        except KeyError:  # Note is not in the skygrid dictionary: so it is not highlighted
             highlighted_classes = []
 
         if note.instrument_is_broken and (note.get_index() == note.get_middle_index()):

@@ -46,5 +46,5 @@ class HtmlInstrumentRenderer(instrument_renderer.InstrumentRenderer):
 
     def render_voice(self, instrument):
         """Renders the lyrics text in HTML inside an invisible table"""
-        chord_render = f'<table class="voice"><tr><td>{instrument.get_lyric()}</td></tr></table>'
-        return chord_render
+        voice_render = f'<table class="voice"><tr><td>{instrument.get_lyric()}</td></tr></table>'
+        return voice_render
