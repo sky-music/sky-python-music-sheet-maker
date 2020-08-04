@@ -8,13 +8,20 @@ recipient_specifics:
     music_cog: answer with - (dash)
     sky_music_website: press answer
   skip_number:
-    command_line: leave blank or 0 and type enter
-    music_cog: answer with - (dash) or 0
+    command_line: leave blank and type enter
+    music_cog: answer with - (dash)
     sky_music_website: press answer
   all_modes:
     command_line: Type choice numbers, or 'all' to select all formats
-    music_cog:
-    sky_music_website:
+    music_cog: 
+    sky_music_website: 
+instrument:
+  normal:
+    short_desc: Normal instrument
+    long_desc: "Normal instrument"
+  drum:
+    short_desc: Drums
+    long_desc: "Drums"
 input_mode:
   skykeyboard:
     short_desc: Sky keyboard
@@ -123,8 +130,9 @@ stock_queries:
     question: |
       Welcome to the Visual Song Sheet creator!
       I am going to ask you several questions to build your song sheet.
-      **Hint: keep your notes in a text file to be able to correct your song later.**
       Type '?' to get help for a particular question.
+      **Hint: keep your notes in a text file to be able to correct your song later.**
+      
     afterword:
     input_tip:
     help_text: |
@@ -137,6 +145,13 @@ stock_queries:
       - Use "{quaver_delimiter}" to link notes within an icon, for triplets, quavers... (e.g. {quaver_example}). With Jianpu, use "{jianpu_quaver_delimiter}" instead of "-" to avoid confusion with the octave.
       - Add "{repeat_indicator}" after a chord to indicate repetition.
       - Sharps "#" and flats "b" (semitones) are supported for Western and Jianpu notations.
+  instrument_type:
+    foreword:
+    question: Please choose your instrument
+    afterword:
+    input_tip: choose one instrument
+    help_text: |
+      The drum is special because it only has 2 rows and 4 columns
   render_modes:
     foreword:
     question: Please choose one or several output rendering formats. {all_modes}
@@ -320,5 +335,11 @@ stock_queries:
     foreword:
     question: 'You can listen to your song being played by our partner website at: <{url}>'
     afterword:
+    input_tip: click OK to acknowledge
+    help_text:
+  discord_ad:
+    foreword: '======================================='
+    question: 'This program is also available on Discord at: https://discord.gg/thatskygame'
+    afterword: 'To call the Bot from any channel, say this: !song'
     input_tip: click OK to acknowledge
     help_text:

@@ -1,5 +1,4 @@
-#import os
-#import io
+import re
 from src.skymusic import notes
 
 class Instrument():
@@ -60,15 +59,19 @@ class Instrument():
         self.is_silent = is_silent
 
 
-class Voice(Instrument):  # Lyrics or comments
+class Voice(Instrument):  # Lyrics
 
     def __init__(self):
         super().__init__()
         self.type = 'voice'
         self.lyric = ''
+        self.TAG_RE = re.compile(r'<[^>]+>')
 
-    def get_lyric(self):
-        return self.lyric
+    def get_lyric(self, strip_html=False):
+        if strip_html:
+            return self.TAG_RE.sub('', self.lyric)
+        else:
+            return self.lyric
 
     def set_lyric(self, lyric):
         self.lyric = lyric
@@ -94,6 +97,9 @@ class Harp(Instrument):
     def get_column_count(self):
         return self.column_count
 
+    def get_dimensions(self):
+        return (self.row_count, self.column_count)
+    
     def get_num_highlighted(self):
         num = 0
         for k in self.chord_skygrid.keys():
@@ -115,16 +121,12 @@ class Harp(Instrument):
         
         return notes.Note(self, pos)
         
-        """
-        note_index = (pos[0] * self.get_column_count()) + pos[1]
 
-        if note_index % 7 == 0:  # the 7 comes from the heptatonic scale of Sky's music (no semitones)
-            # Note is a root note
-            return notes.NoteRoot(self, pos)  # very important: the chord creating the note is passed as a parameter
-        elif note_index % self.get_column_count() % 2 == 0:
-            # Note is in an odd column, so it is a circle
-            return notes.NoteCircle(self, pos)
-        else:
-            # Note is in an even column, so it is a diamond
-            return notes.NoteDiamond(self, pos)
-        """
+class Drum(Harp):
+    
+    def __init__(self):
+        super().__init__()
+        self.type = 'drum'
+        self.column_count = 4
+        self.row_count = 2
+    

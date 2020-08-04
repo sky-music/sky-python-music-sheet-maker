@@ -20,12 +20,15 @@ class Jianpu(noteparser.NoteParser):
         self.note_octave_regex = re.compile(r'[\+\-]+')
         self.not_note_name_regex = re.compile(r'[^1234567b#♭♯]+')
         self.not_octave_regex = re.compile(r'[^\+\-]+')
-
-        self.inverse_position_map = {
-            (0, 0): '1', (0, 1): '2', (0, 2): '3', (0, 3): '4', (0, 4): '5',
-            (1, 0): '6', (1, 1): '7', (1, 2): '1+', (1, 3): '2+', (1, 4): '3+',
-            (2, 0): '4+', (2, 1): '5+', (2, 2): '6+', (2, 3): '7+', (2, 4): '1++'
-        }
+        
+        self.MAJOR_NOTES = ['1', '2', '3', '4', '5', '6', '7']
+        self.inverse_position_map = {}
+        for i in range(self.get_row_count()):
+            for j in range(self.get_column_count()):
+                (quotient, remainder) = divmod(i*self.get_column_count()+j, len(self.MAJOR_NOTES))
+                note_name = self.MAJOR_NOTES[remainder]
+                oct_str = '+' * quotient if quotient > 0 else ''
+                self.inverse_position_map[(i,j)] = note_name + oct_str
 
     def get_note_octave(self, note):
 

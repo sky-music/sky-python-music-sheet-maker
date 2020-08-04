@@ -241,17 +241,23 @@ class MusicSheetMaker:
 
         # Actually the following is not used but it may be useful to have the triggering query as an argument
         try:
-            q_create_song = kwargs['query']
+            kwargs['query']
         except KeyError:
             raise MusicSheetMakerError('No Query passed to create_song')
 
-            # ======= NEW SONG =======
+        # ======= NEW SONG =======
 
-        # 1. Set Song Parser
+        # 0. Set Song Parser # Must be done first!
         self.set_song_parser(recipient=recipient)
 
-        # 2. Display instructions
+        # 1. Display instructions
         (i_instr, res) = self.ask_instructions(recipient=recipient)
+
+        # 2. Asks instrument type
+        (q_instr_type, instrument_type) = self.ask_instrument(recipient=recipient)
+
+        # 2b. Sets instrument type
+        self.get_song_parser().set_instrument_type(instrument_type)
 
         # 3. Ask for notes
         (q_notes, notes) = self.ask_notes_or_file(recipient=recipient, prerequisites=[i_instr])
@@ -278,7 +284,7 @@ class MusicSheetMaker:
         # 8. Displays error ratio
         (i_error, res) = self.display_error_ratio(recipient=recipient, prerequisites=[q_notes, q_mode, q_shift])
         
-        # 9 Asks for render modes
+        # 9. Asks for render modes
         (q_render, render_modes) = self.ask_render_modes(recipient=recipient)
 
         # 10. Asks for aspect ratio
@@ -302,36 +308,28 @@ class MusicSheetMaker:
         # 14. Sends an url from sky-music.herokuapp.com
         if self.enable_skyjson_url:
             self.send_json_url(recipient=recipient, song_bundle=song_bundle)
+
+        # 15. Advertises for the Discord version
+        if self.is_command_line(recipient):
+            q_discord = self.communicator.send_stock_query('discord_ad', recipient=recipient)
+            recipient.execute_queries(q_discord)
+
         
-        # 15. Sends result back (required for website)
+        # 16. Sends result back (required for website)
         return song_bundle
 
 
-    def send_json_url(self, recipient, song_bundle, skyjson_api_key=None, prerequisites=None, execute=True):
-        
-        json_buffers = song_bundle.get_buffers(RenderMode.SKYJSON)
-        
-        if json_buffers:
-                        
-            url = skyjson_sr.SkyjsonSongRenderer(locale=self.locale).generate_url(json_buffers[0], skyjson_api_key)
-            
-            replacements={'url': url}
-            
-            if url:
-                i_url = self.communicator.send_stock_query('skyjson_url', recipient=recipient,
-                                                             replacements=replacements, prerequisites=prerequisites)
-            else:
-                i_url = None
+
+    def ask_instrument(self, recipient, prerequisites=None, execute=True):
+
+        q_instrument = self.communicator.send_stock_query('instrument_type', recipient=recipient, prerequisites=prerequisites)
+
+        if execute:
+            recipient.execute_queries(q_instrument)
+            instrument_name = q_instrument.get_reply().get_result()
+            return q_instrument, instrument_name
         else:
-            i_url = None
-            
-        
-        if execute and i_url is not None:
-            recipient.execute_queries(i_url)
-            ok = i_url.get_reply().get_result()
-            return i_url, ok
-        else:
-            return i_url, None
+            return q_instrument, None
         
 
     def ask_instructions(self, recipient, prerequisites=None, execute=True):
@@ -682,8 +680,9 @@ class MusicSheetMaker:
         if render_modes is None:
             render_modes = self.retrieve_render_modes(recipient)
 
-        time_modes = [RenderMode.MIDI, RenderMode.SKYJSON]
-        if not any([mode in render_modes for mode in time_modes]):
+        #time_modes = RenderMode.get_time_modes()
+        #if not any([mode in render_modes for mode in time_modes]):
+        if not any([mode.get_is_time() for mode in render_modes]):   
             return None, Resources.DEFAULT_BPM
         else:
             replacements = {'skip_number': Lang.get_string(f"recipient_specifics/skip_number/{recipient.get_name()}", self.locale)}
@@ -855,6 +854,31 @@ class MusicSheetMaker:
             return i_song_files, None
 
 
+    def send_json_url(self, recipient, song_bundle, skyjson_api_key=None, prerequisites=None, execute=True):
+        
+        json_buffers = song_bundle.get_buffers(RenderMode.SKYJSON)
+        
+        if json_buffers:
+                        
+            url = skyjson_sr.SkyjsonSongRenderer(locale=self.locale).generate_url(json_buffers[0], skyjson_api_key)
+            
+            replacements={'url': url}
+            
+            if url:
+                i_url = self.communicator.send_stock_query('skyjson_url', recipient=recipient,
+                                                             replacements=replacements, prerequisites=prerequisites)
+            else:
+                i_url = None
+        else:
+            i_url = None
+            
+        
+        if execute and i_url is not None:
+            recipient.execute_queries(i_url)
+            ok = i_url.get_reply().get_result()
+            return i_url, ok
+        else:
+            return i_url, None
     
 
     '''

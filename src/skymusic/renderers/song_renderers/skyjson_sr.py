@@ -27,7 +27,7 @@ class SkyjsonSongRenderer(song_renderer.SongRenderer):
 
         instrument_renderer = SkyjsonInstrumentRenderer(self.locale)
         
-        json_dict = {'name': meta['title'][1], 'author': meta['artist'][1], 'arrangedBy':'', 'transcribedBy': meta['transcript'][1], 'permission':'', 'isComposed': True, 'bpm': int(self.song_bpm), 'pitchLevel':0, 'bitsPerPage': 16, 'songNotes': []}
+        json_dict = {'name': meta['title'][1], 'author': meta['artist'][1], 'arrangedBy':'', 'transcribedBy': meta['transcript'][1], 'permission':'', 'isComposed': True, 'bpm': int(self.song_bpm), 'pitchLevel':0, 'bitsPerPage': 16, 'isEncrypted': False, 'songNotes': []}
     
         instrument_index = 0
         time = 0
@@ -55,7 +55,6 @@ class SkyjsonSongRenderer(song_renderer.SongRenderer):
         json_buffer.seek(0)
         json_dict = json.load(json_buffer)
         json_dict = {'API_KEY': api_key, 'song': json_dict}
-        #json_post_data = json.dumps(json_dict)
         
         headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
         try:

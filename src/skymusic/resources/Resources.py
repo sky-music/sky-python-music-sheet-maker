@@ -112,7 +112,8 @@ PAUSE = '.'
 JIANPU_PAUSE = '0'
 QUAVER_DELIMITER = '-'
 JIANPU_QUAVER_DELIMITER = '^'
-COMMENT_DELIMITER = '#'
+LYRIC_DELIMITER = '#'
+METADATA_DELIMITER = '#$'
 REPEAT_INDICATOR = '*'
 BROKEN_CHORD = 'X'
 SKYJSON_CHORD_DELAY = 50 #Delay in ms below which 2 notes are considered a chord
@@ -128,6 +129,8 @@ SKY_MUSIC_WEBSITE_THEME = 'light'
 COMMAND_LINE_THEME = 'light'
 
 DEFAULT_KEY = 'C'
+
+DEFAULT_INSTRUMENT = 'harp'
 
 MIDI_PITCHES = {'C': 60, 'C#': 61, 'Db': 61, 'D': 62, 'D#': 63, 'Eb': 63, 'E': 64, 'F': 65, 'F#': 66, 'Gb': 66, 'G': 67, 'G#': 68, 'Ab': 68, 'A': 69, 'A#': 70, 'Bb': 70, 'B': 71}
 MIDI_SEMITONES = [0, 2, 4, 5, 7, 9, 11]  # May no longer be used when Western_scales is merged

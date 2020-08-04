@@ -1,5 +1,5 @@
 from src.skymusic import Lang
-from src.skymusic.instruments import Harp, Voice
+from src.skymusic.instruments import Voice
 
 class InstrumentRenderer():
 
@@ -19,10 +19,8 @@ class InstrumentRenderer():
         except IndexError:
             instrument = kwargs['instrument']
 
-        if isinstance(instrument, Harp):
-            return self.render_harp(*args, **kwargs)
-        elif isinstance(instrument, Voice):
+        if isinstance(instrument, Voice):
             return self.render_voice(*args, **kwargs)
         else:
-            raise TypeError(f"Expected Harp or Voice, got:{instrument.__class__.__name__}")
+            return self.render_harp(*args, **kwargs)
             

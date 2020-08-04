@@ -81,7 +81,7 @@ class PngInstrumentRenderer(instrument_renderer.InstrumentRenderer):
 
     def render_voice(self, instrument, rescale=1.0):
         """Renders the lyrics text in PNG"""
-        lyric = instrument.get_lyric()
+        lyric = instrument.get_lyric(strip_html=True)
         chord_size = self.get_png_chord_size()
         fnt = ImageFont.truetype(self.font_path, int(self.voice_font_size))
         lyric_width = fnt.getsize(lyric)[0]

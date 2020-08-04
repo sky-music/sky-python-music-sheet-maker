@@ -27,6 +27,6 @@ class AsciiInstrumentRenderer(instrument_renderer.InstrumentRenderer):
 
 
     def render_voice(self, instrument, render_mode):
-        chord_render = f"{Resources.COMMENT_DELIMITER}{instrument.get_lyric()}"  # Lyrics marked as comments in output text files
+        chord_render = f"{Resources.LYRIC_DELIMITER}{instrument.get_lyric()}"  # Lyrics marked as comments in output text files
         return chord_render
 

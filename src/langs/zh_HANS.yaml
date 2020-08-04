@@ -9,13 +9,20 @@ recipient_specifics:
     music_cog: 用 -（中划线）回答
     sky_music_website: 按输入
   skip_number:
-    command_line: 留空或输入0 再按回车键
-    music_cog: 用 - （中划键）回答或输入0
+    command_line: 留空或输 再按回车键
+    music_cog: 用 - （中划键）回答或输
     sky_music_website: 按输入
   all_modes:
     command_line: 在已选择的数字中间加入逗号, or 'all' to select all formats
-    music_cog:
-    sky_music_website:
+    music_cog: 
+    sky_music_website: 
+instrument:
+  normal:
+    short_desc: Normal instrument
+    long_desc: "Normal instrument"
+  drum:
+    short_desc: Drums
+    long_desc: "Drums"
 input_mode:
   skykeyboard:
     short_desc: 光遇游戏键盘
@@ -124,8 +131,9 @@ stock_queries:
     question: |
       欢迎使用光遇乐谱创建网站！
       在此会向您询问一些问题为您创建您的乐谱
-      **提示：请把您的乐谱文案存入文字档以方便更改**
       输入 '?' 如对以上有疑惑
+      **提示：请把您的乐谱文案存入文字档以方便更改**
+      
     afterword:
     input_tip:
     help_text: |
@@ -138,6 +146,13 @@ stock_queries:
       - 使用 '{quaver_delimiter}' 来连接同一个格子里的音符，例如三连音、八分音符、等等...(举例 {quaver_example})。 简谱使用法：请使用 '{jianpu_quaver_delimiter}'，非 '-' 来避免与八度打乱。
       - 和弦过后加入 '{repeat_indicator}' 以表注重复。
       - 西方乐谱和简谱支持使用升号 "#" 和降号 "b" (变音记号)。
+  instrument_type:
+    foreword:
+    question: Please choose your instrument
+    afterword:
+    input_tip: choose one instrument
+    help_text: |
+      The drum is special because it only has 2 rows and 4 columns
   render_modes:
     foreword:
     question: 请选择一个或以上的输出格式。{all_modes}
@@ -320,5 +335,11 @@ stock_queries:
     foreword:
     question: 'You can listen to your song being played by our partner website at: <{url}>'
     afterword:
+    input_tip: click OK to acknowledge
+    help_text:
+  discord_ad:
+    foreword: '======================================='
+    question: 'This program is also available on Discord at: https://discord.gg/thatskygame'
+    afterword: 'To call the Bot from any channel, say this: !song'
     input_tip: click OK to acknowledge
     help_text:

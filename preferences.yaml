@@ -4,6 +4,7 @@
 # It is operational for command-line users only
 # To disable a default answer, start the whole line with an hashtag #
 #==========================================#
+instrument_type: NORMAL #An instrument short name among NORMAL, DRUM
 #aspect_ratio: WIDESCREEN # an aspect ratio short name among WIDESCREEN, OLDTV, SQUARE, A4, VERTPANEL
 #song_bpm: 120 # an integer value between 12 and 1200
 #octave_shift: 0 # an integer between -12 and +12

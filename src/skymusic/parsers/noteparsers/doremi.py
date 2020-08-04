@@ -14,19 +14,16 @@ class Doremi(noteparser.NoteParser):
                                      'fa#': 6, 'solb': 6, 'sob': 6, 'sol': 7, 'so': 7, 'sol#': 8, 'so#': 8, 'lab': 8,
                                      'la': 9, 'la#': 10, 'sib': 10, 'tib': 10, 'si': 11, 'ti': 11}
 
-        oct_str = ''
         oct_int = self.get_default_starting_octave()
-        if oct_int > 1:
-            oct_str = str(oct_int)
-
-        self.inverse_position_map = {
-            (0, 0): 'do' + oct_str, (0, 1): 're' + oct_str, (0, 2): 'mi' + oct_str, (0, 3): 'fa' + oct_str,
-            (0, 4): 'sol' + oct_str,
-            (1, 0): 'la' + oct_str, (1, 1): 'si' + oct_str, (1, 2): 'do' + str(oct_int + 1),
-            (1, 3): 're' + str(oct_int + 1), (1, 4): 'mi' + str(oct_int + 1),
-            (2, 0): 'fa' + str(oct_int + 1), (2, 1): 'sol' + str(oct_int + 1), (2, 2): 'la' + str(oct_int + 2),
-            (2, 3): 'si' + str(oct_int + 2), (2, 4): 'do' + str(oct_int + 2)
-        }
+        
+        self.MAJOR_NOTES = ['do', 're', 'mi', 'fa', 'sol', 'la', 'si']
+        self.inverse_position_map = {}
+        for i in range(self.get_row_count()):
+            for j in range(self.get_column_count()):
+                (quotient, remainder) = divmod(i*self.get_column_count()+j, len(self.MAJOR_NOTES))
+                note_name = self.MAJOR_NOTES[remainder]
+                oct_str = str(oct_int + quotient) if (oct_int + quotient) > 1 else ''
+                self.inverse_position_map[(i,j)] = note_name + oct_str
 
         # Compile regexes for notes to save before using
         self.note_name_with_octave_regex = re.compile(r'([DRMFSLTdrmfslt][OEIAoeia][Ll]?[b#♭♯]?\d)')

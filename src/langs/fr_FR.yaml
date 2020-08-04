@@ -6,16 +6,23 @@ warnings:
 recipient_specifics:
   skip:
     command_line: laissez vide et tapez entrée
-    music_cog: répondez avec un espace
+    music_cog: répondez avec - (tiret)
     sky_music_website: appuyez sur 'send answer'
   skip_number:
-    command_line: laissez blanc ou '0' et tapez entrée
-    music_cog: répondez avec un espace ou '0'
+    command_line: laissez blanc et tapez entrée
+    music_cog: répondez avec - (tiret)
     sky_music_website: appuyez sur 'send answer'
   all_modes:
     command_line: Entrez une liste de nombres, ou 'all' pour sélectionner tous les formats
-    music_cog:
-    sky_music_website:
+    music_cog: 
+    sky_music_website: 
+instrument:
+  normal:
+    short_desc: Instrument normal
+    long_desc: "Instrument normal"
+  drum:
+    short_desc: Tambour
+    long_desc: "Tambour"    
 input_mode:
   skykeyboard:
     short_desc: Clavier
@@ -122,8 +129,9 @@ stock_queries:
     question: |
       Bienvenue dans le créateur de portée visuelles pour Sky!
       Je vais vous posez plusieurs questions afin de construire votre portée.
-      **Astuce : conservez vos notes dans un fichier texte pour pouvoir modifier la chanson plus tard**
       Tapez '?' après une question pour de l'aide supplémentaire.
+      **Astuce : conservez vos notes dans un fichier texte pour pouvoir modifier la chanson plus tard**
+      
     afterword:
     input_tip:
     help_text: |
@@ -135,6 +143,13 @@ stock_queries:
       - Tapez "{quaver_delimiter}" pour relier les notes entre elles, pour les triplets... (e.g. {quaver_example}). En Jianpu, utilisez "{jianpu_quaver_delimiter}" au lieu de '-' pour éviter la confusion avec l'octave.
       - Tapez "{repeat_indicator}" après un groupe de notes pour indiquer la répétition.
       - Les dièses "#" et les bémoles "b" (demi-tons) sont possibles pour les notations autres que Sky ABC-15.
+  instrument_type:
+    foreword:
+    question: Merci de choisir votre instrument
+    afterword:
+    input_tip: Merci de choisir votre instrument
+    help_text: |
+      The drum is special because it only has 2 rows and 4 columns
   render_modes:
     foreword:
     question: Choisissez les formats d'exportation de la chanson. {all_modes}
@@ -316,5 +331,11 @@ stock_queries:
     foreword:
     question: 'You can listen to your song being played by our partner website at: <{url}>'
     afterword:
+    input_tip: click OK to acknowledge
+    help_text:
+  discord_ad:
+    foreword: '======================================='
+    question: 'This program is also available on Discord at: https://discord.gg/thatskygame'
+    afterword: 'To call the Bot from any channel, say this: !song'
     input_tip: click OK to acknowledge
     help_text:

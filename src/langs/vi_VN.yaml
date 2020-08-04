@@ -18,13 +18,20 @@ recipient_specifics:
     music_cog: trả lời với phím Space
     sky_music_website: bở trống và bấm trả lời
   skip_number:
-    command_line: bỏ trống hoặc nhập số 0 và bấm Enter
-    music_cog: trả lời với phím Space hoặc số 0
-    sky_music_website: bở trống hoặc nhập số 0 và bấm trả lời
+    command_line: bỏ trống hoặc nhập và bấm Enter
+    music_cog: trả lời với phím Space hoặc
+    sky_music_website: bở trống hoặc nhập và bấm trả lời
   all_modes:
     command_line: nhập các lựa chọn đặc cách nhau bởi dấu phẩy, or 'all' to select all formats
-    music_cog:
-    sky_music_website:
+    music_cog: 
+    sky_music_website: 
+instrument:
+  normal:
+    short_desc: Normal instrument
+    long_desc: "Normal instrument"
+  drum:
+    short_desc: Drums
+    long_desc: "Drums"
 input_mode:
   skykeyboard:
     short_desc: Bàn phím Sky 
@@ -131,8 +138,9 @@ stock_queries:
     question: |
       Chào mừng đến với trình tạo bản nhạc trực quan!
       Tôi sẽ hỏi một số câu hỏi để có thể tạo ra bản nhạc cho bạn.
-      **Mẹo: Lưu nốt của bạn trong một tệp văn bản để có thể sửa lại sau này**
       Nhập '?' để được trợ giúp cho câu hỏi cụ thể
+      **Mẹo: Lưu nốt của bạn trong một tệp văn bản để có thể sửa lại sau này**
+      
     afterword:
     input_tip:
     help_text: |
@@ -144,6 +152,13 @@ stock_queries:
       - Sử dụng "{quaver_delimiter}" để nối nốt trong một biểu tượng (liên ba, láy rền/hát rung,...) (VD: {quaver_example}). Với Jianpu, sử dụng "{jianpu_quaver_delimiter}" thay vì "-" để không bị nhầm lẫn với quãng tám.
       - Thêm "{repeat_indicator}" sau một hợp âm để biểu thị sự lập lại (repetition).
       - Dấu thăng "#" và dấu giáng "b" (nửa cung) được hỗ trợ cho hệ kí tự Phương Tây và Jianpu.
+  instrument_type:
+    foreword:
+    question: Please choose your instrument
+    afterword:
+    input_tip: choose one instrument
+    help_text: |
+      The drum is special because it only has 2 rows and 4 columns
   render_modes:
     foreword:
     question: Hãy chọn các định dạng xuất bản đầu ra (rendering formats). {all_modes}
@@ -323,5 +338,11 @@ stock_queries:
     foreword:
     question: 'You can listen to your song being played by our partner website at: <{url}>'
     afterword:
+    input_tip: click OK to acknowledge
+    help_text:
+  discord_ad:
+    foreword: '======================================='
+    question: 'This program is also available on Discord at: https://discord.gg/thatskygame'
+    afterword: 'To call the Bot from any channel, say this: !song'
     input_tip: click OK to acknowledge
     help_text:

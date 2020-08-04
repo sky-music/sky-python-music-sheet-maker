@@ -1,11 +1,12 @@
-import os, re, json
+import os, re
 from src.skymusic import instruments, Lang
-from src.skymusic.modes import InputMode
+from src.skymusic.modes import InputMode, InstrumentType
 from src.skymusic.song import Song
 import src.skymusic.parsers.noteparsers
-from src.skymusic.parsers import music_theory
 from src.skymusic.resources import Resources
 from src.skymusic.parsers.html_parser import HtmlSongParser
+from src.skymusic.parsers import music_theory
+
 
 class SongParserError(Exception):
     def __init__(self, explanation):
@@ -25,6 +26,7 @@ class SongParser:
     def __init__(self, maker, silent_warnings=True):
 
         self.maker = maker
+        self.instrument_type = InstrumentType.NORMAL
         self.silent_warnings = silent_warnings
         #Delimiters must be character or strings
         #The backslash character is forbidden
@@ -34,9 +36,9 @@ class SongParser:
         self.icon_delimiter = Resources.ICON_DELIMITER
         self.pause = Resources.PAUSE
         self.quaver_delimiter = Resources.QUAVER_DELIMITER
-        self.comment_delimiter = Resources.COMMENT_DELIMITER
+        self.lyric_delimiter = Resources.LYRIC_DELIMITER
+        self.metadata_delimiter = Resources.METADATA_DELIMITER
         self.repeat_indicator = Resources.REPEAT_INDICATOR
-        self.skyjson_chord_delay = Resources.SKYJSON_CHORD_DELAY #Delay in ms below which 2 notes are considered a chord
         self.default_key = Resources.DEFAULT_KEY
         self.allowed_regex = ['\s', '\t', '\w', '\d', '\n', '\r', '\a', '\e', '\f', '\v', '\R']
         
@@ -46,17 +48,6 @@ class SongParser:
         except AttributeError:  # Should never happen
             self.locale = Lang.guess_locale()
             print(f"**ERROR: SongParser self.maker has no locale. Reverting to {self.locale}")
-
-    """
-    def set_delimiters(self, icon_delimiter=Resources.ICON_DELIMITER, pause=Resources.PAUSE, quaver_delimiter=Resources.QUAVER_DELIMITER, comment_delimiter=Resources.COMMENT_DELIMITER,
-                       repeat_indicator=Resources.REPEAT_INDICATOR):
-
-        self.icon_delimiter = icon_delimiter
-        self.pause = pause
-        self.quaver_delimiter = quaver_delimiter
-        self.comment_delimiter = comment_delimiter
-        self.repeat_indicator = repeat_indicator
-    """
     
     def get_icon_delimiter(self):
 
@@ -70,9 +61,9 @@ class SongParser:
 
         return self.quaver_delimiter
 
-    def get_comment_delimiter(self):
+    def get_lyric_delimiter(self):
 
-        return self.comment_delimiter
+        return self.lyric_delimiter
 
     def get_repeat_indicator(self):
 
@@ -103,22 +94,22 @@ class SongParser:
                     print('\n'+Lang.get_string("warnings/jianpu_quaver_delimiter", self.locale).format(jianpu_quaver_delimiter=Resources.JIANPU_QUAVER_DELIMITER, quaver_delimiter=self.quaver_delimiter))
                 self.quaver_delimiter = Resources.JIANPU_QUAVER_DELIMITER
 
-        delims = [self.icon_delimiter, self.pause, self.quaver_delimiter, self.comment_delimiter, self.repeat_indicator]
+        delims = [self.icon_delimiter, self.pause, self.quaver_delimiter, self.lyric_delimiter, self.repeat_indicator]
 
 
         if self.quaver_delimiter == '\s' or re.match('\s', self.quaver_delimiter):
             print("\n***ERROR: You cannot use a blank delimiter to separate notes in a quaver")
         if self.pause == '\s' or re.match('\s', self.pause):
             print("\n***ERROR: You cannot use a blank delimiter to indicate a pause")
-        if self.comment_delimiter == '\s' or re.match('\s', self.comment_delimiter):
-            print("\n***ERROR: You cannot use a blank delimiter to indicate comments")
-        if self.comment_delimiter == '\s' or re.match('\s', self.repeat_indicator):
+        if self.lyric_delimiter == '\s' or re.match('\s', self.lyric_delimiter):
+            print("\n***ERROR: You cannot use a blank delimiter to indicate lyrics")
+        if self.lyric_delimiter == '\s' or re.match('\s', self.repeat_indicator):
             print("\n***ERROR: You cannot use a blank delimiter to indicate repetition")
 
         parser = self.get_note_parser()
         if parser is not None:
             for delim in delims:
-                if (parser.not_note_name_regex.match(delim) is None or parser.not_octave_regex.match(delim) is None) and delim != self.comment_delimiter:
+                if (parser.not_note_name_regex.match(delim) is None or parser.not_octave_regex.match(delim) is None) and delim != self.lyric_delimiter:
                     print(f"\n***ERROR: You chose an invalid delimiter for notation {self.input_mode.get_short_desc(self.locale)}: {delim}")
                 if delims.count(delim) > 1:
                     print("\n***ERROR: You used the same delimiter for different purposes.")
@@ -148,6 +139,14 @@ class SongParser:
 
         return self.input_mode
 
+    def set_instrument_type(self, instrument_type):
+        
+        self.instrument_type = instrument_type
+        
+    def get_instrument_type(self):
+        
+        return self.instrument_type
+
     def find_key(self, song_lines=None):
         
         return self.music_theory.find_key(song_lines)
@@ -159,8 +158,10 @@ class SongParser:
 
         if input_mode is None:
             input_mode = self.input_mode
-
+        
+        (rows, columns) = self.get_instrument_type().get_instrument().get_dimensions()
         note_parser = input_mode.get_note_parser(locale=self.locale)
+        note_parser.set_dimensions((rows, columns))
 
         return note_parser
 
@@ -292,121 +293,31 @@ class SongParser:
         
         return line
 
-
-    def analyze_tempo(self, times):
-        
-        def find_barycenter(t, y, i0, di):
-           
-            while len(t) < 2*di+1:
-                di = di - 1
-            if di < 0:
-                return None
-            
-            dt = t[1] - t[0]
-            tmin = t[0]
-            nmax = 10
-            
-            n = 0
-            iG = i0
-            iG_old = iG - 10
-            while (iG-iG_old) > 1 and n < nmax:            
-                i1 = max([0,iG-di])
-                i2 = min([len(t),iG+di])
-                y_band = y[i1:i2+1]
-                t_band = t[i1:i2+1]
-                iG_old = iG
-                tG = sum([y*t for (t,y) in zip(t_band, y_band)])/sum(y_band)
-                iG = round((tG - tmin)/dt)
-                n += 1                
-            y[i1:i2+1] = [0]*len(y[i1:i2+1])          
-            return tG 
-        
-        diffs = [times[i] - times[i-1] for i in range(1, len(times))]
-        
-        div_resol = 3
-        hbin = self.skyjson_chord_delay / div_resol
-        num_slots = 2 + int(max(diffs) / hbin)
-        
-        y = [0]*num_slots
-        t = [i*hbin for i in range(num_slots)]
-        
-        for diff in diffs: #histogram starting from t=0
-            y[1+int(diff/hbin)] += 1
-            
-        num_peaks = 3
-        floor = max(y)/10
-         
-        tempos = []
-        
-        for i in range(num_peaks):   
-            y0 = max(y)
-            if y0 < floor:
-                break
-            i0 = y.index(y0)
-            tG = find_barycenter(t, y, i0, div_resol)       
-            tempos.append(tG)
-        
-        return tempos
-
-
-    def split_json(self, line):
-        
-        json_dict = json.loads(line).copy()
-        notes = json_dict[0]['songNotes']
-
-        times = [note['time'] for note in notes]
-        keys = [note['key'] for note in notes]
-
-        # A Special trick to have the same number of digit for all numbers
-        # Facilitates the splitting of glued chords into notes
-        keys = [self.get_note_parser().sanitize_digits(key) for key in keys]
-
-        tempos = [tempo for tempo in self.analyze_tempo(times) if tempo > 2*self.skyjson_chord_delay]
-        
-        if len(tempos) > 0:
-            main_tempo = min(tempos)
-        else:
-            main_tempo = None
-                        
-        icons = [keys[0]]
-        
-        for i in range(1,len(times)):
-            if times[i] - times[i-1] < self.skyjson_chord_delay:
-                icons[-1] += keys[i] # Notes belong to the same chord
-            else:
-                n_pauses = max([0, round((times[i] - times[i-1])/main_tempo - 1)])
-                if n_pauses > 0:
-                    icons += [self.pause + (self.repeat_indicator + str(n_pauses) if n_pauses > 1 else '')]
-                
-                icons += [keys[i]]
-                
-        return icons
-
-
     
     def split_line(self, line, delimiter=None):
         """
         Splits a song line into icons
         An icon is a made of 1 note, several notes (chord), or several chords played rapidly (triplet, quaver)
         Icons will be visually split in SkyGrid renders (aka Harps), possibly with pauses between them
-        """
+        """    
         if self.input_mode == InputMode.SKYJSON:
-       
-            return self.split_json(line)
+            from . import json_parser
+            parser = json_parser.JsonSongParser(self.maker, self.silent_warnings)
+            parser.set_input_mode(self.input_mode)
+            return parser.split_line(line)
             
         else:
             
             if delimiter is None:
-                if line[0] == self.comment_delimiter:
-                    delimiter = self.comment_delimiter
+                if line[0] == self.lyric_delimiter:
+                    delimiter = self.lyric_delimiter
                 else:
                     delimiter = self.icon_delimiter
                 
             if delimiter in self.allowed_regex:
                 return re.compile(delimiter).split(line)
             else:
-                return line.split(delimiter)        
-
+                return line.split(delimiter)
 
 
     def parse_line(self, line, song_key='C', note_shift=0):
@@ -417,8 +328,7 @@ class SongParser:
         line = self.sanitize_line(line)
 
         if len(line) > 0:
-            if line[0] == self.comment_delimiter:
-                #lyrics = line.split(self.comment_delimiter)
+            if line[0] == self.lyric_delimiter:
                 lyrics = self.split_line(line)
                 for lyric in lyrics:
                     if len(lyric) > 0:
@@ -432,7 +342,8 @@ class SongParser:
                     chords = self.split_icon(icon)
                     # From here, real chords are still glued, quavers have been split in different list slots
                     chord_skygrid, harp_broken, harp_silent, repeat = self.parse_chords(chords, song_key, note_shift)
-                    harp = instruments.Harp()
+                    
+                    harp = self.instrument_type.get_instrument()
                     harp.set_repeat(repeat)
                     harp.set_is_silent(harp_silent)
                     harp.set_is_broken(harp_broken)

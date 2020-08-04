@@ -129,8 +129,8 @@ class Communicator:
         method_args['sender'] = self.owner
         method_args['recipient'] = recipient
         method_args.update(kwargs)  # Merge tuples to override default parameters with optional keyword arguments
-                        
-        # supposes we have imported QueryChoice, QueryOpen, QueryBoolean, Information, etc
+        
+        # Supposes we have imported QueryChoice, QueryOpen, QueryBoolean, Information, etc
         q = stock_query_dict['class'](**method_args)  # Creates the Query
         self.memory.store(q)
         q.check_sender(allowed=self.owner)

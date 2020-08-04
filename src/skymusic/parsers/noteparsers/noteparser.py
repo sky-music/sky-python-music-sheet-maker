@@ -11,8 +11,8 @@ class NoteParser:
     def __init__(self, locale='en_US'):
 
         self.locale = locale
+        self.rows = 3 #Can be overridden by set_dimensions()
         self.columns = 5
-        self.rows = 3
 
         self.CHROMATIC_SCALE_DICT = None
         self.SEMITONE_INTERVAL_TO_MAJOR_SCALE_INTERVAL_DICT = {
@@ -57,6 +57,14 @@ class NoteParser:
     def get_row_count(self):
 
         return self.rows
+
+    def get_dimensions(self):
+        
+        return (self.rows, self.columns)
+
+    def set_dimensions(self, dimensions=(3,5)):
+        
+        (self.rows, self.columns) = dimensions
 
     def get_default_starting_octave(self):
 
@@ -179,7 +187,7 @@ class NoteParser:
 
             else:
                 # Raise error, not a valid note
-                raise SyntaxError('Note ' + str(note) + ' was not formatted correctly.')
+                raise SyntaxError(f"Note {note} was not formatted correctly.")
 
     def handle_note_name_without_octave(self, note_name, song_key):
 
@@ -207,14 +215,14 @@ class NoteParser:
             note_name = self.sanitize_note_name(note_name)
         else:
             # Error: note is not formatted right, output broken harp
-            raise SyntaxError('ParsingError: Note ' + str(note_name) + ' was not formatted correctly.')
+            raise SyntaxError(f"ParsingError: Note {note_name} was not formatted correctly.")
 
         chromatic_scale_dict = self.get_chromatic_scale_dict()
 
         if note_name in chromatic_scale_dict.keys():
             return chromatic_scale_dict[note_name]
         else:
-            raise KeyError('ParsingError: Note ' + str(note_name) + ' was not found in the chromatic scale.')
+            raise KeyError(f"ParsingError: Note {note_name} was not found in the chromatic scale.")
 
     def convert_semitone_interval_to_major_scale_interval(self, semitone_interval):
 
@@ -223,7 +231,7 @@ class NoteParser:
         if semitone_interval in conversion_dict.keys():
             return conversion_dict[semitone_interval]
         else:
-            raise KeyError('ParsingError: Interval ' + str(semitone_interval) + ' is not in the major scale.')
+            raise KeyError(f"ParsingError: Interval {semitone_interval} is not in the major scale.")
 
     def calculate_coordinate_for_note(self, note, song_key='C', note_shift=0, is_finding_key=False):
 
@@ -262,9 +270,9 @@ class NoteParser:
             note_name_chromatic_equivalent = self.convert_note_name_into_chromatic_position(note_name)
         except KeyError:
             # will output broken harp
-            raise KeyError('Note ' + str(note_name) + ' was not found in the chromatic scale.')
+            raise KeyError(f"Note {note_name} was not found in the chromatic scale.")
         except SyntaxError:
-            raise SyntaxError('Note ' + str(note_name) + ' was not formatted correctly')
+            raise SyntaxError(f"Note {note_name} was not formatted correctly.")
 
         interval_in_semitones = note_name_chromatic_equivalent - song_key_chromatic_equivalent
         if interval_in_semitones < 0:
@@ -278,7 +286,7 @@ class NoteParser:
             major_scale_interval = self.convert_semitone_interval_to_major_scale_interval(interval_in_semitones)
         except KeyError:
             # Turn note into a broken harp, since note is not in the song_key
-            raise KeyError('Note ' + str(note) + ' is not in the song key.')
+            raise KeyError(f"Note {note} is not in the song key.")
 
         # Convert note to base 10 for arithmetic
         note_in_base_10 = self.convert_base_7_to_base_10(note_octave_str + str(major_scale_interval))
@@ -294,8 +302,7 @@ class NoteParser:
             return note_coordinate
         else:
             # Coordinate is not in range of the two octaves of the Sky piano
-            raise KeyError(
-                'Note ' + str(note) + ' is not in range of the two octaves of the Sky piano: ' + str(note_coordinate))
+            raise KeyError(f"Note {note} is not in range of the two octaves of the Sky piano: {note_coordinate}")
             # TODO: define custom errors
 
     def convert_base_10_to_base_7(self, num):
