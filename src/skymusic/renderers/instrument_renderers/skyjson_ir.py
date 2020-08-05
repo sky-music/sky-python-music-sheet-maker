@@ -11,23 +11,23 @@ class SkyjsonInstrumentRenderer(instrument_renderer.InstrumentRenderer):
 
     def render_harp(self, instrument, time=0):
 
-        json_chord = []
+        json_render = []
 
         if instrument.get_is_broken():
-            json_chord = [{'time':int(time), 'key':'ERROR'}]
+            json_render = [{'time':int(time), 'key':'ERROR'}]
         elif instrument.get_is_silent():
-            json_chord = [{'time':int(time), 'key':'.'}]
+            json_render = [{'time':int(time), 'key':'.'}]
         else:
-            chord_skygrid = instrument.get_chord_skygrid()
+            skygrid = instrument.get_skygrid()
             
             dt = Resources.SKYJSON_CHORD_DELAY/max([instrument.get_num_highlighted(),5])
-            for k in chord_skygrid:  # Cycle over positions in a frame
-                for f in chord_skygrid[k]:  # Cycle over triplets & quavers
-                    if chord_skygrid[k][f]:  # Button is highlighted
-                        json_chord += [{'time':int(time), 'key':self.note_parser.get_note_from_coordinate(k)}]
+            for k in skygrid:  # Cycle over positions in a frame
+                for f in skygrid[k]:  # Cycle over triplets & quavers
+                    if skygrid[k][f]:  # Button is highlighted
+                        json_render += [{'time':int(time), 'key':self.note_parser.get_note_from_coordinate(k)}]
                         time = time + dt
                         
-        return json_chord
+        return json_render
 
 
     def render_voice(self, *args, **kwargs):    

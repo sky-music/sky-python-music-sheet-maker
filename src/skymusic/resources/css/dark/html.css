@@ -39,7 +39,7 @@ p, svg text.headers {
   vertical-align: middle;
 }
 
-/* <!-- Sky chord chart: a table with rounded edges (HTML only) --> */
+/* <!-- Sky instrument chart: a table with rounded edges (HTML only) --> */
 table {
   margin-top: 0px;
   margin-bottom: 0px;
@@ -63,7 +63,7 @@ td {
   color: white;
 }
 
-/* <!-- Makes the table disappear in case of broken chord  (HTML only)--> */
+/* <!-- Makes the table disappear in case of broken instrument  (HTML only)--> */
 table.broken {
   border-color: #121212;
   border-width: 0;
@@ -72,6 +72,22 @@ table.broken {
 /* <!-- Silent table  (HTML only)--> */
 table.silent {
   border-color:transparent;
+}
+
+/* <!-- Middle note button when the instrument is silent --> */
+table.harp.silent svg.button-7 .silent.icon {
+  stroke-width: 0;
+  stroke: white;
+  fill: #BBBBBB;
+  opacity: 1;
+}
+
+/* <!-- Middle note button when the instrument is silent --> */
+table.drum.silent svg.button-5 .silent.icon {
+  stroke-width: 0;
+  stroke: white;
+  fill: #BBBBBB;
+  opacity: 1;
 }
 
 /* <!-- Lyrics table  (HTML only)--> */
@@ -121,7 +137,7 @@ table svg[class*="button-"] {
   height: 1em;
 }
 
-/* <!-- Note background when the chord is or is silent (HTML only) --> */
+/* <!-- Note background when the instrument is or is silent (HTML only) --> */
 table.broken .ON-0.button,
 table.silent .ON-0.button {
   stroke-width: 0;

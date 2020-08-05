@@ -10,7 +10,7 @@ class JsonSongParser(song_parser.SongParser):
 
     def __init__(self, maker, instrument_type=Resources.DEFAULT_INSTRUMENT, silent_warnings=True):
 
-        super().__init__(maker, instrument_type, silent_warnings)
+        super().__init__(maker=maker, silent_warnings=silent_warnings)
         self.skyjson_chord_delay = Resources.SKYJSON_CHORD_DELAY #Delay in ms below which 2 notes are considered a chord
         self.music_theory = music_theory.MusicTheory(self)
 
@@ -111,5 +111,5 @@ class JsonSongParser(song_parser.SongParser):
                     icons += [self.pause + (self.repeat_indicator + str(n_pauses) if n_pauses > 1 else '')]
                 
                 icons += [keys[i]]
-                
+        
         return icons

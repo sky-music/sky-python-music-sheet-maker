@@ -13,24 +13,24 @@ except (ImportError, ModuleNotFoundError):
 
 class PngInstrumentRenderer(instrument_renderer.InstrumentRenderer):
     
-    def __init__(self, locale=None):
+    def __init__(self, locale=None, harp_type='harp'):
         super().__init__(locale)
         
         self.broken_png = Resources.PNGS['broken-symbol']
         self.silent_png = Resources.PNGS['silent-symbol']
 
-        self.png_chord_size = None
-        self.empty_chord_png = Resources.PNGS['empty-chord']
-        self.unhighlighted_chord_png = Resources.PNGS['unhighlighted-chord']
         self.text_bkg = Resources.text_bkg  # Transparent white
         self.song_bkg = Resources.song_bkg # White paper sheet
-        self.font_color = Resources.font_color
-        
+        self.font_color = Resources.font_color        
         self.font_path = Resources.font_path
         self.harp_font_size = Resources.harp_font_size
         self.repeat_height = None
-
         self.voice_font_size = Resources.voice_font_size
+
+        self.png_harp_size = None
+        self.harp_type = harp_type
+        self.empty_harp_png = Resources.PNGS[f'empty-{harp_type}']
+        self.unhighlighted_harp_png = Resources.PNGS[f'unhighlighted-{harp_type}']
 
     def trans_paste(self, bg, fg, box=(0, 0)):
         if fg.mode == 'RGBA':
@@ -46,20 +46,20 @@ class PngInstrumentRenderer(instrument_renderer.InstrumentRenderer):
             return bg
 
  
-    def set_png_chord_size(self):
-        """ Sets the size of the chord image from the .png file """
-        if self.png_chord_size is None:
-            self.png_chord_size = Image.open(self.unhighlighted_chord_png).size
+    def set_png_harp_size(self):
+        """ Sets the size of the instrument image from the .png file """
+        if self.png_harp_size is None:
+            self.png_harp_size = Image.open(self.unhighlighted_harp_png).size
 
-    def get_png_chord_size(self):
-        """ Returns the size of the chord image, or sets it if None """
-        if self.png_chord_size is None:
-            self.set_png_chord_size()
-        return self.png_chord_size
+    def get_png_harp_size(self):
+        """ Returns the size of the instrument image, or sets it if None """
+        if self.png_harp_size is None:
+            self.set_png_harp_size()
+        return self.png_harp_size
 
     def get_repeat_png(self, instrument, max_rescaled_width, rescale=1):
         """Returns an image of the repeat number xN"""
-        repeat_im = Image.new('RGBA', (int(max_rescaled_width / rescale), int(self.get_png_chord_size()[1])),
+        repeat_im = Image.new('RGBA', (int(max_rescaled_width / rescale), int(self.get_png_harp_size()[1])),
                               color=self.text_bkg)
         draw = ImageDraw.Draw(repeat_im)
         fnt = ImageFont.truetype(self.font_path, self.harp_font_size)
@@ -82,17 +82,17 @@ class PngInstrumentRenderer(instrument_renderer.InstrumentRenderer):
     def render_voice(self, instrument, rescale=1.0):
         """Renders the lyrics text in PNG"""
         lyric = instrument.get_lyric(strip_html=True)
-        chord_size = self.get_png_chord_size()
+        harp_size = self.get_png_harp_size()
         fnt = ImageFont.truetype(self.font_path, int(self.voice_font_size))
         lyric_width = fnt.getsize(lyric)[0]
 
-        lyric_im = Image.new('RGBA', (int(max(chord_size[0], lyric_width)), int(self.get_lyric_height())),
+        lyric_im = Image.new('RGBA', (int(max(harp_size[0], lyric_width)), int(self.get_lyric_height())),
                              color=self.text_bkg)
         draw = ImageDraw.Draw(lyric_im)
 
-        if lyric_width < chord_size[0]:
+        if lyric_width < harp_size[0]:
             # Draws centered text
-            draw.text((int((chord_size[0] - lyric_width) / 2.0), 0), lyric, font=fnt, fill=self.font_color)
+            draw.text((int((harp_size[0] - lyric_width) / 2.0), 0), lyric, font=fnt, fill=self.font_color)
         else:
             # Draws left-aligned text that spilles over the next icon
             draw.text((0, 0), lyric, font=fnt, fill=self.font_color)
@@ -110,11 +110,11 @@ class PngInstrumentRenderer(instrument_renderer.InstrumentRenderer):
 
         note_renderer = png_nr.PngNoteRenderer()
 
-        harp_file = Image.open(self.unhighlighted_chord_png)  # loads default harp image into memory
+        harp_file = Image.open(self.unhighlighted_harp_png)  # loads default harp image into memory
         harp_size = harp_file.size
 
         harp_render = Image.new('RGB', harp_file.size, self.song_bkg)  # Empty image
-
+        
         # Get a typical note to check that the size of the note png is consistent with the harp png                  
         #note_size = notes.Note(instrument).get_png_size()
         note_size = png_nr.PngNoteRenderer().get_png_size()
@@ -135,6 +135,11 @@ class PngInstrumentRenderer(instrument_renderer.InstrumentRenderer):
                 int((harp_size[0] - symbol.size[0]) / 2.0), int((harp_size[1] - symbol.size[1]) / 2.0)))
         else:
             harp_render = self.trans_paste(harp_render, harp_file)  # default harp image
+            
+            adjustement = (instrument.get_aspect_ratio()/(5/3))**2
+            xn0 = 0.13*adjustement
+            yn0 = 0.17*adjustement            
+            
             for row in range(instrument.get_row_count()):
                 for col in range(instrument.get_column_count()):
 
@@ -143,9 +148,9 @@ class PngInstrumentRenderer(instrument_renderer.InstrumentRenderer):
 
                     # NOTE RENDER
                     if len(note.get_highlighted_frames()) > 0:  # Only paste highlighted notes
-                        xn = (0.13 + col * (1 - 2 * 0.13) / (instrument.get_column_count() - 1)) * harp_size[0] - note_size[
+                        xn = (xn0 + col * (1 - 2 * xn0) / (instrument.get_column_count() - 1)) * harp_size[0] - note_size[
                             0] / 2.0
-                        yn = (0.17 + row * (1 - 2 * 0.17) / (instrument.get_row_count() - 1)) * harp_size[1] - note_size[
+                        yn = (yn0 + row * (1 - 2 * yn0) / (instrument.get_row_count() - 1)) * harp_size[1] - note_size[
                             1] / 2.0
                         note_render = note_renderer.render(note=note, rescale=note_rescale)
                         harp_render = self.trans_paste(harp_render, note_render, (int(round(xn)), int(round(yn))))

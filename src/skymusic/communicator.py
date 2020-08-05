@@ -146,7 +146,7 @@ class Communicator:
         for q in queries:
             if q.check_recipient(allowed=self.owner):
                 self.memory.store(q)
-                # TODO: check for duplicates before storing?
+                # Duplicates will be remived by clean()
 
     def query_to_stdout(self, query):
         """

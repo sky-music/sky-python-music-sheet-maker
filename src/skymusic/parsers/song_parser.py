@@ -226,7 +226,7 @@ class SongParser:
         # Real chord is a single element list: chords=['B1A1A3']
         # Triplets and quavers are a list of notes or chords: chords=['B2', 'B3B1', 'B4', 'B5', 'C1', 'C2']
         harp_broken = True
-        chord_skygrid = {}
+        skygrid = {}
 
         if len(chords) > 1:
             idx0 = 1  # Notes in quavers and triplets have a frame index >1
@@ -264,14 +264,14 @@ class SongParser:
                     if not self.silent_warnings:
                         print(err)
                 else:
-                    chord_skygrid[highlighted_note_position] = {}
-                    chord_skygrid[highlighted_note_position][idx0 + chord_idx] = True
+                    skygrid[highlighted_note_position] = {}
+                    skygrid[highlighted_note_position][idx0 + chord_idx] = True
                     harp_silent = False
                     if highlighted_note_position[0] < 0 and highlighted_note_position[1] < 0:  # Note is a silence
-                        chord_skygrid[highlighted_note_position][idx0 + chord_idx] = False
+                        skygrid[highlighted_note_position][idx0 + chord_idx] = False
                         harp_silent = True
 
-        results = [chord_skygrid, harp_broken, harp_silent, repeat]
+        results = [skygrid, harp_broken, harp_silent, repeat]
         return results
 
     def sanitize_line(self, line):
@@ -341,13 +341,13 @@ class SongParser:
                 for icon in icons:
                     chords = self.split_icon(icon)
                     # From here, real chords are still glued, quavers have been split in different list slots
-                    chord_skygrid, harp_broken, harp_silent, repeat = self.parse_chords(chords, song_key, note_shift)
+                    skygrid, harp_broken, harp_silent, repeat = self.parse_chords(chords, song_key, note_shift)
                     
                     harp = self.instrument_type.get_instrument()
                     harp.set_repeat(repeat)
                     harp.set_is_silent(harp_silent)
                     harp.set_is_broken(harp_broken)
-                    harp.set_chord_skygrid(chord_skygrid)
+                    harp.set_skygrid(skygrid)
 
                     instrument_line.append(harp)
 

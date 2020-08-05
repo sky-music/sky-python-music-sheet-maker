@@ -16,7 +16,7 @@ class NoteRenderer:
 
         if note_index % 7 == 0:  # the 7 comes from the heptatonic scale of Sky's music (no semitones)
             # Note is a root note
-            return 'root'  # very important: the chord creating the note is passed as a parameter
+            return 'root'
         elif note_index % note.get_column_count() % 2 == 0:
             # Note is in an odd column, so it is a circle
             return 'circle'

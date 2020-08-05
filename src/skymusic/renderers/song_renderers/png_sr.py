@@ -30,16 +30,11 @@ class PngSongRenderer(song_renderer.SongRenderer):
 
         if not no_PIL_module:
             Resources.load_theme(theme)
-            png_instrument_renderer = PngInstrumentRenderer(self.locale)
-            self.png_size = (round(self.aspect_ratio*750 * 2), 750 * 2)  # must be an integer tuple
+            
             self.png_margins = (13, 7)
-            self.png_harp_size0 = png_instrument_renderer.get_png_chord_size()  # A tuple
-            self.png_harp_spacings0 = (int(self.harp_relspacings[0] * self.png_harp_size0[0]),
-                                       int(self.harp_relspacings[1] * self.png_harp_size0[1]))
-            self.png_harp_size = None
-            self.png_harp_spacings = None
+            self.png_size = (round(self.aspect_ratio*750 * 2), 750 * 2)  # must be an integer tuple
             self.png_line_width = int(self.png_size[0] - 2*self.png_margins[0])  # self.png_lyric_relheight = instruments.Voice().lyric_relheight
-            self.png_lyric_size0 = (self.png_harp_size0[0], png_instrument_renderer.get_lyric_height())
+            
             self.png_lyric_size = None
             self.png_dpi = (96 * 2, 96 * 2)
             self.png_compress = Resources.png_compress
@@ -48,6 +43,19 @@ class PngSongRenderer(song_renderer.SongRenderer):
             self.png_font_size = Resources.png_font_size
             self.png_title_font_size = Resources.png_title_font_size
             self.png_font_path = Resources.font_path
+
+            self.switch_harp('harp')            
+            
+
+    def switch_harp(self, harp_type):
+        
+            png_instrument_renderer = PngInstrumentRenderer(self.locale, harp_type=harp_type)            
+            self.png_harp_size0 = png_instrument_renderer.get_png_harp_size()  # A tuple
+            self.png_harp_spacings0 = (int(self.harp_relspacings[0] * self.png_harp_size0[0]),
+                                       int(self.harp_relspacings[1] * self.png_harp_size0[1]))
+            self.png_harp_size = None
+            self.png_harp_spacings = None
+            self.png_lyric_size0 = (self.png_harp_size0[0], png_instrument_renderer.get_lyric_height())        
 
 
     def set_png_harp_size(self, max_instruments_per_line):
@@ -165,9 +173,11 @@ class PngSongRenderer(song_renderer.SongRenderer):
             print(f"\n***WARNING: Your song is too long. Stopping at {self.maxFiles} files.")
             return buffer_list
         
-        instrument_renderer = PngInstrumentRenderer(self.locale)
+        harp_type = song.get_harp_type()
+        instrument_renderer = PngInstrumentRenderer(locale=self.locale, harp_type=harp_type)
+        self.switch_harp(harp_type)
         
-        # Determines png size as a function of the numer of chords per line
+        # Determines png size as a function of the numer of icons per line
         self.set_png_harp_size(song.get_max_instruments_per_line())
         self.set_png_voice_size()
         harp_rescale = self.get_png_harp_rescale()

@@ -7,7 +7,7 @@ class Note:
             self.index = (pos[0] * instrument.get_column_count()) + pos[1]
         else:
             self.index = None
-        self.chord_skygrid = instrument.get_chord_skygrid()
+        self.skygrid = instrument.get_skygrid()
         self.instrument_type = instrument.get_type()
         self.instrument_is_broken = instrument.get_is_broken()
         self.instrument_is_silent = instrument.get_is_silent()
@@ -36,9 +36,9 @@ class Note:
 
     def get_highlighted_frames(self):
         try:
-            note_states = self.chord_skygrid[self.get_position()]  # Is note at 'position' highlighted or not
+            note_states = self.skygrid[self.get_position()]  # Is note at 'position' highlighted or not
             highlighted_frames = [frame_index for frame_index in note_states.keys()]
-        except KeyError:  # Note is not in the chord_skygrid dictionary: so it is not highlighted
+        except KeyError:  # Note is not in the skygrid dictionary: so it is not highlighted
             highlighted_frames = []
         return highlighted_frames
 
