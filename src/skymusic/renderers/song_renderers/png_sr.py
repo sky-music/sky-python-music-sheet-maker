@@ -177,7 +177,7 @@ class PngSongRenderer(song_renderer.SongRenderer):
         instrument_renderer = PngInstrumentRenderer(locale=self.locale, harp_type=harp_type)
         self.switch_harp(harp_type)
         
-        # Determines png size as a function of the numer of chords per line
+        # Determines png size as a function of the numer of icons per line
         self.set_png_harp_size(song.get_max_instruments_per_line())
         self.set_png_voice_size()
         harp_rescale = self.get_png_harp_rescale()
