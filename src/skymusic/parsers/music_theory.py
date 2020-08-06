@@ -29,7 +29,7 @@ class MusicTheory():
                 json_dict = json_dict[0]
             json_dict['songNotes']
             return [InputMode.SKYJSON]
-        except (json.JSONDecodeError, NameError, TypeError):
+        except (json.JSONDecodeError, NameError, TypeError, KeyError):
             pass        
         
         if isinstance(song_lines, str):  # Break newlines and make sure the result is a List

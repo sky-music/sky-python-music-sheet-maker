@@ -179,7 +179,7 @@ stock_queries:
     help_text: |
       You have selected an output format (such as Midi) that requires to know how fast to play the song. This is usually expressed in terms of beats per minute. Please give a integer value between 12 and 1200.
   keep_meta:
-    foreword: "We have found metadata for the song in your input"
+    foreword: "We have found metadata for the song in your input."
     question: 'Do you want to keep this information?'
     afterword:
     input_tip: 'yes/no question'

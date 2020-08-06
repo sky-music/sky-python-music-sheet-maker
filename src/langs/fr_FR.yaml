@@ -177,7 +177,7 @@ stock_queries:
     help_text: |
       Vous avez choisi un format (Midi par ex.) qui veut savoir à quelle vitesse jouer la chanson. Ceci s'exprime généralement en BPM (beats per minute), un nombre entier entre 12 et 1200.
   keep_meta:
-    foreword: "Nous avons trouvé des informations sur la chanson dans le texte que vous avez entré."
+    foreword: "Nous avons trouvé des informations sur la chanson avec les notes que vous avez entrées (le titre, etc)."
     question: 'Voulez-vous les garder?'
     afterword:
     input_tip: 'oui/non'

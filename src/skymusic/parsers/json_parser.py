@@ -109,9 +109,10 @@ class JsonSongParser(song_parser.SongParser):
     def split_line(self, line):
         
         json_dict = self.load_dict(line)
-            
+        
+        # The existence of this field has already been assessed by MusicTheory
         notes = json_dict['songNotes']
-
+        
         times = [note['time'] for note in notes]
         keys = [note['key'] for note in notes]
 
