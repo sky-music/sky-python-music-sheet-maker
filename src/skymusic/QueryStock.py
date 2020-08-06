@@ -1,5 +1,5 @@
 from src.skymusic.modes import ReplyType, AspectRatio, InstrumentType
-from src.skymusic.communication import QueryOpen, QueryChoice, QueryMultipleChoices, Information
+from src.skymusic.communication import QueryOpen, QueryChoice, QueryMultipleChoices, QueryBoolean, Information
 from src.skymusic import Lang
 
 """
@@ -208,6 +208,18 @@ def load(locale):
                                  'reply_type': ReplyType.INPUTMODE,
                                  'limits': []
                                  },
+
+            'keep_meta': {'class': QueryBoolean,
+                                 'handler': 'None',
+                                 'foreword': Lang.get_string("stock_queries/keep_meta/foreword", locale),
+                                 'question': Lang.get_string("stock_queries/keep_meta/question", locale),
+                                 'afterword': Lang.get_string("stock_queries/keep_meta/afterword", locale),
+                                 'input_tip': Lang.get_string("stock_queries/keep_meta/input_tip", locale),
+                                 'help_text': Lang.get_string("stock_queries/keep_meta/help_text", locale),
+                                 'reply_type': ReplyType.TEXT,
+                                 'limits': [Lang.get_string("words/yes_word", locale), Lang.get_string("words/no_word", locale)]
+                                 },
+
         
             'no_possible_key': {'class': Information,
                                 'handler': 'None',

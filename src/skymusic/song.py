@@ -21,7 +21,9 @@ class Song():
                     'artist': [Lang.get_string("song_meta/artist", self.locale) + ': ', ''],
                     'transcript': [Lang.get_string("song_meta/transcript", self.locale) + ': ', ''],
                     'song_key': [Lang.get_string("song_meta/musical_key", self.locale) + ': ', '']}
-
+        
+        self.is_meta_changed = False
+        
     def get_title(self):
 
         return self.meta['title'][1]
@@ -118,15 +120,26 @@ class Song():
     def get_meta(self):
         
         return self.meta
+
+    def set_meta_changed(self, has_changed):
+        
+        self.is_meta_changed = has_changed
+
+    def get_meta_changed(self):
+        
+        return self.is_meta_changed
                 
     def set_meta(self, **kwargs):
-                
+        
         for k in kwargs:
+            val = kwargs[k]
             try:
-                if kwargs[k].lower().strip() != '':
-                    self.meta[k.lower().strip()][1] = kwargs[k]
+                if val and str(val).lower().strip():
+                    self.meta[k][1] = val
             except KeyError:
                 pass
+                #self.meta[key] = kwargs[k]
+
             
     def render(self, render_mode, **kwargs):
 

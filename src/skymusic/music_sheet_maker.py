@@ -280,7 +280,7 @@ class MusicSheetMaker:
         # 7. Parses song
         self.parse_song(recipient, notes=notes, song_key=song_key, octave_shift=octave_shift)
         #self.parse_song(recipient) # EXPERIMENTAL
-
+        
         # 8. Displays error ratio
         (i_error, res) = self.display_error_ratio(recipient=recipient, prerequisites=[q_notes, q_mode, q_shift])
         
@@ -295,12 +295,18 @@ class MusicSheetMaker:
         (q_song_bpm, song_bpm) = self.ask_song_bpm(recipient=recipient, render_modes=render_modes, prerequisites=[q_render])
         #(q_song_bpm, song_bpm) = self.ask_song_bpm(recipient=recipient, prerequisites=[q_render])  # EXPERIMENTAL       
 
-        # 12. Asks for song metadata
-        (qs_meta, (title, artist, transcript)) = self.ask_song_metadata(recipient=recipient)
+        #TODO: detects if song_meta data has been set, if yes ask if player wants to keep it
 
-        # 12.b sets song metadata
-        self.set_song_metadata(recipient=recipient, meta=(title, artist, transcript), song_key=song_key)
-        #self.set_song_metadata(recipient=recipient) # EXPERIMENTAL
+        # 12. Asks for song metadata
+        if self.get_song().get_meta_changed():
+            (q_keep_meta, keep_meta) = self.ask_song_keep_metadata(recipient=recipient)
+        else:
+            keep_meta = False
+                
+        if not keep_meta:
+            (qs_meta, (title, artist, transcript)) = self.ask_song_metadata(recipient=recipient)
+            self.set_song_metadata(recipient=recipient, meta=(title, artist, transcript), song_key=song_key)
+            #self.set_song_metadata(recipient=recipient) # EXPERIMENTAL
 
         # 13. Renders Song
         song_bundle = self.render_song(recipient=recipient, render_modes=render_modes, aspect_ratio=aspect_ratio, song_bpm=song_bpm)
@@ -478,9 +484,21 @@ class MusicSheetMaker:
                 return q_notes, notes
 
 
+    def ask_song_keep_metadata(self, recipient, prerequisites=None, execute=True):
+        
+        q_keep_meta = self.communicator.send_stock_query('keep_meta', recipient=recipient, 
+                                                       prerequisites=prerequisites)
+        
+        if execute:
+            recipient.execute_queries(q_keep_meta)
+            keep_meta = q_keep_meta.get_reply().get_result()
+            return q_keep_meta, keep_meta
+        else:
+            return q_keep_meta, None
+
 
     def ask_song_metadata(self, recipient, prerequisites=None, execute=True):
-
+                
         queries = []
         replacements = {'skip': Lang.get_string(f"recipient_specifics/skip/{recipient.get_name()}", self.locale)}
         queries += [self.communicator.send_stock_query('song_title', recipient=recipient, 
@@ -746,7 +764,6 @@ class MusicSheetMaker:
             song_key = self.retrieve_query_result(recipient, '_key', 'C')
 
         self.get_song().set_meta(title=title, artist=artist, transcript=transcript, song_key=song_key)
-
 
     def parse_song(self, recipient, notes=None, song_key=None, octave_shift=None):
 

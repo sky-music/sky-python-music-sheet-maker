@@ -857,7 +857,7 @@ class QueryBoolean(QueryChoice):
                 kwargs['limits'] = self.default_limits
         except:
             kwargs['limits'] = self.default_limits
-            
+        
         super().__init__(*args, **kwargs)
 
     def build_result(self):
