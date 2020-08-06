@@ -295,11 +295,9 @@ class MusicSheetMaker:
         (q_song_bpm, song_bpm) = self.ask_song_bpm(recipient=recipient, render_modes=render_modes, prerequisites=[q_render])
         #(q_song_bpm, song_bpm) = self.ask_song_bpm(recipient=recipient, prerequisites=[q_render])  # EXPERIMENTAL       
 
-        #TODO: detects if song_meta data has been set, if yes ask if player wants to keep it
-
         # 12. Asks for song metadata
         if self.get_song().get_meta_changed():
-            (q_keep_meta, keep_meta) = self.ask_song_keep_metadata(recipient=recipient)
+            (q_keep_meta, keep_meta) = self.ask_song_keep_metadata(recipient=recipient, prerequisites=[q_notes])
         else:
             keep_meta = False
                 

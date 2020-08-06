@@ -1,4 +1,4 @@
-import json
+import json, re
 from src.skymusic.resources import Resources
 from . import song_parser
 from src.skymusic.parsers import music_theory
@@ -72,17 +72,26 @@ class JsonSongParser(song_parser.SongParser):
         
         
     def load_dict(self, line):
-        
-        json_dict = json.loads(line).copy()
-        if isinstance(json_dict, list):
-            json_dict = json_dict[0]
+
         try:
-            is_encrypted = json_dict['isEncrypted']
-        except KeyError:
-            is_encrypted = False
-            
-        if is_encrypted:
-            raise song_parser.SongParserError("Cannot parse an encrypted song.")
+            try:
+                json_dict = json.loads(line)
+            except json.JSONDecodeError:
+               json_dict = json.loads(re.sub(r'\\{','{',line))
+
+            if isinstance(json_dict, list):
+                json_dict = json_dict[0]
+        except (json.JSONDecodeError, TypeError, KeyError):
+            json_dict = None        
+        
+        if json_dict:
+            try:
+                is_encrypted = json_dict['isEncrypted']
+            except KeyError:
+                is_encrypted = False            
+            if is_encrypted:
+                print("***WARNING: cannot parse an encrypted JSON recording") 
+                json_dict = None
             
         return json_dict
 
