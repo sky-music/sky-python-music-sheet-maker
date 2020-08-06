@@ -94,7 +94,7 @@ class SongParser:
                     print('\n'+Lang.get_string("warnings/jianpu_quaver_delimiter", self.locale).format(jianpu_quaver_delimiter=Resources.JIANPU_QUAVER_DELIMITER, quaver_delimiter=self.quaver_delimiter))
                 self.quaver_delimiter = Resources.JIANPU_QUAVER_DELIMITER
 
-        delims = [self.icon_delimiter, self.pause, self.quaver_delimiter, self.lyric_delimiter, self.repeat_indicator]
+        delims = [self.icon_delimiter, self.pause, self.quaver_delimiter, self.lyric_delimiter, self.repeat_indicator, self.metadata_delimiter]
 
 
         if self.quaver_delimiter == '\s' or re.match('\s', self.quaver_delimiter):
@@ -103,13 +103,15 @@ class SongParser:
             print("\n***ERROR: You cannot use a blank delimiter to indicate a pause")
         if self.lyric_delimiter == '\s' or re.match('\s', self.lyric_delimiter):
             print("\n***ERROR: You cannot use a blank delimiter to indicate lyrics")
+        if self.metadata_delimiter == '\s' or re.match('\s', self.metadata_delimiter):
+            print("\n***ERROR: You cannot use a blank delimiter to indicate metadata")
         if self.lyric_delimiter == '\s' or re.match('\s', self.repeat_indicator):
             print("\n***ERROR: You cannot use a blank delimiter to indicate repetition")
 
         parser = self.get_note_parser()
         if parser is not None:
             for delim in delims:
-                if (parser.not_note_name_regex.match(delim) is None or parser.not_octave_regex.match(delim) is None) and delim != self.lyric_delimiter:
+                if (parser.not_note_name_regex.match(delim) is None or parser.not_octave_regex.match(delim) is None) and delim not in [self.lyric_delimiter, self.metadata_delimiter]:
                     print(f"\n***ERROR: You chose an invalid delimiter for notation {self.input_mode.get_short_desc(self.locale)}: {delim}")
                 if delims.count(delim) > 1:
                     print("\n***ERROR: You used the same delimiter for different purposes.")
@@ -322,12 +324,12 @@ class SongParser:
 
     def parse_line(self, line, song_key='C', note_shift=0):
         """
-        Returns instrument_line: a list of chord 'skygrid' (1 chord = 1 dict)
+        Returns instrument_line: a list of  'skygrid' objects (1 skygrid = 1 dict)
         """
         instrument_line = []
         line = self.sanitize_line(line)
 
-        if len(line) > 0:
+        if len(line) > 0 and not re.match(re.escape(Resources.METADATA_DELIMITER),line):
             if line[0] == self.lyric_delimiter:
                 lyrics = self.split_line(line)
                 for lyric in lyrics:
@@ -353,6 +355,42 @@ class SongParser:
 
         return instrument_line
 
+
+    def parse_metadata(self, input_lines, song):
+        changed = False        
+        
+        if self.input_mode == InputMode.SKYJSON and len(input_lines) > 0:
+            from . import json_parser
+            parser = json_parser.JsonSongParser(self.maker, self.silent_warnings)
+            parser.set_input_mode(self.input_mode)
+            
+            (changed, meta_data) = parser.parse_metadata(input_lines[0], song)
+        
+        else:
+            
+            dict_iter = iter(song.get_meta())
+            regexp = re.escape(Resources.METADATA_DELIMITER) + '([^:]+):*(.*)'
+            
+            meta_data = {}
+            i = 0
+            for line in input_lines:
+                line = self.sanitize_line(line)
+                g = re.match(regexp,line)
+                if line and not g:
+                    break
+                if g:
+                    try:
+                        next_key = next(dict_iter)
+                    except StopIteration:
+                        next_key = f"meta{i}"
+                        i += 1
+                    (g1, g2) = g.groups()
+                    meta_data[next_key] = g2.strip() if g2.strip() else g1.strip()
+                    changed = True
+            
+        return (changed, meta_data)
+
+
     def parse_song(self, song_lines, song_key, octave_shift):
         """
         Create a Song object from the textual song in 'song_lines'
@@ -370,6 +408,12 @@ class SongParser:
 
         # Parses song line by line
         song = Song(locale=self.locale, music_key=english_song_key)
+        
+        (changed, meta_data) = self.parse_metadata(song_lines, song)
+        if changed:
+            song.set_meta(**meta_data)
+            song.set_meta_changed(True)
+                
         for song_line in song_lines:
             instrument_line = self.parse_line(song_line, song_key,
                                               note_shift)  # The song key must be in the original format

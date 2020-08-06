@@ -1,3 +1,4 @@
+instrument_type: NORMAL
 aspect_ratio: WIDESCREEN # an aspect ratio short name among WIDESCREEN, OLDTV, SQUARE, A4, VERTPANEL
 song_bpm: 60 # an integer value between 12 and 1200
 #octave_shift: 0 # an integer between -12 and +12

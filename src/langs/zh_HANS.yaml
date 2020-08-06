@@ -3,6 +3,9 @@ warnings:
   jianpu_pause: "简谱模式使用中:设定 '0'代替{pause}。请确认您的输入遵守该条件。"
   jianpu_quaver_delimiter: "简谱模式使用中:设定 '{jianpu_quaver_delimiter}' 为八分音符链接符号 '{quaver_delimiter}'.请确认您的输入遵守该条件."
   skyjson_url_connection: "Connection error when trying to get url from sky-music.herokuapp.com"
+words:
+  yes_word: yes
+  no_word: no
 recipient_specifics:
   skip:
     command_line: 留空以及按下回车键
@@ -177,6 +180,13 @@ stock_queries:
     input_tip: '输入 12 - 1200 之间的数字，或{skip_number} 跳过'
     help_text: |
       您的选择中含有需要弹奏速度的格式（例如 MIDI），皆为拍子数。请输入 12- 1200 之间的整数。
+  keep_meta:
+    foreword: "We have found metadata for the song in your input"
+    question: 'Do you want to keep this information?'
+    afterword:
+    input_tip: 'yes/no question'
+    help_text: |
+      We have found metadata for the song, such as the title, author, etc, in your input. Do you want to keep it (yes), or enter new information (no)?
   song_title:
     foreword:
     question: 该乐谱歌名

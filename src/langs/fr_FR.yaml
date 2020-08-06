@@ -3,6 +3,9 @@ warnings:
   jianpu_pause: "Notation Jianpu: j'utilise '0' pour marquer la pause au lieu de '{pause}'. Merci de respecter cette convention."
   jianpu_quaver_delimiter: "Notation Jianpu: j'utilise '{jianpu_quaver_delimiter}' pour séparer les croches au lieu de '{quaver_delimiter}'. Merci de respecter cette convention."
   skyjson_url_connection: "Connection error when trying to get url from sky-music.herokuapp.com"
+words:
+  yes_word: oui
+  no_word: non
 recipient_specifics:
   skip:
     command_line: laissez vide et tapez entrée
@@ -83,7 +86,7 @@ aspect_ratio:
     short_desc: Panneau vertical (1:2)
 song_meta:
   title: Titre
-  artist: Artiste(s) d'origine
+  artist: "Artiste(s) d'origine"
   transcript: Arrangeur, transcripteur
   musical_key: Clef musicale
   untitled: Sans titre
@@ -173,6 +176,13 @@ stock_queries:
     input_tip: 'un nombre entier positif entre 12 et 1200. {skip_number} pour passer'
     help_text: |
       Vous avez choisi un format (Midi par ex.) qui veut savoir à quelle vitesse jouer la chanson. Ceci s'exprime généralement en BPM (beats per minute), un nombre entier entre 12 et 1200.
+  keep_meta:
+    foreword: "Nous avons trouvé des informations sur la chanson avec les notes que vous avez entrées (le titre, etc)."
+    question: 'Voulez-vous les garder?'
+    afterword:
+    input_tip: 'oui/non'
+    help_text: |
+      Nous avons trouvé, dans les notes que vous avez entrées, des informations sur la chanson, comme son titre, son auteur, etc. Voulez-vous garder ces informations (oui), ou bien en entrer de nouvelles (non) ?
   song_title:
     foreword:
     question: Quel est le titre de la chanson ?

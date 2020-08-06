@@ -69,9 +69,9 @@ class JsonSongParser(song_parser.SongParser):
             tempos.append(tG)
         
         return tempos
-
-
-    def split_line(self, line):
+        
+        
+    def load_dict(self, line):
         
         json_dict = json.loads(line).copy()
         if isinstance(json_dict, list):
@@ -84,8 +84,35 @@ class JsonSongParser(song_parser.SongParser):
         if is_encrypted:
             raise song_parser.SongParserError("Cannot parse an encrypted song.")
             
-        notes = json_dict['songNotes']
+        return json_dict
 
+
+    def parse_metadata(self, line, song):
+        
+        json_dict = self.load_dict(line)
+        changed = False
+        
+        meta_data = {}
+        
+        try:
+            meta_data['title'] = json_dict['name']
+            meta_data['artist'] = json_dict['author']
+            meta_data['transcript'] = ', '.join(filter(None,[json_dict['arrangedBy'], json_dict['transcribedBy']]))
+            meta_data['song_key'] = json_dict['pitchLevel']
+            changed = True
+        except KeyError:
+            changed = False
+        
+        return (changed, meta_data)
+
+
+    def split_line(self, line):
+        
+        json_dict = self.load_dict(line)
+        
+        # The existence of this field has already been assessed by MusicTheory
+        notes = json_dict['songNotes']
+        
         times = [note['time'] for note in notes]
         keys = [note['key'] for note in notes]
 
