@@ -2,9 +2,9 @@
 import os, re
 from operator import truediv, itemgetter
 from collections import OrderedDict
-import json
 from src.skymusic.modes import InputMode
 from src.skymusic.parsers.html_parser import HtmlSongParser
+
 
 class MusicTheory():
     """
@@ -23,15 +23,13 @@ class MusicTheory():
         Attempts to detect input musical notation for the textual song in 'song_lines'.
         Returns a list with the probable input modes (eliminating the least likely)
         """
-        try:
-            json_dict = json.loads(song_lines[0])
-            if isinstance(json_dict, list):
-                json_dict = json_dict[0]
-            json_dict['songNotes']
-            return [InputMode.SKYJSON]
-        except (json.JSONDecodeError, NameError, TypeError, KeyError):
-            pass        
+        from src.skymusic.parsers import json_parser
         
+        jsonparser = json_parser.JsonSongParser(maker=self.song_parser.get_maker())        
+        json_dict = jsonparser.load_dict(song_lines[0])        
+        if json_dict:
+            return [InputMode.SKYJSON]
+                
         if isinstance(song_lines, str):  # Break newlines and make sure the result is a List
             song_lines = song_lines.split(os.linesep)
 

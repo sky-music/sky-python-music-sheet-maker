@@ -1,6 +1,6 @@
 import io, re
 from src.skymusic.modes import InputMode, RenderMode, ReplyType
-from src.skymusic.communication import QueryOpen, QueryChoice, QueryMultipleChoices, QueryMemory, Information
+from src.skymusic.communication import QueryOpen, QueryChoice, QueryBoolean, QueryMultipleChoices, QueryMemory, Information
 from src.skymusic import Lang, QueryStock
 
 """
@@ -258,7 +258,9 @@ class Communicator:
         result.update({'question': question_text})
 
         # options keyword arguments dictionary
-        if isinstance(query, (QueryMultipleChoices, QueryChoice)) and query.get_reply_type() is not ReplyType.NOTE:
+        if isinstance(query, QueryBoolean):
+            result.update({'yesnos': [{'number': i, 'text': str(limit).strip()} for i, limit in enumerate(limits)]})
+        elif isinstance(query, (QueryMultipleChoices, QueryChoice)) and query.get_reply_type() is not ReplyType.NOTE:
             result.update({'options': [{'number': i, 'text': str(limit).strip()} for i, limit in enumerate(limits)]})
 
         result.update({'result': query.get_result()})
