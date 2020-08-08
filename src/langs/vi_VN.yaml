@@ -98,7 +98,7 @@ song_meta:
    artist: Nghệ sĩ gốc
    transcript: Người sắp xếp, Người dịch
    musical_key: Phím nhạc
-   untitle: Không tên
+   untitled: Không tên
 open_file: |
   (Bài hát được nhập từ tệp {file_path})
 stock_queries:
