@@ -19,7 +19,7 @@ with open(filepath, 'r', encoding='utf-8', errors='ignore') as fp:
 
 song = re.sub(',',' . ', song)
 song = re.sub('(\s){2,}',r'\1', song)
-chord_matches = re.finditer('(\[(?:(?:\w+\s*)+)\])', song)
+chord_matches = re.finditer('((\(|\[)([^\]|\)]+)(\)|\]))', song)
 for match in chord_matches:
     notes = re.sub('\s|\[|\]|\(|\)','',match.group(0))
     song = song.replace(match.group(0), notes)
