@@ -280,7 +280,7 @@ class SongParser:
 
     def convert_bracket_chords(self, line):
         
-        bracket_chord = re.compile('((\(|\[)([^\]|\)]+)(\)|\]))')
+        bracket_chord = re.compile('((\(|\[)(?:\w|\s)+(\)|\]))')
         brackets_blanks = re.compile('\[|\]|\(|\)|\s')
         chord_matches = bracket_chord.finditer(line)
         for match in chord_matches:
