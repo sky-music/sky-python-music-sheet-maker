@@ -1,8 +1,8 @@
 import io
 from . import song_renderer
-from src.skymusic.renderers.instrument_renderers.svg_ir import SvgInstrumentRenderer
-from src.skymusic.modes import CSSMode
-from src.skymusic.resources import Resources
+from skymusic.renderers.instrument_renderers.svg_ir import SvgInstrumentRenderer
+from skymusic.modes import CSSMode
+from skymusic.resources import Resources
 
 class SvgSongRenderer(song_renderer.SongRenderer):
 

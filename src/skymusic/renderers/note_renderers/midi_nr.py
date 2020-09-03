@@ -1,5 +1,5 @@
 #import os
-from src.skymusic.resources import Resources
+from skymusic.resources import Resources
 from . import note_renderer
 
 try:

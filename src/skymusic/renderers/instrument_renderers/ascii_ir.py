@@ -1,5 +1,5 @@
 from . import instrument_renderer
-from src.skymusic.resources import Resources
+from skymusic.resources import Resources
 
 class AsciiInstrumentRenderer(instrument_renderer.InstrumentRenderer):
     

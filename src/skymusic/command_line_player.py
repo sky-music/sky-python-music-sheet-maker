@@ -1,17 +1,23 @@
 #!/usr/bin/env python3
+import os
 if __name__ == '__main__':    
-    import os, sys
+    import sys
     # VERY IMPORTANT: the root project path directory must be defined and added to path
     # The '../../' has to be changed if the current file location is changed
-    PROJECT_ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), '../../'))
-    if PROJECT_ROOT not in sys.path:
-        sys.path.append(PROJECT_ROOT)
+    PACKAGE_ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), '../'))
+    USER_FILES_ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), '../../'))
+    if PACKAGE_ROOT not in sys.path:
+        sys.path.append(PACKAGE_ROOT)
+else:
+    USER_FILES_ROOT = os.path.join(os.path.expanduser("~"), 'Documents/skymusic')
+    if not os.path.isdir(USER_FILES_ROOT):
+        os.makedirs(USER_FILES_ROOT)
 
 import yaml
-from src.skymusic.music_sheet_maker import MusicSheetMaker
-from src.skymusic.communicator import Communicator, QueriesExecutionAbort
-from src.skymusic import Lang
-from src.skymusic.resources import Resources
+from skymusic.music_sheet_maker import MusicSheetMaker
+from skymusic.communicator import Communicator, QueriesExecutionAbort
+from skymusic import Lang
+from skymusic.resources import Resources
 try:
     import readline
 except ModuleNotFoundError:
@@ -20,11 +26,11 @@ except ModuleNotFoundError:
 #=========================================
 #SETTINGS FOR ADVANCED USERS
 SKYJSON_URL = False # To generate a temporary song link at sky-music.herokuapp.com. By default will be enabled on the Discord Music Cog but disabled on the command line (to avoid spamming this server). Always disabled if batch_mode is True
-SONG_DIR_IN = os.path.normpath(PROJECT_ROOT + '/test_songs') # Overrides defaut input song folder
-SONG_DIR_OUT = os.path.normpath(PROJECT_ROOT + '/songs_out') # Overrides defaut output song folder
+SONG_DIR_IN = os.path.join(USER_FILES_ROOT, 'test_songs') # Overrides defaut input song folder
+SONG_DIR_OUT = os.path.join(USER_FILES_ROOT, 'songs_out') # Overrides defaut output song folder
 BATCH_MODE = False # To process songs in a batch,stored as .yaml files
-BATCH_DIR = os.path.normpath(PROJECT_ROOT + '/batch_songs')
-PREFERENCES_PATH = os.path.normpath(PROJECT_ROOT + '/preferences.yaml')
+BATCH_DIR = os.path.join(USER_FILES_ROOT, 'batch_songs')
+PREFERENCES_PATH = os.path.join(USER_FILES_ROOT, 'skymusic_preferences.yaml')
 #==========================================
 
 class CommandLinePlayer:

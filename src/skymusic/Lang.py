@@ -1,14 +1,13 @@
-import yaml
-import os
-import re
+import os, re, yaml
 import locale as localepy
 
-LANG = dict()
+LANG_ROOT = os.path.join(os.path.dirname(__file__), "langs")
 locales = ['en_US', 'fr_FR', 'vi_VN', 'zh_HANS']
 substitutes = {'fr': 'fr_FR', 'en': 'en_US', 'vn': 'vi_VN', 'zh': 'zh_HANS', 'zh_CN': 'zh_HANS'}
+
+LANG = dict()
 loaded = dict((locale, False) for locale in locales)
 warn_count = 0
-
 
 def check_locale(locale):
     try:
@@ -48,11 +47,11 @@ def guess_locale():
 def load(locale):
     global LANG, loaded
     
-    file_path = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "langs", "%s.yaml" % locale))
+    file_path = os.path.join(LANG_ROOT, "%s.yaml" % locale)
     
     if not os.path.isfile(file_path):
         print(f"\n***WARNING: missing .yaml file for locale '{locale}'. Replacing with {locales[0]}")        
-        file_path = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "langs", "%s.yaml" % locales[0]))
+        file_path = os.path.join(LANG_ROOT, "%s.yaml" % locales[0])
     
     with open(file_path, mode='r', encoding='utf-8', errors='ignore') as file:
         LANG[locale] = yaml.safe_load(file)

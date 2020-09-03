@@ -1,5 +1,5 @@
 import os, re, html.parser
-from src.skymusic.song import Song
+from skymusic.song import Song
 
 class HtmlSongParser(html.parser.HTMLParser):
     

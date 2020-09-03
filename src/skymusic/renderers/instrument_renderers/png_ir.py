@@ -1,6 +1,6 @@
 from . import instrument_renderer
-from src.skymusic.resources import Resources
-from src.skymusic.renderers.note_renderers import png_nr
+from skymusic.resources import Resources
+from skymusic.renderers.note_renderers import png_nr
 
 
 try:

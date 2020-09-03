@@ -1,7 +1,7 @@
 import re, io
 from . import song_renderer
-from src.skymusic.renderers.instrument_renderers.midi_ir import MidiInstrumentRenderer
-from src.skymusic.resources import Resources
+from skymusic.renderers.instrument_renderers.midi_ir import MidiInstrumentRenderer
+from skymusic.resources import Resources
 
 try:
     import mido

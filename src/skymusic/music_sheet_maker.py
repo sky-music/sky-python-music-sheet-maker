@@ -1,11 +1,11 @@
 import os, io, re
-from src.skymusic.modes import InputMode, CSSMode, RenderMode, ReplyType, AspectRatio
-from src.skymusic.communicator import Communicator, QueriesExecutionAbort
-from src.skymusic.parsers.song_parser import SongParser
-from src.skymusic.renderers.song_renderers.song_renderer import SongRenderer
-from src.skymusic.renderers.song_renderers import skyjson_sr
-from src.skymusic import Lang
-from src.skymusic.resources import Resources
+from skymusic.modes import InputMode, CSSMode, RenderMode, ReplyType, AspectRatio
+from skymusic.communicator import Communicator, QueriesExecutionAbort
+from skymusic.parsers.song_parser import SongParser
+from skymusic.renderers.song_renderers.song_renderer import SongRenderer
+from skymusic.renderers.song_renderers import skyjson_sr
+from skymusic import Lang
+from skymusic.resources import Resources
 
 
 class MusicSheetMakerError(Exception):

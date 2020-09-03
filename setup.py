@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 from setuptools import setup, find_packages
 
-import src
-from src import skymusic
+#import src
+#from src import skymusic
 
 PKG = 'skymusic'  # root package name; should have a directory
 
@@ -13,33 +13,35 @@ Instructions are available at the project homepage.
 '''
 
 setup(
-    name='Sky Music Sheet Maker',
-    version='1.0.0',
-    description='Make visual music sheets for Sky: Children of The Light',
-    long_description=long_description,
-    long_description_content_type='text/markdown',
-    author='Tracey',
-    maintainer='maintainer',
-    maintainer_email='skymusicwebsite@gmail.com',
-    url='https://sky-music.github.io',
-    download_url={
+    name = 'skymusic',
+    version = '1.0.0',
+    description = 'Make visual music sheets for Sky: Children of The Light',
+    long_description = long_description,
+    long_description_content_type = 'text/markdown',
+    author = 'Tracey',
+    maintainer = 'maintainer',
+    maintainer_email = 'skymusicwebsite@gmail.com',
+    url = 'https://sky-music.github.io',
+    download_url = {
         'Source': 'https://github.com/sky-music/sky-python-music-sheet-maker',
     },
-    license='MIT',
-    package_dir={"": "src"},
-    packages=find_packages('src'),
-    python_requires='>=3.6',
-    install_requires=['Pillow', 'mido'],
+    license = 'MIT',
+    package_dir = {"": "src"},
+    packages = find_packages('src'),
+    include_package_data = True,
+    package_data = {"": ["*.css", "*.png", "*.otf", "*.yaml", "*.txt"],},
+    python_requires = '>=3.6',
+    install_requires = ['Pillow', 'mido'],
 
-    entry_points={
+    entry_points = {
         # This entry point is no longer valid on the dev branch.
         # It makes a script called 'skymusic' that runs skymusic.main.main().
         'console_scripts': [
-            '{PKG} = {PKG}.command_line_player:command_line_player'.format(PKG=PKG),
+            '{PKG} = {PKG}.command_line_player:command_line_player'.format(PKG = PKG),
         ],
     },
 
-    classifiers=[
+    classifiers = [
         "Programming Language :: Python",
         'Environment :: Console',
         'License :: OSI Approved :: MIT License',

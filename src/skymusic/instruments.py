@@ -1,5 +1,5 @@
 import re
-from src.skymusic import notes
+from skymusic import notes
 
 class Instrument():
 

@@ -1,8 +1,8 @@
 import io
 import textwrap
 from . import song_renderer
-from src.skymusic.renderers.instrument_renderers.png_ir import PngInstrumentRenderer
-from src.skymusic.resources import Resources
+from skymusic.renderers.instrument_renderers.png_ir import PngInstrumentRenderer
+from skymusic.resources import Resources
 
 
 try:

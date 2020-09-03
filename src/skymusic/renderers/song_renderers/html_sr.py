@@ -1,8 +1,8 @@
 import io, datetime
 from . import song_renderer, ascii_sr
-from src.skymusic.renderers.instrument_renderers.html_ir import HtmlInstrumentRenderer
-from src.skymusic.resources import Resources
-from src.skymusic.modes import CSSMode, RenderMode
+from skymusic.renderers.instrument_renderers.html_ir import HtmlInstrumentRenderer
+from skymusic.resources import Resources
+from skymusic.modes import CSSMode, RenderMode
 
 class HtmlSongRenderer(song_renderer.SongRenderer):
 

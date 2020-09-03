@@ -1,7 +1,7 @@
 import re, io
 from . import song_renderer
-from src.skymusic.renderers.instrument_renderers.ascii_ir import AsciiInstrumentRenderer
-from src.skymusic.resources import Resources
+from skymusic.renderers.instrument_renderers.ascii_ir import AsciiInstrumentRenderer
+from skymusic.resources import Resources
 
 
 class AsciiSongRenderer(song_renderer.SongRenderer):

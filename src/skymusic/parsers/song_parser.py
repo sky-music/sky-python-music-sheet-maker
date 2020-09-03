@@ -1,12 +1,12 @@
 import os, re
-from src.skymusic import instruments, Lang
-from src.skymusic.modes import InputMode, InstrumentType
-from src.skymusic.song import Song
-import src.skymusic.parsers.noteparsers
-from src.skymusic.resources import Resources
-from src.skymusic.parsers.html_parser import HtmlSongParser
-from src.skymusic.parsers import music_theory
-from src.skymusic.modes import InputMode 
+from skymusic import instruments, Lang
+from skymusic.modes import InputMode, InstrumentType
+from skymusic.song import Song
+import skymusic.parsers.noteparsers
+from skymusic.resources import Resources
+from skymusic.parsers.html_parser import HtmlSongParser
+from skymusic.parsers import music_theory
+from skymusic.modes import InputMode 
 
 
 class SongParserError(Exception):
@@ -83,7 +83,7 @@ class SongParser:
 
     def check_delimiters(self):
 
-        if self.input_mode == InputMode.JIANPU or isinstance(self.note_parser, src.skymusic.parsers.noteparsers.jianpu.Jianpu):
+        if self.input_mode == InputMode.JIANPU or isinstance(self.note_parser, skymusic.parsers.noteparsers.jianpu.Jianpu):
             if self.pause != Resources.JIANPU_PAUSE:
                 
                 if not self.silent_warnings:

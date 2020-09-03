@@ -1,7 +1,7 @@
 #import os
 #import io
 from . import instrument_renderer
-from src.skymusic.renderers.note_renderers.html_nr import HtmlNoteRenderer
+from skymusic.renderers.note_renderers.html_nr import HtmlNoteRenderer
 
 class HtmlInstrumentRenderer(instrument_renderer.InstrumentRenderer):
     

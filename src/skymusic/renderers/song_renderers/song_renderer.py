@@ -1,5 +1,5 @@
 import re, os, io
-from src.skymusic import Lang
+from skymusic import Lang
 
 class SongRendererError(Exception):
     def __init__(self, explanation):

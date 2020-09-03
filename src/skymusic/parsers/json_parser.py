@@ -1,7 +1,7 @@
 import json, re
-from src.skymusic.resources import Resources
+from skymusic.resources import Resources
 from . import song_parser
-from src.skymusic.parsers import music_theory
+from skymusic.parsers import music_theory
 
 class JsonSongParser(song_parser.SongParser):
     """

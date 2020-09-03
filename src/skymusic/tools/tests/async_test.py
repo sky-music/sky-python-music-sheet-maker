@@ -2,7 +2,7 @@ import asyncio
 import sys
 sys.path.append('..')
 from concurrent.futures import ThreadPoolExecutor
-from src.skymusic.command_line_player import CommandLinePlayer
+from skymusic.command_line_player import CommandLinePlayer
 
 
 #A method declared with async def ... must be called with await, or run in an asyncio executor

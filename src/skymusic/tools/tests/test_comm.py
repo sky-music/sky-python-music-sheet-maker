@@ -6,8 +6,8 @@ import sys, os
 PROJECT_ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), '../../../'))
 if PROJECT_ROOT not in sys.path:
     sys.path.append(PROJECT_ROOT)
-from src.skymusic.modes import InputMode, ReplyType
-from src.skymusic.communication import QueryOpen, QueryChoice, QueryBoolean, QueryMemory
+from skymusic.modes import InputMode, ReplyType
+from skymusic.communication import QueryOpen, QueryChoice, QueryBoolean, QueryMemory
 
 # song_dir_in = 'test_songs'
 # song_dir_out = 'songs_out'

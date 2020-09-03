@@ -1,7 +1,7 @@
-from src.skymusic import instruments, Lang
-from src.skymusic.renderers.song_renderers import html_sr, svg_sr, png_sr, midi_sr, skyjson_sr, ascii_sr
-from src.skymusic.modes import RenderMode
-from src.skymusic.resources import Resources
+from skymusic import instruments, Lang
+from skymusic.renderers.song_renderers import html_sr, svg_sr, png_sr, midi_sr, skyjson_sr, ascii_sr
+from skymusic.modes import RenderMode
+from skymusic.resources import Resources
 
 class Song():
 

@@ -4,7 +4,7 @@ try:
     from importlib import resources as importlib_resources
 except ImportError:
     import importlib_resources
-from src.skymusic.resources import fonts, png, css, js
+from skymusic.resources import fonts, png, css, js
 
 
 def get_default_theme():
