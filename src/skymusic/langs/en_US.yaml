@@ -220,10 +220,10 @@ stock_queries:
       - Sharps "#" and flats "b" (semitones) are supported for Western and Jianpu notations.
   file:
     foreword:
-    question: 'Enter a valid file name (case sensitive), in {songs_in}/'
+    question: "Enter a valid file name (case sensitive), in '{songs_in}/'"
     afterword:
     input_tip: any text file containing one or several musical notes
-    help_text: "We have detected that you are trying to open a file, but couldn't find it. Please check its name and that it is located in the {songs_in} directory. File names are case sensitive"
+    help_text: "We have detected that you are trying to open a file, but couldn't find it. Please check its name and that it is located in the '{songs_in}' directory. File names are case sensitive"
   notes:
     foreword:
     question: 'Please type or copy-paste notes ({skip} to skip)'

@@ -1,14 +1,24 @@
 #!/usr/bin/env python3
-import os
-if __name__ == '__main__':    
-    import sys
-    # VERY IMPORTANT: the root project path directory must be defined and added to path
-    # The '../../' has to be changed if the current file location is changed
-    PACKAGE_ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), '../'))
-    USER_FILES_ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), '../../'))
+import os, sys
+
+#Gets the directory from which the script is executed, either as a python script or as a bundle (PyInstalled dist) or an executable (PyInstaller one-file)
+try:
+    this_file = os.path.abspath(__file__)
+except NameError:
+    this_file = os.path.abspath(sys.argv[0])
+if getattr(sys, 'frozen', False):
+    application_root = getattr(sys, '_MEIPASS', os.path.dirname(sys.executable))
+else:
+    application_root = os.path.dirname(this_file)
+
+if __name__ == '__main__' and not getattr(sys, 'frozen', False): #Local Script
+    # VERY IMPORTANT: the skymusic package root directory must be added to the system PATH
+    # The '../' has to be changed if the directory structure is changed, in particular if the current __file__ location is changed
+    PACKAGE_ROOT = os.path.normpath(os.path.join(application_root, '../'))
+    USER_FILES_ROOT = os.path.normpath(os.path.join(application_root, '../../'))
     if PACKAGE_ROOT not in sys.path:
         sys.path.append(PACKAGE_ROOT)
-else:
+else: #Executable, or pip installed
     USER_FILES_ROOT = os.path.join(os.path.expanduser("~"), 'Documents/skymusic')
     if not os.path.isdir(USER_FILES_ROOT):
         os.makedirs(USER_FILES_ROOT)
@@ -27,6 +37,8 @@ except ModuleNotFoundError:
 #SETTINGS FOR ADVANCED USERS
 SKYJSON_URL = False # To generate a temporary song link at sky-music.herokuapp.com. By default will be enabled on the Discord Music Cog but disabled on the command line (to avoid spamming this server). Always disabled if batch_mode is True
 SONG_DIR_IN = os.path.join(USER_FILES_ROOT, 'test_songs') # Overrides defaut input song folder
+if not os.path.isdir(SONG_DIR_IN):
+    os.makedirs(SONG_DIR_IN)
 SONG_DIR_OUT = os.path.join(USER_FILES_ROOT, 'songs_out') # Overrides defaut output song folder
 BATCH_MODE = False # To process songs in a batch,stored as .yaml files
 BATCH_DIR = os.path.join(USER_FILES_ROOT, 'batch_songs')
@@ -45,7 +57,7 @@ class CommandLinePlayer:
     to call methods from communicator directly from the puppet.
     """
 
-    def __init__(self, locale='en_US', preferences_path='../../preferences.yaml'):
+    def __init__(self, locale='en_US', preferences_path='../skymusic_preferences.yaml'):
         self.name = Resources.COMMAND_LINE_NAME
         self.locale = self.set_locale(locale)
         self.communicator = Communicator(owner=self, locale=locale)
@@ -184,7 +196,7 @@ class CommandLinePlayer:
 
 try:
     player = CommandLinePlayer(locale=Lang.guess_locale(), preferences_path=PREFERENCES_PATH)
-    maker = MusicSheetMaker(locale=Lang.guess_locale(), song_dir_in=SONG_DIR_IN, song_dir_out=SONG_DIR_OUT, enable_skyjson_url=(SKYJSON_URL and not BATCH_MODE))
+    maker = MusicSheetMaker(locale=Lang.guess_locale(), application_root=application_root, song_dir_in=SONG_DIR_IN, song_dir_out=SONG_DIR_OUT, enable_skyjson_url=(SKYJSON_URL and not BATCH_MODE))
 
     if BATCH_MODE:
         

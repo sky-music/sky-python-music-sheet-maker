@@ -100,15 +100,15 @@ class SongBundle:
 
 class MusicSheetMaker:
 
-    def __init__(self, locale='en_US', song_dir_in=None, song_dir_out=None, enable_skyjson_url=False):
+    def __init__(self, locale='en_US', application_root=None, song_dir_in=None, song_dir_out=None, enable_skyjson_url=False):
         self.name = Resources.MUSIC_MAKER_NAME
         self.locale = self.set_locale(locale)
         self.communicator = Communicator(owner=self, locale=self.locale)
         self.song = None
         self.song_parser = None
-        self.directory_base = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'))
-        self.song_dir_in = song_dir_in if song_dir_in is not None else os.path.join(self.directory_base, 'test_songs')
-        self.song_dir_out = song_dir_out if song_dir_out is not None else os.path.join(self.directory_base, 'songs_out')
+        self.application_root = application_root if application_root is not None else os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'))
+        self.song_dir_in = song_dir_in if song_dir_in is not None else os.path.join(self.application_root, 'test_songs')
+        self.song_dir_out = song_dir_out if song_dir_out is not None else os.path.join(self.application_root, 'songs_out')
         self.css_mode = CSSMode.EMBED
         self.render_modes_enabled = [mode for mode in RenderMode]
         # self.render_modes_disabled = [RenderMode.JIANPUASCII, RenderMode.DOREMIASCII]
@@ -129,6 +129,14 @@ class MusicSheetMaker:
 
     def get_name(self):
         return self.name
+
+    def shortest_path(self, path):
+        
+        relpath = os.path.relpath(path,start=self.application_root)
+        abs_path = os.path.abspath(path)
+        home_relpath = os.path.relpath(path,start=os.path.expanduser("~"))
+        
+        return sorted([relpath,abs_path,home_relpath],key=len)[0]
 
     def get_locale(self):
         return self.locale
@@ -387,7 +395,7 @@ class MusicSheetMaker:
     def ask_file(self, recipient, prerequisites=None, execute=True):
 
         q_file = self.communicator.send_stock_query('file', recipient=recipient,
-                                                    replacements={'songs_in': os.path.relpath(os.path.normpath(self.song_dir_in))},
+                                                    replacements={'songs_in': self.shortest_path(self.song_dir_in)},
                                                     prerequisites=prerequisites,
                                                     limits=(os.path.normpath(self.song_dir_in)))
 
@@ -437,7 +445,7 @@ class MusicSheetMaker:
 
         else:
 
-            replacements.update({'songs_in': os.path.relpath(os.path.normpath(self.song_dir_in))})
+            replacements.update({'songs_in': self.shortest_path(self.song_dir_in)})
             q_notes = self.communicator.send_stock_query('notes_file', recipient=recipient, replacements=replacements, prerequisites=prerequisites)
 
             if not execute:
@@ -839,7 +847,7 @@ class MusicSheetMaker:
         if numfiles == 1:
 
             replacements = {'render_mode': render_mode.get_short_desc(self.locale),
-                            'song_file': str(os.path.relpath(file_paths[0]))
+                            'song_file': str(self.shortest_path(file_paths[0]))
                             }
 
             i_song_files = self.communicator.send_stock_query('one_song_file', recipient=recipient,
@@ -848,7 +856,7 @@ class MusicSheetMaker:
         elif numfiles > 1:
 
             replacements = {'render_mode': render_mode.get_short_desc(self.locale),
-                            'songs_out': str(os.path.relpath(self.song_dir_out)),
+                            'songs_out': str(self.shortest_path(self.song_dir_out)),
                             'num_files': str(numfiles),
                             'first_file': str(os.path.split(file_paths[0])[1]),
                             'last_file': str(os.path.split(file_paths[-1])[1])

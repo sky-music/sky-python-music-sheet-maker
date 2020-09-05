@@ -1,23 +1,29 @@
 # -*- mode: python ; coding: utf-8 -*-
-# pyinstaller --distpath="/Users/lagaffe/Desktop/dist" --workpath="/Users/lagaffe/Desktop/build" skymusic.spec
+# pyinstaller --distpath="~/Desktop/dist" --workpath="~/Desktop/build" skymusic.spec
+# pyinstaller --distpath="%homedrive%%homepath%\Desktop\dist" --workpath=""%homedrive%%homepath%\Desktop\build" skymusic.spec
+
 
 block_cipher = None
 
-
 a = Analysis(['src/skymusic/command_line_player.py'],
-             pathex=['src/skymusic'],
+             pathex=['src'],
              binaries=[],
-             datas= [('src/skymusic/resources/fonts/*.otf', 'skymusic.resources.fonts' ),
-             		('src/skymusic/resources/png/light/*.png', 'skymusic.resources.png.light' ),
-             		('src/skymusic/resources/png/light/*.png', 'skymusic.resources.png.dark' ),
-             		('src/skymusic/resources/css/light/*.css', 'skymusic.resources.css.light' ),
-             		('src/skymusic/resources/css/light/*.css', 'skymusic.resources.css.dark' ),
-             		#('src/skymusic/resources/js/*.js', 'js' )             
+             datas= [('src/skymusic/langs/*.yaml', 'skymusic/langs' ),
+             		('src/skymusic/resources/fonts/*.otf', 'skymusic/resources/fonts' ),
+            		('src/skymusic/resources/png/light/*.png', 'skymusic/resources/png/light' ),
+             		('src/skymusic/resources/png/dark/*.png', 'skymusic/resources/png/dark' ),
+             		('src/skymusic/resources/css/light/*.css', 'skymusic/resources/css/light' ),
+            		('src/skymusic/resources/css/dark/*.css', 'skymusic/resources/css/dark' ),
+            		('src/skymusic/resources/png/light/__init__.py', 'skymusic/resources/png/light' ),
+             		('src/skymusic/resources/png/dark/__init__.py', 'skymusic/resources/png/dark' ),
+             		('src/skymusic/resources/css/light/__init__.py', 'skymusic/resources/css/light' ),
+            		('src/skymusic/resources/css/dark/__init__.py', 'skymusic/resources/css/dark' ),
+             		#('src/skymusic/resources/js/*.js', 'skymusic.resources.js' )
              ],
-             hiddenimports=['skymusic.resources.fonts', 'skymusic.resources.png.light', 'skymusic.resources.png.dark', 'skymusic.resources.css.light', 'skymusic.resources.css.dark' ],
              hookspath=[],
+             hiddenimports=[],
              runtime_hooks=[],
-             excludes=[],
+             excludes=['numpy', 'scipy', 'tk', 'tkinter'],
              win_no_prefer_redirects=False,
              win_private_assemblies=False,
              cipher=block_cipher,
@@ -28,7 +34,7 @@ exe = EXE(pyz,
           a.scripts,
           [],
           exclude_binaries=True,
-          name='SkyMusic',
+          name='SkyMusicSheetMaker',
           debug=False,
           bootloader_ignore_signals=False,
           strip=False,
@@ -41,4 +47,4 @@ coll = COLLECT(exe,
                strip=False,
                upx=True,
                upx_exclude=[],
-               name='SkyMusic')
+               name='SkyMusicSheetMaker')

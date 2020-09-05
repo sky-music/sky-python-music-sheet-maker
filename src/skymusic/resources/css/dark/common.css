@@ -18,6 +18,30 @@ h1, svg text.title {
 }
 
 /* <!-- Small buttons showing notes positions for Harp --> */
+[class*="harp"] svg.button-0 .OFF.icon,
+[class*="harp"] svg.button-1 .OFF.icon,
+[class*="harp"] svg.button-2 .OFF.icon,
+[class*="harp"] svg.button-3 .OFF.icon,
+[class*="harp"] svg.button-4 .OFF.icon {
+  stroke-width: 0;
+  stroke: white;
+  fill: rgb(194,240,194);
+  opacity: 1;
+}
+
+/* <!-- Small buttons showing notes positions for Harp --> */
+[class*="harp"] svg.button-5 .OFF.icon,
+[class*="harp"] svg.button-6 .OFF.icon,
+[class*="harp"] svg.button-7 .OFF.icon,
+[class*="harp"] svg.button-8 .OFF.icon,
+[class*="harp"] svg.button-9 .OFF.icon {
+  stroke-width: 0;
+  stroke: white;
+  fill: rgb(179,236,255);
+  opacity: 1;
+}
+
+/* <!-- Small buttons showing notes positions for Harp --> */
 [class*="harp"] svg.button-10 .OFF.icon,
 [class*="harp"] svg.button-11 .OFF.icon,
 [class*="harp"] svg.button-12 .OFF.icon,
