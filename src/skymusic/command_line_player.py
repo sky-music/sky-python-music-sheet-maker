@@ -36,10 +36,10 @@ except ModuleNotFoundError:
 #=========================================
 #SETTINGS FOR ADVANCED USERS
 SKYJSON_URL = False # To generate a temporary song link at sky-music.herokuapp.com. By default will be enabled on the Discord Music Cog but disabled on the command line (to avoid spamming this server). Always disabled if batch_mode is True
-SONG_DIR_IN = os.path.join(USER_FILES_ROOT, 'test_songs') # Overrides defaut input song folder
+SONG_DIR_IN = os.path.normpath(os.getenv("SONG_INPUT_DIR")) if os.getenv("SONG_INPUT_DIR") != None else os.path.join(USER_FILES_ROOT, 'test_songs') # Overrides defaut input song folder
 if not os.path.isdir(SONG_DIR_IN):
     os.makedirs(SONG_DIR_IN)
-SONG_DIR_OUT = os.path.join(USER_FILES_ROOT, 'songs_out') # Overrides defaut output song folder
+SONG_DIR_OUT = os.path.normpath(os.getenv("SONG_OUTPUT_DIR")) if os.getenv("SONG_OUTPUT_DIR") != None else os.path.join(USER_FILES_ROOT, 'songs_out') # Overrides defaut output song folder
 BATCH_MODE = False # To process songs in a batch,stored as .yaml files
 BATCH_DIR = os.path.join(USER_FILES_ROOT, 'batch_songs')
 PREFERENCES_PATH = os.path.join(USER_FILES_ROOT, 'skymusic_preferences.yaml')

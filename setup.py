@@ -19,6 +19,7 @@ setup(
     long_description = long_description,
     long_description_content_type = 'text/markdown',
     author = 'Tracey',
+    author_email = 'bloomexperimentxx@gmail.com',
     maintainer = 'maintainer',
     maintainer_email = 'skymusicwebsite@gmail.com',
     url = 'https://sky-music.github.io',
