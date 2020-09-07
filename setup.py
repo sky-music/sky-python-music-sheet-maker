@@ -15,7 +15,7 @@ setup(
     long_description_content_type='text/markdown',
 
     author='Tracey',
-    maintainer_email='bloomexperimentxx@gmail.com',
+    author_email='bloomexperimentxx@gmail.com',
 
     url='https://sky.bloomexperiment.com/t/sky-python-music-sheet-maker/102',
     project_urls={
@@ -40,6 +40,8 @@ setup(
     install_requires=[
         'Pillow',
         'mido',
+        'PyYaml',
+        'requests'
     ],
 
     entry_points={

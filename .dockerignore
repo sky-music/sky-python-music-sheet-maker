@@ -1,0 +1,11 @@
+## Exclude unnecessary development files from docker build
+.git*
+*.md
+!README.md
+test_songs
+batch_songs
+LICENSE
+__pycache__
+*.pyc
+*.pyo
+*.pyd
