@@ -1,0 +1,23 @@
+version: "3.1"
+
+services:
+    skymusic:
+        build:
+            context: .
+            dockerfile: Dockerfile.dev
+            args:
+                - IMAGE_TAG=3.8.5-alpine3.12
+                - PKGNAME=skymusic
+        entrypoint: 
+            - python3 
+            - -B
+            - command_line_player.py
+        # POSIX parameter expansion
+        volumes:
+            - ${INPUT_DIR:?INPUT_DIR is not set}:/tmp/input
+            - ${OUTPUT_DIR:?OUTPUT_DIR is not set}:/tmp/output
+        environment:
+            - SONG_INPUT_DIR=/tmp/input
+            - SONG_OUTPUT_DIR=/tmp/output
+        working_dir: /app-bundle/src/skymusic
+        network_mode: "bridge"

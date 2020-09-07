@@ -19,6 +19,7 @@ setup(
     long_description = long_description,
     long_description_content_type = 'text/markdown',
     author = 'Tracey',
+    author_email = 'bloomexperimentxx@gmail.com',
     maintainer = 'maintainer',
     maintainer_email = 'skymusicwebsite@gmail.com',
     url = 'https://sky-music.github.io',
@@ -31,7 +32,7 @@ setup(
     include_package_data = True,
     package_data = {"": ["*.css", "*.png", "*.otf", "*.yaml", "*.txt"],},
     python_requires = '>=3.6',
-    install_requires = ['pillow', 'mido>=1.2.9', 'pyyaml', 'importlib_resources;python_version<"3.8"'],
+    install_requires = ['pillow', 'mido>=1.2.9', 'pyyaml', 'requests', 'importlib_resources;python_version<"3.8"'],
 
     entry_points = {
         # This entry point is no longer valid on the dev branch.

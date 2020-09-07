@@ -54,6 +54,29 @@ The command-line version supports functions for faster processing of several son
 
 ***
 
+**Docker images**
+
+It is a bit difficult to ensure that all client python3 installations are functional and reproducible, there is a Dockerfile and Compose file provided. The Dockerfile contains the instructions to assemble a basic image to run skymusic, while the Compose file orchestrate the instructions t run the image.
+
+The prebuilt containers have the basis skymusic modules included. `INPUT_DIR` specifies where the container will look for song inputs. 'OUTPUT_DIR' is where the container will output generated music sheets.
+
+1. [Install Docker](https://docs.docker.com/get-docker/)
+2. [Install Docker Compose](https://docs.docker.com/compose/install/)
+3. Run the skymusic script
+
+```sh
+INPUT_DIR=/path/to/dir/containing/test/songs \
+OUTPUT_DIR=/path/to/output/dir/ \
+docker-compose run skymusic
+```
+
+After running, the output will be placed in `/tmp/output/`, referring to the path inside the container. Your `OUTPUT_DIR` is bind mounted to `/tmp/output`.
+
+The first time you execute the above command, Docker will pull the image from the Docker Reguistry and cache it. Any subsequent runs will utilize the cached image.
+Note this is a development image with all optional dependencies included.
+
+***
+
 **Co-authors:** Tracey L, jmmelko
 
 SVG icons are thanks to [madwurmz](http://madwurmz.com).
