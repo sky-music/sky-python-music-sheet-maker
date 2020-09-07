@@ -30,6 +30,8 @@ a = Analysis(['src/skymusic/command_line_player.py'],
              noarchive=False)
 pyz = PYZ(a.pure, a.zipped_data,
              cipher=block_cipher)
+"""
+# Instructions for one-dir bundling (to dist folder)
 exe = EXE(pyz,
           a.scripts,
           [],
@@ -47,4 +49,18 @@ coll = COLLECT(exe,
                strip=False,
                upx=True,
                upx_exclude=[],
-               name='SkyMusicSheetMaker')
+               name='SkyMusicSheetMaker')   
+"""   
+# Instructions for one-file bundling
+exe = EXE(pyz,
+          a.scripts,
+          a.binaries,
+          a.zipfiles,
+          a.datas,
+          name='SkyMusicSheetMaker',
+          debug=False,
+          bootloader_ignore_signals=False,
+          strip=False,
+          upx=True,
+          runtime_tmpdir=None,
+          console=True )          

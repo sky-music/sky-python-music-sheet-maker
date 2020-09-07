@@ -1,4 +1,3 @@
-
 class NoteRenderer:
 
     def __init__(self):

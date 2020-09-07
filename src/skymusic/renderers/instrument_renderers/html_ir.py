@@ -1,5 +1,3 @@
-#import os
-#import io
 from . import instrument_renderer
 from skymusic.renderers.note_renderers.html_nr import HtmlNoteRenderer
 

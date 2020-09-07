@@ -32,7 +32,7 @@ setup(
     include_package_data = True,
     package_data = {"": ["*.css", "*.png", "*.otf", "*.yaml", "*.txt"],},
     python_requires = '>=3.6',
-    install_requires = ['pillow', 'mido>=1.2.9', 'pyyaml', 'importlib_resources;python_version<"3.8"'],
+    install_requires = ['pillow', 'mido>=1.2.9', 'pyyaml', 'importlib_resources;python_version<"3.8"', 'requests'],
 
     entry_points = {
         # This entry point is no longer valid on the dev branch.
