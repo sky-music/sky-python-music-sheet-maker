@@ -1,5 +1,7 @@
 # sky-python-music-sheet-maker
-***
+
+—-
+
 This program lets you make visual music sheets for Sky: Children of the Light. It will ask you a few questions, and does not require previous knowledge of the command line to run. 
 
 More details at the [Sky-Music website] (https://sky-music.github.io).
@@ -18,13 +20,13 @@ See [here] (https://sky-music.github.io/make-your-own-sheet.html) for how to dow
 
 The program can be run on a desktop computer,  or a smartphone if a Python IDE is installed (such as [Pythonista] (http://omz-software.com/pythonista/))
 
-# Plug-and-play versions
+## Plug-and-play versions
 
 If you’re afraid of the command line, there is a [website] (https://jmmelko.pythonanywhere.com) running this script.
 There is also a bot running an older version of the program, on thatskygame Discord server, that can be called by typing `!song` on a channel.
 Executable binaries are also available for download at <https://sky-music.github.io>.
 
-# Running the script
+## Running the script
 
     cd sky-python-music-sheet-maker/src/skymusic
     python3 command_line_player.py
@@ -45,7 +47,7 @@ The output will be HTML, SVG, or PNG, with small icons of the Sky keyboard. If y
 
 After generating a sheet, you are encouraged to publish the file on https://sky-music.github.io
 
-# Advanced functions
+## Advanced functions
 
 In contrast with the website or bot versions, the command-line version supports functions for faster processing of several songs:
 
@@ -97,4 +99,4 @@ This program is not being actively maintained by its original creator Tracey. As
 - Kai00 (simplified chinese)
 - we are looking for a japanese translator
 
-***
+—-
