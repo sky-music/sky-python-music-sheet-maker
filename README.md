@@ -4,24 +4,27 @@ This program lets you make visual music sheets for Sky: Children of the Light. I
 
 More details at the [Sky-Music website] (https://sky-music.github.io).
 
-**Installation**
+## Installation
 
-The script requires Python >= 3.6 and the following packages:
+The program requires Python >= 3.6 and the following packages:
 
 * pillow (PIL)
-* import_resources (for Python < 3.7)
-* mido (optional: for generating midi output)
+* import_resources (for Python < 3.8)
 * pyYaml
+* mido (optional: for generating midi output)
+* requests (optional: for generating a link to skymusic.herokuapp.com)
 
 See [here] (https://sky-music.github.io/make-your-own-sheet.html) for how to download and install.
 
 The program can be run on a desktop computer,  or a smartphone if a Python IDE is installed (such as [Pythonista] (http://omz-software.com/pythonista/))
 
-**Website version**
+# Plug-and-play versions
 
 If you’re afraid of the command line, there is a [website] (https://jmmelko.pythonanywhere.com) running this script.
+There is also a bot running an older version of the program, on thatskygame Discord server, that can be called by typing `!song` on a channel.
+Executable binaries are also available for download at <https://sky-music.github.io>.
 
-**Running the script**
+# Running the script
 
     cd sky-python-music-sheet-maker/src/skymusic
     python3 command_line_player.py
@@ -42,19 +45,19 @@ The output will be HTML, SVG, or PNG, with small icons of the Sky keyboard. If y
 
 After generating a sheet, you are encouraged to publish the file on https://sky-music.github.io
 
-**Advanced functions**
+# Advanced functions
 
-The command-line version supports functions for faster processing of several songs:
+In contrast with the website or bot versions, the command-line version supports functions for faster processing of several songs:
 
-* the default answer to any question can be put in the *preferences.yaml* file. This way, you will no longer be asked this question (for instance the aspect ratio of the visual sheet). You can  even put the notes in there! 
-* songs can be processed in a by batch by placing preference-like *.yaml* files in the *batch\_songs* directory (see the example files in it) and modifying this line in  *command\_line\_player.py*:
+* the default answer to any question can be put in the *sky_music_preferences.yaml* file. This way, you will no longer be asked this question (for instance the aspect ratio of the visual sheet). You can  even put the notes in there! 
+* songs can be processed in a by batch by placing preference-like *.yaml* files in the *batch\_songs* directory (see the example files in it) and modifying the following line in  *command\_line\_player.py*:
 
         batch_mode = True
 * Visual sheets generated after July, 2020 1st can be read again by the program for further modification. You will have to enter the artist again though.
 
 ***
 
-**Docker images**
+## Docker images
 
 It is a bit difficult to ensure that all client python3 installations are functional and reproducible, there is a Dockerfile and Compose file provided. The Dockerfile contains the instructions to assemble a basic image to run skymusic, while the Compose file orchestrate the instructions t run the image.
 
@@ -80,7 +83,8 @@ Note this is a development image with all optional dependencies included.
 **Co-authors:** Tracey L, jmmelko
 
 SVG icons are thanks to [madwurmz](http://madwurmz.com).
-Advices taken from Specy, Jurassimok, Skyventuree
+Advices taken from Specy, Jurassimok, Skyventuree.
+Docker images by heronwr aka lambdaw.
 
 **Re-use and branching:**
 
