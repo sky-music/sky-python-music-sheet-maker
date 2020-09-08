@@ -1,7 +1,7 @@
 # -*- mode: python ; coding: utf-8 -*-
 # pyinstaller --distpath="~/Desktop/dist" --workpath="~/Desktop/build" skymusic.spec
-# pyinstaller --distpath="%homedrive%%homepath%\Desktop\dist" --workpath=""%homedrive%%homepath%\Desktop\build" skymusic.spec
-
+# In Spyder: # ! pyinstaller --distpath="%homedrive%%homepath%\Desktop\dist" --workpath="%homedrive%%homepath%\Desktop\build" skymusic.spec
+# %homedrive%%homepath%\WinPython\python-3.7.2.amd64\python.exe -m PyInstaller --distpath="%homedrive%%homepath%\Desktop\dist" --workpath="%homedrive%%homepath%\Desktop\build" skymusic.spec
 
 block_cipher = None
 
