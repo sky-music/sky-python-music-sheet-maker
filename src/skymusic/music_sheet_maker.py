@@ -132,11 +132,14 @@ class MusicSheetMaker:
 
     def shortest_path(self, path):
         
-        relpath = os.path.relpath(path,start=self.application_root)
-        abs_path = os.path.abspath(path)
-        home_relpath = os.path.relpath(path,start=os.path.expanduser("~"))
+        try:
+            relpath = os.path.relpath(path,start=self.application_root)
+            abs_path = os.path.abspath(path)
+            home_relpath = os.path.relpath(path,start=os.path.expanduser("~"))
         
-        return sorted([relpath,abs_path,home_relpath],key=len)[0]
+            return sorted([relpath,abs_path,home_relpath],key=len)[0]
+        except ValueError:
+            return path
 
     def get_locale(self):
         return self.locale
