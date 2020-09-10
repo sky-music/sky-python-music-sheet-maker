@@ -54,7 +54,7 @@ class SongBundle:
             filename = self.meta['artist'] + '__' + self.meta['title']
             sanitized_filename = re.sub(r'[\\/:"~`#*?<>|]', '', re.escape(filename)).strip()
             sanitized_filename = re.sub('(\s)+', '_', sanitized_filename)  # replaces spaces by underscore
-            sanitized_filename = sanitized_filename[:63]
+            sanitized_filename = sanitized_filename[:Resources.MAX_FILENAME_LENGTH]
             if re.search('[^_]+',sanitized_filename) is None:
                 return ''
             else:
