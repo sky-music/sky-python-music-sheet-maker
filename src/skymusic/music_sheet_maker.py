@@ -48,14 +48,17 @@ class SongBundle:
         
         self.meta.update(meta)
 
-    def get_sanitized_song_title(self):
+    def get_sanitized_song_filename(self):
         
         try:
-            title = self.meta['title']
-            sanitized_title = re.sub(r'[\\/:"*?<>|]', '', re.escape(title)).strip()
-            sanitized_title = re.sub('(\s)+', '_', sanitized_title)  # replaces spaces by underscore
-            sanitized_title = sanitized_title[:31]
-            return sanitized_title
+            filename = self.meta['artist'] + '__' + self.meta['title']
+            sanitized_filename = re.sub(r'[\\/:"~`#*?<>|]', '', re.escape(filename)).strip()
+            sanitized_filename = re.sub('(\s)+', '_', sanitized_filename)  # replaces spaces by underscore
+            sanitized_filename = sanitized_filename[:63]
+            if re.search('[^_]+',sanitized_filename) is None:
+                return ''
+            else:
+                return sanitized_filename
         except KeyError:
             return ''
         
@@ -830,7 +833,7 @@ class MusicSheetMaker:
             if buffers is not None:
                 song_bundle.add_render(render_mode, buffers)
                 if self.is_command_line(recipient):
-                    song_title = song_bundle.get_sanitized_song_title()
+                    song_title = song_bundle.get_sanitized_song_filename()
                     self.send_buffers_to_files(song_title, render_mode, buffers, recipient=recipient)
                         
         return song_bundle
