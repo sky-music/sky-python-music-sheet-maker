@@ -1,5 +1,5 @@
 from . import instrument_renderer
-from src.skymusic.renderers.note_renderers.svg_nr import SvgNoteRenderer
+from skymusic.renderers.note_renderers.svg_nr import SvgNoteRenderer
 
 class SvgInstrumentRenderer(instrument_renderer.InstrumentRenderer):
     

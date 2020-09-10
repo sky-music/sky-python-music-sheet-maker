@@ -1,5 +1,5 @@
 from . import instrument_renderer
-from src.skymusic.resources import Resources
+from skymusic.resources import Resources
 
 class AsciiInstrumentRenderer(instrument_renderer.InstrumentRenderer):
     
@@ -17,10 +17,13 @@ class AsciiInstrumentRenderer(instrument_renderer.InstrumentRenderer):
             ascii_render = Resources.PAUSE
         else:
             skygrid = instrument.get_skygrid()
-            for k in skygrid:  # Cycle over positions in a frame
-                for f in skygrid[k]:  # Cycle over triplets & quavers
-                    if skygrid[k][f]:  # Button is highlighted
-                        ascii_render += note_parser.get_note_from_coordinate(k) + Resources.QUAVER_DELIMITER
+            
+            for pos in skygrid:  # Cycle over (row, col) positions in an icon
+                for f in skygrid[pos]:  # Cycle over triplets & quavers
+                    if skygrid[pos][f]:  # Button is highlighted
+                        ascii_render += note_parser.get_note_from_coordinate(pos)
+                    if f > 0:
+                        ascii_render += Resources.QUAVER_DELIMITER
             ascii_render = ascii_render.rstrip(Resources.QUAVER_DELIMITER)
             
         return ascii_render

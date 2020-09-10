@@ -4,9 +4,9 @@ import requests
 #from urllib import parse, request
 #import socket
 from . import song_renderer
-from src.skymusic import Lang
-from src.skymusic.renderers.instrument_renderers.skyjson_ir import SkyjsonInstrumentRenderer
-from src.skymusic.resources import Resources
+from skymusic import Lang
+from skymusic.renderers.instrument_renderers.skyjson_ir import SkyjsonInstrumentRenderer
+from skymusic.resources import Resources
 
 class SkyjsonSongRenderer(song_renderer.SongRenderer):
 

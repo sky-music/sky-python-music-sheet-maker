@@ -1,11 +1,12 @@
 import os, re
-from src.skymusic import instruments, Lang
-from src.skymusic.modes import InputMode, InstrumentType
-from src.skymusic.song import Song
-import src.skymusic.parsers.noteparsers
-from src.skymusic.resources import Resources
-from src.skymusic.parsers.html_parser import HtmlSongParser
-from src.skymusic.parsers import music_theory
+from skymusic import instruments, Lang
+from skymusic.modes import InputMode, InstrumentType
+from skymusic.song import Song
+import skymusic.parsers.noteparsers
+from skymusic.resources import Resources
+from skymusic.parsers.html_parser import HtmlSongParser
+from skymusic.parsers import music_theory
+from skymusic.modes import InputMode 
 
 
 class SongParserError(Exception):
@@ -82,7 +83,7 @@ class SongParser:
 
     def check_delimiters(self):
 
-        if self.input_mode == InputMode.JIANPU or isinstance(self.note_parser, src.skymusic.parsers.noteparsers.jianpu.Jianpu):
+        if self.input_mode == InputMode.JIANPU or isinstance(self.note_parser, skymusic.parsers.noteparsers.jianpu.Jianpu):
             if self.pause != Resources.JIANPU_PAUSE:
                 
                 if not self.silent_warnings:
@@ -186,7 +187,8 @@ class SongParser:
 
     def split_icon(self, icon, delimiter=None):
         """
-        An icon is a collection of chords assembled with '-': ['A1C2-F3D4', 'C#4B4-Gb3A2']
+        A song is a list of icons
+        An icon is a bundle of chords assembled with '-': ['A1C2-F3D4', 'C#4B4-Gb3A2']
         This method splits an icon into a list of chords:  ['A1C2', 'F3D4', 'C#4B4', 'Gb3A2']
         """
         if delimiter is None:
@@ -276,12 +278,25 @@ class SongParser:
         results = [skygrid, harp_broken, harp_silent, repeat]
         return results
 
+    def convert_bracket_chords(self, line):
+        
+        bracket_chord = re.compile('((\(|\[)(?:\w|\s)+(\)|\]))')
+        brackets_blanks = re.compile('\[|\]|\(|\)|\s')
+        chord_matches = bracket_chord.finditer(line)
+        for match in chord_matches:
+            notes = brackets_blanks.sub('',match.group(0))
+            line = line.replace(match.group(0), notes)
+        return line
+
     def sanitize_line(self, line):
         """
         Strip leading spaces and replace surnumerous spaces
         :param line:
         :return:
         """
+        if self.input_mode is not InputMode.SKYJSON:
+            line = self.convert_bracket_chords(line)
+        
         line = re.sub('(\s){2,}', '\\1', line)  # removes surnumerous blank characters
         line = line.strip()
         

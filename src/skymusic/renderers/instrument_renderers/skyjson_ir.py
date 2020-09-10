@@ -1,6 +1,6 @@
 from . import instrument_renderer
-from src.skymusic.resources import Resources
-from src.skymusic.parsers.noteparsers import skyjson as skyjson_parser
+from skymusic.resources import Resources
+from skymusic.parsers.noteparsers import skyjson as skyjson_parser
 
 
 class SkyjsonInstrumentRenderer(instrument_renderer.InstrumentRenderer):

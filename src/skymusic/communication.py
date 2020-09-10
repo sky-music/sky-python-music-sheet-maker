@@ -1,5 +1,5 @@
 import re, os
-from src.skymusic.modes import ReplyType, InputMode, RenderMode, AspectRatio, InstrumentType
+from skymusic.modes import ReplyType, InputMode, RenderMode, AspectRatio, InstrumentType
 from datetime import datetime
 import hashlib
 from fractions import Fraction

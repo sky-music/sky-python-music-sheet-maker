@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import math
-from src.skymusic.resources import Resources 
+from skymusic.resources import Resources 
 
 class NoteParser:
     """
@@ -119,7 +119,7 @@ class NoteParser:
             return False
 
     def english_note_name(self, notes_string, reverse=False):
-        from src.skymusic.parsers.noteparsers import english
+        from skymusic.parsers.noteparsers import english
         if reverse:
             native_parser = english.English()
             foreign_parser = self

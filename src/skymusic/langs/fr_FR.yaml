@@ -203,7 +203,7 @@ stock_queries:
     help_text: L'arrangeur est la personne qui a trouvé les bonnes notes ou accorss pour que la chanson sonne juste dans Sky. C'est peut-être vous!
   notes_file:
     foreword:
-    question: 'Tapez ou collez vos notes ci-dessous. Vous pouvez aussi entrer un nom de fichier texte contenant les notes (à placer dans {songs_in}/)'
+    question: "Tapez ou collez vos notes ci-dessous. Vous pouvez aussi entrer un nom de fichier texte contenant les notes (à placer dans '{songs_in}/')"
     afterword:
     input_tip: du texte contenant des notes telles que C1 D1F1, do re mi, ou un nom de fichier comme song.txt
     help_text: |
@@ -217,7 +217,7 @@ stock_queries:
       - Les dièses "#" et les bémoles "b" (demi-tons) sont possibles pour les notations autres que Sky ABC-15.
   file:
     foreword:
-    question: 'Entrez un nom de fichier valide, rangé dans {songs_in}/ (sensible à la casse)'
+    question: "Entrez un nom de fichier valide, rangé dans '{songs_in}/' (sensible à la casse)"
     afterword:
     input_tip: un fichier texte contenant des notes de musique
     help_text: "We have detected that you are trying to open a file, but couldn't find it. Please check its name and that it is located in the {songs_in} directory. File names are case sensitive"

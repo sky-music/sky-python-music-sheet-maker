@@ -1,6 +1,6 @@
-from src.skymusic.modes import ReplyType, AspectRatio, InstrumentType
-from src.skymusic.communication import QueryOpen, QueryChoice, QueryMultipleChoices, QueryBoolean, Information
-from src.skymusic import Lang
+from skymusic.modes import ReplyType, AspectRatio, InstrumentType
+from skymusic.communication import QueryOpen, QueryChoice, QueryMultipleChoices, QueryBoolean, Information
+from skymusic import Lang
 
 """
 NOTE ABOUT LIMITS

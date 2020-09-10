@@ -1,10 +1,8 @@
-#import os
-from src.skymusic.resources import Resources
+from skymusic.resources import Resources
 from . import note_renderer
 
 try:
     import mido
-
     no_mido_module = False
 except (ImportError, ModuleNotFoundError):
     no_mido_module = True

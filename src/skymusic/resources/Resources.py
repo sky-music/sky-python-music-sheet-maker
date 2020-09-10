@@ -4,7 +4,7 @@ try:
     from importlib import resources as importlib_resources
 except ImportError:
     import importlib_resources
-from src.skymusic.resources import fonts, png, css, js
+from skymusic.resources import fonts, png, css, js
 
 
 def get_default_theme():
@@ -36,7 +36,7 @@ def load_theme(theme):
         png_files = importlib_resources.contents(png_module)
         
         if not png_files:
-            print(f"\n*** ERROR: could not find any PNG file to embed. ***\n")   
+            print(f"\n*** ERROR: could not find any PNG file to embed from {png_module}. ***\n")   
         
         png_files = [file for file in png_files if os.path.splitext(file)[1] == '.png']
         
@@ -47,7 +47,7 @@ def load_theme(theme):
         
         css_files = importlib_resources.contents(css_module)
         if not css_files:
-            print(f"\n*** ERROR: could not find any CSS file to embed. ***\n")     
+            print(f"\n*** ERROR: could not find any CSS file to embed from {css_module}. ***\n")     
         
         css_files = [file for file in css_files if os.path.splitext(file)[1] == '.css']
         

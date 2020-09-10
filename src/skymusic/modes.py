@@ -1,19 +1,19 @@
 from enum import Enum
-import src.skymusic.parsers.noteparsers
-import src.skymusic.instruments
-from src.skymusic import Lang
+import skymusic.parsers.noteparsers
+import skymusic.instruments
+from skymusic import Lang
 
 class InputMode(Enum):
-    SKYKEYBOARD = (False, "input_mode/skykeyboard/short_desc", "input_mode/skykeyboard/long_desc", src.skymusic.parsers.noteparsers.skykeyboard.SkyKeyboard)
-    SKY = (False, "input_mode/sky/short_desc", "input_mode/sky/long_desc", src.skymusic.parsers.noteparsers.skyabc15.SkyABC15)
-    SKYHTML = (False, "input_mode/skyhtml/short_desc", "input_mode/skyhtml/long_desc", src.skymusic.parsers.noteparsers.skyabc15.SkyABC15)
-    SKYJSON = (False, "input_mode/skyjson/short_desc", "input_mode/skyjson/long_desc", src.skymusic.parsers.noteparsers.skyjson.SkyJson)
-    ENGLISH = (True, "input_mode/english/short_desc", "input_mode/english/long_desc", src.skymusic.parsers.noteparsers.english.English)
-    DOREMI = (True, "input_mode/doremi/short_desc", "input_mode/doremi/long_desc", src.skymusic.parsers.noteparsers.doremi.Doremi)
-    JIANPU = (True, "input_mode/jianpu/short_desc", "input_mode/jianpu/long_desc", src.skymusic.parsers.noteparsers.jianpu.Jianpu)
+    SKYKEYBOARD = (False, "input_mode/skykeyboard/short_desc", "input_mode/skykeyboard/long_desc", skymusic.parsers.noteparsers.skykeyboard.SkyKeyboard)
+    SKY = (False, "input_mode/sky/short_desc", "input_mode/sky/long_desc", skymusic.parsers.noteparsers.skyabc15.SkyABC15)
+    SKYHTML = (False, "input_mode/skyhtml/short_desc", "input_mode/skyhtml/long_desc", skymusic.parsers.noteparsers.skyabc15.SkyABC15)
+    SKYJSON = (False, "input_mode/skyjson/short_desc", "input_mode/skyjson/long_desc", skymusic.parsers.noteparsers.skyjson.SkyJson)
+    ENGLISH = (True, "input_mode/english/short_desc", "input_mode/english/long_desc", skymusic.parsers.noteparsers.english.English)
+    DOREMI = (True, "input_mode/doremi/short_desc", "input_mode/doremi/long_desc", skymusic.parsers.noteparsers.doremi.Doremi)
+    JIANPU = (True, "input_mode/jianpu/short_desc", "input_mode/jianpu/long_desc", skymusic.parsers.noteparsers.jianpu.Jianpu)
     ENGLISHCHORDS = (True, "input_mode/englishchords/short_desc", "input_mode/englishchords/long_desc",
-                     src.skymusic.parsers.noteparsers.englishchords.EnglishChords)
-    DOREMIJP = (True, "input_mode/doremijp/short_desc", "input_mode/doremijp/long_desc", src.skymusic.parsers.noteparsers.doremi_jp.DoremiJP)
+                     skymusic.parsers.noteparsers.englishchords.EnglishChords)
+    DOREMIJP = (True, "input_mode/doremijp/short_desc", "input_mode/doremijp/long_desc", skymusic.parsers.noteparsers.doremi_jp.DoremiJP)
 
     def __init__(self, chromatic, short_desc, long_desc, note_parser_method):
         self.chromatic = chromatic
@@ -39,15 +39,15 @@ class InputMode(Enum):
 
 
 class RenderMode(Enum):
-    HTML = (False, False, False, "render_mode/html/short_desc", 'text/html', '.html', src.skymusic.parsers.noteparsers.skyabc15.SkyABC15)
-    SVG = (True, False, False, "render_mode/svg/short_desc", 'image/svg+xml', '.svg', src.skymusic.parsers.noteparsers.skyabc15.SkyABC15)
-    PNG = (True, False, False, "render_mode/png/short_desc", 'image/png', '.png', src.skymusic.parsers.noteparsers.skyabc15.SkyABC15)
-    MIDI = (False, True, True, "render_mode/midi/short_desc", 'audio/midi', '.mid', src.skymusic.parsers.noteparsers.skyabc15.SkyABC15)
-    SKYJSON = (False, True, False, "render_mode/skyjson/short_desc", 'application/json', '.json', src.skymusic.parsers.noteparsers.skyjson.SkyJson)
-    SKYASCII = (False, False, False, "render_mode/skyascii/short_desc", 'text/plain', '_sky.txt', src.skymusic.parsers.noteparsers.skyabc15.SkyABC15)
-    ENGLISHASCII = (False, False, True, "render_mode/englishascii/short_desc", 'text/plain', '_english.txt', src.skymusic.parsers.noteparsers.english.English)
-    JIANPUASCII = (False, False, True, "render_mode/jianpuascii/short_desc", 'text/plain', '_jianpu.txt', src.skymusic.parsers.noteparsers.jianpu.Jianpu)
-    DOREMIASCII = (False, False, True, "render_mode/doremiascii/short_desc", 'text/plain', '_doremi.txt', src.skymusic.parsers.noteparsers.doremi.Doremi)
+    HTML = (False, False, False, "render_mode/html/short_desc", 'text/html', '.html', skymusic.parsers.noteparsers.skyabc15.SkyABC15)
+    SVG = (True, False, False, "render_mode/svg/short_desc", 'image/svg+xml', '.svg', skymusic.parsers.noteparsers.skyabc15.SkyABC15)
+    PNG = (True, False, False, "render_mode/png/short_desc", 'image/png', '.png', skymusic.parsers.noteparsers.skyabc15.SkyABC15)
+    MIDI = (False, True, True, "render_mode/midi/short_desc", 'audio/midi', '.mid', skymusic.parsers.noteparsers.skyabc15.SkyABC15)
+    SKYJSON = (False, True, False, "render_mode/skyjson/short_desc", 'application/json', '.json', skymusic.parsers.noteparsers.skyjson.SkyJson)
+    SKYASCII = (False, False, False, "render_mode/skyascii/short_desc", 'text/plain', '_sky.txt', skymusic.parsers.noteparsers.skyabc15.SkyABC15)
+    ENGLISHASCII = (False, False, True, "render_mode/englishascii/short_desc", 'text/plain', '_english.txt', skymusic.parsers.noteparsers.english.English)
+    JIANPUASCII = (False, False, True, "render_mode/jianpuascii/short_desc", 'text/plain', '_jianpu.txt', skymusic.parsers.noteparsers.jianpu.Jianpu)
+    DOREMIASCII = (False, False, True, "render_mode/doremiascii/short_desc", 'text/plain', '_doremi.txt', skymusic.parsers.noteparsers.doremi.Doremi)
 
 
     def __init__(self, image_mode, time_mode, chromatic, short_desc, mime_type, extension, note_parser_method):
@@ -96,8 +96,8 @@ class RenderMode(Enum):
         return self.extension
 
 class InstrumentType(Enum):
-    NORMAL = ("instrument/normal/short_desc", "instrument/normal/long_desc", src.skymusic.instruments.Harp)
-    DRUM = ("instrument/drum/short_desc", "instrument/drum/long_desc", src.skymusic.instruments.Drum)
+    NORMAL = ("instrument/normal/short_desc", "instrument/normal/long_desc", skymusic.instruments.Harp)
+    DRUM = ("instrument/drum/short_desc", "instrument/drum/long_desc", skymusic.instruments.Drum)
 
     def __init__(self, short_desc_yaml, long_desc_yaml, instrument_class):
         self.short_desc_yaml = short_desc_yaml

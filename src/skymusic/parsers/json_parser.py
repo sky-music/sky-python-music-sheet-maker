@@ -1,7 +1,7 @@
 import json, re
-from src.skymusic.resources import Resources
+from skymusic.resources import Resources
 from . import song_parser
-from src.skymusic.parsers import music_theory
+from skymusic.parsers import music_theory
 
 class JsonSongParser(song_parser.SongParser):
     """
@@ -82,7 +82,7 @@ class JsonSongParser(song_parser.SongParser):
             if isinstance(json_dict, list):
                 json_dict = json_dict[0]
         except (json.JSONDecodeError, TypeError, KeyError):
-            json_dict = None        
+            json_dict = None
         
         if json_dict:
             try:
@@ -118,6 +118,9 @@ class JsonSongParser(song_parser.SongParser):
     def split_line(self, line):
         
         json_dict = self.load_dict(line)
+        
+        if json_dict is None:
+            return line
         
         # The existence of this field has already been assessed by MusicTheory
         notes = json_dict['songNotes']

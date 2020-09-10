@@ -1,7 +1,7 @@
 import io, re
-from src.skymusic.modes import InputMode, RenderMode, ReplyType
-from src.skymusic.communication import QueryOpen, QueryChoice, QueryBoolean, QueryMultipleChoices, QueryMemory, Information
-from src.skymusic import Lang, QueryStock
+from skymusic.modes import InputMode, RenderMode, ReplyType
+from skymusic.communication import QueryOpen, QueryChoice, QueryBoolean, QueryMultipleChoices, QueryMemory, Information
+from skymusic import Lang, QueryStock
 
 """
 Classes to ask and answer questions called Query and Reply between the bot and the music sheet maker
@@ -165,9 +165,9 @@ class Communicator:
         result_dict.update({'song_files': []})
         result_dict.update({'saves': []})
 
-        sanitized_title = song_bundle.get_sanitized_song_title()
-        if len(sanitized_title) == 0 or sanitized_title == '_':
-            sanitized_title = Lang.get_string("song_meta/untitled", self.locale)
+        sanitized_filename = song_bundle.get_sanitized_song_filename()
+        if len(sanitized_filename) == 0:
+            sanitized_filename = Lang.get_string("song_meta/untitled", self.locale)
 
         for render_mode, buffers in song_bundle.get_renders().items():
 
@@ -178,10 +178,10 @@ class Communicator:
             if not isinstance(buffers[0], (io.BytesIO, io.StringIO)):
                 raise CommunicatorError(f"Unexpected type for song_bundle value:{type(buffers[0])}")
             
-            result_dict['song_files'] += [{'file_type': render_mode.mime_type, 'base_name': sanitized_title+'_', 'number': i,
+            result_dict['song_files'] += [{'file_type': render_mode.mime_type, 'base_name': sanitized_filename+'_', 'number': i,
                                 'ext': render_mode.extension} for i, buffer in enumerate(buffers)]
             
-            result_dict['saves'] += [{'name': sanitized_title + '_' + str(i) + render_mode.extension, 'buffer': buffer} for i, buffer
+            result_dict['saves'] += [{'name': sanitized_filename + '_' + str(i) + render_mode.extension, 'buffer': buffer} for i, buffer
                          in enumerate(buffers)]
             
         return result_dict

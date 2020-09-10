@@ -136,7 +136,7 @@ def set_transparency(png_paths, transparency):
                 im = im.convert('RGBA')
             else:
                 im = im.convert('RGB')
-            im.save(png_path, dpi=(96, 96), compress_level=0)
+            im.save(png_path, dpi=(96, 96), optimize=True)
 
 
 if __name__ == '__main__':

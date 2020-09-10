@@ -13,9 +13,9 @@ if __name__ == '__main__':
         sys.path.append(project_path)
 import os
 import math
-from src.skymusic.parsers.song_parser import SongParser
-from src.skymusic.modes import InputMode
-from src.skymusic.resources import Resources
+from skymusic.parsers.song_parser import SongParser
+from skymusic.modes import InputMode
+from skymusic.resources import Resources
 
 def set_dodecas(mode):
     if mode==InputMode.DOREMI:

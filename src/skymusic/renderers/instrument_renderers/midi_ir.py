@@ -1,5 +1,5 @@
 from . import instrument_renderer
-from src.skymusic.renderers.note_renderers import midi_nr
+from skymusic.renderers.note_renderers import midi_nr
 
 try:
     import mido

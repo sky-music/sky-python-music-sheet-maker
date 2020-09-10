@@ -1,5 +1,5 @@
-from src.skymusic import Lang
-from src.skymusic.instruments import Voice
+from skymusic import Lang
+from skymusic.instruments import Voice
 
 class InstrumentRenderer():
 
