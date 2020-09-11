@@ -77,13 +77,13 @@ This last feature might require installation of the *requests* module, if not al
 
 ## Docker images
 
-Since it might be a bit difficult to ensure that all client python3 installations are functional and reproducible, there is a Dockerfile and Compose file provided. The Dockerfile contains the instructions to assemble a basic image to run skymusic, while the Compose file orchestrate the instructions to run the image.
+Since it might be a bit difficult to ensure that all client python3 installations are functional and reproducible, there is a Dockerfile and Compose file provided. The Dockerfile contains the instructions to assemble a base image to run skymusic, while the Compose file orchestrate the instructions to run the image.
 
-The prebuilt containers have the basis skymusic modules included. `INPUT_DIR` specifies where the container will look for song inputs. 'OUTPUT_DIR' is where the container will output generated music sheets.
+The prebuilt containers have the base skymusic modules included. `INPUT_DIR` specifies where the container will look for song inputs. `OUTPUT_DIR` is where the container will output generated music sheets.
 
 1. [Install Docker](https://docs.docker.com/get-docker/)
 2. [Install Docker Compose](https://docs.docker.com/compose/install/)
-3. Run the skymusic script
+3. Run the skymusic module
 
 ```sh
 INPUT_DIR=/path/to/dir/containing/test/songs \

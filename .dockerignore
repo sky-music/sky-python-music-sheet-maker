@@ -5,6 +5,7 @@
 test_songs
 batch_songs
 LICENSE
+requirements.txt
 __pycache__
 *.pyc
 *.pyo
