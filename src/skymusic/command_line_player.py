@@ -19,7 +19,7 @@ if __name__ == '__main__' and not getattr(sys, 'frozen', False): #Local Script
     if PACKAGE_ROOT not in sys.path:
         sys.path.append(PACKAGE_ROOT)
 else: #Executable, or pip installed
-    USER_FILES_ROOT = os.path.join(os.path.expanduser("~"), 'Documents/skymusic')
+    USER_FILES_ROOT = os.path.join(os.path.expanduser("~"), 'skymusic')
     if not os.path.isdir(USER_FILES_ROOT):
         os.makedirs(USER_FILES_ROOT)
 
