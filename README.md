@@ -35,7 +35,7 @@ The program requires Python >= 3.6 and the following packages:
 
 The program can be installed by simply unzipping the code on your computer, and running the main script file, or by installing it in your Python distribution with pip: `pip install .`
 
-The program can be installed on a desktop computer,  or a smartphone if a Python IDE is installed (such as [Pythonista] (http://omz-software.com/pythonista/)).
+The program can be installed on a desktop computer,  or a smartphone if a Python IDE is installed (such as [Pythonista](http://omz-software.com/pythonista/)).
 
 The program can also be installed in a virtualenv to mitigate possible dependency clashes with system site-packages.
 
@@ -49,14 +49,14 @@ pip3 install -r requirements.txt
 
 You can activate the virtual environment with `source venv/bin/activate`, to exit the virtual enviroment use the `deactivate` command. Note, it is possible some packages are distributed via `bdist_wheel`, hence the wheel package may be required.
 
-See [here] (https://sky-music.github.io/make-your-own-sheet.html) for further details on how to download and install.
+See [here](https://sky-music.github.io/make-your-own-sheet.html) for further details on how to download and install.
 
 ***
 
 <a id="plugnplay"></a>
 ### Plug-and-play versions
 
-If you’re afraid of the command line, there is a [website] (https://jmmelko.pythonanywhere.com) running this script.
+If you’re afraid of the command line, there is a [website](https://jmmelko.pythonanywhere.com) running this script.
 There is also a bot running an older version of the program, on thatskygame Discord server, that can be called by typing `!song` in a channel.
 Executable binaries are also available for download at <https://sky-music.github.io>.
 
@@ -158,6 +158,7 @@ SVG icons are thanks to [madwurmz](http://madwurmz.com).
 **Codebase:**
 
 Advices taken from Specy, Jurassimok, Skyventuree.
+
 Docker images by heronwr aka lambdaw.
 
 **Re-use and branching:**
