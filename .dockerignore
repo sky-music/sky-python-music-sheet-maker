@@ -1,12 +1,15 @@
 ## Exclude unnecessary development files from docker build
-.git*
+.git
+.github
+*.egg-info
+*venv
 *.md
 !README.md
 test_songs
 batch_songs
 LICENSE
 requirements.txt
-__pycache__
+**/__pycache__
 *.pyc
 *.pyo
 *.pyd

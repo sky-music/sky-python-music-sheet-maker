@@ -36,8 +36,14 @@ RUN set -eu pipefall \
         yaml-dev \
         cython \
     && cd /app-bundle \
-    && python setup.py bdist_wheel \
-    && python -B -m pip install "dist/${PKGNAME}"*"" \
+    && python3 -B setup.py bdist_wheel \
+    && python3 -B -m pip --no-cache-dir install "dist/${PKGNAME}"*"" \
+    && find /usr/local -depth \
+        \( \
+            \( -type d -a \( -name test -o -name tests -o -name idle_test -o -name __pycache__ \) \) \
+            -o \
+            \( -type f -a \( -name '*.pyc' -o -name '*.pyo' -o -name '*.pyd' \) \) \
+        \) | xargs rm -rf \
     && apk del --no-cache --clean-protected --purge \
         .build-base \
         .pillow-deps \
