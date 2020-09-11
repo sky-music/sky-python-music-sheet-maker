@@ -1,6 +1,5 @@
 ## Exclude unnecessary development files from docker build
-.git
-.github
+.git*
 *.egg-info
 *venv
 *.md
