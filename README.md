@@ -1,10 +1,11 @@
 # sky-python-music-sheet-maker
-***
+
 This program lets you make visual music sheets for Sky: Children of the Light. It will ask you a few questions, and does not require previous knowledge of the command line to run.
 
 More details at the [Sky-Music website] (https://sky-music.github.io).
 
 ## Table of contents
+
 <!--ts-->
 * [Usage](#usage)
     * [Installation](#setup)
@@ -50,12 +51,16 @@ You can activate the virtual environment with `source venv/bin/activate`, to exi
 
 See [here] (https://sky-music.github.io/make-your-own-sheet.html) for further details on how to download and install.
 
+***
+
 <a id="plugnplay"></a>
 ### Plug-and-play versions
 
 If you’re afraid of the command line, there is a [website] (https://jmmelko.pythonanywhere.com) running this script.
 There is also a bot running an older version of the program, on thatskygame Discord server, that can be called by typing `!song` in a channel.
 Executable binaries are also available for download at <https://sky-music.github.io>.
+
+***
 
 <a id="running"></a>
 ### Running the script
@@ -133,8 +138,6 @@ After running, the output will be placed in `/tmp/output/`, referring to the pat
 The first time you execute the above command, Docker will pull the image from the Docker Registry and cache it. Any subsequent runs will utilize the cached image.
 Note this is a development image with all optional dependencies included.
 
-***
-
 <a id="credits"></a>
 ## Credits
 
@@ -148,7 +151,12 @@ Note this is a development image with all optional dependencies included.
 <a id="contributors"></a>
 ### Contributors
 
+**Assets:**
+
 SVG icons are thanks to [madwurmz](http://madwurmz.com).
+
+**Codebase:**
+
 Advices taken from Specy, Jurassimok, Skyventuree.
 Docker images by heronwr aka lambdaw.
 
@@ -162,5 +170,3 @@ This program is not being actively maintained by its original creator Tracey. As
 - jmmelko (French)
 - Kai00 (simplified chinese)
 - we are looking for a japanese translator
-
-***
