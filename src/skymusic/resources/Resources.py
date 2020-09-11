@@ -105,6 +105,7 @@ png_font_size = 36
 png_title_font_size = 48
 png_compress = 6
 
+MAX_FILENAME_LENGTH = 127
 MAX_NUM_FILES = 15
 
 ICON_DELIMITER = '\s'
