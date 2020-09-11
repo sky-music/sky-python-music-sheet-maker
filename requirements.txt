@@ -1,0 +1,5 @@
+Pillow
+mido>=1.2.9
+pyyaml
+requests
+importlib_resources; python_version < '3.8'
