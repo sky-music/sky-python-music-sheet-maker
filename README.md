@@ -2,7 +2,7 @@
 
 This program lets you make visual music sheets for Sky: Children of the Light. It will ask you a few questions, and does not require previous knowledge of the command line to run.
 
-More details at the [Sky-Music website] (https://sky-music.github.io).
+More details at the [Sky-Music website](https://sky-music.github.io).
 
 ## Table of contents
 
