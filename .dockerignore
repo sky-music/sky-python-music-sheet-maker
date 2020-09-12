@@ -1,7 +1,7 @@
 ## Exclude unnecessary development files from docker build
 .git*
 *.egg-info
-*venv
+**/venv
 *.md
 !README.md
 test_songs
