@@ -20,4 +20,4 @@ services:
             - SONG_INPUT_DIR=/tmp/input
             - SONG_OUTPUT_DIR=/tmp/output
         working_dir: /app-bundle/src/skymusic
-        network_mode: "bridge"
+        network_mode: "host"
