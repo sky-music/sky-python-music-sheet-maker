@@ -3,9 +3,9 @@ on:
   # set the workflow trigger to push and pull request events
   # only for dev branch
   push:
-    branches: "dev"
+    branches: dev
   pull_request:
-    branches: "dev"
+    branches: dev
 jobs:
   flake8_lint:
       env:
@@ -13,18 +13,18 @@ jobs:
         PYTHONPYCACHEPREFIX: "/dev/null"
       strategy:
         # by default, github cancels all in-progress jobs if matrix jobs fail
-        fail-fast: "false"
+        fail-fast: false
         matrix:
           os: [ubuntu-latest]
           python-version: [3.8, 3.7, 3.6]
-          experimental: "false"
+          experimental: false
       runs-on: ${{ matrix.os }}
       steps:
         - name: Setup environment
           uses: actions/checkout@v2
           with:
             repository: ${{ github.repository }}
-            persist-credentials: "false"
+            persist-credentials: false
           uses: actions/setup-python@v2
           with:
             python-version: ${{ matrix.python-version }}
