@@ -1,47 +1,47 @@
 name: flake8_lint
 on:
-    # set the workflow trigger to push and pull request events
-    # only for dev branch
-    push:
-        branches: "dev"
-    pull_request:
-        branches: "dev"
+  # set the workflow trigger to push and pull request events
+  # only for dev branch
+  push:
+    branches: "dev"
+  pull_request:
+    branches: "dev"
 jobs:
-    flake8_lint:
-        env:
-            PYTHONDONTWRITEBYTECODE: 1  
-            PYTHONPYCACHEPREFIX: "/dev/null"
-        strategy:
-            # by default, github cancels all in-progress jobs if matrix jobs fail
-            fail-fast: "false"
-            matrix:
-                os: [ubuntu-latest]
-                python-version: [3.8, 3.7, 3.6]
-                experimental: "false"
-        runs-on: ${{ matrix.os }}
-        steps:
-            - name: Install linting modules
-                uses: actions/checkout@v2
-                    with:
-                        repository: ${{ github.repository }}
-                        persist-credentials: "false"
-                uses: actions/setup-python@v2
-                    with:
-                        python-version: ${{ matrix.python-version }}
-                        architecture: "x64"k
-                run: 
-                    pip3 install --no-cache-dir flake8 codespell
-                    
-            - name: Python style check - black
-                run:
-                    if: matrix.python-version >= 3.6
-                        pip3 install --no-cache-dir black
-                        black --check . || true
-            - name: Python linting check - flake8         
-                run:
-                    # flake error codes reference (https://flake8.pycqa.org/en/latest/user/error-codes.html)
-                    # pycodestyle error codes reference (https://pycodestyle.pycqa.org/en/latest/intro.html#error-codes)
-                    flake8 . --count --exclude=*.md,.tox,.eggs,*.git,*.egg,__pycache__ --select=E9,F63,F7,F82,W6 --show-source --statistics
-            - name: Python spell check - codespell
-                run:
-                    codespell --quiet-level=2 || true 
+  flake8_lint:
+      env:
+        PYTHONDONTWRITEBYTECODE: 1
+        PYTHONPYCACHEPREFIX: "/dev/null"
+      strategy:
+        # by default, github cancels all in-progress jobs if matrix jobs fail
+        fail-fast: "false"
+        matrix:
+          os: [ubuntu-latest]
+          python-version: [3.8, 3.7, 3.6]
+          experimental: "false"
+      runs-on: ${{ matrix.os }}
+      steps:
+        - name: Install linting modules
+          uses: actions/checkout@v2
+            with:
+              repository: ${{ github.repository }}
+              persist-credentials: "false"
+          uses: actions/setup-python@v2
+            with:
+              python-version: ${{ matrix.python-version }}
+              architecture: "x64"
+          run:
+              pip3 install --no-cache-dir flake8 codespell
+
+        - name: Python style check - black
+          run:
+            if: matrix.python-version >= 3.6
+              pip3 install --no-cache-dir black
+              black --check . || true
+        - name: Python linting check - flake8
+          run:
+            # flake error codes reference (https://flake8.pycqa.org/en/latest/user/error-codes.html)
+            # pycodestyle error codes reference (https://pycodestyle.pycqa.org/en/latest/intro.html#error-codes)
+            flake8 . --count --exclude=*.md,.tox,.eggs,*.git,*.egg,__pycache__ --select=E9,F63,F7,F82,W6 --show-source --statistics
+        - name: Python spell check - codespell
+          run:
+            codespell --quiet-level=2 || true
