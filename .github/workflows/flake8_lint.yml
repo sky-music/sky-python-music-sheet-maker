@@ -20,7 +20,7 @@ jobs:
           experimental: "false"
       runs-on: ${{ matrix.os }}
       steps:
-        - name: Install linting modules
+        - name: Setup environment
           uses: actions/checkout@v2
           with:
             repository: ${{ github.repository }}
@@ -29,9 +29,9 @@ jobs:
           with:
             python-version: ${{ matrix.python-version }}
             architecture: "x64"
+        - name: Install linting modules
           run:
             pip3 install --no-cache-dir flake8 codespell
-
         - name: Python style check - black
           run:
             if: matrix.python-version >= 3.6
