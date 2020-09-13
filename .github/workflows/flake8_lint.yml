@@ -32,9 +32,9 @@ jobs:
             pip3 install --no-cache-dir flake8 codespell
         - name: Python style check - black
           if: matrix.python-version >= 3.6
-            run:
-              pip3 install --no-cache-dir black
-              black --check . || true
+          run:
+            pip3 install --no-cache-dir black
+            black --check . || true
         - name: Python linting check - flake8
           run:
             # flake error codes reference (https://flake8.pycqa.org/en/latest/user/error-codes.html)
