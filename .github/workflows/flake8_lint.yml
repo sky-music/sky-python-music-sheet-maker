@@ -32,14 +32,14 @@ jobs:
             pip3 install --no-cache-dir flake8 codespell
         - name: Python style check - black
           if: matrix.python-version >= 3.6
-          run:
+          run: |
             pip3 install --no-cache-dir black
             black --check . || true
         - name: Python linting check - flake8
           run:
             # flake error codes reference (https://flake8.pycqa.org/en/latest/user/error-codes.html)
             # pycodestyle error codes reference (https://pycodestyle.pycqa.org/en/latest/intro.html#error-codes)
-            flake8 . --count --exclude=*.md,.tox,.eggs,*.git,*.egg,__pycache__ --select=E9,F63,F7,F82,W6 --show-source --statistics
+            flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         - name: Python spell check - codespell
           run:
             codespell --quiet-level=2 || true
