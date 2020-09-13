@@ -2,7 +2,8 @@
 *.pyc
 *.pyo
 *.pyd
-*.github
+dist/*
+build/*
 /songs_out
 .DS_Store
 /venv
