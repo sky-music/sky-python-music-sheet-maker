@@ -17,7 +17,6 @@ jobs:
         matrix:
           os: [ubuntu-latest]
           python-version: [3.8, 3.7, 3.6]
-          experimental: false
       runs-on: ${{ matrix.os }}
       steps:
         - name: Setup environment
