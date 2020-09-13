@@ -22,15 +22,15 @@ jobs:
       steps:
         - name: Install linting modules
           uses: actions/checkout@v2
-            with:
-              repository: ${{ github.repository }}
-              persist-credentials: "false"
+          with:
+            repository: ${{ github.repository }}
+            persist-credentials: "false"
           uses: actions/setup-python@v2
-            with:
-              python-version: ${{ matrix.python-version }}
-              architecture: "x64"
+          with:
+            python-version: ${{ matrix.python-version }}
+            architecture: "x64"
           run:
-              pip3 install --no-cache-dir flake8 codespell
+            pip3 install --no-cache-dir flake8 codespell
 
         - name: Python style check - black
           run:
