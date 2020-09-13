@@ -31,8 +31,8 @@ jobs:
           run:
             pip3 install --no-cache-dir flake8 codespell
         - name: Python style check - black
-          run:
-            if: matrix.python-version >= 3.6
+          if: matrix.python-version >= 3.6
+            run:
               pip3 install --no-cache-dir black
               black --check . || true
         - name: Python linting check - flake8
