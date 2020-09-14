@@ -103,7 +103,7 @@ In contrast with the website or bot versions, the command-line version supports 
 
         -b/--batch_mode
 
-* Visual sheets generated after July, 2020 1st can be read again by the program for further modification. You will have to enter the artist again though.
+* visual sheets generated after July, 2020 1st can be read again by the program for further modification. you will have to enter the artist again though.
 
 Customized configrations for default directory are supported via command line flags, flags that are not passed or are not valid will reference their default fallback vaules defined in *command\_line\_player.py*:
 
