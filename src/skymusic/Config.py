@@ -29,8 +29,8 @@ def parse_args():
             help="set the batch song preference processing directory, defaults to batch_songs"
         )
         parser.add_argument(
-            "-f",
-            "--preference",
+            "-p",
+            "--pref_file",
             nargs="?",
             const="",
             help="set the default song preference file, defaults to `skymusic_preferences.yaml`"
@@ -90,7 +90,7 @@ def verify_path(path, prop="dir"):
 
 def get_configuration(args):
     config = {
-        "preference": None,
+        "pref_file": None,
         "song_dir_out": None,
         "song_dir_in": None,
         "batch_mode": args.batch_mode,
@@ -99,7 +99,7 @@ def get_configuration(args):
     }
 
     # re-setting dictionary key-val pairs to perserve NoneType when exception is catched
-    config["preference"] = verify_path(args.preference, "file")
+    config["pref_file"] = verify_path(args.pref_file, "file")
     config["song_dir_in"] = verify_path(args.in_dir)
     config["song_dir_out"] = verify_path(args.out_dir)
     config["batch_dir"] = verify_path(args.batch_dir)

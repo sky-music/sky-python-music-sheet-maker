@@ -24,27 +24,27 @@ else: #Executable, or pip installed
         os.makedirs(USER_FILES_ROOT)
 
 import yaml
-import skymusic.config
 from skymusic.music_sheet_maker import MusicSheetMaker
 from skymusic.communicator import Communicator, QueriesExecutionAbort
 from skymusic import Lang
+from skymusic import Config
 from skymusic.resources import Resources
 try:
     import readline
 except ModuleNotFoundError:
     pass  # probably Windows
 
-args = skymusic.config.parse_args()
-cfg = skymusic.config.get_configuration(args)
+args = Config.parse_args()
+cfg = Config.get_configuration(args)
 
 #=========================================
 #SETTINGS FOR ADVANCED USERS
 SKYJSON_URL = cfg["skyjson"] # To generate a temporary song link at sky-music.herokuapp.com. By default will be enabled on the Discord Music Cog but disabled on the command line (to avoid spamming this server). Always disabled if batch_mode is True
-SONG_DIR_IN = cfg["song_dir_in"] if cfg["song_dir_in"] is not None else os.path.join(USER_FILES_ROOT, 'test_songs') # Overrides defaut input song folder
-SONG_DIR_OUT = cfg["song_dir_out"] if cfg["song_dir_out"] is not None else os.path.join(USER_FILES_ROOT, 'songs_out') # Overrides defaut output song folder
+SONG_IN_DIR = cfg["song_dir_in"] or os.path.join(USER_FILES_ROOT, 'test_songs') # Overrides defaut input song folder
+SONG_OUT_DIR = cfg["song_dir_out"] or os.path.join(USER_FILES_ROOT, 'songs_out') # Overrides defaut output song folder
 BATCH_MODE = cfg["batch_mode"] # To process songs in a batch,stored as .yaml files
-BATCH_DIR = cfg["batch_dir"] if cfg["batch_dir"] is not None else os.path.join(USER_FILES_ROOT, 'batch_songs')
-PREFERENCES_PATH = cfg["preference"] if cfg["preference"] is not None else os.path.join(USER_FILES_ROOT, 'skymusic_preferences.yaml')
+BATCH_DIR = cfg["batch_dir"] or os.path.join(USER_FILES_ROOT, 'batch_songs')
+PREFERENCES_PATH = cfg["pref_file"] or os.path.join(USER_FILES_ROOT, 'skymusic_preferences.yaml')
 #==========================================
 
 class CommandLinePlayer:
@@ -199,7 +199,7 @@ class CommandLinePlayer:
 
 try:
     player = CommandLinePlayer(locale=Lang.guess_locale(), preferences_path=PREFERENCES_PATH)
-    maker = MusicSheetMaker(locale=Lang.guess_locale(), application_root=application_root, song_dir_in=SONG_DIR_IN, song_dir_out=SONG_DIR_OUT, enable_skyjson_url=(SKYJSON_URL and not BATCH_MODE))
+    maker = MusicSheetMaker(locale=Lang.guess_locale(), application_root=application_root, song_in_dir=SONG_IN_DIR, song_out_dir=SONG_OUT_DIR, enable_skyjson_url=(SKYJSON_URL and not BATCH_MODE))
 
     if BATCH_MODE:
 
