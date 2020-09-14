@@ -17,8 +17,8 @@ def parse_args():
             help="enable batch processing of preference .yaml files in the batch_dir"
         )
         mgroup.add_argument(
-            "-r",
-            "--json_recording",
+            "-u",
+            "--skyjson_url",
             action="store_true",
             help="enable conversion of the song to a recording stored in JSON format"
         )
@@ -95,7 +95,7 @@ def get_configuration(args):
         "song_dir_in": None,
         "batch_mode": args.batch_mode,
         "batch_dir": None,
-        "skyjson": args.json_recording
+        "skyjson_url": args.skyjson_url
     }
 
     # re-setting dictionary key-val pairs to perserve NoneType when exception is catched

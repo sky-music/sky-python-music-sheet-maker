@@ -39,7 +39,7 @@ cfg = Config.get_configuration(args)
 
 #=========================================
 #SETTINGS FOR ADVANCED USERS
-SKYJSON_URL = cfg["skyjson"] # To generate a temporary song link at sky-music.herokuapp.com. By default will be enabled on the Discord Music Cog but disabled on the command line (to avoid spamming this server). Always disabled if batch_mode is True
+SKYJSON_URL = cfg["skyjson_url"] # To generate a temporary song link at sky-music.herokuapp.com. By default will be enabled on the Discord Music Cog but disabled on the command line (to avoid spamming this server). Always disabled if batch_mode is True
 SONG_IN_DIR = cfg["song_dir_in"] or os.path.join(USER_FILES_ROOT, 'test_songs') # Overrides defaut input song folder
 SONG_OUT_DIR = cfg["song_dir_out"] or os.path.join(USER_FILES_ROOT, 'songs_out') # Overrides defaut output song folder
 BATCH_MODE = cfg["batch_mode"] # To process songs in a batch,stored as .yaml files
