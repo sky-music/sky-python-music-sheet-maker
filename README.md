@@ -121,11 +121,15 @@ Customized configrations for default directory are supported via command line fl
         -p/--pref_file <path/to/pref/file>
 
 * by default, conversion of the song to a music recording using JSON format is disabled. a link to hear the song being played on https://sky-music.herokuapp.com will be generated, to enable it setting the following flag:
-(Note: this requires the `requests` library, which can be installed via the `pip` package manager by running `pip install requests`)
+
 
         -r/--json_recording
 
 Note that to minimize strain to the skymusic node server, the `-r/--json_recording` and `-b/--batch_mode` flags are mutually exclusive, meaning that only either one of them can be passed to the module but not both. Further help can be invoked via the `-h/--help` flag.
+
+Note: json recording feature requires the `requests` library, which can be installed via the `pip` package manager by running:
+
+    pip install requests
 
 ***
 
