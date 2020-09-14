@@ -1,6 +1,6 @@
 # Contributing
 
-Contributions are welcomed from everyone. However, please abide by the following guidelines if possible when submitting a Github Pull Request on the sky-python-music-sheet-maker project:
+Contributions are welcomed from everyone. However, please adhere by the following guidelines if possible when submitting a Github Pull Request and working on the codebase for the sky-python-music-sheet-maker project:
 
 ## Pull requests and commits
 
@@ -13,5 +13,4 @@ Contributions are welcomed from everyone. However, please abide by the following
 
 * New additions to the codebase that are not classes should use a *CamelCase* naming scheme.
 * Otherwise class implementations should use a *flat case* nameing scheme separated by hyphens when appropriate.
-
 
