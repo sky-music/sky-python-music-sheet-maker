@@ -157,7 +157,7 @@ SVG icons are thanks to [madwurmz](http://madwurmz.com).
 
 **Codebase:**
 
-Advices taken from Specy, Jurassimok, Skyventuree.
+Various contributions from Specy-wot (html & js), Jurassimok (Setup.py), Skyventuree, heronwr (command-line arguments).
 
 Docker images by heronwr aka lambdaw.
 
