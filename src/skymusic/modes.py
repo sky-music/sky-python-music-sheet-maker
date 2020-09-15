@@ -33,8 +33,8 @@ class InputMode(Enum):
     def get_long_desc(self, locale='en_US'):
         return Lang.get_string(self.long_desc_yaml, locale)
 
-    def get_note_parser(self, locale='en_US'):
-        return self.note_parser_method(locale=locale)
+    def get_note_parser(self, *args, **kwargs):
+        return self.note_parser_method(*args, **kwargs)
 
 
 
@@ -86,8 +86,8 @@ class RenderMode(Enum):
     def get_short_desc(self, locale='en_US'):
         return Lang.get_string(self.short_desc_yaml, locale)
 
-    def get_note_parser(self, locale='en_US'):
-        return self.note_parser_method(locale=locale)
+    def get_note_parser(self, *args, **kwargs):
+        return self.note_parser_method(*args, **kwargs)
 
     def get_mime_type(self):
         return self.mime_type

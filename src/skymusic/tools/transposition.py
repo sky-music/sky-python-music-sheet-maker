@@ -8,7 +8,7 @@ THIS SCRIPTS IS COMPLETELY OBSOLETE AND SHOULD BE REWRITTEN
 """
 if __name__ == '__main__':    
     import os, sys
-    project_path = os.path.normpath(os.path.join(os.path.dirname(__file__), '../../../'))
+    project_path = os.path.normpath(os.path.join(os.path.dirname(__file__), '../../'))
     if project_path not in sys.path:
         sys.path.append(project_path)
 import os
@@ -129,7 +129,8 @@ while True:
     line = input("Type your notes here: ")
     if line == '':
         break
-    song_lines.append(line)
+    line = line.split(os.linesep)
+    song_lines += line
 
 """
 try:

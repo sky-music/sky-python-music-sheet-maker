@@ -119,6 +119,8 @@ REPEAT_INDICATOR = '*'
 BROKEN_HARP= 'X'
 SKYJSON_CHORD_DELAY = 50 #Delay in ms below which 2 notes are considered a chord
 DEFAULT_BPM = 220
+PARSING_START_OCTAVE = 1
+RENDERING_START_OCTAVE = 4
 
 MUSIC_MAKER_NAME = 'music_sheet_maker'
 MUSIC_COG_NAME = 'music_cog'
