@@ -8,7 +8,7 @@ class NoteParser:
     coordinate on Sky's 3*5 piano.
     """
 
-    def __init__(self, locale='en_US'):
+    def __init__(self, locale='en_US', start_octave=Resources.PARSING_START_OCTAVE):
 
         self.locale = locale
         self.rows = 3 #Can be overridden by set_dimensions()
@@ -31,7 +31,7 @@ class NoteParser:
 
         # Specify the default starting octave of the harp, for instance 1 (C1 D1 E1 etc.), or 4 (C4 D4 E4).
         #Octave-less notes will be assigned to this octave, e.g. F == F1
-        self.default_starting_octave = 1
+        self.default_starting_octave = start_octave
 
         # Compile regexes for notes to save before using
         # these regexes are used for validating whether an individual note is formatted correctly.

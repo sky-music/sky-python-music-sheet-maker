@@ -10,7 +10,7 @@ class AsciiInstrumentRenderer(instrument_renderer.InstrumentRenderer):
     def render_harp(self, instrument, note_parser=None):
 
         ascii_render = ''
-
+        
         if instrument.get_is_broken():
             ascii_render = Resources.BROKEN_HARP
         elif instrument.get_is_silent():
@@ -27,7 +27,6 @@ class AsciiInstrumentRenderer(instrument_renderer.InstrumentRenderer):
             ascii_render = ascii_render.rstrip(Resources.QUAVER_DELIMITER)
             
         return ascii_render
-
 
     def render_voice(self, instrument, render_mode):
         voice_render = f"{Resources.LYRIC_DELIMITER}{instrument.get_lyric()}"  # Lyrics marked as comments in output text files
