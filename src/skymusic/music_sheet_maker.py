@@ -653,8 +653,10 @@ class MusicSheetMaker:
         if not input_mode.get_is_chromatic():
             return None, 0
         else:
-
-            replacements = {'skip_number': Lang.get_string(f"recipient_specifics/skip_number/{recipient.get_name()}", self.locale)}
+            
+            recommended_octave_shift = Resources.PARSING_START_OCTAVE - 4
+            
+            replacements = {'recommended_octave_shift': recommended_octave_shift, 'skip_number': Lang.get_string(f"recipient_specifics/skip_number/{recipient.get_name()}", self.locale)}
             q_shift = self.communicator.send_stock_query('octave_shift', recipient=recipient,
                                                          replacements=replacements,
                                                          prerequisites=prerequisites)

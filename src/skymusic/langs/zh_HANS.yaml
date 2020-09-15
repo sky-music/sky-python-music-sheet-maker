@@ -285,7 +285,7 @@ stock_queries:
     help_text: |
       您使用的格式能定特定的音高。因此，此乐谱在游戏中不同的地点会发出不一样的音高。
   octave_shift:
-    foreword: 您是否要升音符的音高？
+    foreword: '您是否要升音符的音高？ Use {recommended_octave_shift} if your notes start at octave 4.'
     question: '升降音高 ({skip_number} 跳过)'
     afterword:
     input_tip: 输入-6 到 +6 之间的数字来升降音高

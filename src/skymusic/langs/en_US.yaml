@@ -285,7 +285,7 @@ stock_queries:
       You have used a musical notation that does impose the exact pitch of the notes.
       Hence the visual sheet will sound differently in different places in Sky.  This is called transposition.
   octave_shift:
-    foreword: Do you want to shift the pitch of your notes?
+    foreword: "Do you want to shift the pitch of your notes? Use {recommended_octave_shift} if your notes start at octave 4."
     question: 'Octave shift number ({skip_number} to skip)'
     afterword:
     input_tip: octave shift as an integer between -6 and +6

@@ -280,7 +280,7 @@ stock_queries:
       Votre notation musicale n'utilise pas la notion d'octave : la hauteur de vos notes est donc indéterminée.
       Votre partition risque de sonner différement à différents endroits du jeu. Indiquez une clef pour obliger les joueurs à respecter votre chanson.
   octave_shift:
-    foreword: Voulez-vous transposer vos notes ?
+    foreword: "Voulez-vous transposer vos notes ? Utilisez {recommended_octave_shift} si vos notes démarrent à l'octave 4."
     question: "Décalage d'octave ({skip_number} pour ne rien faire)"
     afterword:
     input_tip: décalage d'octave vers le haut ou le bas entre -6 et +6
