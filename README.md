@@ -83,7 +83,8 @@ As well as using QWERT ASDFG ZXCVB keys on the keyboard (like a piano), there ar
 - French do ré mi + octave number
 - Japanese do ré mi + octave number
 
-Note that for musical notations supporting octaves (such as English, Jianpu, and doremi), the starting octave is 1, by convention. Typing a note name without octave (e.g. F) implicitely assumes that it belongs to the starting octave (e.g. F1). So the full range of the piano write C1-C3. This convention is different from SkyStudio's which assumes that the piano range is C4-C6. Note that the absolute range depends on the instrument, so it's just a matter of convention.
+Note that for musical notations supporting octaves (such as English, Jianpu, and doremi), the starting octave is 1, by convention. Typing a note name without octave (e.g. F) implicitely assumes that it belongs to the starting octave (e.g. F1). However for notes belonging to the next octave (higher pitch), you will have to use the number 2 (C2, D2, E2, etc). So the full range of the piano write C1-C3.
+This convention is different from SkyStudio's which assumes that the instrument range is C4-C6 (this is true for the basic Sky piano, but not for other instruments such as the winter piano). If you're used to start the octave at 4 (C4, D4, E4...), then enter -3 when asked for an octave shift.
 
 You can type these directly in the command line prompt, but you are strongly advised to save the notes first in a text file. Text files are looked for by the program in the 'test_songs' folder. if you installed the program with pip, this folder must be moved in the Documents folder of your user home directory.
 
