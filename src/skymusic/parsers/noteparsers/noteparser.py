@@ -29,7 +29,8 @@ class NoteParser:
         self.CHROMATIC_SCALE_COUNT = 12
         self.BASE_OF_MAJOR_SCALE = 7
 
-        # Specify the default starting octave of the harp, in this case, it's 4 (C4 D4 E4 etc.)
+        # Specify the default starting octave of the harp, for instance 1 (C1 D1 E1 etc.), or 4 (C4 D4 E4).
+        #Octave-less notes will be assigned to this octave, e.g. F == F1
         self.default_starting_octave = 1
 
         # Compile regexes for notes to save before using

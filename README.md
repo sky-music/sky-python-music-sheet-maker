@@ -83,11 +83,13 @@ As well as using QWERT ASDFG ZXCVB keys on the keyboard (like a piano), there ar
 - French do ré mi + octave number
 - Japanese do ré mi + octave number
 
+Note that for musical notations supporting octaves (such as English, Jianpu, and doremi), the starting octave is 1, by convention. Typing a note name without octave (e.g. F) implicitely assumes that it belongs to the starting octave (e.g. F1). So the full range of the piano write C1-C3. This convention is different from SkyStudio's which assumes that the piano range is C4-C6. Note that the absolute range depends on the instrument, so it's just a matter of convention.
+
 You can type these directly in the command line prompt, but you are strongly advised to save the notes first in a text file. Text files are looked for by the program in the 'test_songs' folder. if you installed the program with pip, this folder must be moved in the Documents folder of your user home directory.
 
-The output will be HTML, SVG, or PNG, with small icons of the Sky keyboard. If you use Western notation or Jianpu notation, it will also convert to Sky notation in a text file.
+The output will be HTML, SVG, or PNG, with small icons of the Sky keyboard. If you use Western notation or Jianpu notation, it will also convert to Sky notation (ABC1-5) in a text file.
 
-After generating a sheet, you are encouraged to publish the file on https://sky-music.github.io
+After generating a sheet, you are encouraged to publish the file on <https://sky-music.github.io>
 
 <a id="configs"></a>
 ## Configurations
@@ -105,7 +107,7 @@ In contrast with the website or bot versions, the command-line version supports 
 
 * visual sheets generated after July, 2020 1st can be read again by the program for further modification. you will have to enter the artist again though.
 
-Customized configrations for default directory are supported via command line flags, flags that are not passed or are not valid will reference their default fallback vaules defined in *command\_line\_player.py*:
+Customized configurations for default directory are supported via command line flags, flags that are not passed or are not valid will reference their default fallback values defined in *command\_line\_player.py*:
 
 * input/output directories where the module will read from/write to can be defined by passing the following flag with the desired directory to *command\_line\_player.py* respectively:
 
@@ -123,9 +125,9 @@ Customized configrations for default directory are supported via command line fl
 * by default, conversion of the song to a music recording using JSON format is disabled. a link to hear the song being played on https://sky-music.herokuapp.com will be generated, to enable it setting the following flag:
 
 
-        -r/--json_recording
+        -u/--skyjson_url
 
-Note that to minimize strain to the skymusic node server, the `-r/--json_recording` and `-b/--batch_mode` flags are mutually exclusive, meaning that only either one of them can be passed to the module but not both. Further help can be invoked via the `-h/--help` flag.
+Note that to minimize strain to the <sky-music.herokuapp.com> server, the `-u/--skyjson_url` and `-b/--batch_mode` flags are mutually exclusive, meaning that only either one of them can be passed to the module but not both. Further help can be invoked via the `-h/--help` flag.
 
 Note: json recording feature requires the `requests` library, which can be installed via the `pip` package manager by running:
 
