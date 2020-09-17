@@ -1,4 +1,4 @@
-import os, io, re
+import os, io, re, importlib
 from skymusic.modes import InputMode, CSSMode, RenderMode, ReplyType, AspectRatio
 from skymusic.communicator import Communicator, QueriesExecutionAbort
 from skymusic.parsers.song_parser import SongParser
@@ -7,6 +7,8 @@ from skymusic.renderers.song_renderers import skyjson_sr
 from skymusic import Lang
 from skymusic.resources import Resources
 
+# placeholder for skyjson_sr if required by submodules
+requests = None
 
 class MusicSheetMakerError(Exception):
     def __init__(self, explanation):
@@ -120,6 +122,12 @@ class MusicSheetMaker:
                                      mode not in self.render_modes_disabled]
         self.music_cog_render_modes = [RenderMode.PNG, RenderMode.SKYJSON]
         self.enable_skyjson_url = enable_skyjson_url
+
+        if self.enable_skyjson_url:
+            # dynamic imports should be passed down from the top level calling function to avoid late exits, all modules loaded in sys.modules is inherited
+            requests = importlib.import_module('request')
+            # invalidate internal caches stored at sys.meta_path to make import recognize the module
+            importlib.invalidate_caches()
 
     def __getattr__(self, attr_name):
         """
@@ -653,9 +661,9 @@ class MusicSheetMaker:
         if not input_mode.get_is_chromatic():
             return None, 0
         else:
-            
+
             recommended_octave_shift = Resources.PARSING_START_OCTAVE - 4
-            
+
             replacements = {'recommended_octave_shift': recommended_octave_shift, 'skip_number': Lang.get_string(f"recipient_specifics/skip_number/{recipient.get_name()}", self.locale)}
             q_shift = self.communicator.send_stock_query('octave_shift', recipient=recipient,
                                                          replacements=replacements,
