@@ -1,4 +1,4 @@
-import os, io, re, importlib
+import os, io, re
 from skymusic.modes import InputMode, CSSMode, RenderMode, ReplyType, AspectRatio
 from skymusic.communicator import Communicator, QueriesExecutionAbort
 from skymusic.parsers.song_parser import SongParser
@@ -122,12 +122,6 @@ class MusicSheetMaker:
                                      mode not in self.render_modes_disabled]
         self.music_cog_render_modes = [RenderMode.PNG, RenderMode.SKYJSON]
         self.enable_skyjson_url = enable_skyjson_url
-
-        if self.enable_skyjson_url:
-            # dynamic imports should be passed down from the top level calling function to avoid late exits, all modules loaded in sys.modules is inherited
-            requests = importlib.import_module('request')
-            # invalidate internal caches stored at sys.meta_path to make import recognize the module
-            importlib.invalidate_caches()
 
     def __getattr__(self, attr_name):
         """

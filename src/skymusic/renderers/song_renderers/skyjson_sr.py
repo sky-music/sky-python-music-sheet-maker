@@ -1,4 +1,4 @@
-import io, json
+import io, json, importlib
 #import requests
 #from urllib.error import HTTPError, URLError
 #from urllib import parse, request
@@ -51,6 +51,10 @@ class SkyjsonSongRenderer(song_renderer.SongRenderer):
         return [json_buffer]
 
     def generate_url(self, json_buffer, api_key=Resources.skyjson_api_key):
+
+        # clears the sys.meta_path cache to reload packages(directory), does not really apply to top-level libraries
+        importlib.invalidate_caches()
+        import requests
 
         json_buffer.seek(0)
         json_dict = json.load(json_buffer)
