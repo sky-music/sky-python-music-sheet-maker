@@ -5,50 +5,55 @@ import os
 import sys
 import pathlib
 
-def parse_args():
+def parse_args(args=None):
+    parser = argparse.ArgumentParser()
+    # set batch mode and json recording uploads mutually exclusive to avoid strains on the server
+    mgroup = parser.add_mutually_exclusive_group()
+    mgroup.add_argument(
+        "-b",
+        "--batch_mode",
+        action="store_true",
+        help="enable batch processing of preference .yaml files in the batch_dir"
+    )
+    mgroup.add_argument(
+        "-u",
+        "--skyjson_url",
+        action="store_true",
+        help="enable conversion of the song to a recording stored in JSON format"
+    )
+    parser.add_argument(
+        "--batch_dir",
+        nargs="?",
+        const="",
+        help="set the batch song preference processing directory, defaults to batch_songs"
+    )
+    parser.add_argument(
+        "-p",
+        "--pref_file",
+        nargs="?",
+        const="",
+        help="set the default song preference file, defaults to `skymusic_preferences.yaml`"
+    )
+    parser.add_argument(
+        "--in_dir",
+        nargs="?",
+        const="",
+        help="set the input directory for song processing, defaults to `test_songs`"
+    )
+    parser.add_argument(
+        "--out_dir",
+        nargs="?",
+        const="",
+        help="set the output directory for song processing, defaults to `songs_out`"
+    )
+
     try:
-        parser = argparse.ArgumentParser()
-        # set batch mode and json recording uploads mutually exclusive to avoid strains on the server
-        mgroup = parser.add_mutually_exclusive_group()
-        mgroup.add_argument(
-            "-b",
-            "--batch_mode",
-            action="store_true",
-            help="enable batch processing of preference .yaml files in the batch_dir"
-        )
-        mgroup.add_argument(
-            "-u",
-            "--skyjson_url",
-            action="store_true",
-            help="enable conversion of the song to a recording stored in JSON format"
-        )
-        parser.add_argument(
-            "--batch_dir",
-            nargs="?",
-            const="",
-            help="set the batch song preference processing directory, defaults to batch_songs"
-        )
-        parser.add_argument(
-            "-p",
-            "--pref_file",
-            nargs="?",
-            const="",
-            help="set the default song preference file, defaults to `skymusic_preferences.yaml`"
-        )
-        parser.add_argument(
-            "--in_dir",
-            nargs="?",
-            const="",
-            help="set the input directory for song processing, defaults to `test_songs`"
-        )
-        parser.add_argument(
-            "--out_dir",
-            nargs="?",
-            const="",
-            help="set the output directory for song processing, defaults to `songs_out`"
-        )
-        return parser.parse_args()
-    except ValueError as err:
+        if args is None:
+            return parser.parse_args()
+        else:
+            return parser.parse_args(args)
+
+    except (ValueError, TypeError) as err:
         print(str(err))
         sys.exit(2) # On Unix, exit status 2 is used for command line syntax errors
 
@@ -88,21 +93,23 @@ def verify_path(path, prop="dir"):
         print(str(err))
         sys.exit(2)
 
-def get_configuration(args):
+# pargs - parsed arguments
+# args  - unparsed arguments
+def get_configuration(pargs):
     config = {
         "pref_file": None,
         "song_dir_out": None,
         "song_dir_in": None,
-        "batch_mode": args.batch_mode,
+        "batch_mode": pargs.batch_mode,
         "batch_dir": None,
-        "skyjson_url": args.skyjson_url
+        "skyjson_url": pargs.skyjson_url
     }
 
     # re-setting dictionary key-val pairs to perserve NoneType when exception is catched
-    config["pref_file"] = verify_path(args.pref_file, "file")
-    config["song_dir_in"] = verify_path(args.in_dir)
-    config["song_dir_out"] = verify_path(args.out_dir)
-    config["batch_dir"] = verify_path(args.batch_dir)
+    config["pref_file"] = verify_path(pargs.pref_file, "file")
+    config["song_dir_in"] = verify_path(pargs.in_dir)
+    config["song_dir_out"] = verify_path(pargs.out_dir)
+    config["batch_dir"] = verify_path(pargs.batch_dir)
 
     return config
 
