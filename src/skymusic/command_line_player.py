@@ -199,7 +199,7 @@ class CommandLinePlayer:
 
 try:
     player = CommandLinePlayer(locale=Lang.guess_locale(), preferences_path=PREFERENCES_PATH)
-    maker = MusicSheetMaker(locale=Lang.guess_locale(), application_root=application_root, song_in_dir=SONG_IN_DIR, song_out_dir=SONG_OUT_DIR, enable_skyjson_url=(SKYJSON_URL and not BATCH_MODE))
+    maker = MusicSheetMaker(locale=Lang.guess_locale(), application_root=application_root, song_in_dir=SONG_IN_DIR, song_out_dir=SONG_OUT_DIR, skyjson_url_api=(SKYJSON_URL if not BATCH_MODE else None))
 
     if BATCH_MODE:
 

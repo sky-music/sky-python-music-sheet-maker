@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 import argparse
 import os
 import sys
@@ -18,8 +17,9 @@ def parse_args(args=None):
     mgroup.add_argument(
         "-u",
         "--skyjson_url",
-        action="store_true",
-        help="enable conversion of the song to a recording stored in JSON format"
+        nargs="?",
+        const=True,
+        help="enable conversion of the song to a recording stored in JSON format using the API key of sky-music.herokuapp.com"
     )
     parser.add_argument(
         "--batch_dir",

@@ -47,7 +47,6 @@ class SkyjsonSongRenderer(song_renderer.SongRenderer):
         return [json_buffer]
 
     def generate_url(self, json_buffer, api_key=Resources.skyjson_api_key):
-
         # clears the sys.meta_path cache to reload packages(directory), does not really apply to top-level libraries
         importlib.invalidate_caches()
         try:
@@ -55,7 +54,7 @@ class SkyjsonSongRenderer(song_renderer.SongRenderer):
         except (ImportError, ModuleNotFoundError):
             print("\n***WARNING: 'requests' package not installed: could not generate temp link to sky-music.herokuapp.com")
         
-        else:            
+        else:
             json_buffer.seek(0)
             json_dict = json.load(json_buffer)
             json_dict = {'API_KEY': api_key, 'song': json_dict}
