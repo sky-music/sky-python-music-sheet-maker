@@ -1,8 +1,4 @@
 import io, json, importlib
-#import requests
-#from urllib.error import HTTPError, URLError
-#from urllib import parse, request
-#import socket
 from . import song_renderer
 from skymusic import Lang
 from skymusic.renderers.instrument_renderers.skyjson_ir import SkyjsonInstrumentRenderer
@@ -54,34 +50,25 @@ class SkyjsonSongRenderer(song_renderer.SongRenderer):
 
         # clears the sys.meta_path cache to reload packages(directory), does not really apply to top-level libraries
         importlib.invalidate_caches()
-        import requests
-
-        json_buffer.seek(0)
-        json_dict = json.load(json_buffer)
-        json_dict = {'API_KEY': api_key, 'song': json_dict}
-
-        headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
         try:
-            rep = requests.post(url=Resources.skyjson_api_url, json=json_dict, headers=headers, timeout=5)
-            url = rep.text
-
-        except (requests.ConnectionError, requests.HTTPError, requests.exceptions.ReadTimeout) as err:
-            print('\n*** WARNING:'+Lang.get_string("warnings/skyjson_url_connection", self.locale)+':')
-            print(err)
-            url = None
-        '''
-        #req = request.Request(url=Resources.skyjson_api_url, data=json_dict.encode('ascii'), headers=headers, method='POST')
-        try:
-            response = request.urlopen(req, timeout=10)
-            url = str(response.read())
-        except (URLError, socket.timeout) as err:
-            print('\n*** WARNING:'+Lang.get_string("warnings/skyjson_url_connection", self.locale)+':')
-            print(err)
-            url = None
-        except HTTPError:
-            print(err)
-            url = None
-        '''
-
-        return url
+            import requests
+        except (ImportError, ModuleNotFoundError):
+            print("\n***WARNING: 'requests' package not installed: could not generate temp link to sky-music.herokuapp.com")
+        
+        else:            
+            json_buffer.seek(0)
+            json_dict = json.load(json_buffer)
+            json_dict = {'API_KEY': api_key, 'song': json_dict}
+    
+            headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+            try:
+                rep = requests.post(url=Resources.skyjson_api_url, json=json_dict, headers=headers, timeout=5)
+                url = rep.text
+    
+            except (requests.ConnectionError, requests.HTTPError, requests.exceptions.ReadTimeout) as err:
+                print('\n*** WARNING:'+Lang.get_string("warnings/skyjson_url_connection", self.locale)+':')
+                print(err)
+                url = None
+    
+            return url
 
