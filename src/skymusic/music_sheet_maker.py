@@ -105,7 +105,7 @@ class SongBundle:
 
 class MusicSheetMaker:
 
-    def __init__(self, locale='en_US', application_root=None, song_in_dir=None, song_out_dir=None, skyjson_url_api=False):
+    def __init__(self, locale='en_US', application_root=None, song_in_dir=None, song_out_dir=None, skyjson_url_api=None):
         self.name = Resources.MUSIC_MAKER_NAME
         self.locale = self.set_locale(locale)
         self.communicator = Communicator(owner=self, locale=self.locale)
