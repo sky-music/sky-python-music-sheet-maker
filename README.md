@@ -123,10 +123,10 @@ Customized configurations for default directory are supported via command line f
 
         -p/--pref_file <path/to/pref/file>
 
-* by default, conversion of the song to a music recording using JSON format is disabled. a link to hear the song being played on https://sky-music.herokuapp.com will be generated, to enable it setting the following flag:
+* by default, conversion of the song to a music recording using JSON format is disabled. A link to hear the song being played on https://sky-music.herokuapp.com can be generated, to enable it setting the following flag with the website API key (this key will be given to trusted players):
 
 
-        -u/--skyjson_url
+        -u/--skyjson_url <API_KEY>
 
 Note that to minimize strain to the <sky-music.herokuapp.com> server, the `-u/--skyjson_url` and `-b/--batch_mode` flags are mutually exclusive, meaning that only either one of them can be passed to the module but not both. Further help can be invoked via the `-h/--help` flag.
 

@@ -39,7 +39,7 @@ cfg = Config.get_configuration(args)
 
 #=========================================
 #SETTINGS FOR ADVANCED USERS
-SKYJSON_URL = cfg["skyjson_url"] # To generate a temporary song link at sky-music.herokuapp.com. By default will be enabled on the Discord Music Cog but disabled on the command line (to avoid spamming this server). Always disabled if batch_mode is True
+SKYJSON_URL = cfg["skyjson_url"] # True / None / <alphanumeric> value. To generate a temporary song link at sky-music.herokuapp.com. By default will be enabled on the Discord Music Cog but disabled on the command line (to avoid spamming this server). Always disabled if batch_mode is True
 SONG_IN_DIR = cfg["song_dir_in"] or os.path.join(USER_FILES_ROOT, 'test_songs') # Overrides defaut input song folder
 SONG_OUT_DIR = cfg["song_dir_out"] or os.path.join(USER_FILES_ROOT, 'songs_out') # Overrides defaut output song folder
 BATCH_MODE = cfg["batch_mode"] # To process songs in a batch,stored as .yaml files
@@ -199,7 +199,7 @@ class CommandLinePlayer:
 
 try:
     player = CommandLinePlayer(locale=Lang.guess_locale(), preferences_path=PREFERENCES_PATH)
-    maker = MusicSheetMaker(locale=Lang.guess_locale(), application_root=application_root, song_in_dir=SONG_IN_DIR, song_out_dir=SONG_OUT_DIR, enable_skyjson_url=(SKYJSON_URL and not BATCH_MODE))
+    maker = MusicSheetMaker(locale=Lang.guess_locale(), application_root=application_root, song_in_dir=SONG_IN_DIR, song_out_dir=SONG_OUT_DIR, skyjson_url_api=(SKYJSON_URL if not BATCH_MODE else None))
 
     if BATCH_MODE:
 

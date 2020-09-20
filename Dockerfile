@@ -36,8 +36,7 @@ RUN set -eu pipefall \
         yaml-dev \
         cython \
     && cd /app-bundle \
-    && python3 -B setup.py bdist_wheel \
-    && python3 -B -m pip --no-cache-dir install "dist/${PKGNAME}"*"" \
+    && python3 -B -m pip --no-cache-dir install .[extra] \
     && find /usr/local -depth \
         \( \
             \( -type d -a \( -name test -o -name tests -o -name idle_test -o -name __pycache__ \) \) \

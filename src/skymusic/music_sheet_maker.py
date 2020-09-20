@@ -7,6 +7,8 @@ from skymusic.renderers.song_renderers import skyjson_sr
 from skymusic import Lang
 from skymusic.resources import Resources
 
+# placeholder for skyjson_sr if required by submodules
+requests = None
 
 class MusicSheetMakerError(Exception):
     def __init__(self, explanation):
@@ -103,7 +105,7 @@ class SongBundle:
 
 class MusicSheetMaker:
 
-    def __init__(self, locale='en_US', application_root=None, song_in_dir=None, song_out_dir=None, enable_skyjson_url=False):
+    def __init__(self, locale='en_US', application_root=None, song_in_dir=None, song_out_dir=None, skyjson_url_api=None):
         self.name = Resources.MUSIC_MAKER_NAME
         self.locale = self.set_locale(locale)
         self.communicator = Communicator(owner=self, locale=self.locale)
@@ -119,7 +121,7 @@ class MusicSheetMaker:
         self.render_modes_enabled = [mode for mode in self.render_modes_enabled if
                                      mode not in self.render_modes_disabled]
         self.music_cog_render_modes = [RenderMode.PNG, RenderMode.SKYJSON]
-        self.enable_skyjson_url = enable_skyjson_url
+        self.skyjson_url_api = skyjson_url_api
 
     def __getattr__(self, attr_name):
         """
@@ -330,8 +332,8 @@ class MusicSheetMaker:
         song_bundle = self.render_song(recipient=recipient, render_modes=render_modes, aspect_ratio=aspect_ratio, song_bpm=song_bpm)
 
         # 14. Sends an url from sky-music.herokuapp.com
-        if self.enable_skyjson_url:
-            self.send_json_url(recipient=recipient, song_bundle=song_bundle)
+        if self.skyjson_url_api:
+            self.send_json_url(recipient=recipient, song_bundle=song_bundle, skyjson_url_api=self.skyjson_url_api)
 
         # 15. Advertises for the Discord version
         if self.is_command_line(recipient):
@@ -653,9 +655,9 @@ class MusicSheetMaker:
         if not input_mode.get_is_chromatic():
             return None, 0
         else:
-            
+
             recommended_octave_shift = Resources.PARSING_START_OCTAVE - 4
-            
+
             replacements = {'recommended_octave_shift': recommended_octave_shift, 'skip_number': Lang.get_string(f"recipient_specifics/skip_number/{recipient.get_name()}", self.locale)}
             q_shift = self.communicator.send_stock_query('octave_shift', recipient=recipient,
                                                          replacements=replacements,
@@ -891,13 +893,15 @@ class MusicSheetMaker:
             return i_song_files, None
 
 
-    def send_json_url(self, recipient, song_bundle, skyjson_api_key=None, prerequisites=None, execute=True):
+    def send_json_url(self, recipient, song_bundle, skyjson_url_api=None, prerequisites=None, execute=True):
 
         json_buffers = song_bundle.get_buffers(RenderMode.SKYJSON)
 
         if json_buffers:
 
-            url = skyjson_sr.SkyjsonSongRenderer(locale=self.locale).generate_url(json_buffers[0], skyjson_api_key)
+            api_key = Resources.skyjson_api_key if skyjson_url_api is True else skyjson_url_api
+            
+            url = skyjson_sr.SkyjsonSongRenderer(locale=self.locale).generate_url(json_buffers[0], api_key)
 
             replacements={'url': url}
 
