@@ -284,7 +284,7 @@ stock_queries:
       Bạn đã sử dụng hệ kí tự nhạc mà cho phép bạn có thể xác định độ cao thấp chính xác của nốt nhạc.
       Tuy nhiên thì bảng nhạc trực quan có thể có âm khác tùy vào tùy nơi trong Sky.
   octave_shift:
-    foreword: "Bạn có muốn chỉnh độ cao thấp của nốt nhạc không? Use {recommended_octave_shift} if your notes start at octave 4."
+    foreword: "Bạn có muốn chỉnh độ cao thấp của nốt nhạc không? Sử dụng {recommended_octave_shift} nếu nốt nhạc bắt đầu tông nhịp là 4."
     question: Chỉnh quãng tám (để trống hoặc nhập 0 để bỏ qua)
     afterword:
     input_tip: chỉnh quãng tám bằng số nguyên từ -6 đến +6
