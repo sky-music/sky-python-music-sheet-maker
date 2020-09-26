@@ -1,20 +1,13 @@
-# ======================================================================
 # Bất kì ai, là người có hiểu biết về ngôn ngữ Việt Nam, đều có thể đóng
-# góp cho bản dịch này.
-# Lần cuối dịch: 06/29/2020 
-# Người đóng góp: skyventuree
-# Nếu bạn vừa chỉnh sửa bản dịch này, hãy chỉnh sửa luôn cả ngày dịch và
-# thêm tên bạn vào phần người đóng góp, cho dù bạn chỉ dịch được một
-# phần nhỏ của bản dịch này. Cảm ơn bạn đã tham gia đóng góp!
-# ======================================================================
+# góp cho bản dịch này. Cảm ơn bạn đã tham gia đóng góp!
 # Only developer(s) can add new localization string to this translation.
 warnings:
   jianpu_pause: "Ký hiệu Jianpu được sử dụng: đặt '0' như là ký tự ngắt quãng thay vì '{pause}'. Hãy chắc chắn rằng nốt bạn nhập vào tuân theo quy luật này."
   jianpu_quaver_delimiter: "Ký hiệu Jianpu được sử dụng: đặt '{jianpu_quaver_delimiter}' như là vùng phân định run nôt nhạc Quaver thay vì '{quaver_delimiter}'. Hãy chắc chắn rằng nốt bạn nhập vào tuân theo quy luật này."
-  skyjson_url_connection: "Connection error when trying to get url from sky-music.herokuapp.com"  
+  skyjson_url_connection: "Đã xảy ra lỗi khi lấy URL từ sky-music.herokuapp.com"  
 words:
-  yes_word: yes
-  no_word: no
+  yes_word: Có
+  no_word: Không
 recipient_specifics:
   skip:
     command_line: bỏ trống và bấm Enter
@@ -25,16 +18,16 @@ recipient_specifics:
     music_cog: trả lời với phím Space hoặc
     sky_music_website: bở trống hoặc nhập và bấm trả lời
   all_modes:
-    command_line: nhập các lựa chọn đặc cách nhau bởi dấu phẩy, or 'all' to select all formats
+    command_line: nhập các lựa chọn đặc cách nhau bởi dấu phẩy, hoặc 'all' để chọn tất cả.
     music_cog: 
     sky_music_website: 
 instrument:
   normal:
-    short_desc: Normal instrument
-    long_desc: "Normal instrument"
+    short_desc: Nhạc cụ thường
+    long_desc: "Nhạc cụ thường"
   drum:
-    short_desc: Drums
-    long_desc: "Drums"
+    short_desc: Trống
+    long_desc: "Trống"
 input_mode:
   skykeyboard:
     short_desc: Bàn phím Sky 
@@ -157,16 +150,16 @@ stock_queries:
       - Dấu thăng "#" và dấu giáng "b" (nửa cung) được hỗ trợ cho hệ kí tự Phương Tây và Jianpu.
   instrument_type:
     foreword:
-    question: Please choose your instrument
+    question: Vui lòng chọn nhạc cụ của bạn
     afterword:
-    input_tip: choose one instrument
+    input_tip: chọn một nhạc cụ
     help_text: |
-      The drum is special because it only has 2 rows and 4 columns
+      Trống là nhạc cụ đặc biệt vì chúng chỉ gồm 2 hàng 4 cột
   render_modes:
     foreword:
     question: Hãy chọn các định dạng xuất bản đầu ra (rendering formats). {all_modes}
     afterword:
-    input_tip: Chọn một hoặc nhiều hộp thoại. Add a text format to edit your song notes later.
+    input_tip: Chọn một hoặc nhiều hộp thoại. Thêm một định dạng văn bản để thay đổi nốt bài nhạc sau này.
     help_text: |
       Bảng nhạc trực quan có thể xuất ra thành nhiều định dạng.
       Hãy chọn những tùy chọn bạn muốn.
@@ -186,12 +179,12 @@ stock_queries:
     help_text: |
       Bạn đã chọn định dạng đầu ra (như Midi) yêu cầu tùy chọn tốc độ để chơi bài hát. Tốc độ này được biểu diễn bằng nhịp trên phút. Hãy nhập một số nguyên từ 12 đến 1200.
   keep_meta:
-    foreword: "We have found metadata for the song in your input"
-    question: 'Do you want to keep this information?'
+    foreword: "Tìm thấy siêu dữ liệu từ bài hát bạn nhập vào"
+    question: 'Bạn có muốn giữ lại thông tin này không?'
     afterword:
-    input_tip: 'yes/no question'
+    input_tip: 'câu hỏi có/không'
     help_text: |
-      We have found metadata for the song, such as the title, author, etc, in your input. Do you want to keep it (yes), or enter new information (no)?
+      Tôi tìm được siêu dữ liệu (metadata) từ bài hát của bạn, như là tiêu đề, người sáng tác,... từ nguồn bạn nhập vào. Bạn có muốn giữ nó (có), hay nhập thông tin mới (không)?
   song_title:
     foreword:
     question: Tiêu đề bài hát là gì?
@@ -291,7 +284,7 @@ stock_queries:
       Bạn đã sử dụng hệ kí tự nhạc mà cho phép bạn có thể xác định độ cao thấp chính xác của nốt nhạc.
       Tuy nhiên thì bảng nhạc trực quan có thể có âm khác tùy vào tùy nơi trong Sky.
   octave_shift:
-    foreword: "Bạn có muốn chỉnh độ cao thấp của nốt nhạc không? Use {recommended_octave_shift} if your notes start at octave 4."
+    foreword: "Bạn có muốn chỉnh độ cao thấp của nốt nhạc không? Sử dụng {recommended_octave_shift} nếu nốt nhạc bắt đầu tông nhịp là 4."
     question: Chỉnh quãng tám (để trống hoặc nhập 0 để bỏ qua)
     afterword:
     input_tip: chỉnh quãng tám bằng số nguyên từ -6 đến +6
@@ -346,13 +339,13 @@ stock_queries:
     help_text:  
   skyjson_url:
     foreword:
-    question: 'You can listen to your song being played by our partner website at: <{url}>'
+    question: 'Bạn có thể nghe bài hát của bạn được phát tại trang web này: <{url}>'
     afterword:
-    input_tip: click OK to acknowledge
+    input_tip: bấm OK để tiếp tục
     help_text:
   discord_ad:
     foreword: '======================================='
-    question: 'This program is also available on Discord at: https://discord.gg/thatskygame'
-    afterword: 'To call the Bot from any channel, say this: !song'
-    input_tip: click OK to acknowledge
+    question: 'Phần mềm này còn có trên Discord chính thức của Sky tại: https://discord.gg/thatskygame'
+    afterword: 'Để gọi phần mềm này ở bất kì kênh nào, hãy nhắn: !song'
+    input_tip: bấm OK để tiếp tục
     help_text:
