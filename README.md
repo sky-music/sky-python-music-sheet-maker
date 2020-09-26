@@ -69,7 +69,7 @@ Executable binaries are also available for download at <https://sky-music.github
 <a id="running"></a>
 ### Running the script
 
-    python <path to installation folder>/sky-python-music-sheet-maker/src/skymusic/command_line_player.py
+    python <path/to/installation/folder>/sky-python-music-sheet-maker/src/skymusic/command_line_player.py
 
 If you have installed the program by pip, just type: `skymusic` instead.
 
@@ -201,7 +201,7 @@ This program is not being actively maintained by its original creator Tracey. As
 ```
 MIT License
 
-Copyright (c) 2019 Tracey
+Copyright (c) 2020 Tracey
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
