@@ -187,7 +187,7 @@ This program is not being actively maintained by its original creator Tracey. As
 
 **Translators:**
 
-- jdewfiez (Vietnamese)
+- skyventuree, a.k.a. こじめ (Vietnamese)
 - jmmelko (French)
 - Kai00 (simplified chinese)
 - we are looking for a japanese translator
