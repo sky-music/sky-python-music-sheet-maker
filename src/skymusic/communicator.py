@@ -49,9 +49,7 @@ class QueriesExecutionAbort(Exception):
         return f"{self.__class__.__name__}, queries={queries_str}, explanations={self.explanations}"
 
     def __str__(self):
-        return str(self.queries)
-
-    pass
+        return str(self.explanations)
 
 
 class Communicator:

@@ -318,9 +318,8 @@ stock_queries:
     input_tip: click OK to acknowledge
     help_text:
   many_errors:
-    foreword:
-    question: '*WARNING*: Your song contains many errors.'
-    afterword: |
+    foreword: |
+      *WARNING*: Your song contains many errors.
       Please check the following:
       
       - If you have specified the octave number, it must be between 1 and 3. If not, try again with an octave shift.
@@ -328,18 +327,20 @@ stock_queries:
       - Your song is free of typos. Please check this website for full instructions: 
       
       <https://sky-music.github.io/make-your-own-sheet.html>
-    input_tip: click OK to acknowledge
+    question: Do you want to continue anyway?
+    afterword: 
+    input_tip: 'yes/no question'
     help_text:
   empty_song:
-    foreword:
-    question: '*WARNING*: Your song is empty'
-    afterword: |
+    foreword: |
+      *WARNING*: Your song is empty!
       Please check the following:
       
       - You have entered at least one valid note
       - If you entered an HTML visual sheet file, make sure it has been generated after the 1st July 2020 and contains the tag <div id='ascii' hidden>
-      
-    input_tip: click OK to acknowledge
+    question: Do you want to continue anyway?
+    afterword: 
+    input_tip: 'yes/no question'    
     help_text:
   skyjson_url:
     foreword:

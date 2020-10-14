@@ -304,7 +304,10 @@ class MusicSheetMaker:
         #self.parse_song(recipient) # EXPERIMENTAL
 
         # 8. Displays error ratio
-        (i_error, res) = self.display_error_ratio(recipient=recipient, prerequisites=[q_notes, q_mode, q_shift])
+        (i_error, ok) = self.display_error_ratio(recipient=recipient, prerequisites=[q_notes, q_mode, q_shift])
+        
+        if i_error and not ok:
+            raise QueriesExecutionAbort([i_error],'Execution aborted by the player.')
 
         # 9. Asks for render modes
         (q_render, render_modes) = self.ask_render_modes(recipient=recipient)
@@ -656,7 +659,7 @@ class MusicSheetMaker:
             return None, 0
         else:
 
-            recommended_octave_shift = Resources.PARSING_START_OCTAVE - 4
+            recommended_octave_shift = '{:d}/{:d}'.format(Resources.PARSING_START_OCTAVE - 3, Resources.PARSING_START_OCTAVE - 4)
 
             replacements = {'recommended_octave_shift': recommended_octave_shift, 'skip_number': Lang.get_string(f"recipient_specifics/skip_number/{recipient.get_name()}", self.locale)}
             q_shift = self.communicator.send_stock_query('octave_shift', recipient=recipient,

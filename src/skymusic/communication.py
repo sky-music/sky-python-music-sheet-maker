@@ -100,6 +100,8 @@ class Reply:
         elif isinstance(self.query, QueryChoice):
             index = self.query.get_answer_index() #QueryChoices always have limits
             self.result = limits[index]
+        elif isinstance(self.query, Information):
+            self.result = True
         else:#QueryOpen
             if self.query.get_reply_type() == ReplyType.NUMBER:
                 try:

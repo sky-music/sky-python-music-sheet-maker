@@ -314,9 +314,9 @@ stock_queries:
     input_tip: cliquez sur OK pour passer
     help_text:
   many_errors:
-    foreword:
-    question: "*ATTENTION*: Le décodage de votre chanson a généré beaucoup d'erreurs."
-    afterword: |
+    foreword: |
+      *ATTENTION*: Le décodage de votre chanson a généré beaucoup d'erreurs.
+      
       Veuillez vérifier les points suivants:
     
       - Si vous avez spécifié l'octave, il doit être entre 1 et 3. Sinon, recommencez en utilisant le décalage d'octave.
@@ -324,18 +324,20 @@ stock_queries:
       - Que votre chanson ne contient pas d'erreur de frappe. Veuillez consulter ce site web pour plus d'infos: 
     
       <https://sky-music.github.io/make-your-own-sheet.html>
-    input_tip: cliquez sur OK pour passer
+    question: Voulez-vous quand même continuer ?
+    afterword: 
+    input_tip: 'oui/non'
     help_text:
   empty_song:
-    foreword:
-    question: '*WARNING*: Your song is empty'
-    afterword: |
-      Please check the following:
+    foreword: |
+      *ATTENTION*: Votre chanson est vide !
+      Merci de vérifier que :
       
-      - You have entered at least one valid note
-      - If you entered an HTML visual sheet file, make sure it has been generated after the 1st July 2020 and contains the tag <div id='ascii' hidden>
-      
-    input_tip: click OK to acknowledge
+      - Vous avez entré au moins 1 note valide
+      - Si avez chargé une portée visuelle en HTML, vérifiez qu'elle est postérieure au 1er Juillet 2020 (son code doit contenir la balise <div id='ascii' hidden>).
+    question: 
+    afterword: 
+    input_tip: 'oui/non'
     help_text:
   skyjson_url:
     foreword:
