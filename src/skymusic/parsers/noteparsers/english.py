@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 import re
-
+from collections import OrderedDict
 from . import noteparser
-
 
 class English(noteparser.NoteParser):
 
@@ -14,8 +13,10 @@ class English(noteparser.NoteParser):
                                      'Gb': 6, 'G': 7, 'G#': 8, 'Ab': 8, 'A': 9, 'A#': 10, 'Bb': 10, 'B': 11}
 
         oct_int = self.get_default_starting_octave()
-        
+        self.INVERSE_CHROMATIC_SCALE_DICT = {self.CHROMATIC_SCALE_DICT[k]:k for k in reversed(OrderedDict(self.CHROMATIC_SCALE_DICT))}
         self.MAJOR_NOTES = ['C', 'D', 'E', 'F', 'G', 'A', 'B']
+        #self.MAJOR_NOTES = list(OrderedDict({k:None for k in [k.strip('#').strip('b') for k in self.CHROMATIC_SCALE_DICT.keys()]}).keys())
+        
         self.inverse_position_map = {}
         for i in range(self.get_row_count()):
             for j in range(self.get_column_count()):

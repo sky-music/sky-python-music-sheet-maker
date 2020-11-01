@@ -4,8 +4,8 @@ warnings:
   jianpu_quaver_delimiter: "简谱模式使用中:设定 '{jianpu_quaver_delimiter}' 为八分音符链接符号 '{quaver_delimiter}'.请确认您的输入遵守该条件."
   skyjson_url_connection: "Connection error when trying to get url from sky-music.herokuapp.com"
 words:
-  yes_word: yes
-  no_word: no
+  yes_word: 'yes'
+  no_word: 'no'
 recipient_specifics:
   skip:
     command_line: 留空以及按下回车键

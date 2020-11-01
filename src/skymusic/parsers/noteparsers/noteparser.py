@@ -234,7 +234,7 @@ class NoteParser:
         else:
             raise KeyError(f"ParsingError: Interval {semitone_interval} is not in the major scale.")
 
-    def calculate_coordinate_for_note(self, note, song_key='C', note_shift=0, is_finding_key=False):
+    def calculate_coordinate_for_note(self, note, song_key=Resources.DEFAULT_KEY, note_shift=0, is_finding_key=False):
 
         """
 

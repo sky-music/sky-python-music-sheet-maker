@@ -13,63 +13,6 @@ class JsonSongParser(song_parser.SongParser):
         super().__init__(maker=maker, silent_warnings=silent_warnings)
         self.skyjson_chord_delay = Resources.SKYJSON_CHORD_DELAY #Delay in ms below which 2 notes are considered a chord
         self.music_theory = music_theory.MusicTheory(self)
-
-
-    def analyze_tempo(self, times):
-        
-        def find_barycenter(t, y, i0, di):
-           
-            while len(t) < 2*di+1:
-                di = di - 1
-            if di < 0:
-                return None
-            
-            dt = t[1] - t[0]
-            tmin = t[0]
-            nmax = 10
-            
-            n = 0
-            iG = i0
-            iG_old = iG - 10
-            while (iG-iG_old) > 1 and n < nmax:            
-                i1 = max([0,iG-di])
-                i2 = min([len(t),iG+di])
-                y_band = y[i1:i2+1]
-                t_band = t[i1:i2+1]
-                iG_old = iG
-                tG = sum([y*t for (t,y) in zip(t_band, y_band)])/sum(y_band)
-                iG = round((tG - tmin)/dt)
-                n += 1                
-            y[i1:i2+1] = [0]*len(y[i1:i2+1])          
-            return tG 
-        
-        diffs = [times[i] - times[i-1] for i in range(1, len(times))]
-        
-        div_resol = 3
-        hbin = self.skyjson_chord_delay / div_resol
-        num_slots = 2 + int(max(diffs) / hbin)
-        
-        y = [0]*num_slots
-        t = [i*hbin for i in range(num_slots)]
-        
-        for diff in diffs: #histogram starting from t=0
-            y[1+int(diff/hbin)] += 1
-            
-        num_peaks = 3
-        floor = max(y)/10
-         
-        tempos = []
-        
-        for i in range(num_peaks):   
-            y0 = max(y)
-            if y0 < floor:
-                break
-            i0 = y.index(y0)
-            tG = find_barycenter(t, y, i0, div_resol)       
-            tempos.append(tG)
-        
-        return tempos
-        
         
     def load_dict(self, line):
 
@@ -81,7 +24,7 @@ class JsonSongParser(song_parser.SongParser):
 
             if isinstance(json_dict, list):
                 json_dict = json_dict[0]
-        except (json.JSONDecodeError, TypeError, KeyError):
+        except (json.JSONDecodeError, TypeError, KeyError, UnicodeDecodeError):
             json_dict = None
         
         if json_dict:
@@ -114,6 +57,16 @@ class JsonSongParser(song_parser.SongParser):
         
         return (changed, meta_data)
 
+    def extract_note_interval(self, times):
+        
+        intervals = [interval for interval in self.music_theory.analyze_tempo(times, self.skyjson_chord_delay) if interval > 2*self.skyjson_chord_delay]
+        
+        if len(intervals) > 0:
+            note_interval = intervals[0]
+        else:
+            note_interval = None
+            
+        return note_interval
 
     def split_line(self, line):
         
@@ -132,12 +85,9 @@ class JsonSongParser(song_parser.SongParser):
         # Facilitates the splitting of glued chords into notes
         keys = [self.get_note_parser().sanitize_digits(key) for key in keys]
 
-        tempos = [tempo for tempo in self.analyze_tempo(times) if tempo > 2*self.skyjson_chord_delay]
-        
-        if len(tempos) > 0:
-            main_tempo = min(tempos)
-        else:
-            main_tempo = None
+        note_interval = self.extract_note_interval(times)
+        if note_interval is None:
+            note_interval = 2*self.skyjson_chord_delay
                         
         icons = [keys[0]]
         
@@ -145,7 +95,7 @@ class JsonSongParser(song_parser.SongParser):
             if times[i] - times[i-1] < self.skyjson_chord_delay:
                 icons[-1] += keys[i] # Notes belong to the same chord
             else:
-                n_pauses = max([0, round((times[i] - times[i-1])/main_tempo - 1)])
+                n_pauses = max([0, round((times[i] - times[i-1])/note_interval - 1)])
                 if n_pauses > 0:
                     icons += [self.pause + (self.repeat_indicator + str(n_pauses) if n_pauses > 1 else '')]
                 

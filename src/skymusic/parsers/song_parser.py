@@ -5,8 +5,8 @@ from skymusic.song import Song
 import skymusic.parsers.noteparsers
 from skymusic.resources import Resources
 from skymusic.parsers.html_parser import HtmlSongParser
+from skymusic.parsers.midi_parser import MidiSongParser
 from skymusic.parsers import music_theory
-from skymusic.modes import InputMode 
 
 
 class SongParserError(Exception):
@@ -80,6 +80,19 @@ class SongParser:
     def get_maker(self):
 
         return self.maker
+
+    def check_is_bytes(self, song_line):
+        if isinstance(song_line, (list,tuple)):
+            line = song_line[0]
+        else:
+            line = song_line
+        try:
+            line.decode()
+            return True
+        except AttributeError as err:
+            return False
+        except UnicodeDecodeError:
+            return True
 
     def check_delimiters(self):
 
@@ -220,7 +233,7 @@ class SongParser:
 
         return repeat, chord
 
-    def parse_chords(self, chords, song_key='C', note_shift=0):
+    def parse_chords(self, chords, song_key=Resources.DEFAULT_KEY, note_shift=0):
         """
         Creates a skygrid from the harp's chord notes
         # For each chord, sets the highlighted state of each note accordingly (True or False)
@@ -337,7 +350,7 @@ class SongParser:
                 return line.split(delimiter)
 
 
-    def parse_line(self, line, song_key='C', note_shift=0):
+    def parse_line(self, line, song_key=Resources.DEFAULT_KEY, note_shift=0):
         """
         Returns instrument_line: a list of  'skygrid' objects (1 skygrid = 1 dict)
         """
@@ -416,6 +429,8 @@ class SongParser:
             
         if self.input_mode == InputMode.SKYHTML:
             song_lines = HtmlSongParser().parse_html(song_lines)
+        elif self.input_mode == InputMode.MIDI:
+            song_lines = MidiSongParser().parse_midi(song_lines)
 
         english_song_key = self.english_note_name(song_key)
 

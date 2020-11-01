@@ -21,7 +21,7 @@ class MidiSongRenderer(song_renderer.SongRenderer):
             # CAUTION: instrument codes correspond to General Midi codes (see Wikipedia) minus 1
             # An instrument will sound very strange if played outside its natural pitch range
             midi_instruments = {'piano': 0, 'guitar': 24, 'flute': 73, 'pan': 75}
-            self.midi_note_duration = 0.3*Resources.DEFAULT_BPM/120  # note duration is 0.3 seconds for 120 bpm
+            self.midi_note_duration = 0.55*Resources.DEFAULT_BPM/220  # note duration is 0.55 seconds for 220 bpm
             if isinstance(song_bpm, (int, float)):
                 self.midi_bpm = song_bpm  # Beats per minute
             else:
@@ -37,13 +37,9 @@ class MidiSongRenderer(song_renderer.SongRenderer):
         try:
             track.append(mido.MetaMessage('key_signature', key=self.midi_key))
         except ValueError:
-            print("\n***ERROR: invalid key passed to MIDI renderer. Using C instead.")
-            track.append(mido.MetaMessage('key_signature', key='C'))
-        try:
+            print(f"\n***ERROR: invalid key passed to MIDI renderer. Using {Resources.DEFAULT_KEY} instead.")
+            track.append(mido.MetaMessage('key_signature', key=Resources.DEFAULT_KEY))
             track.append(mido.Message('program_change', program=self.midi_instrument, time=0))
-        except ValueError:
-            print("\n***ERROR: invalid instrument passed to MIDI renderer. Using piano instead.")
-            track.append(mido.Message('program_change', program=1, time=0))      
 
 
     def write_buffers(self, song):
@@ -74,7 +70,7 @@ class MidiSongRenderer(song_renderer.SongRenderer):
                         
         self.write_header(mid, track, tempo)
 
-        instrument_renderer = MidiInstrumentRenderer(self.locale)
+        instrument_renderer = MidiInstrumentRenderer(self.locale, note_ticks=note_ticks, music_key=song.get_music_key())
         song_lines = song.get_lines()
         for line in song_lines:
             if len(line) > 0:
@@ -84,8 +80,7 @@ class MidiSongRenderer(song_renderer.SongRenderer):
                         instrument.set_index(instrument_index)
                         #instrument_render = instrument.render_in_midi(note_duration=note_ticks,
                         #                                              music_key=song.get_music_key())
-                        instrument_render = instrument_renderer.render(instrument, note_duration=note_ticks,
-                                                                      music_key=song.get_music_key())
+                        instrument_render = instrument_renderer.render(instrument)
                         for i in range(0, instrument.get_repeat()):
                             for note_render in instrument_render:
                                 track.append(note_render)

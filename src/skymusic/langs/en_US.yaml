@@ -32,6 +32,9 @@ input_mode:
   sky:
     short_desc: 'Sky ABC1-5'
     long_desc: "Sky column/row notation:\n   A1 A2 A3 A4 A5\n   B1 B2 B3 B4 B5\n   C1 C2 C3 C4 C5"
+  skyhtml:
+    short_desc: HTML visual sheet
+    long_desc: HTML visual sheet
   english:
     short_desc: English CDEFGAB
     long_desc: "English (note name in C D E F G A B + alteration b/# + octave number, e.g. Cb4 D#4 E5 ...)"
@@ -50,9 +53,9 @@ input_mode:
   skyjson:
     short_desc: Sky-Music recording (JSON text)
     long_desc: "Dictionary with time in ms and key number 0-14 used by SkyStudio app and <https://sky-music.herokuapp.com>"
-  skyhtml:
-    short_desc: HTML visual sheet
-    long_desc: HTML visual sheet
+  midi:
+    short_desc: Midi file
+    long_desc: Midi file
 render_mode:
   html:
     short_desc: HTML visual sheet

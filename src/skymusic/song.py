@@ -5,7 +5,7 @@ from skymusic.resources import Resources
 
 class Song():
 
-    def __init__(self, locale=None, music_key='C'):
+    def __init__(self, locale=None, music_key=Resources.DEFAULT_KEY):
 
         if isinstance(music_key, str):
             self.music_key = music_key

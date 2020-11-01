@@ -427,14 +427,20 @@ class MusicSheetMaker:
     def read_file(self, file_path):
 
         isfile = os.path.isfile(file_path)
-
+        
+        _, ext = os.path.splitext(file_path)
+        
         if not isfile:
             MusicSheetMakerError("File does not exist: %s" % os.path.abspath(file_path))
         else:
             # load file
             try:
-                with open(file_path, mode='r', encoding='utf-8', errors='ignore') as fp:
-                    lines = fp.readlines()  # Returns a list of strings
+                if ext in ['.mid', '.midi', '.bin']:
+                    with open(file_path, mode='rb') as fp:
+                        lines = fp.readlines()  # Returns a list of bytes
+                else:
+                    with open(file_path, mode='r', encoding='utf-8', errors='ignore') as fp:
+                        lines = fp.readlines()  # Returns a list of strings
             except (OSError, IOError) as err:
                 raise err
 
@@ -592,12 +598,13 @@ class MusicSheetMaker:
             input_mode = self.retrieve_input_mode(recipient, notes)
 
         song_key = None
+        
         possible_keys = self.get_song_parser().find_key(notes)
 
         try:
             default_key = self.get_song_parser().get_default_key()
         except AttributeError:
-            default_key = 'C'
+            default_key = Resources.DEFAULT_KEY
 
         if possible_keys is None:
             # Asks for any text string
@@ -786,7 +793,7 @@ class MusicSheetMaker:
             (title, artist, transcript) = meta
 
         if song_key is None:
-            song_key = self.retrieve_query_result(recipient, '_key', 'C')
+            song_key = self.retrieve_query_result(recipient, '_key', Resources.DEFAULT_KEY)
 
         self.get_song().set_meta(title=title, artist=artist, transcript=transcript, song_key=song_key)
 
@@ -799,8 +806,9 @@ class MusicSheetMaker:
             octave_shift = self.retrieve_query_result(recipient, 'octave_shift', 0)
 
         if song_key is None:
-            song_key = self.retrieve_query_result(recipient, '_key', 'C')
+            song_key = self.retrieve_query_result(recipient, '_key', Resources.DEFAULT_KEY)
 
+        
         song = self.get_song_parser().parse_song(song_lines=notes, song_key=song_key, octave_shift=octave_shift)
 
         self.set_song(song)

@@ -54,6 +54,9 @@ input_mode:
   skyjson:
     short_desc: 'Enregistrement Sky-Music  (JSON text)'
     long_desc: "Dictionaire avec le temps en ms et la touche 0-14 comme sur l'app SkyStudio et <https://sky-music.herokuapp.com>"
+  midi:
+    short_desc: Midi file
+    long_desc: Midi file
 render_mode:
   html:
     short_desc: partition graphique en HTML

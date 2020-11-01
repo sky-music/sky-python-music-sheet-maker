@@ -131,7 +131,7 @@ MUSIC_COG_THEME = 'dark'
 SKY_MUSIC_WEBSITE_THEME = 'light'
 COMMAND_LINE_THEME = 'light'
 
-DEFAULT_KEY = 'C'
+DEFAULT_KEY = 'C' # The default proposed song key, to parse notes when the song key cannot be retrieved, not to be confused with the 0 index of the English/Jianpu/doremi chromatic scales, which is C by convention 
 
 DEFAULT_INSTRUMENT = 'harp'
 

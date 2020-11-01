@@ -31,7 +31,7 @@ class SkyJson(noteparser.NoteParser):
         self.not_note_name_regex = re.compile(r'[^Key\d]+', re.IGNORECASE) #not accurate
         self.not_octave_regex = re.compile(r'[^\d]+') #not accurate
 
-    def calculate_coordinate_for_note(self, note, song_key='C', note_shift=0, is_finding_key=False):
+    def calculate_coordinate_for_note(self, note, song_key=None, note_shift=0, is_finding_key=False):
         """
         Returns a tuple containing the row index and the column index of the note's position.
         """

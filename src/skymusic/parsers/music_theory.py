@@ -5,7 +5,6 @@ from collections import OrderedDict
 from skymusic.modes import InputMode
 from skymusic.parsers.html_parser import HtmlSongParser
 
-
 class MusicTheory():
     """
      This class is actually just an extension of SongParser,
@@ -23,23 +22,37 @@ class MusicTheory():
         Attempts to detect input musical notation for the textual song in 'song_lines'.
         Returns a list with the probable input modes (eliminating the least likely)
         """
-        from skymusic.parsers import json_parser
+        from skymusic.parsers import json_parser, midi_parser
+        
+        song_parser = self.song_parser
+        all_modes = [mode for mode in InputMode]
+        
+        is_midi = midi_parser.MidiSongParser().detect_midi(song_lines[0])
+        is_bytes = song_parser.check_is_bytes(song_lines[0])
+        
+        if is_midi:
+            if is_bytes:
+                return [InputMode.MIDI]
+            else:
+                try:
+                    song_lines[-1].encode()
+                    return [InputMode.MIDI]
+                except:
+                    return all_modes
         
         jsonparser = json_parser.JsonSongParser(maker=self.song_parser.get_maker())        
-        json_dict = jsonparser.load_dict(song_lines[0])        
+        json_dict = jsonparser.load_dict(song_lines[0])     
         if json_dict:
             return [InputMode.SKYJSON]
                 
-        if isinstance(song_lines, str):  # Break newlines and make sure the result is a List
+        if isinstance(song_lines, str):  # Break newlines and make sure the result is a list
             song_lines = song_lines.split(os.linesep)
 
         is_html = HtmlSongParser().detect_html(song_lines)
         if is_html:
             return [InputMode.SKYHTML]
 
-        song_parser = self.song_parser
-
-        possible_modes = [mode for mode in InputMode if mode not in [InputMode.SKYJSON, InputMode.SKYHTML]]
+        possible_modes = [mode for mode in InputMode if mode not in [InputMode.SKYJSON, InputMode.SKYHTML, InputMode.MIDI]]
         possible_parsers = [song_parser.get_note_parser(mode) for mode in possible_modes]
         possible_regex = [parser.single_note_name_regex for parser in possible_parsers]
 
@@ -104,9 +117,15 @@ class MusicTheory():
         Attempts to find the musical key for the textual song in 'input_lines'.
         Requires knoledge of the musical notation (input_mode) first.
         """
+        from skymusic.parsers import midi_parser
+        
         if isinstance(song_lines, str):  # Break newlines and make sure the result is a List
             song_lines = song_lines.split(os.linesep)
-
+        
+        is_midi = midi_parser.MidiSongParser().detect_midi(song_lines)
+        if is_midi:
+            return midi_parser.MidiSongParser().get_song_key(song_lines)
+        
         song_parser = self.song_parser
         note_parser = song_parser.get_note_parser()
         is_note_regex = note_parser.note_name_regex
@@ -182,5 +201,157 @@ class MusicTheory():
 
             sorted_items = [item for item in sorted_items if item is not None]
 
-        return sorted_items
+        return sorted_items   
+    
+    
+    def spectrum(self, x, y):
+        import cmath
+        from math import log, ceil
+        
+        def omega(p, q):
+            return cmath.exp((2.0 * cmath.pi * 1j * q) / p)
+        
+        def fft(signal):
+            n = len(signal)
+            if n == 1:
+                return signal
+            else:
+                Feven = fft([signal[i] for i in range(0, n, 2)])
+                Fodd = fft([signal[i] for i in range(1, n, 2)])
+                combined = [0] * n
+                for m in range(n // 2):
+                    combined[m] = Feven[m] + omega(n, -m) * Fodd[m]
+                    combined[m + n // 2] = Feven[m] - omega(n, -m) * Fodd[m]
+            return combined        
+
+        n1 = len(y)
+        m = ceil(log(n1)/log(2))
+        ffty = fft(y + [0]*(2**m - n1)) #Zero padding to a power of 2 length  
+        n2 = len(ffty)
+        dx = x[2] - x[1]
+        f = [k/(dx*n2) for k in range(int(n2/2))]
+        sp = [abs(ffty[k])**2 for k in range(int(n2/2))]
+        return f, sp
+
+
+    def find_peaks(self, x, y, threshold, max_peaks=3, x_bounds = ()):
+                
+        def find_barycenter(t, z, i0, di):
+            while len(t) < 2*di+1:
+                di = di - 1
+            if di < 0:
+                return None
+            
+            dt = t[1] - t[0]
+            tmin = t[0]
+            nmax = 10 #max number of iterations to find barycenter
+            
+            n = 0
+            iG = i0
+            iG_old = iG - 2 #to enter the loop once
+            while (iG-iG_old) > 1 and n < nmax:            
+                i1 = max([0,iG-di])
+                i2 = min([len(t),iG+di])
+                z_band = z[i1:i2+1]
+                t_band = t[i1:i2+1]
+                iG_old = iG
+                tG = sum([z*t for (t,z) in zip(t_band, z_band)])/sum(z_band)
+                iG = round((tG - tmin)/dt)
+                n += 1        
+            return (i1, i2), tG 
+        
+        def bounds_indices(array, bounds):
+            if bounds:
+                if bounds[1] > bounds[0]:
+                    i1 = next((i for i in range(len(array)) if array[i]>=bounds[0]), None)
+                    i2 = next((i for i in reversed(range(len(array))) if array[i]<=bounds[1]), None)
+                else:
+                    i1 = next((i for i in range(len(array)) if array[i]<=bounds[0]), None)
+                    i2 = next((i for i in reversed(range(len(array))) if array[i]>=bounds[1]), None)
+            else:
+                (i1, i2) = (None, None)
+            
+            i1 = i1 if i1 else 0
+            i2 = i2 if i2 else len(array)-1
+            return (i1, i2)
+        
+        
+        div_resol = 3 #precision increase        
+        peaks = list() #list of (t,h) tuples
+        (i1, i2) = bounds_indices(x, x_bounds)
+        
+        x2 = x.copy()[i1:i2+1]
+        y2 = y.copy()[i1:i2+1]
+        
+        '''
+        import matplotlib.pyplot as plt
+        plt.plot(x2, y2)
+        plt.xlabel('x2 (filtered)')
+        ax = plt.gca()
+        ax.set_xscale('log')
+        ax.invert_xaxis()
+        plt.show()
+        '''
+        
+        for i in range(max_peaks):
+            y0 = max(y2)
+            if y0 < max(y2)*threshold:
+                break
+            i0 = y2.index(y0)
+            (i1, i2), tG = find_barycenter(x2, y2, i0, div_resol)
+            peaks.append((tG, y0))
+            y2[i1:i2+1] = [0]*len(y2[i1:i2+1])#peak deletion 
+        
+        return [delay for (delay, occ) in peaks]
+
+    
+    def analyze_tempo(self, times, chord_delay):
+        
+        def build_histogram(vals, hbin):
+            num_slots = 2 + int(max(vals) / hbin)
+            h = [0]*num_slots #occurrences
+            t = [i*hbin for i in range(num_slots)] #delays
+            for v in vals: #histogram starting at t=0
+                h[1+int(v/hbin)] += 1
+            return (t, h)
+        
+        #div_resol = 3 #precision increase
+        #tbin = chord_delay / div_resol
+        
+        # Notes strokes versus time
+        tbin = 1
+        (t, h) = build_histogram(times, tbin)
+        f, sp = self.spectrum(t, h)
+        f0 = f[1]/2
+        taus = [1/(max(x,f0)) for x in f]
+        
+        # Typical spacing between two consecutive notes
+        dtimes = [times[i] - times[i-1] for i in range(1, len(times))]
+        (dt, dh) = build_histogram(dtimes, tbin)
+        typ_diffs = self.find_peaks(dt, dh, 1/10, 3)
+        typ_diffs = [diff for diff in typ_diffs if diff > 2*tbin]
+        
+        
+        min_tau = min(typ_diffs)-tbin # to exclude quavers and quasi-chords
+        max_tau = taus[1] # to exclude the zero-frequency component
+        
+        typ_taus = self.find_peaks(taus, sp, 1/5, 3, (max_tau, min_tau))
+        
+        '''
+        import matplotlib.pyplot as plt
+        plt.plot(dt, dh)
+        plt.xlabel('dt')
+        plt.show()
+        ax = plt.gca()
+        ax.clear()
+        
+        plt.plot(taus, sp)
+        ax = plt.gca()
+        ax.set_xscale('log')
+        ax.invert_xaxis()
+        plt.xlabel('taus')
+        plt.show()
+        '''
+        
+        return typ_taus
 
