@@ -68,7 +68,7 @@ class MidiSongParser:
         
         for msg in track:
             if msg.type == 'note_on':
-                if msg.velocity != 0:
+                if msg.velocity != 0: #reject  silences
                     times.append(t)
             try:
                 t += msg.time
@@ -162,8 +162,8 @@ class MidiSongParser:
                 
                 note = self.parse_note_msg(msg, base_octave)
                 
-                #print(msg)
-                #print(f"dt={dt:.1f}, note={note}\n")  
+                print(msg)
+                print(f"dt={dt:.1f}, note={note}\n")  
                 
                 if note == Resources.PAUSE:
                     if dt > 0.5*note_interval:
@@ -205,6 +205,8 @@ class MidiSongParser:
         
         first_key = self.extract_first_key(mid)
         
+        first_key = 'C' #DEBUG TODO
+        
         return first_key                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
     def parse_midi(self, midi_lines):
@@ -231,6 +233,6 @@ class MidiSongParser:
             song += '\n'.join(filter(None,[metadata, notes])) + '\n'
             
         song = song.strip().split(os.linesep)
-        #print('%%%DEBUG')
-        #print(song)
+        print('%%%DEBUG')
+        print(song)
         return song

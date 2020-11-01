@@ -338,7 +338,7 @@ stock_queries:
       
       - Vous avez entré au moins 1 note valide
       - Si avez chargé une portée visuelle en HTML, vérifiez qu'elle est postérieure au 1er Juillet 2020 (son code doit contenir la balise <div id='ascii' hidden>).
-    question: 
+    question: Voulez-vous quand même continuer ?
     afterword: 
     input_tip: 'oui/non'
     help_text:

@@ -25,6 +25,7 @@ class MidiInstrumentRenderer(instrument_renderer.InstrumentRenderer):
         quaver_relticks = 0.5
         self.delta_times = {'note_on': relspacing * note_ticks, 'note_off': note_ticks, 'quaver_on': quaver_relspacing*note_ticks, 'quaver_off': quaver_relticks*note_ticks}
 
+    '''
     def cycle_chord(self, instrument):
         
         note_renderer = midi_nr.MidiNoteRenderer(music_key=self.music_key)
@@ -46,27 +47,43 @@ class MidiInstrumentRenderer(instrument_renderer.InstrumentRenderer):
                                 t = 0 #In a chord all notes are played simultaneously
                             
         return harp_render
+    '''
 
-
-    def cycle_quaver(self, instrument):
+    def render_icon(self, instrument):
         
         note_renderer = midi_nr.MidiNoteRenderer(music_key=self.music_key)
-        harp_render = []
+        #harp_render = []
         
-        for row in range(instrument.get_row_count()):
-            for col in range(instrument.get_column_count()):
-                note = instrument.get_note_from_position((row, col))
-                frames = note.get_highlighted_frames()
-                
-                if frames:
-                    if frames[0] > 0:
-                        # A chord note has a frame index==0
-                        for event_type in ['note_on', 'note_off']:
-                            t = self.delta_times[event_type.replace('note','quaver')]
-                            note_render = note_renderer.render(note, event_type, t)
+        render_args = []
         
-                            if isinstance(note_render, mido.Message):
-                                harp_render.append(note_render)
+        t = self.delta_times['note_on']
+        for frame in range(instrument.get_frame_count()):
+            
+            skygrid = instrument.get_skygrid(frame)
+            if skygrid:
+                for coord in skygrid:  # Cycle over (row, col) positions in an icon
+                    
+                    if skygrid[coord][frame]:  # Button is highlighted
+                        note = instrument.get_note_from_position(coord)                     
+                        render_args.append({'note':note,'event_type':'note_on','t':t})
+                        
+                        note_duration = self.delta_times['note_off'] if frame == 0 else self.delta_times['quaver_off']
+                        render_args.append({'note':note,'event_type':'note_off','t':t+note_duration})
+                        
+                if frame > 0:
+                    t += self.delta_times['quaver_on']
+        
+        render_args.sort(key=lambda v:v['t']) #sort by absolute time
+        
+        for i in range(1, len(render_args)):
+            render_args[i]['delta_t'] = render_args[i]['t'] - render_args[i-1]['t']
+        
+        harp_render = []                                  
+        for kwarg in render_args:
+            del(kwarg['t'])
+            note_render = note_renderer.render(**kwarg)
+            if note_render:
+                harp_render.append(note_render)                   
                             
         return harp_render
 
@@ -74,8 +91,9 @@ class MidiInstrumentRenderer(instrument_renderer.InstrumentRenderer):
     def render_harp(self, instrument):
         harp_silent = instrument.get_is_silent()
         harp_broken = instrument.get_is_broken()
+        harp_dead = (instrument.get_num_highlighted() == 0) and harp_broken
 
-        if harp_broken:
+        if harp_dead:
             harp_render = [
                 mido.Message('note_on', note=115, velocity=127, time=int(self.delta_times['note_on'])),
                 mido.Message('note_off', note=115, velocity=127, time=int(self.delta_times['note_off']))]
@@ -84,7 +102,7 @@ class MidiInstrumentRenderer(instrument_renderer.InstrumentRenderer):
                 mido.Message('note_on', note=115, velocity=0, time=int(self.delta_times['note_on'])),
                 mido.Message('note_off', note=115, velocity=0, time=int(self.delta_times['note_off']))]
         else:
-            harp_render = self.cycle_chord(instrument) + self.cycle_quaver(instrument)
+            harp_render = self.render_icon(instrument)
                                 
         return harp_render
 

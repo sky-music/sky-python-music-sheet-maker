@@ -239,16 +239,16 @@ class SongParser:
         # For each chord, sets the highlighted state of each note accordingly (True or False)
         """
 
-        # Individual note is a single-element list: chords=['A5']
-        # Real chord is a single element list: chords=['B1A1A3']
-        # Triplets and quavers are a list of notes or chords: chords=['B2', 'B3B1', 'B4', 'B5', 'C1', 'C2']
+        # A isolated note is a single-element list: chords=['A5']
+        # An isolated chord is a single element list: chords=['B1A1A3']
+        # Triplets and quavers have been decomposed into a list of notes or chords: chords=['B2', 'B3B1', 'B4', 'B5', 'C1', 'C2']
         harp_broken = True
         skygrid = {}
 
         if len(chords) > 1:
-            idx0 = 1  # Notes in quavers and triplets have a frame index >1
+            idx0 = 1  # Chords in quavers and triplets have a frame index>1
         else:
-            idx0 = 0  # Single note or note in chord has a frame index ==0
+            idx0 = 0  # An isolated chord or note has a frame index==0
 
         if self.note_parser is None:
             self.set_note_parser()
@@ -270,6 +270,7 @@ class SongParser:
             harp_broken = False
             harp_silent = False
             for note in chord:  # Chord is a list of notes
+                note_broken = False
                 try:
                     if note == self.pause:
                         highlighted_note_position = (-1, -1)
@@ -277,16 +278,19 @@ class SongParser:
                         highlighted_note_position = self.note_parser.calculate_coordinate_for_note(note, song_key,
                                                                                                    note_shift, False)
                 except (KeyError, SyntaxError) as err:
+                    note_broken = True
                     harp_broken = True
                     if not self.silent_warnings:
                         print(err)
-                else:
-                    skygrid[highlighted_note_position] = {}
-                    skygrid[highlighted_note_position][idx0 + chord_idx] = True
-                    harp_silent = False
-                    if highlighted_note_position[0] < 0 and highlighted_note_position[1] < 0:  # Note is a silence
-                        skygrid[highlighted_note_position][idx0 + chord_idx] = False
-                        harp_silent = True
+                finally:
+                    
+                    if not note_broken:
+                        skygrid[highlighted_note_position] = {}
+                        skygrid[highlighted_note_position][idx0 + chord_idx] = True
+                        harp_silent = False
+                        if highlighted_note_position[0] < 0 and highlighted_note_position[1] < 0:  # Note is a silence
+                            skygrid[highlighted_note_position][idx0 + chord_idx] = False
+                            harp_silent = True
 
         results = [skygrid, harp_broken, harp_silent, repeat]
         return results

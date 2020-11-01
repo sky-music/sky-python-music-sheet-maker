@@ -16,13 +16,15 @@ class AsciiInstrumentRenderer(instrument_renderer.InstrumentRenderer):
         elif instrument.get_is_silent():
             ascii_render = Resources.PAUSE
         else:
-            skygrid = instrument.get_skygrid()
-            
-            for pos in skygrid:  # Cycle over (row, col) positions in an icon
-                for f in skygrid[pos]:  # Cycle over triplets & quavers
-                    if skygrid[pos][f]:  # Button is highlighted
-                        ascii_render += note_parser.get_note_from_coordinate(pos)
-                    if f > 0:
+
+            for frame in range(instrument.get_frame_count()): #Cycle over triplets & quavers
+                skygrid = instrument.get_skygrid(frame)
+                
+                if skygrid:
+                    for coord in skygrid:  # Cycle over (row, col) positions in an icon
+                        if skygrid[coord][frame]:  # Button is highlighted
+                            ascii_render += note_parser.get_note_from_coordinate(coord)
+                    if frame > 0:
                         ascii_render += Resources.QUAVER_DELIMITER
             ascii_render = ascii_render.rstrip(Resources.QUAVER_DELIMITER)
             
