@@ -59,6 +59,8 @@ class HtmlSongRenderer(song_renderer.SongRenderer):
             if k != 'title':
                 html_buffer.write(f"\n<p><b>{meta[k][0]}</b>{meta[k][1]}</p>")
         
+        html_buffer.write("\n<!-- Embedded video tag goes here (Youtube: share/embed/iframe) -->")
+        
         return html_buffer
 
 
