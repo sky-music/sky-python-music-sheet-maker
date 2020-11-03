@@ -49,6 +49,10 @@ class Instrument():
     def get_is_broken(self):
         """Returns whether the Harp is broken (notes were not recognized by the Parser)"""
         return self.is_broken
+    
+    def get_is_dead(self):
+        
+        return self.get_is_broken()
 
     def set_is_broken(self, is_broken=True):
         """Returns a boolean whether the harp could be translated"""
@@ -57,6 +61,7 @@ class Instrument():
     def set_is_silent(self, is_silent=True):
         """Returns a boolean whether the harp is empty in this frame"""
         self.is_silent = is_silent
+    
 
 class Voice(Instrument):  # Lyrics or comments
 
@@ -131,6 +136,10 @@ class Harp(Instrument):
         
         return self.num_highlighted
 
+    def get_is_dead(self):
+        
+        return self.get_is_broken() and self.get_num_highlighted() == 0
+
     def get_frame_count(self):
         
         if not self.frame_count:
@@ -151,7 +160,14 @@ class Harp(Instrument):
         return self.column_count * self.row_count
 
     def __str__(self):
-        return f'<{self.type}-{self.index}, {len(self)} notes, {self.get_num_highlighted()} highlighted, repeat={self.repeat}>'
+        if self.get_is_dead():
+            broken = 'dead'
+        elif self.get_is_broken():
+            broken = ' broken' 
+        else:
+            broken = ''
+        silent = ' broken' if self.get_is_silent() else ''
+        return f'<{self.type}-{self.index}, {self.get_row_count()}*{self.get_column_count()}, {self.get_num_highlighted()} ON, repeat={self.repeat}, {broken}{silent}>'
         
 
     def get_note_from_position(self, pos):

@@ -298,7 +298,7 @@ class MusicSheetMaker:
 
         # 6. Asks for octave shift
         (q_shift, octave_shift) = self.ask_octave_shift(recipient=recipient, input_mode=input_mode)
-
+                
         # 7. Parses song
         self.parse_song(recipient, notes=notes, song_key=song_key, octave_shift=octave_shift)
         #self.parse_song(recipient) # EXPERIMENTAL
@@ -683,11 +683,13 @@ class MusicSheetMaker:
 
     def display_error_ratio(self, recipient, prerequisites=None, execute=True):
 
-        error_ratio = self.get_song().get_num_broken() / max(1, self.get_song().get_num_instruments())
+        num_errors = self.get_song().get_num_broken()
+        
+        error_ratio = num_errors / max(1, self.get_song().get_num_instruments())
 
         if error_ratio == 0:
             i_error = None
-        elif error_ratio < 0.05:
+        elif error_ratio < 0.05 and num_errors < 50:
             i_error = self.communicator.send_stock_query('few_errors', recipient=recipient, prerequisites=prerequisites)
         else:
             i_error = self.communicator.send_stock_query('many_errors', recipient=recipient,

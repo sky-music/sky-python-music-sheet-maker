@@ -27,7 +27,7 @@ class MusicTheory():
         song_parser = self.song_parser
         all_modes = [mode for mode in InputMode]
         
-        is_midi = midi_parser.MidiSongParser().detect_midi(song_lines[0])
+        is_midi = midi_parser.MidiSongParser(maker=self.song_parser.get_maker()).detect_midi(song_lines[0])
         is_bytes = song_parser.check_is_bytes(song_lines[0])
         
         if is_midi:
@@ -122,9 +122,14 @@ class MusicTheory():
         if isinstance(song_lines, str):  # Break newlines and make sure the result is a List
             song_lines = song_lines.split(os.linesep)
         
-        is_midi = midi_parser.MidiSongParser().detect_midi(song_lines)
+        midi_song_parser = midi_parser.MidiSongParser(maker=self.song_parser.get_maker())
+        is_midi = midi_song_parser.detect_midi(song_lines)
         if is_midi:
-            return midi_parser.MidiSongParser().get_song_key(song_lines)
+            song_key = midi_song_parser.find_key(song_lines)
+            if song_key:
+                return song_key
+            else:
+                song_lines = midi_song_parser.collect_notes(song_lines)
         
         song_parser = self.song_parser
         note_parser = song_parser.get_note_parser()
@@ -305,7 +310,7 @@ class MusicTheory():
         return [delay for (delay, occ) in peaks]
 
     
-    def analyze_tempo(self, times, chord_delay):
+    def analyze_tempo(self, times, chord_delay, method='diff'):
         
         def build_histogram(vals, hbin):
             num_slots = 2 + int(max(vals) / hbin)
@@ -317,41 +322,31 @@ class MusicTheory():
         
         #div_resol = 3 #precision increase
         #tbin = chord_delay / div_resol
-        
-        # Notes strokes versus time
         tbin = 1
-        (t, h) = build_histogram(times, tbin)
-        f, sp = self.spectrum(t, h)
-        f0 = f[1]/2
-        taus = [1/(max(x,f0)) for x in f]
         
         # Typical spacing between two consecutive notes
         dtimes = [times[i] - times[i-1] for i in range(1, len(times))]
         (dt, dh) = build_histogram(dtimes, tbin)
         typ_diffs = self.find_peaks(dt, dh, 1/10, 3)
         typ_diffs = [diff for diff in typ_diffs if diff > 2*tbin]
-        
+
+        if method == 'diff':
+            return typ_diffs
+
+        # Notes strokes versus time
+        (t, h) = build_histogram(times[:128], tbin)
+        f, sp = self.spectrum(t, h)
+        f0 = f[1]/2
+        taus = [1/(max(x,f0)) for x in f]
         
         min_tau = min(typ_diffs)-tbin # to exclude quavers and quasi-chords
         max_tau = taus[1] # to exclude the zero-frequency component
         
         typ_taus = self.find_peaks(taus, sp, 1/5, 3, (max_tau, min_tau))
         
-        '''
-        import matplotlib.pyplot as plt
-        plt.plot(dt, dh)
-        plt.xlabel('dt')
-        plt.show()
-        ax = plt.gca()
-        ax.clear()
-        
-        plt.plot(taus, sp)
-        ax = plt.gca()
-        ax.set_xscale('log')
-        ax.invert_xaxis()
-        plt.xlabel('taus')
-        plt.show()
-        '''
+        #print('%DEBUG')
+        #print(typ_diffs)
+        #print(typ_taus)l
         
         return typ_taus
 

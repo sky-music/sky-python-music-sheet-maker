@@ -89,7 +89,7 @@ class SongParser:
         try:
             line.decode()
             return True
-        except AttributeError as err:
+        except AttributeError:
             return False
         except UnicodeDecodeError:
             return True
@@ -282,15 +282,14 @@ class SongParser:
                     harp_broken = True
                     if not self.silent_warnings:
                         print(err)
-                finally:
                     
-                    if not note_broken:
-                        skygrid[highlighted_note_position] = {}
-                        skygrid[highlighted_note_position][idx0 + chord_idx] = True
-                        harp_silent = False
-                        if highlighted_note_position[0] < 0 and highlighted_note_position[1] < 0:  # Note is a silence
-                            skygrid[highlighted_note_position][idx0 + chord_idx] = False
-                            harp_silent = True
+                if not note_broken:
+                    skygrid[highlighted_note_position] = {}
+                    skygrid[highlighted_note_position][idx0 + chord_idx] = True
+                    harp_silent = False
+                    if highlighted_note_position[0] < 0 and highlighted_note_position[1] < 0:  # Note is a silence
+                        skygrid[highlighted_note_position][idx0 + chord_idx] = False
+                        harp_silent = True
 
         results = [skygrid, harp_broken, harp_silent, repeat]
         return results
@@ -434,7 +433,11 @@ class SongParser:
         if self.input_mode == InputMode.SKYHTML:
             song_lines = HtmlSongParser().parse_html(song_lines)
         elif self.input_mode == InputMode.MIDI:
-            song_lines = MidiSongParser().parse_midi(song_lines)
+            song_lines = MidiSongParser(self.maker, self.silent_warnings).parse_midi(song_lines)
+
+        print('%%%DEBUG%%%')
+        print(song_lines)
+
 
         english_song_key = self.english_note_name(song_key)
 

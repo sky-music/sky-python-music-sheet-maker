@@ -6,7 +6,7 @@ from io import BytesIO
 this_file = os.path.abspath(__file__)
 
 fileroot = "../../../../test_songs/"
-filename = 'birth.mid'
+filename = 'supermario.mid'
 filepath = os.path.join(fileroot, filename)
 
 

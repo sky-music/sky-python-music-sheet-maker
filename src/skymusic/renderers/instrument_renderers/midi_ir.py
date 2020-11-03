@@ -23,7 +23,7 @@ class MidiInstrumentRenderer(instrument_renderer.InstrumentRenderer):
         #midi_pause_relticks = 1  # Spacing between midi notes, as a ratio of note duration
         quaver_relspacing = 0.1
         quaver_relticks = 0.5
-        self.delta_times = {'note_on': relspacing * note_ticks, 'note_off': note_ticks, 'quaver_on': quaver_relspacing*note_ticks, 'quaver_off': quaver_relticks*note_ticks}
+        self.delta_times = {'note_on': relspacing * note_ticks, 'note_off': note_ticks, 'quaver_on': relspacing*note_ticks, 'quaver_off': quaver_relticks*note_ticks}
 
     '''
     def cycle_chord(self, instrument):
@@ -57,14 +57,18 @@ class MidiInstrumentRenderer(instrument_renderer.InstrumentRenderer):
         render_args = []
         
         t = self.delta_times['note_on']
+        print(' ')
         for frame in range(instrument.get_frame_count()):
             
             skygrid = instrument.get_skygrid(frame)
+            print(skygrid)
             if skygrid:
                 for coord in skygrid:  # Cycle over (row, col) positions in an icon
                     
                     if skygrid[coord][frame]:  # Button is highlighted
-                        note = instrument.get_note_from_position(coord)                     
+                        note = instrument.get_note_from_position(coord)
+                        
+                        print(coord)            
                         render_args.append({'note':note,'event_type':'note_on','t':t})
                         
                         note_duration = self.delta_times['note_off'] if frame == 0 else self.delta_times['quaver_off']
@@ -75,6 +79,7 @@ class MidiInstrumentRenderer(instrument_renderer.InstrumentRenderer):
         
         render_args.sort(key=lambda v:v['t']) #sort by absolute time
         
+        render_args[0]['delta_t'] = render_args[0]['t']
         for i in range(1, len(render_args)):
             render_args[i]['delta_t'] = render_args[i]['t'] - render_args[i-1]['t']
         
@@ -90,20 +95,20 @@ class MidiInstrumentRenderer(instrument_renderer.InstrumentRenderer):
 
     def render_harp(self, instrument):
         harp_silent = instrument.get_is_silent()
-        harp_broken = instrument.get_is_broken()
-        harp_dead = (instrument.get_num_highlighted() == 0) and harp_broken
+        #harp_broken = instrument.get_is_broken()
+        harp_dead = instrument.get_is_dead()
 
         if harp_dead:
             harp_render = [
-                mido.Message('note_on', note=115, velocity=127, time=int(self.delta_times['note_on'])),
-                mido.Message('note_off', note=115, velocity=127, time=int(self.delta_times['note_off']))]
+                mido.Message('note_on', note=120, velocity=127, time=int(self.delta_times['note_on'])),
+                mido.Message('note_off', note=120, velocity=127, time=int(self.delta_times['note_off']))]
         elif harp_silent:
             harp_render = [
                 mido.Message('note_on', note=115, velocity=0, time=int(self.delta_times['note_on'])),
                 mido.Message('note_off', note=115, velocity=0, time=int(self.delta_times['note_off']))]
         else:
             harp_render = self.render_icon(instrument)
-                                
+                                                                             
         return harp_render
 
 

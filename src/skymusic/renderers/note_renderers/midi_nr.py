@@ -26,12 +26,9 @@ class MidiNoteRenderer(note_renderer.NoteRenderer):
             
         note_pitch = root_pitch + octave * 12 + semi
 
-        if not note.instrument_is_broken and not note.instrument_is_silent:
-            if len(note.get_highlighted_frames()) == 0:
-                midi_render = None
-            else:
-                midi_render = mido.Message(event_type, channel=0, note=note_pitch, velocity=64, time=int(delta_t))
-        else:
+        if len(note.get_highlighted_frames()) == 0:
             midi_render = None
+        else:
+            midi_render = mido.Message(event_type, channel=0, note=note_pitch, velocity=64, time=int(delta_t))
 
         return midi_render

@@ -3,6 +3,7 @@ from skymusic.modes import ReplyType, InputMode, RenderMode, AspectRatio, Instru
 from datetime import datetime
 import hashlib
 from fractions import Fraction
+from collections import OrderedDict
 #import io
 
 
@@ -849,16 +850,24 @@ class QueryBoolean(QueryChoice):
     """
     A yes/no, true/false question type
     """
-
+    default_limits = ['y', 'n']
+    
     def __init__(self, *args, **kwargs):
-        # repairing missing choices
-        self.default_limits = ['y', 'n']
-        try:
-            kwargs['limits'] = list(kwargs['limits'])
-            if len(kwargs['limits']) % 2 != 0: # a tuple of couples is accepted: (yes,no,true,false,oui,non)
-                kwargs['limits'] = self.default_limits
-        except:
-            kwargs['limits'] = self.default_limits
+        
+        try: # repairing missing choices
+            limits = list(kwargs['limits'])
+            n = len(limits)-len(limits)%2
+            limits = limits[:n+1] # a tuple of couples is accepted: (yes,no,true,false,oui,non)
+            if len(limits) < 2: 
+                limits = self.default_limits
+        except (TypeError, KeyError):
+            limits = self.default_limits
+        
+        shorts = list(OrderedDict({lim[0]:None for lim in limits}))
+        if len(shorts) == len(limits):
+            limits += shorts #adding one-letter abbreviations of choices
+                 
+        kwargs['limits'] = limits
         
         super().__init__(*args, **kwargs)
 
