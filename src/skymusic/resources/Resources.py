@@ -108,6 +108,8 @@ png_compress = 6
 MAX_FILENAME_LENGTH = 127
 MAX_NUM_FILES = 15
 
+BINARY_EXT = ['.mid', '.midi', '.bin'] # Files that must be opened in binary mode
+
 ICON_DELIMITER = '\s'
 PAUSE = '.'
 JIANPU_PAUSE = '0'

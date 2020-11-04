@@ -21,6 +21,10 @@ class MidiSongParser:
         self.note_parser = InputMode.MIDI.get_note_parser()
         self.music_theory = music_theory.MusicTheory(self)
         
+        root_note = self.note_parser.convert_chromatic_position_into_note_name(0)
+        root_note = self.note_parser.english_note_name(root_note)
+        self.root_pitch = Resources.MIDI_PITCHES[root_note]
+                
     def detect_midi(self, song_line, strict=False):
         if isinstance(song_line, (list,tuple)):
             midi_bytes = song_line[0]
@@ -30,11 +34,13 @@ class MidiSongParser:
             if midi_bytes.startswith(b'MThd'):
                 return True
             else:
-                if not strict and midi_bytes.startswith('MThd'):
-                    return True
-                else:
-                    return False
-        except (AttributeError, TypeError):
+                return False #Non-midi binary file
+        except TypeError:
+            if not strict and midi_bytes.startswith('MThd'): #Accepting string
+                return True
+            else:
+                return False
+        except AttributeError: #Neither string or bytes, skipping
             return False
     
     def extract_note_interval(self, track, min_interval):
@@ -118,8 +124,7 @@ class MidiSongParser:
                 if msg.note < lowest:
                     lowest = msg.note
                     
-        root_pitch = Resources.MIDI_PITCHES['C']
-        lowest_octave = int((lowest - root_pitch) / 12)
+        lowest_octave = int((lowest - self.root_pitch) / 12)
         
         return lowest_octave
 
@@ -161,13 +166,11 @@ class MidiSongParser:
             else:
                 return Resources.PAUSE
 
-        root_pitch = Resources.MIDI_PITCHES['C']
-        octave = int((note_msg.note - root_pitch) / 12)
-        semi = (note_msg.note - root_pitch) % 12
+        octave = int((note_msg.note - self.root_pitch) / 12)
+        semi = (note_msg.note - self.root_pitch) % 12
         
         try:
             note = self.note_parser.convert_chromatic_position_into_note_name(semi)
-            #note = self.inverse_map[semi]
         except KeyError:
             note = Resources.BROKEN_HARP
             

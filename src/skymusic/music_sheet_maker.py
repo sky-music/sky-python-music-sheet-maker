@@ -435,7 +435,7 @@ class MusicSheetMaker:
         else:
             # load file
             try:
-                if ext in ['.mid', '.midi', '.bin']:
+                if ext in Resources.BINARY_EXT:
                     with open(file_path, mode='rb') as fp:
                         lines = fp.readlines()  # Returns a list of bytes
                 else:

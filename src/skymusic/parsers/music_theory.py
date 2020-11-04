@@ -25,20 +25,11 @@ class MusicTheory():
         from skymusic.parsers import json_parser, midi_parser
         
         song_parser = self.song_parser
-        all_modes = [mode for mode in InputMode]
+        #all_modes = [mode for mode in InputMode]
         
-        is_midi = midi_parser.MidiSongParser(maker=self.song_parser.get_maker()).detect_midi(song_lines[0])
-        is_bytes = song_parser.check_is_bytes(song_lines[0])
-        
+        is_midi = midi_parser.MidiSongParser(maker=self.song_parser.get_maker()).detect_midi(song_lines[0], strict=True)        
         if is_midi:
-            if is_bytes:
-                return [InputMode.MIDI]
-            else:
-                try:
-                    song_lines[-1].encode()
-                    return [InputMode.MIDI]
-                except:
-                    return all_modes
+            return [InputMode.MIDI]
         
         jsonparser = json_parser.JsonSongParser(maker=self.song_parser.get_maker())        
         json_dict = jsonparser.load_dict(song_lines[0])     

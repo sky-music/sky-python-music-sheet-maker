@@ -131,7 +131,10 @@ class NoteParser:
         else:
             native_parser = self
             foreign_parser = english.English()
-
+        
+        if foreign_parser.__class__ == native_parser.__class__:
+            return notes_string
+        
         note_name = native_parser.note_name_regex.match(str(notes_string))
 
         if note_name is not None:
