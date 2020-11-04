@@ -197,6 +197,9 @@ class Communicator:
 
         for query in queries:
             limits = query.get_limits()
+            
+            if isinstance(query, QueryBoolean):
+                limits = limits[:2] # To skip synonyms (e.g. Y for Yes)
 
             # Question keyword arguments dictionary
             if isinstance(query, QueryMultipleChoices):
@@ -211,7 +214,7 @@ class Communicator:
                              'expect_answer': query.get_expect_reply(), 'multiple_choices': multiple_choices}
 
             # Choices keyword arguments dictionary
-            if isinstance(query, (QueryMultipleChoices, QueryChoice)):
+            if isinstance(query, (QueryMultipleChoices, QueryChoice)):                    
                 if isinstance(limits[0], InputMode):
                     choices_dicts = [{'number': i, 'text': limit.get_short_desc(self.locale)} for i, limit in enumerate(limits)]
                 elif isinstance(limits[0], RenderMode):
