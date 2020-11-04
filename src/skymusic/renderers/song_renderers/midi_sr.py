@@ -5,7 +5,6 @@ from skymusic.resources import Resources
 
 try:
     import mido
-
     no_mido_module = False
 except (ImportError, ModuleNotFoundError):
     no_mido_module = True

@@ -2,9 +2,13 @@
 import os
 from skymusic.resources import Resources
 from io import BytesIO
-from mido import MidiFile
 from skymusic.parsers import music_theory
 from skymusic.modes import InputMode
+try:
+    import mido
+    no_mido_module = False
+except (ImportError, ModuleNotFoundError):
+    no_mido_module = True
 
 class MidiSongParser:
     """
@@ -98,10 +102,11 @@ class MidiSongParser:
  
     def extract_first_key(self, midi_file):
         
-        for track in midi_file.tracks:
-            track_key = self.extract_key(track)
-            if track_key:
-                return track_key
+        if midi_file:
+            for track in midi_file.tracks:
+                track_key = self.extract_key(track)
+                if track_key:
+                    return track_key
         
         return None
                     
@@ -122,12 +127,12 @@ class MidiSongParser:
         
         metadata = []
         if track.name:
-            metadata.append('Track name:' + track.name)
+            metadata.append(Resources.LYRIC_DELIMITER + 'Track name: ' + track.name)
         
         if self.has_notes(track):
             track_key = self.extract_key(track)
             if track_key:
-                metadata.append(Resources.METADATA_DELIMITER + 'Track key: ' + track_key)
+                metadata.append(Resources.LYRIC_DELIMITER + 'Track key: ' + track_key)
         
         return metadata
     
@@ -227,12 +232,16 @@ class MidiSongParser:
 
     def create_MidiFile(self, midi_lines):
         
+        if no_mido_module:
+            print("\n***ERROR: MIDI could not be imported because mido module was not found.")
+            return None
+        
         midi_bytes = self.sanitize_midi_lines(midi_lines)
         
         buffer = BytesIO()
         buffer.write(midi_bytes)
         buffer.seek(0)
-        mid = MidiFile(file=buffer)
+        mid = mido.MidiFile(file=buffer)
         
         return mid 
 
@@ -248,18 +257,21 @@ class MidiSongParser:
         
         mid = self.create_MidiFile(midi_lines)
         
-        song = []
-        for track in mid.tracks:
-            for msg in track:
-                if msg.type == 'note_on':
-                    note = self.parse_note_msg(msg, 1)
-                    if note:
-                        song.append(note)
-        
-        print(' '.join(song))
-        return [' '.join(song)]
+        if mid:
+            song = []
+            for track in mid.tracks:
+                for msg in track:
+                    if msg.type == 'note_on':
+                        note = self.parse_note_msg(msg, 1)
+                        if note:
+                            song.append(note)
+            
+            return [' '.join(song)]
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
     def parse_midi(self, midi_lines):
+        
+        if no_mido_module:
+            return []
         
         mid = self.create_MidiFile(midi_lines)
         

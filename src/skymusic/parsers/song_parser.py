@@ -435,9 +435,6 @@ class SongParser:
         elif self.input_mode == InputMode.MIDI:
             song_lines = MidiSongParser(self.maker, self.silent_warnings).parse_midi(song_lines)
 
-        print('%%%DEBUG%%%')
-        print(song_lines)
-
 
         english_song_key = self.english_note_name(song_key)
 

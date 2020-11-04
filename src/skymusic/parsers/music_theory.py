@@ -130,6 +130,8 @@ class MusicTheory():
                 return song_key
             else:
                 song_lines = midi_song_parser.collect_notes(song_lines)
+                if not song_lines:
+                    return None
         
         song_parser = self.song_parser
         note_parser = song_parser.get_note_parser()
@@ -346,7 +348,7 @@ class MusicTheory():
         
         #print('%DEBUG')
         #print(typ_diffs)
-        #print(typ_taus)l
+        #print(typ_taus)
         
         return typ_taus
 
