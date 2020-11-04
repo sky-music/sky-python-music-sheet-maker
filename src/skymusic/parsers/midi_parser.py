@@ -244,7 +244,12 @@ class MidiSongParser:
         buffer = BytesIO()
         buffer.write(midi_bytes)
         buffer.seek(0)
-        mid = mido.MidiFile(file=buffer)
+        
+        try:
+            mid = mido.MidiFile(file=buffer)
+        except (IOError, EOFError):
+            print("\n***ERROR: mido could not detect your file as being midi.")
+            return None
         
         return mid 
 
@@ -278,6 +283,9 @@ class MidiSongParser:
         
         mid = self.create_MidiFile(midi_lines)
         
+        if not mid:
+            return []
+        
         song = self.parse_first_meta(mid)
         
         for i, track in enumerate(mid.tracks):
@@ -296,6 +304,5 @@ class MidiSongParser:
             song += metadata + [notes]
             
         song = list(filter(None,song))
-        #print('%%%DEBUG')
-        #print(song)
+
         return song
