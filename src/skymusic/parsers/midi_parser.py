@@ -304,5 +304,4 @@ class MidiSongParser:
             song += metadata + [notes]
             
         song = list(filter(None,song))
-
         return song

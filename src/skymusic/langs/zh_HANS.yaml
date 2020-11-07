@@ -19,6 +19,10 @@ recipient_specifics:
     command_line: 在已选择的数字中间加入逗号, or 'all' to select all formats
     music_cog: 
     sky_music_website: 
+  put_in_songs_in:
+    command_line: " (在 '{songs_in}/)'"
+    music_cog: 
+    sky_music_website: 
 instrument:
   normal:
     short_desc: Normal instrument
@@ -207,7 +211,7 @@ stock_queries:
     help_text: '编册作家是把该歌曲编册为此乐谱的人。那个人也可以是您哟！'
   notes_file:
     foreword:
-    question: "请输入或者复制音符，粘贴到以下格子。您也可以输入含有音符的文字档名称 (在 '{songs_in}/)'"
+    question: "请输入或者复制音符，粘贴到以下格子。您也可以输入含有音符的文字档名称{put_in_songs_in}"
     afterword:
     input_tip: 一系列音符，如 C1 D1F1；或者文字档名称，如 song.txt
     help_text: |
@@ -222,7 +226,7 @@ stock_queries:
       - 西方乐谱和简谱支持使用升号 "#" 和降号 "b" (变音记号)。
   file:
     foreword:
-    question: "请输入有效的文字档名称 (在 '{songs_in}/')"
+    question: "请输入有效的文字档名称{put_in_songs_in}"
     afterword:
     input_tip: 任何含有一个音符或以上的文字档
     help_text:

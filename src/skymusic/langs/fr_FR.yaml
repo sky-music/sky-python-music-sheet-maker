@@ -19,6 +19,10 @@ recipient_specifics:
     command_line: Entrez une liste de nombres, ou 'all' pour sélectionner tous les formats
     music_cog: 
     sky_music_website: 
+  put_in_songs_in:
+    command_line: ", rangé dans '{songs_in}/'"
+    music_cog: 
+    sky_music_website: 
 instrument:
   normal:
     short_desc: Instrument normal
@@ -206,7 +210,7 @@ stock_queries:
     help_text: L'arrangeur est la personne qui a trouvé les bonnes notes ou accorss pour que la chanson sonne juste dans Sky. C'est peut-être vous!
   notes_file:
     foreword:
-    question: "Tapez ou collez vos notes ci-dessous. Vous pouvez aussi entrer un nom de fichier texte contenant les notes (à placer dans '{songs_in}/')"
+    question: "Tapez ou collez vos notes ci-dessous. Vous pouvez aussi entrer un nom de fichier texte contenant les notes{put_in_songs_in}"
     afterword:
     input_tip: du texte contenant des notes telles que C1 D1F1, do re mi, ou un nom de fichier comme song.txt
     help_text: |
@@ -220,7 +224,7 @@ stock_queries:
       - Les dièses "#" et les bémoles "b" (demi-tons) sont possibles pour les notations autres que Sky ABC-15.
   file:
     foreword:
-    question: "Entrez un nom de fichier valide, rangé dans '{songs_in}/' (sensible à la casse)"
+    question: "Entrez un nom de fichier valide{put_in_songs_in} (sensible à la casse)"
     afterword:
     input_tip: un fichier texte contenant des notes de musique
     help_text: "We have detected that you are trying to open a file, but couldn't find it. Please check its name and that it is located in the {songs_in} directory. File names are case sensitive"
@@ -283,7 +287,7 @@ stock_queries:
       Votre notation musicale n'utilise pas la notion d'octave : la hauteur de vos notes est donc indéterminée.
       Votre partition risque de sonner différement à différents endroits du jeu. Indiquez une clef pour obliger les joueurs à respecter votre chanson.
   octave_shift:
-    foreword: "Voulez-vous transposer vos notes ? Utilisez {recommended_octave_shift} si vos notes démarrent à l'octave 4."
+    foreword: "Voulez-vous transposer vos notes ? Utilisez {recommended_octave_shift} si vos notes écrites démarrent à l'octave 4."
     question: "Décalage d'octave ({skip_number} pour ne rien faire)"
     afterword:
     input_tip: décalage d'octave vers le haut ou le bas entre -6 et +6

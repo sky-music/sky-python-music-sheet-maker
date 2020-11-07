@@ -411,8 +411,12 @@ class MusicSheetMaker:
 
     def ask_file(self, recipient, prerequisites=None, execute=True):
 
+        replacements = {'songs_in': self.shortest_path(self.song_in_dir),
+                        'put_in_songs_in': Lang.get_string(f"recipient_specifics/put_in_songs_in/{recipient.get_name()}", self.locale)
+                        }
+        
         q_file = self.communicator.send_stock_query('file', recipient=recipient,
-                                                    replacements={'songs_in': self.shortest_path(self.song_in_dir)},
+                                                    replacements=replacements,
                                                     prerequisites=prerequisites,
                                                     limits=(os.path.normpath(self.song_in_dir)))
 
@@ -461,8 +465,9 @@ class MusicSheetMaker:
                         'jianpu_quaver_delimiter': Resources.JIANPU_QUAVER_DELIMITER,
                         'repeat_indicator': self.get_song_parser().get_repeat_indicator() + '2'
                         }
+        replacements.update({'put_in_songs_in': Lang.get_string(f"recipient_specifics/put_in_songs_in/{recipient.get_name()}", self.locale)})
 
-        if not self.is_command_line(recipient):
+        if self.is_music_cog(recipient):
 
             return self.ask_notes(recipient=recipient, prerequisites=prerequisites, execute=execute)
 
@@ -478,7 +483,9 @@ class MusicSheetMaker:
 
                 result = q_notes.get_reply().get_result()
 
-                if self.is_command_line(recipient):
+                if self.is_music_cog(recipient):
+                    isfile = False # Don't allow reading files stored on system path on the music-cog
+                else:                
                     # Detects if the result is a file path
                     file_path = os.path.join(self.song_in_dir, os.path.normpath(result))
                     isfile = os.path.isfile(file_path)
@@ -491,13 +498,12 @@ class MusicSheetMaker:
 
                             q_notes, file_path = self.ask_file(recipient=recipient, prerequisites=prerequisites,
                                                                execute=execute)
-                            isfile = True  # ask_file only returns when a valid file path is found
-                else:
-                    isfile = False  # Don't allow reading files on the website or music-cog
+                            isfile = True  # ask_file only returns when a valid file path is found                   
 
-                if isfile and self.is_command_line(recipient):
+                if isfile: 
                     notes = self.read_file(file_path)
-                    print(Lang.get_string("open_file", self.locale).format(file_path=os.path.abspath(file_path)))
+                    if self.is_command_line(recipient):
+                        print(Lang.get_string("open_file", self.locale).format(file_path=os.path.abspath(file_path)))
                 else:
                     notes = result.split(os.linesep)  # Returns a list of strings in any case
 

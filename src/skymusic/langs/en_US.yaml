@@ -18,6 +18,10 @@ recipient_specifics:
     command_line: Type choice numbers, or 'all' to select all formats
     music_cog: 
     sky_music_website: 
+  put_in_songs_in:
+    command_line: ", put in '{songs_in}/'"
+    music_cog: 
+    sky_music_website: 
 instrument:
   normal:
     short_desc: Normal instrument
@@ -208,7 +212,7 @@ stock_queries:
     help_text: 'The arranger is the musician who found the notes and chords that sound right in Sky. The transcriber is the person who wrote down the notes. It can be the same person: you maybe?'
   notes_file:
     foreword:
-    question: 'Type or copy-paste notes below. You can also enter a text file name containing the notes (in {songs_in}/)'
+    question: 'Type or copy-paste notes below. You can also enter a text file name containing the notes{put_in_songs_in}'
     afterword:
     input_tip: a string of notes such as C1 D1F1, or a file name such as song.txt
     help_text: |
@@ -223,7 +227,7 @@ stock_queries:
       - Sharps "#" and flats "b" (semitones) are supported for Western and Jianpu notations.
   file:
     foreword:
-    question: "Enter a valid file name (case sensitive), in '{songs_in}/'"
+    question: "Enter a valid file name (case sensitive){put_in_songs_in}"
     afterword:
     input_tip: any text file containing one or several musical notes
     help_text: "We have detected that you are trying to open a file, but couldn't find it. Please check its name and that it is located in the '{songs_in}' directory. File names are case sensitive"
@@ -288,7 +292,7 @@ stock_queries:
       You have used a musical notation that does impose the exact pitch of the notes.
       Hence the visual sheet will sound differently in different places in Sky.  This is called transposition.
   octave_shift:
-    foreword: "Do you want to shift the pitch of your notes? Use {recommended_octave_shift} if your notes start at octave 4."
+    foreword: "Do you want to shift the pitch of your notes? Use {recommended_octave_shift} if your written notes start at octave 4."
     question: 'Octave shift number ({skip_number} to skip)'
     afterword:
     input_tip: octave shift as an integer between -6 and +6
