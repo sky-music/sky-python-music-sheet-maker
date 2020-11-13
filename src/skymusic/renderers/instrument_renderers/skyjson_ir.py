@@ -18,14 +18,16 @@ class SkyjsonInstrumentRenderer(instrument_renderer.InstrumentRenderer):
         elif instrument.get_is_silent():
             json_render = [{'time':int(time), 'key':'.'}]
         else:
-            skygrid = instrument.get_skygrid()
             
             dt = Resources.SKYJSON_CHORD_DELAY/max([instrument.get_num_highlighted(),5])
-            for k in skygrid:  # Cycle over positions in a frame
-                for f in skygrid[k]:  # Cycle over triplets & quavers
-                    if skygrid[k][f]:  # Button is highlighted
-                        json_render += [{'time':int(time), 'key':self.note_parser.get_note_from_coordinate(k)}]
-                        time = time + dt
+            
+            for frame in range(instrument.get_frame_count()):
+                skygrid = instrument.get_skygrid(frame)                
+                if skygrid:                
+                    for coord in skygrid:  # Cycle over positions in a frame
+                        if skygrid[coord][frame]:  # Button is highlighted
+                            json_render += [{'time':int(time), 'key':self.note_parser.get_note_from_coordinate(coord)}]
+                    time = time + dt
                         
         return json_render
 

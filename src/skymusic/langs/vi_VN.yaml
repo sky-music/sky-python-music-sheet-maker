@@ -21,6 +21,10 @@ recipient_specifics:
     command_line: nhập các lựa chọn đặc cách nhau bởi dấu phẩy, hoặc 'all' để chọn tất cả.
     music_cog: 
     sky_music_website: 
+  put_in_songs_in:
+    command_line: ", trong thư mục '{songs_in}/'"
+    music_cog: 
+    sky_music_website: 
 instrument:
   normal:
     short_desc: Nhạc cụ thường
@@ -205,7 +209,7 @@ stock_queries:
     help_text: 'Người sắp xếp là người nhạc sĩ đã tìm các nốt và hợp âm nghe hợp lí trong Sky. Người thông dịch là người đã viết bản nhạc này. Nó cũng có thể là cùng một người: có thể là bạn?'
   notes_file:
     foreword:
-    question: "Nhập, hoặc dán nốt vào, hoặc nhập tên tệp (trong thư mục '{songs_in}/')"
+    question: "Nhập, hoặc dán nốt vào, hoặc nhập tên tệp{put_in_songs_in}"
     afterword:
     input_tip: Tên nốt như dạng C1 D1F1, hoặc tên tệp như song.txt
     help_text: |
@@ -219,7 +223,7 @@ stock_queries:
       - Dấu thăng "#" và dấu giáng "b" (nửa cung) được hỗ trợ cho hệ kí tự Phương Tây và Jianpu.
   file:
     foreword:
-    question: "Nhập tên tệp (trong '{songs_in}/')"
+    question: "Nhập tên tệp{put_in_songs_in}"
     afterword:
     input_tip: bất kì tệp văn bản bao gôm một hoặc nhiều nốt văn bản
     help_text:
@@ -318,24 +322,26 @@ stock_queries:
     input_tip: Bấm OK để tiếp tục
     help_text:
   many_errors:
-    foreword:
-    question: '*LƯU Ý:* Bài hát của bạn chứa quá nhiều lỗi'
-    afterword: |
+    foreword: |
+      *LƯU Ý:* Bài hát của bạn chứa quá nhiều lỗi!
       Vui lòng kiểm tra những lỗi sau:
       - Tất cả các nốt nhạc phải ở từ 1 đến 3 quãng tám. Nếu không, hãy thử lại với nốt quãng tám.
-      - In Jianpu, pauses are indicated by '0' (zero)
+      - Trong Jianpu, điểm dừng được đánh dấu bằng '0' (số không)
       - Bài hát của bạn không có lỗi chính tả. Vui lòng xem hướng dẫn đầy đủ ở trang web này: 
       <https://sky-music.github.io/make-your-own-sheet.html> (tiếng Anh)
-    input_tip: Bấm OK để tiếp tục
+    question: Do yo want to continue anyway?
+    afterword: 
+    input_tip: 'câu hỏi có/không'
     help_text:
   empty_song:
-    foreword:
-    question: '*LƯU Ý:* Bài hát của bạn để trống'
-    afterword: |
+    foreword: |
+      *LƯU Ý:* Bài hát của bạn để trống
       Vui lòng kiểm tra những lỗi sau:
       - Bạn đã nhập được ít nhất một nốt hợp lệ.
       - Nếu bạn vừa nhập một tệp bản nhạc trực quan HTML, hãy chắc chắn rằng nó được tạo ra sau 1/7/2020 và có thẻ <div id='ascii' hidden>
-    input_tip: Bấm OK để tiếp tục
+    question: Do yo want to continue anyway?
+    afterword: 
+    input_tip: 'câu hỏi có/không'
     help_text:  
   skyjson_url:
     foreword:

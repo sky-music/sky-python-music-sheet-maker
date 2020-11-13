@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import re
-
+from collections import OrderedDict
 from . import noteparser
 
 
@@ -13,6 +13,7 @@ class Doremi(noteparser.NoteParser):
         self.CHROMATIC_SCALE_DICT = {'do': 0, 'do#': 1, 'reb': 1, 're': 2, 're#': 3, 'mib': 3, 'mi': 4, 'fa': 5,
                                      'fa#': 6, 'solb': 6, 'sob': 6, 'sol': 7, 'so': 7, 'sol#': 8, 'so#': 8, 'lab': 8,
                                      'la': 9, 'la#': 10, 'sib': 10, 'tib': 10, 'si': 11, 'ti': 11}
+        self.INVERSE_CHROMATIC_SCALE_DICT = {self.CHROMATIC_SCALE_DICT[k]:k for k in reversed(OrderedDict(self.CHROMATIC_SCALE_DICT))}
 
         oct_int = self.get_default_starting_octave()
         

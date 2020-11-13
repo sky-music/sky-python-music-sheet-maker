@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import re
+from collections import OrderedDict
 from . import doremi
 
 
@@ -12,6 +13,7 @@ class DoremiJP(doremi.Doremi):
         self.CHROMATIC_SCALE_DICT = {'ド': 0, 'ド#': 1, 'レb': 1, 'レ': 2, 'レ#': 3, 'ミb': 3, 'ミ': 4, 'ファ': 5,
                                      'ファ#': 6, 'ソb': 6, 'ソ': 7, 'ソ#': 8, 'ラb': 8, 'ラ': 9, 'ラ#': 10, 'シb': 10, 'シ': 11,
                                      }
+        self.INVERSE_CHROMATIC_SCALE_DICT = {self.CHROMATIC_SCALE_DICT[k]:k for k in reversed(OrderedDict(self.CHROMATIC_SCALE_DICT))}
 
         # Compile regexes for notes to save before using
         self.note_name_with_octave_regex = re.compile(r'([ドレミフソラシ][ァ]?[b#♭♯]?\d)')

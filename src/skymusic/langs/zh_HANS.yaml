@@ -4,8 +4,8 @@ warnings:
   jianpu_quaver_delimiter: "简谱模式使用中:设定 '{jianpu_quaver_delimiter}' 为八分音符链接符号 '{quaver_delimiter}'.请确认您的输入遵守该条件."
   skyjson_url_connection: "Connection error when trying to get url from sky-music.herokuapp.com"
 words:
-  yes_word: yes
-  no_word: no
+  yes_word: 'yes'
+  no_word: 'no'
 recipient_specifics:
   skip:
     command_line: 留空以及按下回车键
@@ -17,6 +17,10 @@ recipient_specifics:
     sky_music_website: 按输入
   all_modes:
     command_line: 在已选择的数字中间加入逗号, or 'all' to select all formats
+    music_cog: 
+    sky_music_website: 
+  put_in_songs_in:
+    command_line: " (在 '{songs_in}/)'"
     music_cog: 
     sky_music_website: 
 instrument:
@@ -207,7 +211,7 @@ stock_queries:
     help_text: '编册作家是把该歌曲编册为此乐谱的人。那个人也可以是您哟！'
   notes_file:
     foreword:
-    question: "请输入或者复制音符，粘贴到以下格子。您也可以输入含有音符的文字档名称 (在 '{songs_in}/)'"
+    question: "请输入或者复制音符，粘贴到以下格子。您也可以输入含有音符的文字档名称{put_in_songs_in}"
     afterword:
     input_tip: 一系列音符，如 C1 D1F1；或者文字档名称，如 song.txt
     help_text: |
@@ -222,7 +226,7 @@ stock_queries:
       - 西方乐谱和简谱支持使用升号 "#" 和降号 "b" (变音记号)。
   file:
     foreword:
-    question: "请输入有效的文字档名称 (在 '{songs_in}/')"
+    question: "请输入有效的文字档名称{put_in_songs_in}"
     afterword:
     input_tip: 任何含有一个音符或以上的文字档
     help_text:
@@ -319,9 +323,8 @@ stock_queries:
     input_tip: 按 OK 确认
     help_text:
   many_errors:
-    foreword:
-    question: '*警告*: 您的乐谱中含有许多错误.'
-    afterword: |
+    foreword: |
+      *警告*: 您的乐谱中含有许多错误.
       请检查以下几点：
       
       - 如您以标注八度数字，它必须要在 1-3 之内的数字。如没，请重新输入八度数字。
@@ -329,17 +332,19 @@ stock_queries:
       - 您的乐谱中毫无差池。请浏览以下网站了解完整的指示：
       
       <https://sky-music.github.io/make-your-own-sheet.html>
-    input_tip: 按 OK 确认
+    question: Do you want to continue anyway?
+    afterword: 
+    input_tip: 'yes/no question'
     help_text:
   empty_song:
-    foreword:
-    question: '*警告*: 您输入了空白的乐谱'
-    afterword: |
+    foreword: |
+      *警告*: 您输入了空白的乐谱
       请检查以下几点：
       - 您输入了至少一个可通的音符
       - 如果您输入了HTML乐谱文件，请确保文件是于2020年7月1号之后生成以及含有此代码：<div id='ascii' hidden>
-      
-    input_tip: 按 OK 确认
+    question: Do you want to continue anyway?
+    afterword: 
+    input_tip: 'yes/no question'
     help_text:
   skyjson_url:
     foreword:

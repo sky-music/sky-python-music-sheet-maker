@@ -43,6 +43,10 @@ class NoteParser:
 
         return self.CHROMATIC_SCALE_DICT
 
+    def get_inverse_chromatic_scale_dict(self):
+
+        return self.INVERSE_CHROMATIC_SCALE_DICT
+
     def get_semitone_interval_to_major_scale_interval_dict(self):
 
         return self.SEMITONE_INTERVAL_TO_MAJOR_SCALE_INTERVAL_DICT
@@ -127,7 +131,10 @@ class NoteParser:
         else:
             native_parser = self
             foreign_parser = english.English()
-
+        
+        if foreign_parser.__class__ == native_parser.__class__:
+            return notes_string
+        
         note_name = native_parser.note_name_regex.match(str(notes_string))
 
         if note_name is not None:
@@ -225,6 +232,16 @@ class NoteParser:
         else:
             raise KeyError(f"ParsingError: Note {note_name} was not found in the chromatic scale.")
 
+    def convert_chromatic_position_into_note_name(self, chromatic_position):
+        
+        inverse_chromatic_scale_dict = self.get_inverse_chromatic_scale_dict()
+
+        try:
+            return inverse_chromatic_scale_dict[chromatic_position]
+        except KeyError:
+            raise KeyError(f"ParsingError: Chromatic position {chromatic_position} was not found in the inverse chromatic scale.")        
+        
+
     def convert_semitone_interval_to_major_scale_interval(self, semitone_interval):
 
         conversion_dict = self.get_semitone_interval_to_major_scale_interval_dict()
@@ -234,7 +251,7 @@ class NoteParser:
         else:
             raise KeyError(f"ParsingError: Interval {semitone_interval} is not in the major scale.")
 
-    def calculate_coordinate_for_note(self, note, song_key='C', note_shift=0, is_finding_key=False):
+    def calculate_coordinate_for_note(self, note, song_key=Resources.DEFAULT_KEY, note_shift=0, is_finding_key=False):
 
         """
 

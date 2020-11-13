@@ -215,5 +215,5 @@ try:
         maker.execute_queries(q)
 
 except QueriesExecutionAbort as qExecAbort:
-    print(repr(qExecAbort))
+    print(qExecAbort)
 

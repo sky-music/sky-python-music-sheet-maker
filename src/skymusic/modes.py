@@ -14,6 +14,8 @@ class InputMode(Enum):
     ENGLISHCHORDS = (True, "input_mode/englishchords/short_desc", "input_mode/englishchords/long_desc",
                      skymusic.parsers.noteparsers.englishchords.EnglishChords)
     DOREMIJP = (True, "input_mode/doremijp/short_desc", "input_mode/doremijp/long_desc", skymusic.parsers.noteparsers.doremi_jp.DoremiJP)
+    MIDI = (True, "input_mode/midi/short_desc", "input_mode/midi/long_desc", skymusic.parsers.noteparsers.english.English)
+
 
     def __init__(self, chromatic, short_desc, long_desc, note_parser_method):
         self.chromatic = chromatic

@@ -49,9 +49,7 @@ class QueriesExecutionAbort(Exception):
         return f"{self.__class__.__name__}, queries={queries_str}, explanations={self.explanations}"
 
     def __str__(self):
-        return str(self.queries)
-
-    pass
+        return str(self.explanations)
 
 
 class Communicator:
@@ -119,12 +117,13 @@ class Communicator:
         method_args = stock_query_dict.copy()
         method_args.pop('class')  # The class was used and is not an argument for Query
         method_args.pop('handler')  # The handler is not useful here and is not an argument for Query
-        if replacements is not None:
-            for k in method_args:
-                try:
-                    method_args[k] = method_args[k].format_map(replacements)
-                except (KeyError, AttributeError):
-                    pass
+        for i in range(2): # Recursivity level of 2
+            if replacements is not None:
+                for k in method_args:
+                    try:
+                        method_args[k] = method_args[k].format_map(replacements)
+                    except (KeyError, AttributeError):
+                        pass
         method_args['name'] = stock_query_name
         method_args['sender'] = self.owner
         method_args['recipient'] = recipient
@@ -199,21 +198,29 @@ class Communicator:
 
         for query in queries:
             limits = query.get_limits()
+            
+            if isinstance(query, QueryBoolean):
+                limits = limits[:2] # To skip synonyms (e.g. Y for Yes)
 
             # Question keyword arguments dictionary
             if isinstance(query, QueryMultipleChoices):
                 multiple_choices = True
             else:
                 multiple_choices = False
-
+			
+            if (query.get_reply_type() == ReplyType.FILEPATH) or (query.get_reply_type() == ReplyType.OTHER and 'file' in query.get_name()):
+                accepts_file = True
+            else:
+                accepts_file = False
+			
             question_dict = {'foreword': query.get_foreword().strip(), 'question': query.get_question().strip(),
                              'afterword': query.get_afterword().strip(),
                              'help_text': query.get_help_text().strip(), 'input_tip': query.get_input_tip().strip(),
-                             'identifier': query.get_identifier(),
+                             'identifier': query.get_identifier(), 'accepts_file': accepts_file,
                              'expect_answer': query.get_expect_reply(), 'multiple_choices': multiple_choices}
 
             # Choices keyword arguments dictionary
-            if isinstance(query, (QueryMultipleChoices, QueryChoice)):
+            if isinstance(query, (QueryMultipleChoices, QueryChoice)):                    
                 if isinstance(limits[0], InputMode):
                     choices_dicts = [{'number': i, 'text': limit.get_short_desc(self.locale)} for i, limit in enumerate(limits)]
                 elif isinstance(limits[0], RenderMode):

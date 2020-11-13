@@ -19,6 +19,10 @@ recipient_specifics:
     command_line: Entrez une liste de nombres, ou 'all' pour sélectionner tous les formats
     music_cog: 
     sky_music_website: 
+  put_in_songs_in:
+    command_line: ", rangé dans '{songs_in}/'"
+    music_cog: 
+    sky_music_website: 
 instrument:
   normal:
     short_desc: Instrument normal
@@ -54,6 +58,9 @@ input_mode:
   skyjson:
     short_desc: 'Enregistrement Sky-Music  (JSON text)'
     long_desc: "Dictionaire avec le temps en ms et la touche 0-14 comme sur l'app SkyStudio et <https://sky-music.herokuapp.com>"
+  midi:
+    short_desc: Midi file
+    long_desc: Midi file
 render_mode:
   html:
     short_desc: partition graphique en HTML
@@ -203,7 +210,7 @@ stock_queries:
     help_text: L'arrangeur est la personne qui a trouvé les bonnes notes ou accorss pour que la chanson sonne juste dans Sky. C'est peut-être vous!
   notes_file:
     foreword:
-    question: "Tapez ou collez vos notes ci-dessous. Vous pouvez aussi entrer un nom de fichier texte contenant les notes (à placer dans '{songs_in}/')"
+    question: "Tapez ou collez vos notes ci-dessous. Vous pouvez aussi entrer un nom de fichier texte contenant les notes{put_in_songs_in}"
     afterword:
     input_tip: du texte contenant des notes telles que C1 D1F1, do re mi, ou un nom de fichier comme song.txt
     help_text: |
@@ -217,7 +224,7 @@ stock_queries:
       - Les dièses "#" et les bémoles "b" (demi-tons) sont possibles pour les notations autres que Sky ABC-15.
   file:
     foreword:
-    question: "Entrez un nom de fichier valide, rangé dans '{songs_in}/' (sensible à la casse)"
+    question: "Entrez un nom de fichier valide{put_in_songs_in} (sensible à la casse)"
     afterword:
     input_tip: un fichier texte contenant des notes de musique
     help_text: "We have detected that you are trying to open a file, but couldn't find it. Please check its name and that it is located in the {songs_in} directory. File names are case sensitive"
@@ -280,7 +287,7 @@ stock_queries:
       Votre notation musicale n'utilise pas la notion d'octave : la hauteur de vos notes est donc indéterminée.
       Votre partition risque de sonner différement à différents endroits du jeu. Indiquez une clef pour obliger les joueurs à respecter votre chanson.
   octave_shift:
-    foreword: "Voulez-vous transposer vos notes ? Utilisez {recommended_octave_shift} si vos notes démarrent à l'octave 4."
+    foreword: "Voulez-vous transposer vos notes ? Utilisez {recommended_octave_shift} si vos notes écrites démarrent à l'octave 4."
     question: "Décalage d'octave ({skip_number} pour ne rien faire)"
     afterword:
     input_tip: décalage d'octave vers le haut ou le bas entre -6 et +6
@@ -314,9 +321,9 @@ stock_queries:
     input_tip: cliquez sur OK pour passer
     help_text:
   many_errors:
-    foreword:
-    question: "*ATTENTION*: Le décodage de votre chanson a généré beaucoup d'erreurs."
-    afterword: |
+    foreword: |
+      *ATTENTION*: Le décodage de votre chanson a généré beaucoup d'erreurs.
+      
       Veuillez vérifier les points suivants:
     
       - Si vous avez spécifié l'octave, il doit être entre 1 et 3. Sinon, recommencez en utilisant le décalage d'octave.
@@ -324,18 +331,20 @@ stock_queries:
       - Que votre chanson ne contient pas d'erreur de frappe. Veuillez consulter ce site web pour plus d'infos: 
     
       <https://sky-music.github.io/make-your-own-sheet.html>
-    input_tip: cliquez sur OK pour passer
+    question: Voulez-vous quand même continuer ?
+    afterword: 
+    input_tip: 'oui/non'
     help_text:
   empty_song:
-    foreword:
-    question: '*WARNING*: Your song is empty'
-    afterword: |
-      Please check the following:
+    foreword: |
+      *ATTENTION*: Votre chanson est vide !
+      Merci de vérifier que :
       
-      - You have entered at least one valid note
-      - If you entered an HTML visual sheet file, make sure it has been generated after the 1st July 2020 and contains the tag <div id='ascii' hidden>
-      
-    input_tip: click OK to acknowledge
+      - Vous avez entré au moins 1 note valide
+      - Si avez chargé une portée visuelle en HTML, vérifiez qu'elle est postérieure au 1er Juillet 2020 (son code doit contenir la balise <div id='ascii' hidden>).
+    question: Voulez-vous quand même continuer ?
+    afterword: 
+    input_tip: 'oui/non'
     help_text:
   skyjson_url:
     foreword:

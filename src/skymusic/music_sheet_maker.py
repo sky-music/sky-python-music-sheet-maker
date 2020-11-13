@@ -298,13 +298,16 @@ class MusicSheetMaker:
 
         # 6. Asks for octave shift
         (q_shift, octave_shift) = self.ask_octave_shift(recipient=recipient, input_mode=input_mode)
-
+                
         # 7. Parses song
         self.parse_song(recipient, notes=notes, song_key=song_key, octave_shift=octave_shift)
         #self.parse_song(recipient) # EXPERIMENTAL
 
         # 8. Displays error ratio
-        (i_error, res) = self.display_error_ratio(recipient=recipient, prerequisites=[q_notes, q_mode, q_shift])
+        (i_error, ok) = self.display_error_ratio(recipient=recipient, prerequisites=[q_notes, q_mode, q_shift])
+        
+        if i_error and not ok:
+            raise QueriesExecutionAbort([i_error],'Execution aborted by the player.')
 
         # 9. Asks for render modes
         (q_render, render_modes) = self.ask_render_modes(recipient=recipient)
@@ -408,8 +411,12 @@ class MusicSheetMaker:
 
     def ask_file(self, recipient, prerequisites=None, execute=True):
 
+        replacements = {'songs_in': self.shortest_path(self.song_in_dir),
+                        'put_in_songs_in': Lang.get_string(f"recipient_specifics/put_in_songs_in/{recipient.get_name()}", self.locale)
+                        }
+        
         q_file = self.communicator.send_stock_query('file', recipient=recipient,
-                                                    replacements={'songs_in': self.shortest_path(self.song_in_dir)},
+                                                    replacements=replacements,
                                                     prerequisites=prerequisites,
                                                     limits=(os.path.normpath(self.song_in_dir)))
 
@@ -424,14 +431,20 @@ class MusicSheetMaker:
     def read_file(self, file_path):
 
         isfile = os.path.isfile(file_path)
-
+        
+        _, ext = os.path.splitext(file_path)
+        
         if not isfile:
             MusicSheetMakerError("File does not exist: %s" % os.path.abspath(file_path))
         else:
             # load file
             try:
-                with open(file_path, mode='r', encoding='utf-8', errors='ignore') as fp:
-                    lines = fp.readlines()  # Returns a list of strings
+                if ext in Resources.BINARY_EXT:
+                    with open(file_path, mode='rb') as fp:
+                        lines = fp.readlines()  # Returns a list of bytes
+                else:
+                    with open(file_path, mode='r', encoding='utf-8', errors='ignore') as fp:
+                        lines = fp.readlines()  # Returns a list of strings
             except (OSError, IOError) as err:
                 raise err
 
@@ -452,8 +465,9 @@ class MusicSheetMaker:
                         'jianpu_quaver_delimiter': Resources.JIANPU_QUAVER_DELIMITER,
                         'repeat_indicator': self.get_song_parser().get_repeat_indicator() + '2'
                         }
+        replacements.update({'put_in_songs_in': Lang.get_string(f"recipient_specifics/put_in_songs_in/{recipient.get_name()}", self.locale)})
 
-        if not self.is_command_line(recipient):
+        if self.is_music_cog(recipient):
 
             return self.ask_notes(recipient=recipient, prerequisites=prerequisites, execute=execute)
 
@@ -469,7 +483,9 @@ class MusicSheetMaker:
 
                 result = q_notes.get_reply().get_result()
 
-                if self.is_command_line(recipient):
+                if self.is_music_cog(recipient):
+                    isfile = False # Don't allow reading files stored on system path on the music-cog
+                else:                
                     # Detects if the result is a file path
                     file_path = os.path.join(self.song_in_dir, os.path.normpath(result))
                     isfile = os.path.isfile(file_path)
@@ -482,13 +498,12 @@ class MusicSheetMaker:
 
                             q_notes, file_path = self.ask_file(recipient=recipient, prerequisites=prerequisites,
                                                                execute=execute)
-                            isfile = True  # ask_file only returns when a valid file path is found
-                else:
-                    isfile = False  # Don't allow reading files on the website or music-cog
+                            isfile = True  # ask_file only returns when a valid file path is found                   
 
-                if isfile and self.is_command_line(recipient):
+                if isfile: 
                     notes = self.read_file(file_path)
-                    print(Lang.get_string("open_file", self.locale).format(file_path=os.path.abspath(file_path)))
+                    if self.is_command_line(recipient):
+                        print(Lang.get_string("open_file", self.locale).format(file_path=os.path.abspath(file_path)))
                 else:
                     notes = result.split(os.linesep)  # Returns a list of strings in any case
 
@@ -589,12 +604,13 @@ class MusicSheetMaker:
             input_mode = self.retrieve_input_mode(recipient, notes)
 
         song_key = None
+        
         possible_keys = self.get_song_parser().find_key(notes)
 
         try:
             default_key = self.get_song_parser().get_default_key()
         except AttributeError:
-            default_key = 'C'
+            default_key = Resources.DEFAULT_KEY
 
         if possible_keys is None:
             # Asks for any text string
@@ -656,7 +672,7 @@ class MusicSheetMaker:
             return None, 0
         else:
 
-            recommended_octave_shift = Resources.PARSING_START_OCTAVE - 4
+            recommended_octave_shift = '{:d}/{:d}'.format(Resources.PARSING_START_OCTAVE - 3, Resources.PARSING_START_OCTAVE - 4)
 
             replacements = {'recommended_octave_shift': recommended_octave_shift, 'skip_number': Lang.get_string(f"recipient_specifics/skip_number/{recipient.get_name()}", self.locale)}
             q_shift = self.communicator.send_stock_query('octave_shift', recipient=recipient,
@@ -673,11 +689,13 @@ class MusicSheetMaker:
 
     def display_error_ratio(self, recipient, prerequisites=None, execute=True):
 
-        error_ratio = self.get_song().get_num_broken() / max(1, self.get_song().get_num_instruments())
+        num_errors = self.get_song().get_num_broken()
+        
+        error_ratio = num_errors / max(1, self.get_song().get_num_instruments())
 
         if error_ratio == 0:
             i_error = None
-        elif error_ratio < 0.05:
+        elif error_ratio < 0.05 and num_errors < 50:
             i_error = self.communicator.send_stock_query('few_errors', recipient=recipient, prerequisites=prerequisites)
         else:
             i_error = self.communicator.send_stock_query('many_errors', recipient=recipient,
@@ -783,7 +801,7 @@ class MusicSheetMaker:
             (title, artist, transcript) = meta
 
         if song_key is None:
-            song_key = self.retrieve_query_result(recipient, '_key', 'C')
+            song_key = self.retrieve_query_result(recipient, '_key', Resources.DEFAULT_KEY)
 
         self.get_song().set_meta(title=title, artist=artist, transcript=transcript, song_key=song_key)
 
@@ -796,8 +814,9 @@ class MusicSheetMaker:
             octave_shift = self.retrieve_query_result(recipient, 'octave_shift', 0)
 
         if song_key is None:
-            song_key = self.retrieve_query_result(recipient, '_key', 'C')
+            song_key = self.retrieve_query_result(recipient, '_key', Resources.DEFAULT_KEY)
 
+        
         song = self.get_song_parser().parse_song(song_lines=notes, song_key=song_key, octave_shift=octave_shift)
 
         self.set_song(song)

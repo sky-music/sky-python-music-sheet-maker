@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import re
-
+from collections import OrderedDict
 from . import noteparser
 
 
@@ -12,6 +12,8 @@ class Jianpu(noteparser.NoteParser):
 
         self.CHROMATIC_SCALE_DICT = {'1': 0, '1#': 1, '2b': 1, '2': 2, '2#': 3, '3b': 3, '3': 4, '4': 5, '4#': 6,
                                      '5b': 6, '5': 7, '5#': 8, '6b': 8, '6': 9, '6#': 10, '7b': 10, '7': 11}
+        
+        self.INVERSE_CHROMATIC_SCALE_DICT = {self.CHROMATIC_SCALE_DICT[k]:k for k in reversed(OrderedDict(self.CHROMATIC_SCALE_DICT))}
 
         # Compile regexes for notes to save before using
         self.note_name_with_octave_regex = re.compile(r'([1234567][b#♭♯]?[\+\-]+)')

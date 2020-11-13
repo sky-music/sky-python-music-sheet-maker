@@ -10,29 +10,25 @@ except (ImportError, ModuleNotFoundError):
 
 class MidiNoteRenderer(note_renderer.NoteRenderer):
 
-    def __init__(self):
-        pass
+    def __init__(self, music_key=Resources.DEFAULT_KEY):
+        self.music_key = music_key
 
-    def render(self, note, event_type, t=0, music_key='C'):
+    def render(self, note, event_type, delta_t=0):
         """
         Starts or ends a MIDI note, assuming a chromatic scale (12 semitones)
         """
-        octave = int(note.get_index() / 7)
+        octave = int(note.get_index() / 7) #7 because of the heptatonic tone scale of Sky (no accidentals)
         semi = Resources.MIDI_SEMITONES[note.get_index() % 7]
         try:
-            root_pitch = Resources.MIDI_PITCHES[music_key]
+            root_pitch = Resources.MIDI_PITCHES[self.music_key]
         except KeyError:
-            default_key = Resources.DEFAULT_KEY
-            root_pitch = Resources.MIDI_PITCHES[default_key]
+            root_pitch = Resources.MIDI_PITCHES[Resources.DEFAULT_KEY]
             
         note_pitch = root_pitch + octave * 12 + semi
 
-        if not note.instrument_is_broken and not note.instrument_is_silent:
-            if len(note.get_highlighted_frames()) == 0:
-                midi_render = None
-            else:
-                midi_render = mido.Message(event_type, channel=0, note=note_pitch, velocity=127, time=int(t))
-        else:
+        if len(note.get_highlighted_frames()) == 0:
             midi_render = None
+        else:
+            midi_render = mido.Message(event_type, channel=0, note=note_pitch, velocity=64, time=int(delta_t))
 
         return midi_render

@@ -300,7 +300,7 @@ def load(locale):
                              'input_tip': Lang.get_string("stock_queries/no_song_file/input_tip", locale),
                              'help_text': Lang.get_string("stock_queries/no_song_file/help_text", locale)
                              },
-        
+     
             'few_errors': {'class': Information,
                              'handler': 'None',
                              'foreword': Lang.get_string("stock_queries/few_errors/foreword", locale),
@@ -310,22 +310,26 @@ def load(locale):
                              'help_text': Lang.get_string("stock_queries/few_errors/help_text", locale)
                              },
                                                                                                                                            
-            'many_errors': {'class': Information,
+            'many_errors': {'class': QueryBoolean,
                              'handler': 'None',
                              'foreword': Lang.get_string("stock_queries/many_errors/foreword", locale),
                              'question': Lang.get_string("stock_queries/many_errors/question", locale),
                              'afterword': Lang.get_string("stock_queries/many_errors/afterword", locale),
                              'input_tip': Lang.get_string("stock_queries/many_errors/input_tip", locale),
-                             'help_text': Lang.get_string("stock_queries/many_errors/help_text", locale)
+                             'help_text': Lang.get_string("stock_queries/many_errors/help_text", locale),
+                             'reply_type': ReplyType.TEXT,
+                                 'limits': [Lang.get_string("words/yes_word", locale), Lang.get_string("words/no_word", locale)]                             
                              },
                              
-            'empty_song': {'class': Information,
+            'empty_song': {'class': QueryBoolean,
                            'handler': 'None',
                              'foreword': Lang.get_string("stock_queries/empty_song/foreword", locale),
                              'question': Lang.get_string("stock_queries/empty_song/question", locale),
                              'afterword': Lang.get_string("stock_queries/empty_song/afterword", locale),
                              'input_tip': Lang.get_string("stock_queries/empty_song/input_tip", locale),
-                             'help_text': Lang.get_string("stock_queries/empty_song/help_text", locale)
+                             'help_text': Lang.get_string("stock_queries/empty_song/help_text", locale),
+                             'reply_type': ReplyType.TEXT,
+                                 'limits': [Lang.get_string("words/yes_word", locale), Lang.get_string("words/no_word", locale)]                              
                              },
                              
             'skyjson_url': {'class': Information,
