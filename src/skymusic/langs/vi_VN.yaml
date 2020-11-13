@@ -326,7 +326,7 @@ stock_queries:
       *LƯU Ý:* Bài hát của bạn chứa quá nhiều lỗi!
       Vui lòng kiểm tra những lỗi sau:
       - Tất cả các nốt nhạc phải ở từ 1 đến 3 quãng tám. Nếu không, hãy thử lại với nốt quãng tám.
-      - In Jianpu, pauses are indicated by '0' (zero)
+      - Trong Jianpu, điểm dừng được đánh dấu bằng '0' (số không)
       - Bài hát của bạn không có lỗi chính tả. Vui lòng xem hướng dẫn đầy đủ ở trang web này: 
       <https://sky-music.github.io/make-your-own-sheet.html> (tiếng Anh)
     question: Do yo want to continue anyway?
