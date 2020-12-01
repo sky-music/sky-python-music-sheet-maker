@@ -78,11 +78,13 @@ png_color = (255, 255, 255)
 text_bkg = (255, 255, 255, 0)  # Transparent white
 song_bkg = (255, 255, 255)  # White paper sheet                                                                        
 
-with importlib_resources.path(fonts, 'NotoSansCJKjp-Bold.otf') as fp:
-    font_path = str(fp)
-    if not os.path.isfile(font_path):
-        raise FileNotFoundError(f"Could not find fonts/{os.path.relpath(font_path, start=os.path.dirname(fonts.__file__))}")
-
+try:
+    with importlib_resources.path(fonts, 'NotoSansCJKjp-Bold.otf') as fp:
+        font_path = str(fp)
+except FileNotFoundError:
+    font_path = os.path.join(os.path.dirname(fonts.__file__), 'NotoSansCJKjp-Bold.otf')
+    print(f"***ERROR: Could not find: 'fonts/{os.path.relpath(font_path, start=os.path.dirname(fonts.__file__))}'")
+    
 rel_css_path = '../css/main.css' # For IMPORT and HREF methods of embedding css files
 offline_scripts_urls = [] #Embedded in HTML files
 online_scripts_urls = ['/js/navigationTableScript.js', '/js/sheetDarkModeScript.js', '/js/sheetDownloaderScript.js'] # linked in HTML files, stored on sky-music.github.io
