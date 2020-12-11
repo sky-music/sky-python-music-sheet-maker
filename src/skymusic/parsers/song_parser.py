@@ -267,8 +267,8 @@ class SongParser:
             repeat, chord = self.split_chord(chord)
             # Now the real chord has been split in notes (1 note = 1 list slot)
 
-            harp_broken = False
-            harp_silent = False
+            harp_broken = False # No probllem detected yet, so the Harp is a priori OK
+            harp_silent = True  # No note detected yet, so the Harp is a priori silent
             for note in chord:  # Chord is a list of notes
                 note_broken = False
                 try:
@@ -280,13 +280,14 @@ class SongParser:
                 except (KeyError, SyntaxError) as err:
                     note_broken = True
                     harp_broken = True
+                    harp_silent = False # Harp is broken, so it's not silent
                     if not self.silent_warnings:
                         print(err)
-                    
+                
                 if not note_broken:
                     skygrid[highlighted_note_position] = {}
                     skygrid[highlighted_note_position][idx0 + chord_idx] = True
-                    harp_silent = False
+                    harp_silent = False # There's a note, so the harp is a priori not silent
                     if highlighted_note_position[0] < 0 and highlighted_note_position[1] < 0:  # Note is a silence
                         skygrid[highlighted_note_position][idx0 + chord_idx] = False
                         harp_silent = True
