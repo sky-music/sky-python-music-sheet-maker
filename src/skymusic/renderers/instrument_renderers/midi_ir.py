@@ -23,7 +23,7 @@ class MidiInstrumentRenderer(instrument_renderer.InstrumentRenderer):
         #midi_pause_relticks = 1  # Spacing between midi notes, as a ratio of note duration
         quaver_relspacing = 0.1
         quaver_relticks = 0.5
-        self.delta_times = {'note_on': relspacing * note_ticks, 'note_off': note_ticks, 'quaver_on': relspacing*note_ticks, 'quaver_off': quaver_relticks*note_ticks}
+        self.delta_times = {'note_on': relspacing * note_ticks, 'note_off': note_ticks, 'quaver_on': quaver_relspacing*note_ticks, 'quaver_off': quaver_relticks*note_ticks}
 
     '''
     def cycle_chord(self, instrument):
@@ -55,20 +55,20 @@ class MidiInstrumentRenderer(instrument_renderer.InstrumentRenderer):
         #harp_render = []
         
         render_args = []
+        harp_render = [] 
         
         t = self.delta_times['note_on']
-        print(' ')
+        
         for frame in range(instrument.get_frame_count()):
             
             skygrid = instrument.get_skygrid(frame)
-            print(skygrid)
+            
             if skygrid:
                 for coord in skygrid:  # Cycle over (row, col) positions in an icon
                     
                     if skygrid[coord][frame]:  # Button is highlighted
                         note = instrument.get_note_from_position(coord)
                         
-                        print(coord)            
                         render_args.append({'note':note,'event_type':'note_on','t':t})
                         
                         note_duration = self.delta_times['note_off'] if frame == 0 else self.delta_times['quaver_off']
@@ -77,18 +77,18 @@ class MidiInstrumentRenderer(instrument_renderer.InstrumentRenderer):
                 if frame > 0:
                     t += self.delta_times['quaver_on']
         
-        render_args.sort(key=lambda v:v['t']) #sort by absolute time
-        
-        render_args[0]['delta_t'] = render_args[0]['t']
-        for i in range(1, len(render_args)):
-            render_args[i]['delta_t'] = render_args[i]['t'] - render_args[i-1]['t']
-        
-        harp_render = []                                  
-        for kwarg in render_args:
-            del(kwarg['t'])
-            note_render = note_renderer.render(**kwarg)
-            if note_render:
-                harp_render.append(note_render)                   
+        if render_args:
+            render_args.sort(key=lambda v:v['t']) #sort by absolute time
+            
+            render_args[0]['delta_t'] = render_args[0]['t']
+            for i in range(1, len(render_args)):
+                render_args[i]['delta_t'] = render_args[i]['t'] - render_args[i-1]['t']
+                                                 
+            for kwarg in render_args:
+                del(kwarg['t'])
+                note_render = note_renderer.render(**kwarg)
+                if note_render:
+                    harp_render.append(note_render)                   
                             
         return harp_render
 

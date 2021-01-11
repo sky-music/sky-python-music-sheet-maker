@@ -26,6 +26,12 @@ class PngInstrumentRenderer(instrument_renderer.InstrumentRenderer):
         self.harp_font_size = Resources.harp_font_size
         self.repeat_height = None
         self.voice_font_size = Resources.voice_font_size
+        try:
+            self.voice_font = ImageFont.truetype(self.font_path, self.voice_font_size)
+            self.harp_font = ImageFont.truetype(self.font_path, self.harp_font_size)
+        except OSError:
+            self.voice_font = ImageFont.load_default()
+            self.harp_font = ImageFont.load_default()
 
         self.png_harp_size = None
         self.harp_type = harp_type
@@ -62,7 +68,8 @@ class PngInstrumentRenderer(instrument_renderer.InstrumentRenderer):
         repeat_im = Image.new('RGBA', (int(max_rescaled_width / rescale), int(self.get_png_harp_size()[1])),
                               color=self.text_bkg)
         draw = ImageDraw.Draw(repeat_im)
-        fnt = ImageFont.truetype(self.font_path, self.harp_font_size)
+        #fnt = ImageFont.truetype(self.font_path, self.harp_font_size)
+        fnt = self.harp_font
         draw.text((0, repeat_im.size[1] - 1.05 * fnt.getsize(str(instrument.get_repeat()))[1]), 'x' + str(instrument.get_repeat()), font=fnt,
                   fill=self.font_color)
 
@@ -75,7 +82,8 @@ class PngInstrumentRenderer(instrument_renderer.InstrumentRenderer):
 
     def get_lyric_height(self):
         """Calculates the height of the lyrics based on a standard text and the font size"""
-        fnt = ImageFont.truetype(self.font_path, self.voice_font_size)
+        #fnt = ImageFont.truetype(self.font_path, self.voice_font_size)
+        fnt = self.voice_font
         return fnt.getsize('HQfgjyp')[1] #Uppercase H and characters with tails
    
 
@@ -83,7 +91,8 @@ class PngInstrumentRenderer(instrument_renderer.InstrumentRenderer):
         """Renders the lyrics text in PNG"""
         lyric = instrument.get_lyric(strip_html=True)
         harp_size = self.get_png_harp_size()
-        fnt = ImageFont.truetype(self.font_path, int(self.voice_font_size))
+        #fnt = ImageFont.truetype(self.font_path, int(self.voice_font_size))
+        fnt = self.voice_font
         lyric_width = fnt.getsize(lyric)[0]
 
         lyric_im = Image.new('RGBA', (int(max(harp_size[0], lyric_width)), int(self.get_lyric_height())),

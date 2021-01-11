@@ -144,9 +144,11 @@ class Harp(Instrument):
         
         if not self.frame_count:
             
-            frame_counts = 0
             frame_counts = [max(list(self.skygrid[coord].keys()))+1 for coord in self.skygrid.keys()]
-            self.frame_count = max(frame_counts)
+            if frame_counts:
+                self.frame_count = max(frame_counts)
+            else:
+                self.frame_count = 0
             
         return self.frame_count    
 
