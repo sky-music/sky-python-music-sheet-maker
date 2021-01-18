@@ -205,7 +205,8 @@ class PngSongRenderer(song_renderer.SongRenderer):
 
         ysong = y_in_png
         instrument_index = 0
-        end_row = song.get_num_lines()
+        num_lines = song.get_num_lines()
+        end_row = num_lines
         end_col = 0
         ncols = self.maxIconsPerLine
         page_break = False

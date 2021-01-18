@@ -4,13 +4,6 @@
   }
 }
 
-/* <!-- Song title --> */
-h1, svg text.title {
-    font-family: "Noto Sans", "Noto Sans CJK JP", "Noto Sans CJK KR", "Noto Sans CJK SC", "Noto Sans CJK TC", "Avenir", Arial, sans-serif;
-    font-size: 1.3em;
-    font: bold;
-}
-
 .root, .diamond, .circle {
   transform: scale(1.0);
   -ms-transform: scale(1.0);
