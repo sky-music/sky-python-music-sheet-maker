@@ -79,7 +79,6 @@ class HtmlSongRenderer(song_renderer.SongRenderer):
             html_buffer.write('\n'+ascii_buffer.getvalue())
         html_buffer.write('\n</div>')       
 
-
     def write_buffers(self, song, css_mode=CSSMode.EMBED):    
         
         html_buffer = io.StringIO()
@@ -92,15 +91,21 @@ class HtmlSongRenderer(song_renderer.SongRenderer):
         song_render = ''
         instrument_index = 0
         song_lines = song.get_lines()
+        num_lines = len(song_lines)
         instrument_renderer = HtmlInstrumentRenderer(self.locale)
         
-        for line in song_lines:
-            if len(line) > 0:
+        for i, line in enumerate(song_lines):
+            if len(line) > 0:                                
                 if line[0].get_type() == 'voice':
                     song_render += '\n<br />'
                 else:
                     song_render += '\n<hr />'
-
+                            
+                #song_render += '<div class="line">'            
+            
+                if num_lines > 10 and line[0].get_type() != 'voice':
+                    song_render += f'<table class="num"><tr><td>{i:d}</td></tr></table>'
+                
                 line_render = '\n'
                 for instrument in line:
                     instrument.set_index(instrument_index)
@@ -109,8 +114,11 @@ class HtmlSongRenderer(song_renderer.SongRenderer):
                     instrument_render += '\n'
                     instrument_index += 1
                     line_render += instrument_render
-
                 song_render += line_render
+                
+                song_render += '\n'
+                #song_render += '\n</div>'
+                
 
         html_buffer.write(song_render)
         html_buffer.write('\n</div>')

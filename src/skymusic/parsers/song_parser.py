@@ -304,7 +304,13 @@ class SongParser:
             notes = brackets_blanks.sub('',match.group(0))
             line = line.replace(match.group(0), notes)
         return line
-
+    
+    def remove_script_tags(self,line):
+        
+        script_tags = re.compile('<\s*/*\s*script[^>]*>', re.I)
+        return script_tags.sub('',line)
+    
+    
     def sanitize_line(self, line):
         """
         Strip leading spaces and replace surnumerous spaces
@@ -316,6 +322,8 @@ class SongParser:
         
         line = re.sub('(\s){2,}', '\\1', line)  # removes surnumerous blank characters
         line = line.strip()
+        
+        line = self.remove_script_tags(line)
         
         if self.icon_delimiter in self.allowed_regex:
             delimiter = self.icon_delimiter
