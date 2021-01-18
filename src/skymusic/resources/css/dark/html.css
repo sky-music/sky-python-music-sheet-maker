@@ -32,6 +32,7 @@ p, svg text.headers {
     color: white;
 }
 
+
 /* <!-- Alignment of svg (HTML only) --> */
 /* <!-- Seems to have no effect ? --> */
 .root svg, .diamond svg, .circle svg {
@@ -129,6 +130,17 @@ hr {
   padding: 0;
   margin-top: 0px;
   margin-bottom: 4px;
+}
+
+table.num {
+	border: 0;	
+	margin: 0;
+}
+
+table.num td {
+	font-size: 0.8em;
+	width: 1.9em;
+	text-align: right;	
 }
 
 /* <!-- Note width (HTML only)--> */
