@@ -60,7 +60,7 @@ See [here](https://sky-music.github.io/make-your-own-sheet.html) for further det
 <a id="plugnplay"></a>
 ### Plug-and-play versions
 
-If you’re afraid of the command line, there is a [website](https://jmmelko.pythonanywhere.com) running this script.
+If you’re afraid of the command line, there is a [website](https://jmmelko.eu.pythonanywhere.com) running this script.
 There is also a bot running an older version of the program, on thatskygame Discord server, that can be called by typing `!song` in a channel.
 Executable binaries are also available for download at <https://sky-music.github.io>.
 
