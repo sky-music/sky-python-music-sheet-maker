@@ -75,6 +75,7 @@ svg text.voice {
 /* <!-- Line number (SVG only) --> */
 svg text.num {
   font-size: 0.8em;
+  color: grey;
 }
 
 /* <!-- Bottom-left corner repetition mark --> (SVG only) */
