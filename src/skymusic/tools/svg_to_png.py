@@ -20,11 +20,11 @@ max_num_notes = 7  # Maximum number of note images in triplets and quavers, star
 quavers_overwrite = False # Force creation of circle-highlighted-1.svg type files
 
 include_css = ['common.css', 'svg.css'] #css files to copy inside the svg directory before converting to PNG
-css_dir = "../resources/css"
+css_dir = "../resources/png" #css files inside theme folders, e.g. resources/png/dark/common.css
 svg_dir = "../resources/png/svg"
 png_dir = "../resources/png"
-generic_quaver_names = ['circle-highlighted-n', 'diamond-highlighted-n', 'root-highlighted-n']
-generic_quaver_class = 'ON-n'
+generic_quaver_names = ['circle-highlighted-n', 'diamond-highlighted-n', 'root-highlighted-n']  #According to the CSS definitions
+generic_quaver_class = 'ON-n' #According to the CSS definitions
 
 def get_svg_paths(svg_dir, exclude_svg=[]):
     '''

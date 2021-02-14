@@ -3,9 +3,9 @@ G1 A1 B1 G1 C2 E2 D2 B1 . G1 A1 B1 D2 B1 C2 A1 G1
 A1 B1 G1 C2 E2 D2 B1 G1 A1 B1 D2
 # ==Verse:==
 A1-G1-F1-E1 F1 G1 G1 A1 A1 G1-F1-E1 F1 G1
-#old pirates yes #they #rob #I #sold #I #to #the #mer- #chant #ships
+#old pirates yes #they #rob #I #sold #I #to the mer- #chant #ships
 E1-D1-C1 C1 F1 E1 E1 . C1*1 D1 D1
-# min- #-nutes #af- #-ter #they #took # I #, #from the bottom- #less #pit
+# minutes #af- #-ter #they #took # I #, #from the bottom- #less #pit
 E1 A1 G1 G1 F1 E1 F1 G1 G1 .
 #but #my #hand #  #  #  #was #made #strong
 A1*3 G1-F1-E1 F1 F1 .

@@ -4,8 +4,7 @@ try:
     from importlib import resources as importlib_resources
 except ImportError:
     import importlib_resources
-from skymusic.resources import fonts, png, css, js
-
+from skymusic.resources import fonts, png, css, js, svg
 
 def get_default_theme():
     global THEMES
@@ -53,14 +52,29 @@ def load_theme(theme):
         
         for css_file in css_files:
             CSS[os.path.splitext(css_file)[0]] =  io.StringIO(importlib_resources.read_text(css_module, css_file))
-                                               
-        if theme == 'dark':
-            font_color = (255, 255, 255)   #Discord colors
-            png_color = (54, 57, 63)
-            text_bkg = (54, 57, 63, 0)  # Transparent dark
-            song_bkg = (54, 57, 63)  # White paper sheet
-            
+        
+        font_color = COLORS[theme]['font_color']  
+        png_color = COLORS[theme]['png_color']
+        text_bkg = COLORS[theme]['text_bkg']  
+        song_bkg = COLORS[theme]['song_bkg']  
+        
         THEMES[theme] = True
+
+
+try:
+    svg_template = io.StringIO(importlib_resources.read_text(svg, 'template.svg'))
+except FileNotFoundError:
+    svg_template = io.StringIO()
+    print(f"\n*** ERROR: could not find any SVG template to embed from {svg}. ***\n")
+
+try:
+    with importlib_resources.path(fonts, 'NotoSansCJKjp-Bold.otf') as fp:
+        font_path = str(fp)
+except FileNotFoundError:
+    font_path = os.path.join(os.path.dirname(fonts.__file__), 'NotoSansCJKjp-Bold.otf')
+    print(f"***ERROR: Could not find: 'fonts/{os.path.relpath(font_path, start=os.path.dirname(fonts.__file__))}'")
+
+# %% Parameters
 
 THEMES = {'light': False, 'dark': False}
 # THEMES = detect_themes()
@@ -73,17 +87,18 @@ CSS = {'svg': io.StringIO(), 'html': io.StringIO(), 'common': io.StringIO()}
 PNGS = dict()
 #Will be populated by load_theme()
 
-font_color = (0, 0, 0)
-png_color = (255, 255, 255)
-text_bkg = (255, 255, 255, 0)  # Transparent white
-song_bkg = (255, 255, 255)  # White paper sheet                                                                        
 
-try:
-    with importlib_resources.path(fonts, 'NotoSansCJKjp-Bold.otf') as fp:
-        font_path = str(fp)
-except FileNotFoundError:
-    font_path = os.path.join(os.path.dirname(fonts.__file__), 'NotoSansCJKjp-Bold.otf')
-    print(f"***ERROR: Could not find: 'fonts/{os.path.relpath(font_path, start=os.path.dirname(fonts.__file__))}'")
+COLORS = {
+    	'light': {'font_color': (0, 0, 0),
+    			  'png_color': (255, 255, 255),
+    			  'text_bkg': (255, 255, 255, 0), #Transparent white
+    			  'song_bkg': (255, 255, 255)},
+    	'dark': {'font_color': (255, 255, 255), #Discord colors
+    			  'png_color': (54, 57, 63),
+    			  'text_bkg': (54, 57, 63, 0), #Transparent dark
+    			  'song_bkg': (54, 57, 63)}, #White paper sheet
+}
+                                                                      
     
 rel_css_path = '../css/main.css' # For IMPORT and HREF methods of embedding css files
 offline_scripts_urls = [] #Embedded in HTML files

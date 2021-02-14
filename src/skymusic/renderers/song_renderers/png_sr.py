@@ -122,7 +122,6 @@ class PngSongRenderer(song_renderer.SongRenderer):
         if filenum == 0:
 
             title = meta['title'][1]
-            #fnt = ImageFont.truetype(self.png_font_path, self.png_title_font_size)
             fnt = self.title_font
             title, numlines = self.wrap_text(title, fnt.getsize(title)[0], int(self.png_line_width/harp_rescale))               
             h = self.get_png_text_height(fnt)
@@ -151,19 +150,22 @@ class PngSongRenderer(song_renderer.SongRenderer):
                                                resample=Image.LANCZOS)
                     song_render = self.trans_paste(song_render, header, (int(x_in_png), int(y_in_png)))
                     y_in_png += (h+1) * numlines * harp_rescale
+            
+            y_in_png += h * harp_rescale
+            
         else:
             #fnt = ImageFont.truetype(self.png_font_path, self.png_font_size)
             fnt = self.text_font
             h = self.get_png_text_height(fnt)
             title_header = Image.new('RGBA', (int(self.png_line_width), int(h)))
             draw = ImageDraw.Draw(title_header)
-            draw.text((0, 0), meta['title'][1] + '(page ' + str(filenum + 1) + ')', font=fnt, fill=self.font_color)
+            draw.text((0, 0), f"{meta['title'][1]} (page {filenum+1 :d})", font=fnt, fill=self.font_color)
             if harp_rescale != 1:
                 title_header = title_header.resize(
                     (int(title_header.size[0] * harp_rescale), int(title_header.size[1] * harp_rescale)),
                     resample=Image.LANCZOS)
             song_render = self.trans_paste(song_render, title_header, (int(x_in_png), int(y_in_png)))
-            y_in_png += 2 * h * harp_rescale + self.png_harp_spacings[1]    
+            y_in_png += h * harp_rescale + self.png_harp_spacings[1]    
     
         return (song_render, x_in_png, y_in_png)
     

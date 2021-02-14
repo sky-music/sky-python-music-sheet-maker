@@ -103,6 +103,9 @@ class Harp(Instrument):
     def get_column_count(self):
         return self.column_count
 
+    def get_shape(self):
+        return (self.row_count, self.column_count)
+
     def set_skygrid(self, skygrid):
         self.skygrid = skygrid
 
