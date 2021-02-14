@@ -129,7 +129,6 @@ silence { background-image: url("data:image/svg+xml, %3Csvg xmlns='http://www.w3
 @media (prefers-color-scheme: dark)
 {
 	body { background-color: #121212; }
-	table { border-color: white; }
+	.instr.harp { border-color: white; }
 	p, body, td, text.headers { color: white; }
-	.instrument { background-color: white; }
 }

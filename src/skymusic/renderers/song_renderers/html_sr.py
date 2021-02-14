@@ -123,7 +123,7 @@ class HtmlSongRenderer(song_renderer.SongRenderer):
                 
                 song_render += line_render                
                 
-                song_render += '\n'
+                #song_render += '\n'
                 #song_render += '\n</div>'
                 
 
