@@ -92,7 +92,7 @@ h1 {
 
 .instr.silent, .instr.broken
 {
-	border: 0;
+	border-width: 0;
 	background-color: transparent;
 }
 

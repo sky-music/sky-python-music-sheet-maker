@@ -102,7 +102,8 @@ COLORS = {
     
 rel_css_path = '../css/main.css' # For IMPORT and HREF methods of embedding css files
 offline_scripts_urls = [] #Embedded in HTML files
-online_scripts_urls = ['/js/navigationTableScript.js', '/js/sheetDarkModeScript.js', '/js/sheetDownloaderScript.js'] # linked in HTML files, stored on sky-music.github.io
+#online_scripts_urls = ['/js/navigationTableScript.js', '/js/sheetDarkModeScript.js', '/js/sheetDownloaderScript.js'] # linked in HTML files, stored on sky-music.github.io
+online_scripts_urls = ['/js/navigationTableScript.js', '/js/sheetDarkModeScript.js'] # linked in HTML files, stored on sky-music.github.io
 
 script_buffers = []
 for script in offline_scripts_urls:
