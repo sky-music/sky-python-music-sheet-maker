@@ -10,39 +10,39 @@ class HtmlInstrumentRenderer(instrument_renderer.InstrumentRenderer):
         """
         Renders the Instrument in HTML
         """
-        harp_silent = instrument.get_is_silent()
-        harp_broken = instrument.get_is_broken()
+        instr_silent = instrument.get_is_silent()
+        instr_broken = instrument.get_is_broken()
+        instr_type = instrument.get_type()
 
         note_renderer = HtmlNoteRenderer()
 
-        if harp_broken:
-            class_suffix = " broken"
-        elif harp_silent:
-            class_suffix = " silent"
+        if instr_broken:
+            instr_state = "broken"
+        elif instr_silent:
+            instr_state = "silent"
         else:
-            class_suffix = ""
+            instr_state = ""
         
-        harp_render = f'<table class="{instrument.get_type()} {instrument.get_type()}-{instrument.get_index()}{class_suffix}">'
+        css_class = " ".join(filter(None,["instr", instr_type, instr_state]))
+        
+        harp_render = f'<div class="{css_class}" id="instr-{instrument.get_index()}">'
 
-        for row in range(instrument.get_row_count()):
+        (rows, cols) = instrument.get_shape()
 
-            harp_render += '\n<tr>'
-            for col in range(instrument.get_column_count()):
+        for row in range(rows):
+            #harp_render += '\n'
+            for col in range(cols):
                 note = instrument.get_note_from_position((row, col))
-                note_render = note_renderer.render(note)                
-                harp_render += f'<td>{note_render}</td>'
-            harp_render += '</tr>'
-
-        harp_render += '</table>'
+                note_render = note_renderer.render(note)   
+                harp_render += note_render
+        harp_render += '</div>' 
 
         if instrument.get_repeat() > 1:
-            harp_render += (f'<table class="{instrument.get_type()}-{instrument.get_index()} repeat">'
-                            f'<tr><td>x{instrument.get_repeat()}</td></tr>'
-                            f'</table>')
+            harp_render += (f'<div class="repeat">x{instrument.get_repeat()}</div>')
 
         return harp_render
 
     def render_voice(self, instrument):
         """Renders the lyrics text in HTML inside an invisible table"""
-        voice_render = f'<table class="voice"><tr><td>{instrument.get_lyric()}</td></tr></table>'
+        voice_render = f'<div class="lyrics">{instrument.get_lyric()}</div>'
         return voice_render

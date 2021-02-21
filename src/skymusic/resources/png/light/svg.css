@@ -34,8 +34,8 @@ svg.broken rect {
 /* <!-- Silent table (SVG only)--> */
 svg.silent rect:not([class*="-background"]) {
   stroke: grey;
-  stroke-width: 0;
-  fill: none;
+  stroke-width:0;
+  fill:none;
 }
 
 /* <!-- Middle note button when the harp is silent (SVG only) --> */
@@ -54,34 +54,22 @@ svg[class*="drum"].silent svg.button-5 .silent.icon {
   opacity: 1;
 }
 
-svg text {
-    font-family: "Noto Sans", "Noto Sans CJK JP", "Noto Sans CJK KR", "Noto Sans CJK SC", "Noto Sans CJK TC", "Avenir", Arial, sans-serif;
-  	stroke: none;
-  	fill: black;
-}
-
-/* <!-- Song title --> */
-svg text.title {
-    font-size: 1.3em;
-    font: bold;
-}
-
 /* <!-- Sky voice (SVG only) --> */
 svg text.voice {
+  font-family: "Noto Sans", "Noto Sans CJK JP", "Noto Sans CJK KR", "Noto Sans CJK SC", "Noto Sans CJK TC", "Avenir", Arial, sans-serif;
   font-size: 0.8em;
+  stroke: none;
+  fill:black;
   dominant-baseline: middle;
-}
-
-/* <!-- Line number (SVG only) --> */
-svg text.num {
-  font-size: 0.8em;
-  color: grey;
 }
 
 /* <!-- Bottom-left corner repetition mark --> (SVG only) */
 svg.repeat text.repeat {
+  stroke: none;
+  fill:black;
   dominant-baseline: baseline;
   font-size: 0.9em;
+  font-family: "Noto Sans", "Noto Sans CJK JP", "Noto Sans CJK KR", "Noto Sans CJK SC", "Noto Sans CJK TC", "Avenir", Arial, sans-serif;
 }
 
 /* <!-- (SVG) only)--> */

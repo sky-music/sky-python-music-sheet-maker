@@ -425,7 +425,8 @@ class SongParser:
                         next_key = f"meta{i}"
                         i += 1
                     (g1, g2) = g.groups()
-                    meta_data[next_key] = g2.strip() if g2.strip() else g1.strip()
+                    #meta_data[next_key] = g2.strip() if g2.strip() else g1.strip()
+                    meta_data[next_key] = g2.strip()
                     changed = True
             
         return (changed, meta_data)

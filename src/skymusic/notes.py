@@ -30,6 +30,9 @@ class Note:
         """Returns the note index in Sky grid"""
         return self.index
 
+    def get_middle_position(self):
+        return (int(self.row_count/2), int(self.column_count/2))
+
     def get_middle_index(self):
         """Returns the index at the center of Sky grid"""
         return int(self.row_count * self.column_count / 2.0)
