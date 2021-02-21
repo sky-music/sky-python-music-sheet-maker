@@ -38,16 +38,26 @@ h1 {
 	flex-wrap: wrap;
 }
 
-.instr.harp
+.instr
 {
 	margin-left: 0.5rem;
 	margin-bottom: 0.35rem;
 	border-radius: 5px;
 	border: 1px white solid;
 	display: grid;
+	width: fit-content;
+}
+
+.instr.harp
+{
 	grid-template-columns: repeat(5, 1.3em);
 	grid-template-rows: repeat(3, 1.4em);
-	width: fit-content;
+}
+
+.instr.drum
+{
+	grid-template-columns: repeat(4, 1.3em);
+	grid-template-rows: repeat(2, 1.4em);
 }
 
 .lyrics

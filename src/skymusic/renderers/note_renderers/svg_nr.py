@@ -31,14 +31,12 @@ class SvgNoteRenderer(note_renderer.NoteRenderer):
         except KeyError:  # Note is not in the skygrid dictionary: so it is not highlighted
             highlighted_classes = []
 
-        if note.instrument_is_broken and (note.get_index() == note.get_middle_index()):
-            
+        if note.instrument_is_broken and ((row, col) == note.get_middle_position()):           
             highlighted_classes = []
             # Draws a special symbol when harp is broken
             note_core_render = self.get_harpbroken_svg(xs, ys, widths)
             
-        elif note.instrument_is_silent and (note.get_index() == note.get_middle_index()):
-            
+        elif note.instrument_is_silent and ((row, col) == note.get_middle_position()):            
             highlighted_classes = []
             # Draws a special symbol when harp is silent
             note_core_render = self.get_silentsymbol_svg(xs, ys, widths)
