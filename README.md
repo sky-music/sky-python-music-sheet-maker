@@ -31,7 +31,7 @@ More details at the [Sky-Music website](https://sky-music.github.io).
 
 The program requires Python >= 3.6 and the following packages:
 
-* pillow (PIL)
+* PIL (preferably pillow)
 * import_resources (for Python < 3.8)
 * pyYaml
 * mido (optional: for generating midi output)
@@ -106,7 +106,7 @@ In contrast with the website or bot versions, the command-line version supports 
 
         -b/--batch_mode
 
-* visual sheets generated after July, 2020 1st can be read again by the program for further modification. you will have to enter the artist again though.
+* HTML visual sheets generated after July, 2020 1st can be read again by the program for further modification. These sheets can be recognized by the \<div class="ascii"> field they contain.
 
 Customized configurations for default directory are supported via command line flags, flags that are not passed or are not valid will reference their default fallback values defined in *command\_line\_player.py*:
 
