@@ -28,7 +28,7 @@ recipient_specifics:
 instrument:
   normal:
     short_desc: Nhạc cụ thường
-    long_desc: "Nhạc cụ thường"
+    long_desc: "Nhạc cụ thường (piano, harp, flute...)"
   drum:
     short_desc: Trống
     long_desc: "Trống"
