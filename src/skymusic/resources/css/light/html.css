@@ -35,6 +35,8 @@ h1
 {
 	margin-left: 0.5rem;
 	margin-bottom: 0.35rem;
+	padding-left: 0.2rem;
+	padding-top: 0.2rem;
 	border-radius: 5px;
 	border: 1px black solid;
 	display: grid;
@@ -43,14 +45,14 @@ h1
 
 .instr.harp
 {
-	grid-template-columns: repeat(5, 1.3em);
-	grid-template-rows: repeat(3, 1.4em);
+	grid-template-columns: repeat(5, 1.25em);
+	grid-template-rows: repeat(3, 1.3em);
 }
 
 .instr.drum
 {
-	grid-template-columns: repeat(4, 1.3em);
-	grid-template-rows: repeat(2, 1.4em);
+	grid-template-columns: repeat(4, 1.25em);
+	grid-template-rows: repeat(2, 1.3em);
 }
 
 .lyrics
