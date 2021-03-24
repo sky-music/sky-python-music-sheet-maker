@@ -25,7 +25,7 @@ recipient_specifics:
     command_line: ", trong thư mục '{songs_in}/'"
     music_cog: 
     sky_music_website: 
-instrument:
+instrument_type:
   normal:
     short_desc: Nhạc cụ thường
     long_desc: "Nhạc cụ thường (piano, harp, flute...)"

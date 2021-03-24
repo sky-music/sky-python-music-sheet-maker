@@ -98,8 +98,8 @@ class RenderMode(Enum):
         return self.extension
 
 class InstrumentType(Enum):
-    NORMAL = ("instrument/normal/short_desc", "instrument/normal/long_desc", skymusic.instruments.Harp)
-    DRUM = ("instrument/drum/short_desc", "instrument/drum/long_desc", skymusic.instruments.Drum)
+    NORMAL = ("instrument_type/normal/short_desc", "instrument_type/normal/long_desc", skymusic.instruments.Harp)
+    DRUM = ("instrument_type/drum/short_desc", "instrument_type/drum/long_desc", skymusic.instruments.Drum)
 
     def __init__(self, short_desc_yaml, long_desc_yaml, instrument_class):
         self.short_desc_yaml = short_desc_yaml
