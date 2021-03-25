@@ -116,6 +116,8 @@ h1 {
 	align-self: center;
 }
 
+d1, d2, d3, silence { background-position: 50%; }
+
 .r1 { background-color: limegreen; }
 .r2 { background-color: deepskyblue; }
 .r3 { background-color: deeppink; }
@@ -133,8 +135,8 @@ crdm { background-image: url("data:image/svg+xml, %3Csvg xmlns='http://www.w3.or
 d1 { background-image: url("data:image/svg+xml, %3Csvg xmlns='http://www.w3.org/2000/svg' width='1rem' height='1rem' viewBox='0 0 123.40601 123.40601'%3E%3Ccircle stroke='none' fill='rgb(194,240,194)' cx='61.5' cy='61.5' r='14'%3E%3C/circle%3E%3C/svg%3E"); }
 d2 { background-image: url("data:image/svg+xml, %3Csvg xmlns='http://www.w3.org/2000/svg' width='1rem' height='1rem' viewBox='0 0 123.40601 123.40601'%3E%3Ccircle stroke='none' fill='rgb(179,236,255)' cx='61.5' cy='61.5' r='14'%3E%3C/circle%3E%3C/svg%3E"); }
 d3 { background-image: url("data:image/svg+xml, %3Csvg xmlns='http://www.w3.org/2000/svg' width='1rem' height='1rem' viewBox='0 0 123.40601 123.40601'%3E%3Ccircle stroke='none' fill='rgb(255,185,223)' cx='61.5' cy='61.5' r='14'%3E%3C/circle%3E%3C/svg%3E"); }
-dn { background-image: url("data:image/svg+xml, %3Csvg xmlns='http://www.w3.org/2000/svg' width='1rem' height='1rem' viewBox='0 0 123.40601 123.40601'%3E%3Ccircle stroke='none' fill='#BBBBBB' cx='61.5' cy='61.5' r='14'%3E%3C/circle%3E%3C/svg%3E"); }
-silence { background-image: url("data:image/svg+xml, %3Csvg xmlns='http://www.w3.org/2000/svg' width='1rem' height='1rem' viewBox='0 0 123.40601 123.40601'%3E%3Ccircle stroke='none' fill='#BBBBBB' cx='61.5' cy='61.5' r='28'%3E%3C/circle%3E%3C/svg%3E"); }
+dn { background-image: url("data:image/svg+xml, %3Csvg xmlns='http://www.w3.org/2000/svg' width='1rem' height='1rem' viewBox='0 0 123.40601 123.40601'%3E%3Ccircle stroke='none' fill='rgb(167,167,167)' cx='61.5' cy='61.5' r='14'%3E%3C/circle%3E%3C/svg%3E"); }
+silence { background-image: url("data:image/svg+xml, %3Csvg xmlns='http://www.w3.org/2000/svg' width='1rem' height='1rem' viewBox='0 0 123.40601 123.40601'%3E%3Ccircle stroke='none' fill='rgb(167,167,167)' cx='61.5' cy='61.5' r='28'%3E%3C/circle%3E%3C/svg%3E"); }
 
 @media (prefers-color-scheme: dark)
 {
