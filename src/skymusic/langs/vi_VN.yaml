@@ -28,7 +28,7 @@ recipient_specifics:
 instrument_type:
   normal:
     short_desc: Nhạc cụ thường
-    long_desc: "Nhạc cụ thường (piano, harp, flute...)"
+    long_desc: "Nhạc cụ thường (đàn piano, đàn hạp, sáo...)"
   drum:
     short_desc: Trống
     long_desc: "Trống"
@@ -329,7 +329,7 @@ stock_queries:
       - Trong Jianpu, điểm dừng được đánh dấu bằng '0' (số không)
       - Bài hát của bạn không có lỗi chính tả. Vui lòng xem hướng dẫn đầy đủ ở trang web này: 
       <https://sky-music.github.io/make-your-own-sheet.html> (tiếng Anh)
-    question: Do yo want to continue anyway?
+    question: Bạn có muốn tiếp tục không?
     afterword: 
     input_tip: 'câu hỏi có/không'
     help_text:
@@ -339,7 +339,7 @@ stock_queries:
       Vui lòng kiểm tra những lỗi sau:
       - Bạn đã nhập được ít nhất một nốt hợp lệ.
       - Nếu bạn vừa nhập một tệp bản nhạc trực quan HTML, hãy chắc chắn rằng nó được tạo ra sau 1/7/2020 và có thẻ <div id='ascii' hidden>
-    question: Do yo want to continue anyway?
+    question: Bạn có muốn tiếp tục không?
     afterword: 
     input_tip: 'câu hỏi có/không'
     help_text:  
