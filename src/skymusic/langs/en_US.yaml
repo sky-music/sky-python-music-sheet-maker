@@ -22,10 +22,10 @@ recipient_specifics:
     command_line: ", put in '{songs_in}/'"
     music_cog: 
     sky_music_website: 
-instrument:
+instrument_type:
   normal:
     short_desc: Normal instrument
-    long_desc: "Normal instrument"
+    long_desc: "Normal instrument (piano, harp, flute, etc)"
   drum:
     short_desc: Drums
     long_desc: "Drums"

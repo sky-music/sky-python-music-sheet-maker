@@ -8,8 +8,8 @@ class SvgInstrumentRenderer(instrument_renderer.InstrumentRenderer):
 
     def render_voice(self, instrument, x, width: str, height: str, aspect_ratio):
         """Renders the lyrics text in SVG"""
-        voice_render = (f'\n<svg x="{x :.2f}" y="0" width="100%" height="{height}" class="voice voice-{instrument.get_index()}">'
-                        f'\n<text x="0%" y="50%" class="voice voice-{instrument.get_index()}">{instrument.get_lyric(strip_html=True)}</text>'
+        voice_render = (f'\n<svg x="{x :.2f}" y="0" width="100%" height="{height}" class="voice" id="voice-{instrument.get_index()}">'
+                        f'\n<text x="0%" y="50%" class="voice">{instrument.get_lyric(strip_html=True)}</text>'
                         f'</svg>')
 
         return voice_render
@@ -19,25 +19,30 @@ class SvgInstrumentRenderer(instrument_renderer.InstrumentRenderer):
         """
         Renders the Instrument in SVG
         """
-        harp_silent = instrument.get_is_silent()
-        harp_broken = instrument.get_is_broken()
+        instr_silent = instrument.get_is_silent()
+        instr_broken = instrument.get_is_broken()
+        instr_type = instrument.get_type()
 
-        if harp_broken:
-            class_suffix = "broken"
-        elif harp_silent:
-            class_suffix = "silent"
+        if instr_broken:
+            instr_state = "broken"
+        elif instr_silent:
+            instr_state = "silent"
         else:
-            class_suffix = ''
+            instr_state = ""
+            
+        css_class = " ".join(filter(None,["instr", instr_type, instr_state]))
 
         note_renderer = SvgNoteRenderer()
 
         # The harp SVG container
-        harp_render = f'\n<svg x="{x :.2f}" y="0" width="{harp_width}" height="{harp_height}" class="{instrument.get_type()}-{instrument.get_index()} {class_suffix}">'
+        harp_render = f'<svg x="{x :.2f}" y="0" width="{harp_width}" height="{harp_height}" class="{css_class}" id="instr-{instrument.get_index()}">'
 
         # The harp rectangle with rounded edges
-        harp_render += f'<rect x="0.7%" y="0.7%" width="98.6%" height="98.6%" rx="7.5%" ry="{7.5 * aspect_ratio :.2f}%" class="{instrument.get_type()} {instrument.get_type()}-{instrument.get_index()}"/>'
+        #harp_render += f'<rect x="0.7%" y="0.7%" width="98.6%" height="98.6%" rx="7.5%" ry="{7.5 * aspect_ratio :.2f}%" class="{instrument.get_type()} {instrument.get_type()}-{instrument.get_index()}"/>'
+        harp_render += '\n<use xlink:href="#instr" />'
 
         for row in range(instrument.get_row_count()):
+            harp_render += '\n'
             for col in range(instrument.get_column_count()):
                 note = instrument.get_note_from_position((row, col))
                 
@@ -49,7 +54,7 @@ class SvgInstrumentRenderer(instrument_renderer.InstrumentRenderer):
                 yn = yn0 + row * (1 - 2 * yn0*1.07) / (instrument.get_row_count() - 1) - note_width / 2.0
 
                 # NOTE RENDER
-                harp_render += note_renderer.render(note, x=f"{100*xn :.2f}%", y=f"{100*yn :.2f}%", width=f"{100*note_width :.2f}%")
+                harp_render += note_renderer.render(note, xs=f"{100*xn :.2f}%", ys=f"{100*yn :.2f}%", widths=f"{100*note_width :.2f}%")
                 
         harp_render += '\n</svg>'
 

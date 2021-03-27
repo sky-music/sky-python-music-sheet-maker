@@ -267,8 +267,8 @@ class SongParser:
             repeat, chord = self.split_chord(chord)
             # Now the real chord has been split in notes (1 note = 1 list slot)
 
-            harp_broken = False
-            harp_silent = False
+            harp_broken = False # No probllem detected yet, so the Harp is a priori OK
+            harp_silent = True  # No note detected yet, so the Harp is a priori silent
             for note in chord:  # Chord is a list of notes
                 note_broken = False
                 try:
@@ -280,13 +280,14 @@ class SongParser:
                 except (KeyError, SyntaxError) as err:
                     note_broken = True
                     harp_broken = True
+                    harp_silent = False # Harp is broken, so it's not silent
                     if not self.silent_warnings:
                         print(err)
-                    
+                
                 if not note_broken:
                     skygrid[highlighted_note_position] = {}
                     skygrid[highlighted_note_position][idx0 + chord_idx] = True
-                    harp_silent = False
+                    harp_silent = False # There's a note, so the harp is a priori not silent
                     if highlighted_note_position[0] < 0 and highlighted_note_position[1] < 0:  # Note is a silence
                         skygrid[highlighted_note_position][idx0 + chord_idx] = False
                         harp_silent = True
@@ -303,7 +304,13 @@ class SongParser:
             notes = brackets_blanks.sub('',match.group(0))
             line = line.replace(match.group(0), notes)
         return line
-
+    
+    def remove_script_tags(self,line):
+        
+        script_tags = re.compile('<\s*/*\s*script[^>]*>', re.I)
+        return script_tags.sub('',line)
+    
+    
     def sanitize_line(self, line):
         """
         Strip leading spaces and replace surnumerous spaces
@@ -315,6 +322,8 @@ class SongParser:
         
         line = re.sub('(\s){2,}', '\\1', line)  # removes surnumerous blank characters
         line = line.strip()
+        
+        line = self.remove_script_tags(line)
         
         if self.icon_delimiter in self.allowed_regex:
             delimiter = self.icon_delimiter
@@ -416,7 +425,8 @@ class SongParser:
                         next_key = f"meta{i}"
                         i += 1
                     (g1, g2) = g.groups()
-                    meta_data[next_key] = g2.strip() if g2.strip() else g1.strip()
+                    #meta_data[next_key] = g2.strip() if g2.strip() else g1.strip()
+                    meta_data[next_key] = g2.strip()
                     changed = True
             
         return (changed, meta_data)

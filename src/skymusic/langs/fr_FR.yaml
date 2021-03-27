@@ -23,10 +23,10 @@ recipient_specifics:
     command_line: ", rangé dans '{songs_in}/'"
     music_cog: 
     sky_music_website: 
-instrument:
+instrument_type:
   normal:
     short_desc: Instrument normal
-    long_desc: "Instrument normal"
+    long_desc: "Instrument normal (piano, mandoline, flute, etc)"
   drum:
     short_desc: Tambour
     long_desc: "Tambour"    

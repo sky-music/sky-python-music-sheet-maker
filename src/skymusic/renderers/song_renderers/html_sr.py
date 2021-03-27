@@ -57,7 +57,7 @@ class HtmlSongRenderer(song_renderer.SongRenderer):
 
         for k in meta:
             if k != 'title':
-                html_buffer.write(f"\n<p><b>{meta[k][0]}</b>{meta[k][1]}</p>")
+                html_buffer.write(f'\n<p class="header"><b>{meta[k][0]}</b>{meta[k][1]}</p>')
         
         html_buffer.write("\n<!-- Embedded video tag goes here (Youtube: share/embed/iframe) -->")
         
@@ -79,7 +79,6 @@ class HtmlSongRenderer(song_renderer.SongRenderer):
             html_buffer.write('\n'+ascii_buffer.getvalue())
         html_buffer.write('\n</div>')       
 
-
     def write_buffers(self, song, css_mode=CSSMode.EMBED):    
         
         html_buffer = io.StringIO()
@@ -92,25 +91,41 @@ class HtmlSongRenderer(song_renderer.SongRenderer):
         song_render = ''
         instrument_index = 0
         song_lines = song.get_lines()
+        num_lines = len(song_lines)
         instrument_renderer = HtmlInstrumentRenderer(self.locale)
         
-        for line in song_lines:
-            if len(line) > 0:
+        non_voice_row = 1
+        for i, line in enumerate(song_lines):
+            if len(line) > 0:                                
                 if line[0].get_type() == 'voice':
-                    song_render += '\n<br />'
+                    pass
+                    #song_render += '\n<br />'
                 else:
                     song_render += '\n<hr />'
-
-                line_render = '\n'
+                            
+                #song_render += '<div class="line">'            
+            
+                
+                line_render = f'\n<div class="line" id="line-{i :d}">'
                 for instrument in line:
                     instrument.set_index(instrument_index)
                     #instrument_render = instrument.render_in_html(self.HTML_note_width)
-                    instrument_render = instrument_renderer.render(instrument)
-                    instrument_render += '\n'
+                    instrument_render = '\n'
+                    instrument_render += instrument_renderer.render(instrument)  
                     instrument_index += 1
                     line_render += instrument_render
-
-                song_render += line_render
+                
+                if num_lines > 10 and line[0].get_type() != 'voice':
+                    line_render += f'\n<div class="num">{non_voice_row :d}</div>'
+                    non_voice_row += 1
+                
+                line_render += "\n</div>"
+                
+                song_render += line_render                
+                
+                #song_render += '\n'
+                #song_render += '\n</div>'
+                
 
         html_buffer.write(song_render)
         html_buffer.write('\n</div>')
