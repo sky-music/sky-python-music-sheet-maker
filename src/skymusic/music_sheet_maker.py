@@ -307,7 +307,7 @@ class MusicSheetMaker:
         (i_error, ok) = self.display_error_ratio(recipient=recipient, prerequisites=[q_notes, q_mode, q_shift])
         
         if i_error and not ok:
-            raise QueriesExecutionAbort([i_error],'Execution aborted by the player.')
+            raise QueriesExecutionAbort([],'Execution aborted by the player.')
 
         # 9. Asks for render modes
         (q_render, render_modes) = self.ask_render_modes(recipient=recipient)
