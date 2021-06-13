@@ -17,7 +17,9 @@ def check_locale(locale):
     except AttributeError:
         return None
 
-    locale = locale.replace('-', '_')  # In case the locale is a IETF language tag
+	# Sanitization: correct case and replacement of - in case the locale is a IETF language tag
+    matchobj = re.match('([^_|-]*)[_|-]*([^_|-]*)', locale.strip())
+    locale = '_'.join(filter(None,(matchobj.group(1).lower(), matchobj.group(2).upper())))
 
     if locale not in locales:
         substitute = find_substitute(locale)

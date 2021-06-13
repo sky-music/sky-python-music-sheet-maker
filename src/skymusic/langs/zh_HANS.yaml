@@ -58,6 +58,9 @@ input_mode:
   skyjson:
     short_desc: 'Sky-Music recording/光遇音乐录音 (JSON 格式)'
     long_desc: 'SkyStudio app 或 <https://sky-music.herokuapp.com> 使用的文件。该文件需有时间标志 (ms) 和软件中使用的 0-14 数字'
+  midi:
+    short_desc: Midi 文件
+    long_desc: Midi 文件
 render_mode:
   html:
     short_desc: HTML 乐谱
@@ -350,11 +353,11 @@ stock_queries:
     foreword:
     question: 'You can listen to your song being played by our partner website at: <{url}>'
     afterword:
-    input_tip: click OK to acknowledge
+    input_tip: 按 OK 确认
     help_text:
   discord_ad:
     foreword: '======================================='
     question: 'This program is also available on Discord at: https://discord.gg/thatskygame'
     afterword: 'To call the Bot from any channel, say this: !song'
-    input_tip: click OK to acknowledge
+    input_tip: 按 OK 确认
     help_text:
