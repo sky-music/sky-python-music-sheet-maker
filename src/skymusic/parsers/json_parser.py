@@ -35,8 +35,23 @@ class JsonSongParser(song_parser.SongParser):
             if is_encrypted:
                 print("***WARNING: cannot parse an encrypted JSON recording") 
                 json_dict = None
-            
+        
         return json_dict
+
+    def convert_to_old_format(self, columns, bpm):
+        
+        layers = {'100':1, '001':2, '010':2, '011':2, '111':3, '110':3, '111':3}
+        tempo_changers = [1, 1/2, 1/4, 1/8]
+        bpm_ms = int(60000/bpm)
+        elapsed_time = 100
+        
+        songNotes = []
+        
+        for col in columns:
+            songNotes += [{'time':elapsed_time, 'key':str(layers.get(note[1],1))+"Key"+str(note[0])} for note in col[1]]
+            elapsed_time += int(bpm_ms*tempo_changers[col[0]])
+        
+        return songNotes
 
 
     def parse_metadata(self, line, song):
@@ -48,12 +63,14 @@ class JsonSongParser(song_parser.SongParser):
         
         try:
             meta_data['title'] = json_dict['name']
-            meta_data['artist'] = json_dict['author']
-            meta_data['transcript'] = ', '.join(filter(None,[json_dict['arrangedBy'], json_dict['transcribedBy']]))
-            meta_data['song_key'] = json_dict['pitchLevel']
             changed = True
         except KeyError:
             changed = False
+        meta_data['artist'] = json_dict.get('author','')
+        meta_data['transcript'] = ', '.join(filter(None,[json_dict.get('arrangedBy',''), json_dict.get('transcribedBy','')]))
+        meta_data['song_key'] = json_dict.get('pitchLevel','')
+        if not meta_data['song_key']:
+            meta_data['song_key'] = json_dict.get('pitch','')
         
         return (changed, meta_data)
 
@@ -76,7 +93,12 @@ class JsonSongParser(song_parser.SongParser):
             return line
         
         # The existence of this field has already been assessed by MusicTheory
-        notes = json_dict['songNotes']
+        try:
+            notes = json_dict['songNotes']
+        except KeyError:
+            notes = self.convert_to_old_format(json_dict['columns'], json_dict['bpm'])
+        
+        print(notes)
         
         times = [note['time'] for note in notes]
         keys = [note['key'] for note in notes]
