@@ -506,7 +506,6 @@ class MusicSheetMaker:
                         print(Lang.get_string("open_file", self.locale).format(file_path=os.path.abspath(file_path)))
                 else:
                     notes = result.split(os.linesep)  # Returns a list of strings in any case
-
                     if self.is_command_line(recipient):  # Loop to ask for several lines in the standard input interface
                         while result:
 

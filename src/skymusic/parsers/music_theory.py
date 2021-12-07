@@ -31,13 +31,12 @@ class MusicTheory():
         if is_midi:
             return [InputMode.MIDI]
         
-        jsonparser = json_parser.JsonSongParser(maker=self.song_parser.get_maker())        
-        json_dict = jsonparser.load_dict(song_lines[0])     
-        if json_dict:
+        jsonparser = json_parser.JsonSongParser(maker=self.song_parser.get_maker())  
+        if jsonparser.detect_json(song_lines):
             return [InputMode.SKYJSON]
                 
         if isinstance(song_lines, str):  # Break newlines and make sure the result is a list
-            song_lines = song_lines.split(os.linesep)
+            song_lines = song_lines.strip().split(os.linesep)
 
         is_html = HtmlSongParser().detect_html(song_lines)
         if is_html:
@@ -111,7 +110,7 @@ class MusicTheory():
         from skymusic.parsers import midi_parser
         
         if isinstance(song_lines, str):  # Break newlines and make sure the result is a List
-            song_lines = song_lines.split(os.linesep)
+            song_lines = song_lines.strip().split(os.linesep)
         
         midi_song_parser = midi_parser.MidiSongParser(maker=self.song_parser.get_maker())
         is_midi = midi_song_parser.detect_midi(song_lines)
@@ -312,6 +311,9 @@ class MusicTheory():
             for v in vals: #histogram starting at t=0
                 h[1+int(v/hbin)] += 1
             return (t, h)
+        
+        if len(times) <= 1:
+            return []
         
         #div_resol = 3 #precision increase
         #tbin = chord_delay / div_resol
