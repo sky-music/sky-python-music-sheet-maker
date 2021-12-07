@@ -138,7 +138,7 @@ class SongParser:
             return [self.input_mode]
         else:
             if isinstance(song_lines, str):  # Break newlines and make sure the result is a List
-                song_lines = song_lines.split(os.linesep)
+                song_lines = song_lines.strip().split(os.linesep)
                 
             return self.music_theory.detect_input_mode(song_lines)
 
@@ -404,7 +404,7 @@ class SongParser:
             parser = json_parser.JsonSongParser(self.maker, self.silent_warnings)
             parser.set_input_mode(self.input_mode)
             
-            (changed, meta_data) = parser.parse_metadata(input_lines[0], song)
+            (changed, meta_data) = parser.parse_metadata(input_lines, song)
         
         else:
             
@@ -438,13 +438,16 @@ class SongParser:
         Requires knowledge of the input mode and the song key.
         """
         if isinstance(song_lines, str):  # Break newlines and make sure the result is a List
-            song_lines = song_lines.split(os.linesep)
+            song_lines = song_lines.strip().split(os.linesep)
             
         if self.input_mode == InputMode.SKYHTML:
             song_lines = HtmlSongParser().parse_html(song_lines)
         elif self.input_mode == InputMode.MIDI:
             song_lines = MidiSongParser(self.maker, self.silent_warnings).parse_midi(song_lines)
-
+        elif self.input_mode == InputMode.SKYJSON:
+            from . import json_parser
+            parser = json_parser.JsonSongParser(self.maker, self.silent_warnings)
+            song_lines = parser.sanitize_lines(song_lines,join=True)
 
         english_song_key = self.english_note_name(song_key)
 

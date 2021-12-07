@@ -1,4 +1,4 @@
-import json, re
+import json, re, os
 from skymusic.resources import Resources
 from . import song_parser
 from skymusic.parsers import music_theory
@@ -13,7 +13,24 @@ class JsonSongParser(song_parser.SongParser):
         super().__init__(maker=maker, silent_warnings=silent_warnings)
         self.skyjson_chord_delay = Resources.SKYJSON_CHORD_DELAY #Delay in ms below which 2 notes are considered a chord
         self.music_theory = music_theory.MusicTheory(self)
+
+    def sanitize_lines(self, song_lines, join=False):
         
+        song_lines = list(filter(None,map(str.strip, song_lines)))
+        if join:
+            song_lines = [''.join(song_lines)]
+        return song_lines
+        
+    def detect_json(self, song_lines):
+        
+        song_lines = self.sanitize_lines(song_lines)
+        if song_lines:
+            c0 = song_lines[0][0]
+            if c0 == '[' or c0 == '{':
+                if self.load_dict(''.join(song_lines)):
+                    return True
+        return False
+                             
     def load_dict(self, line):
 
         try:
@@ -53,10 +70,18 @@ class JsonSongParser(song_parser.SongParser):
         
         return songNotes
 
-
-    def parse_metadata(self, line, song):
+    def parse_json_midi(self, json_dict):
         
-        json_dict = self.load_dict(line)
+        raise NotImplementedError('***WARNING: your JSON file has been converted from a Midi file. This format is not supported. Please provide the original .mid file')
+        return []
+
+    def parse_metadata(self, song_lines, song):
+        
+        if len(song_lines) > 0:
+            text = ''.join(song_lines)
+        else:
+            text = song_lines[0]
+        json_dict = self.load_dict(text)
         changed = False
         
         meta_data = {}
@@ -96,9 +121,14 @@ class JsonSongParser(song_parser.SongParser):
         try:
             notes = json_dict['songNotes']
         except KeyError:
-            notes = self.convert_to_old_format(json_dict['columns'], json_dict['bpm'])
-        
-        print(notes)
+            if 'columns' in json_dict:
+                notes = self.convert_to_old_format(json_dict['columns'], json_dict['bpm'])
+            elif 'tracks' in json_dict:
+                
+                notes = self.parse_json_midi(json_dict)
+                #TODO handle json
+            else:
+                raise Exception('JSON file contains an invalid music sheet format.')
         
         times = [note['time'] for note in notes]
         keys = [note['key'] for note in notes]
@@ -110,7 +140,8 @@ class JsonSongParser(song_parser.SongParser):
         note_interval = self.extract_note_interval(times)
         if note_interval is None:
             note_interval = 2*self.skyjson_chord_delay
-                        
+        
+        if not keys: return []
         icons = [keys[0]]
         
         for i in range(1,len(times)):
