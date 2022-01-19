@@ -330,6 +330,7 @@ stock_queries:
       Please check the following:
       
       - If you have specified the octave number, it must be between 1 and 3. If not, try again with an octave shift.
+      - If you have changed the musical key (i.e. transposed the song), a +/-1 octave shift might be necessary
       - In Jianpu, pauses are indicated by '0' (zero)
       - Your song is free of typos. Please check this website for full instructions: 
       

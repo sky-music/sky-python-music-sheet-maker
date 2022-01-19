@@ -159,7 +159,7 @@ stock_queries:
     afterword:
     input_tip: Merci de choisir votre instrument
     help_text: |
-      The drum is special because it only has 2 rows and 4 columns
+      Les percussions n'ont que 2 lignes et 4 colonnes
   render_modes:
     foreword:
     question: Choisissez les formats d'exportation de la chanson. {all_modes}
@@ -227,7 +227,7 @@ stock_queries:
     question: "Entrez un nom de fichier valide{put_in_songs_in} (sensible à la casse)"
     afterword:
     input_tip: un fichier texte contenant des notes de musique
-    help_text: "We have detected that you are trying to open a file, but couldn't find it. Please check its name and that it is located in the {songs_in} directory. File names are case sensitive"
+    help_text: "Vous essayez d'ouvrir un fichier, mais il est introuvable. Vérifiez qu'il est dans le répertoire {songs_in}. Attention à la casse"
   notes:
     foreword:
     question: Merci de taper ou de coller vos notes de musique
@@ -327,6 +327,7 @@ stock_queries:
       Veuillez vérifier les points suivants:
     
       - Si vous avez spécifié l'octave, il doit être entre 1 et 3. Sinon, recommencez en utilisant le décalage d'octave.
+      - Si vous avez changé la clef musicale (c-a-d transposé), un decalage d'octave de +/-1 peut être nécessaire
       - En notation Jianpu, les pauses sont marquées par '0' (zéro)
       - Que votre chanson ne contient pas d'erreur de frappe. Veuillez consulter ce site web pour plus d'infos: 
     
@@ -348,13 +349,13 @@ stock_queries:
     help_text:
   skyjson_url:
     foreword:
-    question: 'You can listen to your song being played by our partner website at: <{url}>'
+    question: "Vous pouvez voir votre chanson se jouer à l'adresse suivante': <{url}>"
     afterword:
-    input_tip: click OK to acknowledge
+    input_tip: cliquez sur OK pour passer
     help_text:
   discord_ad:
     foreword: '======================================='
-    question: 'This program is also available on Discord at: https://discord.gg/thatskygame'
-    afterword: 'To call the Bot from any channel, say this: !song'
-    input_tip: click OK to acknowledge
+    question: 'Ce programme est disponible sur le serveur Discord de Sky: https://discord.gg/thatskygame'
+    afterword: 'Pour appeler le bot, dire: !song'
+    input_tip: cliquez sur OK pour passer
     help_text:

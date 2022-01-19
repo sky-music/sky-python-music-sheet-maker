@@ -331,6 +331,7 @@ stock_queries:
       请检查以下几点：
       
       - 如您以标注八度数字，它必须要在 1-3 之内的数字。如没，请重新输入八度数字。
+      - If you have changed the musical key (i.e. transposed the song), a +/-1 octave shift might be necessary。
       - 简谱中，休息需以 '0' 标注
       - 您的乐谱中毫无差池。请浏览以下网站了解完整的指示：
       
