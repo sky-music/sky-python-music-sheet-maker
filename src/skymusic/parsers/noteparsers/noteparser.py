@@ -310,9 +310,9 @@ class NoteParser:
         note_in_base_10 = self.convert_base_7_to_base_10(note_octave_str + str(major_scale_interval))
         note_in_base_10 -= self.get_base_of_western_major_scale() * self.get_default_starting_octave()
 
-        if self.is_valid_note_name_with_octave(note):
-            # Skip the note shift if no octave is specified
-            note_in_base_10 += note_shift
+        #if self.is_valid_note_name_with_octave(note):
+        # Apply the note shift whether the octave has been explicitely written or not
+        note_in_base_10 += note_shift
 
         note_coordinate = self.convert_base_10_to_coordinate_of_another_base(note_in_base_10, self.get_column_count())
 
