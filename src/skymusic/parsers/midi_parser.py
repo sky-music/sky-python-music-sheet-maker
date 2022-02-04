@@ -153,7 +153,9 @@ class MidiSongParser:
         metadata.append(Resources.METADATA_DELIMITER + 'Transcript writer:' + '')
         
         first_key = self.extract_first_key(midi_file)
-        metadata.append(Resources.METADATA_DELIMITER + 'Musical key: ' + first_key)
+        
+        if first_key:
+            metadata.append(Resources.METADATA_DELIMITER + 'Musical key: ' + first_key)
         
         return metadata
 
