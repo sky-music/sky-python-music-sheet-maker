@@ -18,7 +18,7 @@ class MidiNoteRenderer(note_renderer.NoteRenderer):
         Starts or ends a MIDI note, assuming a chromatic scale (12 semitones)
         """
         octave = int(note.get_index() / 7) #7 because of the heptatonic tone scale of Sky (no accidentals)
-        semi = Resources.MIDI_SEMITONES[note.get_index() % 7]
+        semi = Resources.MIDI_SEMITONES[int(note.get_index()) % 7]
         try:
             root_pitch = Resources.MIDI_PITCHES[self.music_key]
         except KeyError:
