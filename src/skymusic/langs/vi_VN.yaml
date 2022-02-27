@@ -59,7 +59,7 @@ input_mode:
     long_desc: "Do re mi Nhật Bản: ド、ド#／レb、レ、レ#／ミb、ミ、ファ、ファ#／ソb、ソ、ソ#／ラb、ラ、ラ#／シb、シ"
   skyjson:
     short_desc: 'Bản ghi âm nhạc trên Sky (tệp văn bản JSON)'
-    long_desc: "Tệp bao gồm thời gian (ms) và thứ tự phím 0-14 để sử dụng trong ứng dụng SkyStudio và <https://sky-music.herokuapp.com>"
+    long_desc: "JSON: Tệp bao gồm thời gian (ms) và thứ tự phím 0-14 để sử dụng trong ứng dụng SkyStudio và <https://sky-music.herokuapp.com>"
   midi:
     short_desc: tệp nhạc MIDI
     long_desc: tệp nhạc MIDI

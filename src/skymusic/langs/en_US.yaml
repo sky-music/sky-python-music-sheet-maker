@@ -56,7 +56,7 @@ input_mode:
     long_desc: "Japanese do re mi: ド、ド#／レb、レ、レ#／ミb、ミ、ファ、ファ#／ソb、ソ、ソ#／ラb、ラ、ラ#／シb、シ"
   skyjson:
     short_desc: Sky-Music recording (JSON text)
-    long_desc: "Dictionary with time in ms and key number 0-14 used by SkyStudio app and <https://sky-music.herokuapp.com>"
+    long_desc: "JSON dictionary with time in ms and key number 0-14 used by SkyStudio app and <https://sky-music.herokuapp.com>"
   midi:
     short_desc: Midi file
     long_desc: Midi file
@@ -289,7 +289,7 @@ stock_queries:
     afterword:
     input_tip: '{skip}, or type a note name (e.g. C in English notation)'
     help_text: |
-      You have used a musical notation that does impose the exact pitch of the notes.
+      You have used a musical notation that imposes the exact pitch of the notes.
       Hence the visual sheet will sound differently in different places in Sky.  This is called transposition.
   octave_shift:
     foreword: "Do you want to shift the pitch of your notes? Use {recommended_octave_shift} if your written notes start at octave 4."

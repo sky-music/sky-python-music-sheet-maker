@@ -13,7 +13,8 @@ If a ReplyType is specified in reply_type, limits must be of the same type
 
 For ReplyType.FILEPATH, it contains valid search directories and valid file extensions, in any order
 
-For ReplyType.NUMBER, it is a list of [min, max, default], default being optional
+For ReplyType.NUMBER, it is a list of [min, max, default], default being optional.
+If the limits and the default value are integers, floats will be rejected. Do not mix int and floats in limits and default
 
 For ReplyType.TEXT, limits can be a (compilable) regular expression
 
