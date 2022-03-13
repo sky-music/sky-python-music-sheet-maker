@@ -252,7 +252,7 @@ class MusicTheory():
                 z_band = z[i1:i2+1]
                 t_band = t[i1:i2+1]
                 iG_old = iG
-                tG = sum([z*t for (t,z) in zip(t_band, z_band)])/sum(z_band)
+                tG = sum([z*t for (t,z) in zip(t_band, z_band)])/(max(1,sum(z_band)))
                 iG = round((tG - tmin)/dt)
                 n += 1        
             return (i1, i2), tG 
@@ -280,7 +280,7 @@ class MusicTheory():
         x2 = x.copy()[i1:i2+1]
         y2 = y.copy()[i1:i2+1]
         
-        '''
+        """
         import matplotlib.pyplot as plt
         plt.plot(x2, y2)
         plt.xlabel('x2 (filtered)')
@@ -288,13 +288,15 @@ class MusicTheory():
         ax.set_xscale('log')
         ax.invert_xaxis()
         plt.show()
-        '''
+        """
         
+        absolute_max = max(y2)
         for i in range(max_peaks):
             y0 = max(y2)
-            if y0 < max(y2)*threshold:
+            if (y0 < absolute_max*threshold) or (y0==0):
                 break
             i0 = y2.index(y0)
+            print(f"max(y2)={y0} @ i={i0}")
             (i1, i2), tG = find_barycenter(x2, y2, i0, div_resol)
             peaks.append((tG, y0))
             y2[i1:i2+1] = [0]*len(y2[i1:i2+1])#peak deletion 
@@ -322,6 +324,8 @@ class MusicTheory():
         # Typical spacing between two consecutive notes
         dtimes = [times[i] - times[i-1] for i in range(1, len(times))]
         (dt, dh) = build_histogram(dtimes, tbin)
+        
+        
         typ_diffs = self.find_peaks(dt, dh, 1/10, 3)
         typ_diffs = [diff for diff in typ_diffs if diff > 2*tbin]
 
