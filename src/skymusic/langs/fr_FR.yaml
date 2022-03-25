@@ -164,11 +164,10 @@ stock_queries:
     foreword:
     question: Choisissez les formats d'exportation de la chanson. {all_modes}
     afterword:
-    input_tip: sélectionnez les différents choix. Ajoutez un format texte pour conserver les notes dans un format modifiable.
+    input_tip: check one or several boxes. Visual sheets have colored notes arranged in a grid. Text formats allow manual editing of the notes. JSON and Midi can be played by dedicated software.
     help_text: |
-      La portée visuelle peut être sauvegardée sous différents formats.
-      Cochez ceux que vous souhaitez garder.
-      Le format texte peut être modifié et réutilisé dans le programme. {all_modes}
+      The visual sheets, with the colored dots arranged in a grid, can be rendered in several file formats. Choose HTML if you're undecided.
+      Text formats can be manually edited, or fed to the program again. {all_modes}
   aspect_ratio:
     foreword: Par défaut le format d'image PNG est en paysage 16:9.
     question: "Vous pouvez choisir un rapport d'aspect différent, ou {skip} pour passer"

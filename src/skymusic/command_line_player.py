@@ -59,11 +59,13 @@ class CommandLinePlayer:
     to call methods from communicator directly from the puppet.
     """
 
-    def __init__(self, locale='en_US', preferences_path='../skymusic_preferences.yaml'):
+    def __init__(self, locale=None, preferences_path='../skymusic_preferences.yaml'):
         self.name = Resources.COMMAND_LINE_NAME
-        self.locale = self.set_locale(locale)
-        self.communicator = Communicator(owner=self, locale=locale)
         self.preferences = self.load_preferences(preferences_path)
+        if locale is None: locale = self.get_locale_from_prefs()
+        self.set_locale(locale)
+        self.communicator = Communicator(owner=self, locale=self.locale)
+        
         self.yaml_song = None
 
     def __getattr__(self, attr_name):
@@ -83,12 +85,23 @@ class CommandLinePlayer:
 
     def set_locale(self, locale):
 
+        if locale is None: locale = Lang.guess_locale()
         self.locale = Lang.check_locale(locale)
         if self.locale is None:
             self.locale = Lang.find_substitute(locale)
             print(f"**WARNING: bad locale type passed to CommandLinePlayer: {locale}. Reverting to {self.locale}")
 
         return self.locale
+
+    def get_locale_from_prefs(self):
+        """Get locale from yaml preferences file
+        """
+        try:
+            locale = self.preferences['locale']
+        except KeyError:
+            locale = None
+
+        return locale        
 
     def fetch_yaml_songs(self, songs_dir):
 
@@ -198,8 +211,8 @@ class CommandLinePlayer:
 
 
 try:
-    player = CommandLinePlayer(locale=Lang.guess_locale(), preferences_path=PREFERENCES_PATH)
-    maker = MusicSheetMaker(locale=Lang.guess_locale(), application_root=application_root, song_in_dir=SONG_IN_DIR, song_out_dir=SONG_OUT_DIR, skyjson_url_api=(SKYJSON_URL if not BATCH_MODE else None))
+    player = CommandLinePlayer(preferences_path=PREFERENCES_PATH)
+    maker = MusicSheetMaker(locale=player.get_locale(), application_root=application_root, song_in_dir=SONG_IN_DIR, song_out_dir=SONG_OUT_DIR, skyjson_url_api=(SKYJSON_URL if not BATCH_MODE else None))
 
     if BATCH_MODE:
 

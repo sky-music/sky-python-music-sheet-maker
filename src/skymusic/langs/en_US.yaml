@@ -166,11 +166,10 @@ stock_queries:
     foreword:
     question: Please choose one or several output rendering formats. {all_modes}
     afterword:
-    input_tip: check or uncheck one or several boxes. Add a text format to facilitate sharing the notes.
+    input_tip: check one or several boxes. Visual sheets have colored notes arranged in a grid. Text formats allow manual editing of the notes. JSON and Midi can be played by dedicated software.
     help_text: |
-      The visual sheet can be rendered in several file formats.
-      Please select the ones you want to generate (or deselect some).
-      Text formats can be easily edited and fed to the program again. {all_modes}
+      The visual sheets, with the colored dots arranged in a grid, can be rendered in several file formats. Choose HTML if you're undecided.
+      Text formats can be manually edited, or fed to the program again. {all_modes}
   aspect_ratio:
     foreword: By default the visual sheet is a 16:9 image in landscape orientation.
     question: 'Please choose a different aspect ratio in the list, or {skip} to skip'
