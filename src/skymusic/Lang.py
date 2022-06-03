@@ -15,6 +15,7 @@ def check_locale(locale):
         if len(locale) < 2:
             return None
     except AttributeError:
+        print(f"\n***WARNING: locale code '{locale}' too short")
         return None
 
 	# Sanitization: correct case and replacement of - in case the locale is a IETF language tag

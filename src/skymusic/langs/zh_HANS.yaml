@@ -167,12 +167,10 @@ stock_queries:
     foreword:
     question: 请选择一个或以上的输出格式。{all_modes}
     afterword:
-    input_tip: 请打勾或取消以上的格子。加入文字档以方便过后更改
+    input_tip: check one or several boxes. Visual sheets have colored notes arranged in a grid. Text formats allow manual editing of the notes. JSON and Midi can be played by dedicated software.
     help_text: |
-      该乐谱可以以几种格式呈现
-      请选择您想要的格式（或者取消一些）
-      该文案能被修改再呈交
-      {all_modes}
+      The visual sheets, with the colored dots arranged in a grid, can be rendered in several file formats. Choose HTML if you're undecided.
+      Text formats can be manually edited, or fed to the program again. {all_modes}
   aspect_ratio:
     foreword: 该网站设定 16:9 为光遇乐谱主要图片比例
     question: '请选择清单里其它的比例，或者选择 {skip} 跳过'

@@ -167,9 +167,8 @@ stock_queries:
     afterword:
     input_tip: Chọn một hoặc nhiều hộp thoại. Thêm một định dạng văn bản để có thể thay đổi bản nhạc sau này.
     help_text: |
-      Bảng nhạc trực quan có thể xuất ra thành nhiều định dạng.
-      Hãy chọn những tùy chọn bạn muốn.
-      Tệp văn bản có thể chỉnh sửa và cho vào phần mềm lại. {all_modes}
+      The visual sheets, with the colored dots arranged in a grid, can be rendered in several file formats. Choose HTML if you're undecided.
+      Text formats can be manually edited, or fed to the program again. {all_modes}
   aspect_ratio:
     foreword: Bảng nhạc trực quan được mặc định là ảnh ngang với tỉ lệ 16:9.
     question: 'Hãy chọn một tỉ lệ khác trong danh sách, hoặc {skip_number} để bỏ qua'
