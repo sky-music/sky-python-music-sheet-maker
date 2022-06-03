@@ -296,7 +296,6 @@ class MusicTheory():
             if (y0 < absolute_max*threshold) or (y0==0):
                 break
             i0 = y2.index(y0)
-            print(f"max(y2)={y0} @ i={i0}")
             (i1, i2), tG = find_barycenter(x2, y2, i0, div_resol)
             peaks.append((tG, y0))
             y2[i1:i2+1] = [0]*len(y2[i1:i2+1])#peak deletion 
