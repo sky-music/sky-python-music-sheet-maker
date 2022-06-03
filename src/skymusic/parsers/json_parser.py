@@ -1,4 +1,4 @@
-import json, re, os
+import json, re
 from skymusic.resources import Resources
 from . import song_parser
 from skymusic.parsers import music_theory
@@ -43,6 +43,7 @@ class JsonSongParser(song_parser.SongParser):
                 json_dict = json_dict[0]
         except (json.JSONDecodeError, TypeError, KeyError, UnicodeDecodeError):
             json_dict = None
+        
         
         if json_dict:
             try:
@@ -126,7 +127,6 @@ class JsonSongParser(song_parser.SongParser):
             elif 'tracks' in json_dict:
                 
                 notes = self.parse_json_midi(json_dict)
-                #TODO handle json
             else:
                 raise Exception('JSON file contains an invalid music sheet format.')
         
