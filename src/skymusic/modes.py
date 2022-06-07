@@ -45,7 +45,7 @@ class RenderMode(Enum):
     SVG = (True, False, False, "render_mode/svg/short_desc", 'image/svg+xml', '.svg', skymusic.parsers.noteparsers.skyabc15.SkyABC15)
     PNG = (True, False, False, "render_mode/png/short_desc", 'image/png', '.png', skymusic.parsers.noteparsers.skyabc15.SkyABC15)
     MIDI = (False, True, True, "render_mode/midi/short_desc", 'audio/midi', '.mid', skymusic.parsers.noteparsers.skyabc15.SkyABC15)
-    SKYJSON = (False, True, False, "render_mode/skyjson/short_desc", 'application/json', '.json', skymusic.parsers.noteparsers.skyjson.SkyJson)
+    SKYJSON = (False, True, False, "render_mode/skyjson/short_desc", 'application/json', '.json.txt', skymusic.parsers.noteparsers.skyjson.SkyJson)
     SKYASCII = (False, False, False, "render_mode/skyascii/short_desc", 'text/plain', '_sky.txt', skymusic.parsers.noteparsers.skyabc15.SkyABC15)
     ENGLISHASCII = (False, False, True, "render_mode/englishascii/short_desc", 'text/plain', '_english.txt', skymusic.parsers.noteparsers.english.English)
     JIANPUASCII = (False, False, True, "render_mode/jianpuascii/short_desc", 'text/plain', '_jianpu.txt', skymusic.parsers.noteparsers.jianpu.Jianpu)
