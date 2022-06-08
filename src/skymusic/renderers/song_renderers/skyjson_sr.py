@@ -25,7 +25,7 @@ class SkyjsonSongRenderer(song_renderer.SongRenderer):
 
         json_dict = {'name': meta['title'][1], 'author': meta['artist'][1],
                      'arrangedBy':'', 'transcribedBy': meta['transcript'][1],
-                     'permission':'', 'isComposed': True,
+                     'permission':'', 'isComposed': False,
                      'bpm': int(self.song_bpm), 'pitchLevel':0, 'bitsPerPage': 16,
                      'isEncrypted': False, 'songNotes': []}
 
