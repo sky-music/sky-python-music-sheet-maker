@@ -43,6 +43,7 @@ class SongParser:
         self.default_key = Resources.DEFAULT_KEY
         self.allowed_regex = ['\s', '\t', '\w', '\d', '\n', '\r', '\a', '\e', '\f', '\v', '\R']
         
+        
         self.music_theory = music_theory.MusicTheory(self)
         try:
             self.locale = self.maker.get_locale()
@@ -358,8 +359,13 @@ class SongParser:
                 
             if delimiter in self.allowed_regex:
                 return re.compile(delimiter).split(line)
+            elif delimiter=="#":
+                return re.compile(r'(?<!"|\'|:)'+re.escape(delimiter)).split(line)
+            elif delimiter=="%":
+                return re.compile(+re.escape(delimiter)+r'(?!"|\')').split(line)
             else:
                 return line.split(delimiter)
+                
 
 
     def parse_line(self, line, song_key=Resources.DEFAULT_KEY, note_shift=0):
