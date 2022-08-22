@@ -28,7 +28,7 @@ body {
 
 h1 {
     font-size: 1.3em;
-    font: bold;
+    font-weight: bold;
 }
 
 .line
@@ -69,6 +69,36 @@ h1 {
 	font-size: 0.8em;
 	text-align: center;
 	color: white;
+}
+
+hr
+{
+	border: none;
+	margin-left: 0;
+	padding: 0;
+	margin-right: 1.8em;
+	width: 100vw;
+}
+
+hr.sep
+{
+	border-top: thin solid lightgray;
+	width: 93vw;
+}
+
+hr.solid
+{
+	border-top: thin solid white;
+}
+
+hr.double
+{
+	border-top: medium double white;
+}
+
+hr.dashed
+{
+	border-top: thin dashed white;
 }
 
 .header

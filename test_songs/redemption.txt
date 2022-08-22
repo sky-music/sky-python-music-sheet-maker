@@ -1,10 +1,13 @@
 #$Title: Redemption Song
 #$Author: Bob Marley
 #$Transcript: jmmelko
-# <h1 style="color:red;">==Intro:==</h1>
+__
+# ##Intro
 G1 A1 B1 G1 C2 E2 D2 B1 . G1 A1 B1 D2 B1 C2 A1 G1
 A1 B1 G1 C2 E2 D2 B1 G1 A1 B1 D2
-# <h1 style="color:#0000FF;">==Verse:==</h1>
+#
+==
+# *Verse*
 A1-G1-F1-E1 F1 G1 G1 A1 A1 G1-F1-E1 F1 G1
 #old pirates yes #they #rob #I #sold #I #to the mer- #chant #ships
 E1-D1-C1 C1 F1 E1 E1 . C1*1 D1 D1
@@ -15,7 +18,7 @@ A1*3 G1-F1-E1 F1 F1 .
 #by the hand #of the al- #-might- #-y 
 E1 E1-D1-C1 F1 E1 E1 C1*3 D1 D1
 #We #forward in #this #ge #ne #ra #tion #triumph- #antly
-# ==Chorus:==
+# **Chorus**
 E1 G1 E1-D1-C1 . G1 E1 D1 D1 C1 . C1 E1 G1 A1 B1 A1
 #Won't #you #help to sing #  #these #songs #of #free- #-dom? #  #cause #all #I #e- #-ver #have
 C1 E1 G1 D1 C1 . C1 E1 G1 D1 C1

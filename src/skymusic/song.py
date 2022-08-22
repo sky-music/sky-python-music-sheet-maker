@@ -30,9 +30,7 @@ class Song():
 
     def add_line(self, line):
         """Adds a line of Instrument to the Song"""
-        if len(line) > 0:
-            if isinstance(line[0], instruments.Instrument):
-                self.lines.append(line)
+        if len(line) > 0: self.lines.append(line)
 
     def get_line(self, row):
         """Returns line #row, if row is in the Song, or else returns an empty list"""
@@ -65,7 +63,7 @@ class Song():
         return self.get_num_instruments()
 
     def __str__(self):
-        return f"<{self.__clas__.__name__} '{self.get_title()}', {self.get_num_lines()} lines, {self.get_num_instruments()} instruments, {self.get_num_broken()} errors>"
+        return f"<{self.__class__.__name__} '{self.get_title()}', {self.get_num_lines()} lines, {self.get_num_instruments()} instruments, {self.get_num_broken()} errors>"
 
     def get_num_instruments(self):
         """Returns the number of instruments in the Song"""
@@ -94,7 +92,7 @@ class Song():
     def get_harp_type(self):
 
         for line in self.lines:
-            if line[0].get_type().lower() != 'voice':
+            if line[0].get_type().lower() in instruments.HARPS:
                 return line[0].get_type()
         
         return 'harp'            

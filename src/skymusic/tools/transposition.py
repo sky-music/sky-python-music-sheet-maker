@@ -76,7 +76,7 @@ def parse_line(song_parser, line, note_shift=0, song_key='C'):
             lyrics = song_parser.split_line(line)
             for lyric in lyrics:
                 if len(lyric) > 0:
-                    splitted_line.append(Resources.LYRIC_DELIMITER + lyric)
+                    splitted_line.append(Resources.DELIMITERS['lyric'] + lyric)
             # splitted_line.append(lyric_line)
         else:
             icons = song_parser.split_line(line)
@@ -101,7 +101,7 @@ def render_transposed_song(song_lines):
             song += '\n'
         for instr_idx, instrument in enumerate(song_line):
             try:
-                if song_line[0][0][0] == Resources.LYRIC_DELIMITER:
+                if song_line[0][0][0] == Resources.DELIMITERS['lyric']:
                     song += str(instrument)
                 else:
                     for icon_idx, icon in enumerate(instrument):

@@ -1,5 +1,6 @@
 from skymusic import Lang
 from skymusic.instruments import Voice
+from skymusic.sheetlayout import Ruler
 
 class InstrumentRenderer():
 
@@ -21,6 +22,8 @@ class InstrumentRenderer():
 
         if isinstance(instrument, Voice):
             return self.render_voice(*args, **kwargs)
+        elif isinstance(instrument, Ruler):
+            return self.render_ruler(*args, **kwargs)
         else:
             return self.render_harp(*args, **kwargs)
             

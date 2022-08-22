@@ -22,7 +22,6 @@ class HtmlSongParser(html.parser.HTMLParser):
                 self.is_html = True
             elif tag == 'div' and attrs:
                 if attrs[0] == ('id', 'ascii'):
-                    #print(f'Encountered <{tag} id="ascii">')
                     self.recording = True
 
     def handle_endtag(self, tag):

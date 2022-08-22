@@ -10,7 +10,7 @@ svg rect.note-background, svg rect.drum-background {
   fill:rgb(54, 57, 63);
 }
 
-/* <!-- Sky instrument chart: a table with rounded edges (SVG only) --> */
+/* <!-- Sky instrument chart: a table with rounded edges --> */
 svg rect.harp, svg rect.drum {
   fill:rgb(54, 57, 63);
   stroke-width:1;
@@ -24,21 +24,22 @@ svg rect[class*="-png"] {
   stroke:white;
 }
 
-/* <!-- Makes the table disappear in case of broken instrument  (SVG only)--> */
-svg.broken rect {
+/* <!-- Makes the table disappear in case of broken instrument  --> */
+svg.broken rect, svg.broken {
   fill:none;
   stroke-width:0;
   stroke:white;
+  font-size: 6em;
 }
 
-/* <!-- Silent table (SVG only)--> */
-svg.silent rect:not([class*="-background"]) {
+/* <!-- Silent table --> */
+svg.silent rect:not([class*="-background"]), svg.silent {
   stroke: grey;
   stroke-width:0;
   fill: none;
 }
 
-/* <!-- Middle note button when the harp is silent (SVG only) --> */
+/* <!-- Middle note button when the harp is silent --> */
 svg[class*="harp"].silent svg.button-7 .silent.icon {
   stroke-width:0;
   stroke:white;
@@ -46,7 +47,7 @@ svg[class*="harp"].silent svg.button-7 .silent.icon {
   opacity:1;
 }
 
-/* <!-- Middle note button when the drum is silent (SVG only) --> */
+/* <!-- Middle note button when the drum is silent --> */
 svg[class*="drum"].silent svg.button-5 .silent.icon {
   stroke-width: 0;
   stroke: white;
@@ -63,29 +64,89 @@ svg text {
 /* <!-- Song title --> */
 svg text.title {
     font-size: 1.3em;
-    font: bold;
+    font-weight: bold;
 }
 
-/* <!-- Sky voice (SVG only) --> */
+/* <!-- Sky voice --> */
 svg text.voice {
   font-size: 0.8em;
   dominant-baseline: middle;
 }
 
-/* <!-- Line number (SVG only) --> */
+svg text.bold
+{
+	font-size: 1em;
+	font-weight: bold;
+}
+
+svg text.italic
+{
+	font-size: 1em;
+	font-style: italic;
+}
+
+svg text.h1
+{
+	font-size: 1.3em;
+	font-weight: bold;
+}
+
+svg text.h2
+{
+	font-size: 1.15em;
+	font-weight: bold;
+}
+
+/* <!-- Line number --> */
 svg text.num {
   font-size: 0.8em;
   color: grey;
 }
 
-/* <!-- Bottom-left corner repetition mark --> (SVG only) */
+/* <!-- Broken text --> */
+svg text.broken {
+  font-size: 6em;
+  stroke: red;
+  fill: red;
+}
+
+/* <!-- Bottom-left corner repetition mark --> */
 svg.repeat text.repeat {
   dominant-baseline: baseline;
   font-size: 0.9em;
 }
 
-/* <!-- (SVG) only)--> */
-svg line.divide {
+/* <!-- Note backgrounds: actually used --> */
+/* <!-- Note backgrounds: actually used --> */
+svg .r1 { fill: limegreen; }
+svg .r2 { fill: deepskyblue; }
+svg .r3 { fill: deeppink; }
+svg .q1 { fill: rgb(253,231,36); }
+svg .q2 { fill: rgb(144,214,67); }
+svg .q3 { fill: rgb(53,183,120); }
+svg .q4 { fill: rgb(32,144,140); }
+svg .q5 { fill: rgb(48,103,141); }
+svg .q6 { fill: rgb(68,57,130); }
+svg .q7 { fill: rgb(68,1,84); }
+
+/* <!-- Rulers --> */
+svg line.sep {
     stroke: white;
-    stroke-width: 1.0px;
+    stroke-width: 0.15em;
+}
+
+svg line.solid {
+    stroke: white;
+    stroke-width: 0.15em;
+}
+
+svg line.dashed {
+    stroke: white;
+    stroke-width: 0.15em;
+    stroke-dasharray: '10,10';
+}
+
+svg line.double {
+    stroke: white;
+    stroke-width: 0.15em;
 }

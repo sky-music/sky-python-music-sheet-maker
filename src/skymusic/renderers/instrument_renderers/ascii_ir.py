@@ -12,9 +12,9 @@ class AsciiInstrumentRenderer(instrument_renderer.InstrumentRenderer):
         ascii_render = ''
         
         if instrument.get_is_broken():
-            ascii_render = Resources.BROKEN_HARP
+            ascii_render = Resources.DELIMITERS['broken_harp']
         elif instrument.get_is_silent():
-            ascii_render = Resources.PAUSE
+            ascii_render = Resources.DELIMITERS['pause']
         else:
 
             for frame in range(instrument.get_frame_count()): #Cycle over triplets & quavers
@@ -25,12 +25,33 @@ class AsciiInstrumentRenderer(instrument_renderer.InstrumentRenderer):
                         if skygrid[coord][frame]:  # Button is highlighted
                             ascii_render += note_parser.get_note_from_coordinate(coord)
                     if frame > 0:
-                        ascii_render += Resources.QUAVER_DELIMITER
-            ascii_render = ascii_render.rstrip(Resources.QUAVER_DELIMITER)
+                        ascii_render += Resources.DELIMITERS['quaver']
+            ascii_render = ascii_render.rstrip(Resources.DELIMITERS['quaver'])
             
         return ascii_render
 
-    def render_voice(self, instrument, render_mode):
-        voice_render = f"{Resources.LYRIC_DELIMITER}{instrument.get_lyric()}"  # Lyrics marked as comments in output text files
+    def render_voice(self, instrument, note_parser=None):
+        
+        text = instrument.get_lyric()
+        emphasis = instrument.emphasis
+        start = ''
+        end = ''
+        if emphasis:
+            if emphasis[0] == 'h':
+                start = '#'*int(emphasis[1])
+                end = ''
+            elif emphasis == 'i':
+                start = '*'
+                end = '*'
+            elif emphasis == 'b':
+                start = '**'
+                end = '**'
+                
+        voice_render = Resources.DELIMITERS['lyric']+start+text+end  # Lyrics marked as comments in output text files
+            
         return voice_render
 
+
+    def render_ruler(self, ruler, note_parser=None):
+        
+        return str(ruler)

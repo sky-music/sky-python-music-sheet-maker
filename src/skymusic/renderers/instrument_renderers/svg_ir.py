@@ -6,10 +6,39 @@ class SvgInstrumentRenderer(instrument_renderer.InstrumentRenderer):
     def __init__(self, locale=None):
         super().__init__(locale)
 
+
+    def render_ruler(self, ruler, x, width: str, height: str, aspect_ratio):
+        
+        hr_render = f'\n<svg x="{x :.2f}" y="0" width="100%" height="{height}" class="ruler" id="ruler-{ruler.get_index()}">\n'
+        
+        code = ruler.get_code()
+        if code == '__':
+            hr_render += '<line x1="0%" y1="0%" x2="100%" y2="0%" class="solid" />'
+        elif code == '--':
+            hr_render += '<line x1="0%" y1="0%" x2="100%" y2="0%" class="dashed" />'
+            #hr_render = '<line x1="0%" y1="0%" x2="95%" y2="0%" style="stroke:gray;stroke-width:1;stroke-dasharray=\'10,10\'" />'
+        elif code == '==':
+            hr_render += '<line x1="0%" y1="10%" x2="100%" y2="10%" class="double" />'
+            hr_render += '<line x1="0%" y1="90%" x2="100%" y2="90%" class="double" />'
+        hr_render += '</svg>'
+        return hr_render
+
+
     def render_voice(self, instrument, x, width: str, height: str, aspect_ratio):
         """Renders the lyrics text in SVG"""
+        
+        lyric = instrument.get_lyric(strip_html=True)
+    
+        class_suffix = ''
+        if instrument.emphasis == 'b':
+            class_suffix = ' bold'
+        elif instrument.emphasis == 'i':
+            class_suffix = ' italic'
+        elif instrument.emphasis != None:
+            class_suffix = ' '+instrument.emphasis
+        
         voice_render = (f'\n<svg x="{x :.2f}" y="0" width="100%" height="{height}" class="voice" id="voice-{instrument.get_index()}">'
-                        f'\n<text x="0%" y="50%" class="voice">{instrument.get_lyric(strip_html=True)}</text>'
+                        f'\n<text x="0%" y="50%" class="voice{class_suffix}">{lyric}</text>'
                         f'</svg>')
 
         return voice_render

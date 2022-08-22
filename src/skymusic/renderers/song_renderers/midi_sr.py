@@ -1,5 +1,6 @@
 import re, io
 from . import song_renderer
+from skymusic import instruments
 from skymusic.renderers.instrument_renderers.midi_ir import MidiInstrumentRenderer
 from skymusic.resources import Resources
 
@@ -73,7 +74,7 @@ class MidiSongRenderer(song_renderer.SongRenderer):
         song_lines = song.get_lines()
         for line in song_lines:
             if len(line) > 0:
-                if line[0].get_type().lower().strip() != 'voice':
+                if line[0].get_type().lower().strip() in instruments.HARPS:
                     instrument_index = 0
                     for instrument in line:
                         instrument.set_index(instrument_index)

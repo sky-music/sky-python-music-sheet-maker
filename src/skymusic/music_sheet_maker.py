@@ -368,7 +368,7 @@ class MusicSheetMaker:
                         'pause': self.get_song_parser().get_pause().replace('\s','<space>'),
                         'quaver_delimiter': self.get_song_parser().get_quaver_delimiter().replace('\s','<space>'),
                         'quaver_example': self.get_song_parser().get_quaver_delimiter().replace('\s','<space>').join(['A1', 'B1', 'C1']),
-                        'jianpu_quaver_delimiter': Resources.JIANPU_QUAVER_DELIMITER,
+                        'jianpu_quaver_delimiter': Resources.DELIMITERS['jianpu_quaver'],
                         'repeat_indicator': self.get_song_parser().get_repeat_indicator() + '2'
                         }
         if self.is_command_line(recipient):
@@ -395,7 +395,7 @@ class MusicSheetMaker:
                         'pause': self.get_song_parser().get_pause().replace('\s','<space>'),
                         'quaver_delimiter': self.get_song_parser().get_quaver_delimiter().replace('\s','<space>'),
                         'quaver_example': self.get_song_parser().get_quaver_delimiter().replace('\s','<space>').join(['A1', 'B1', 'C1']),
-                        'jianpu_quaver_delimiter': Resources.JIANPU_QUAVER_DELIMITER,
+                        'jianpu_quaver_delimiter': Resources.DELIMITERS['jianpu_quaver'],
                         'repeat_indicator': self.get_song_parser().get_repeat_indicator() + '2'
                         }
         replacements.update({'skip': Lang.get_string(f"recipient_specifics/skip/{recipient.get_name()}", self.locale)})
@@ -462,7 +462,7 @@ class MusicSheetMaker:
                         'pause': self.get_song_parser().get_pause().replace('\s','<space>'),
                         'quaver_delimiter': self.get_song_parser().get_quaver_delimiter().replace('\s','<space>'),
                         'quaver_example': self.get_song_parser().get_quaver_delimiter().replace('\s','<space>').join(['A1', 'B1', 'C1']),
-                        'jianpu_quaver_delimiter': Resources.JIANPU_QUAVER_DELIMITER,
+                        'jianpu_quaver_delimiter': Resources.DELIMITERS['jianpu_quaver'],
                         'repeat_indicator': self.get_song_parser().get_repeat_indicator() + '2'
                         }
         replacements.update({'put_in_songs_in': Lang.get_string(f"recipient_specifics/put_in_songs_in/{recipient.get_name()}", self.locale)})

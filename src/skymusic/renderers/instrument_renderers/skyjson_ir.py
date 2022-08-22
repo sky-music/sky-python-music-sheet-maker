@@ -36,3 +36,6 @@ class SkyjsonInstrumentRenderer(instrument_renderer.InstrumentRenderer):
 
         return NotImplemented
         
+    def render_ruler(self, *args, **kwargs):    
+
+        return NotImplemented

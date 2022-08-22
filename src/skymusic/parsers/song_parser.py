@@ -1,5 +1,5 @@
 import os, re
-from skymusic import instruments, Lang
+from skymusic import instruments, sheetlayout, Lang
 from skymusic.modes import InputMode, InstrumentType
 from skymusic.song import Song
 import skymusic.parsers.noteparsers
@@ -34,16 +34,15 @@ class SongParser:
         #Only regex with the following format are supported: \x, where x is s, t, w, d, n, r, a, r, f, v, or R
         self.input_mode = None
         self.note_parser = None
-        self.icon_delimiter = Resources.ICON_DELIMITER
-        self.pause = Resources.PAUSE
-        self.quaver_delimiter = Resources.QUAVER_DELIMITER
-        self.lyric_delimiter = Resources.LYRIC_DELIMITER
-        self.metadata_delimiter = Resources.METADATA_DELIMITER
-        self.repeat_indicator = Resources.REPEAT_INDICATOR
+        self.icon_delimiter = Resources.DELIMITERS['icon']
+        self.pause = Resources.DELIMITERS['pause']
+        self.quaver_delimiter = Resources.DELIMITERS['quaver']
+        self.lyric_delimiter = Resources.DELIMITERS['lyric']
+        self.metadata_delimiter = Resources.DELIMITERS['metadata']
+        self.repeat_indicator = Resources.DELIMITERS['repeat']
         self.default_key = Resources.DEFAULT_KEY
         self.allowed_regex = ['\s', '\t', '\w', '\d', '\n', '\r', '\a', '\e', '\f', '\v', '\R']
-        
-        
+        self.ruler_regex = Resources.DELIMITERS['lyric'] + r'{0,1}\s*(' + r'|'.join(Resources.MARKDOWN_CODES['rulers']) + r')+\s*(.*)'
         self.music_theory = music_theory.MusicTheory(self)
         try:
             self.locale = self.maker.get_locale()
@@ -98,16 +97,16 @@ class SongParser:
     def check_delimiters(self):
 
         if self.input_mode == InputMode.JIANPU or isinstance(self.note_parser, skymusic.parsers.noteparsers.jianpu.Jianpu):
-            if self.pause != Resources.JIANPU_PAUSE:
+            if self.pause != Resources.DELIMITERS['jianpu_pause']:
                 
                 if not self.silent_warnings:
                     print('\n'+Lang.get_string("warnings/jianpu_pause", self.locale).format(pause=self.pause))
-                self.pause = Resources.JIANPU_PAUSE
+                self.pause = Resources.DELIMITERS['jianpu_pause']
             if self.quaver_delimiter == '-':
                 
                 if not self.silent_warnings:
-                    print('\n'+Lang.get_string("warnings/jianpu_quaver_delimiter", self.locale).format(jianpu_quaver_delimiter=Resources.JIANPU_QUAVER_DELIMITER, quaver_delimiter=self.quaver_delimiter))
-                self.quaver_delimiter = Resources.JIANPU_QUAVER_DELIMITER
+                    print('\n'+Lang.get_string("warnings/jianpu_quaver_delimiter", self.locale).format(jianpu_quaver_delimiter=Resources.DELIMITERS['jianpu_quaver'], quaver_delimiter=self.quaver_delimiter))
+                self.quaver_delimiter = Resources.DELIMITERS['jianpu_quaver']
 
         delims = [self.icon_delimiter, self.pause, self.quaver_delimiter, self.lyric_delimiter, self.repeat_indicator, self.metadata_delimiter]
 
@@ -194,7 +193,6 @@ class SongParser:
 
     def english_note_name(self, note_name, reverse=False):
         if self.note_parser is None:
-            #print("\n***WARNING: no note parser defined.")
             return ''
         else:
             return self.note_parser.english_note_name(note_name, reverse)
@@ -359,10 +357,10 @@ class SongParser:
                 
             if delimiter in self.allowed_regex:
                 return re.compile(delimiter).split(line)
-            elif delimiter=="#":
-                return re.compile(r'(?<!"|\'|:)'+re.escape(delimiter)).split(line)
-            elif delimiter=="%":
-                return re.compile(+re.escape(delimiter)+r'(?!"|\')').split(line)
+            elif delimiter=="#":# to allow HTML/CSS hex color codes
+                return re.compile(r'(?<!"|\'|:|#)#').split(line)
+            elif delimiter=="%":# to allow percentages in HTML/CSS size attributes
+                return re.compile(r'%(?!"|\')').split(line)
             else:
                 return line.split(delimiter)
                 
@@ -375,8 +373,17 @@ class SongParser:
         instrument_line = []
         line = self.sanitize_line(line)
 
-        if len(line) > 0 and not re.match(re.escape(Resources.METADATA_DELIMITER),line):
-            if line[0] == self.lyric_delimiter:
+        if len(line) > 0 and not re.match(re.escape(Resources.DELIMITERS['metadata']),line):
+                       
+            hr_match = re.match(self.ruler_regex, line)
+            
+            if hr_match:
+                hr = sheetlayout.Ruler()
+                hr.set_code(hr_match.group(1)) # Markdown code
+                hr.set_content(hr_match.group(2)) # possible text
+                instrument_line.append(hr)
+                                
+            elif line[0] == self.lyric_delimiter:
                 lyrics = self.split_line(line)
                 for lyric in lyrics:
                     if len(lyric) > 0:
@@ -398,7 +405,7 @@ class SongParser:
                     harp.set_skygrid(skygrid)
 
                     instrument_line.append(harp)
-
+        
         return instrument_line
 
 
@@ -415,7 +422,7 @@ class SongParser:
         else:
             
             dict_iter = iter(song.get_meta())
-            regexp = re.escape(Resources.METADATA_DELIMITER) + '([^:]+):*(.*)'
+            regexp = re.escape(Resources.DELIMITERS['metadata']) + '([^:]+):*(.*)'
             
             meta_data = {}
             i = 0
@@ -454,7 +461,8 @@ class SongParser:
             from . import json_parser
             parser = json_parser.JsonSongParser(self.maker, self.silent_warnings)
             song_lines = parser.sanitize_lines(song_lines,join=True)
-
+        
+        # At this point all lines should be strings
         english_song_key = self.english_note_name(song_key)
 
         note_shift = self.get_note_parser().get_base_of_western_major_scale() * octave_shift
@@ -462,6 +470,7 @@ class SongParser:
         # Parses song line by line
         song = Song(locale=self.locale, music_key=english_song_key)
         
+        # Metadata first, indicates by a special character such as #$
         (changed, meta_data) = self.parse_metadata(song_lines, song)
         if changed:
             song.set_meta(**meta_data)

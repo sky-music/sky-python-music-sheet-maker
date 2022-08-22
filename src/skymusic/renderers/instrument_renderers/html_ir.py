@@ -1,4 +1,6 @@
+import re
 from . import instrument_renderer
+from skymusic.resources import Resources
 from skymusic.renderers.note_renderers.html_nr import HtmlNoteRenderer
 
 class HtmlInstrumentRenderer(instrument_renderer.InstrumentRenderer):
@@ -44,5 +46,27 @@ class HtmlInstrumentRenderer(instrument_renderer.InstrumentRenderer):
 
     def render_voice(self, instrument):
         """Renders the lyrics text in HTML inside an invisible table"""
-        voice_render = f'<div class="lyrics">{instrument.get_lyric()}</div>'
+        lyric = instrument.get_lyric()
+        emphasis = instrument.emphasis
+        
+        if emphasis:
+            lyric = f'<{emphasis}>'+lyric+f'</{emphasis}>'
+        
+        voice_render = f'<div class="lyrics">{lyric}</div>'
         return voice_render
+
+    def render_ruler(self, ruler):
+        """Renders the markdown specials"""
+        code = ruler.get_code()
+        if code == '__':
+            hr_render = '<hr class="solid" />'
+        elif code == '--':
+            hr_render = '<hr class="dashed" />'            
+        elif code == '==':    
+            hr_render = '<hr class="double" />'
+        
+        #if ruler.get_content():
+        #    hr_render += '\n'+self.content
+        
+        return hr_render
+        

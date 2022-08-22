@@ -10,10 +10,10 @@ class Skygrid():
         self.skygrid = {}
         
     def reset(self):
-'''        
-        
-        
-    
+'''
+
+TEXT = ['voice','lyric']
+HARPS = ['harp','drum']
 
 class Instrument():
 
@@ -61,7 +61,7 @@ class Instrument():
     def set_is_silent(self, is_silent=True):
         """Returns a boolean whether the harp is empty in this frame"""
         self.is_silent = is_silent
-    
+
 
 class Voice(Instrument):  # Lyrics or comments
 
@@ -70,6 +70,7 @@ class Voice(Instrument):  # Lyrics or comments
         self.type = 'voice'
         self.lyric = ''
         self.TAG_RE = re.compile(r'<[^>]+>')
+        self.emphasis = None
 
     def get_lyric(self, strip_html=False):
         if strip_html:
@@ -78,13 +79,29 @@ class Voice(Instrument):  # Lyrics or comments
             return self.lyric
 
     def set_lyric(self, lyric):
-        self.lyric = lyric
+        
+        lyric = lyric.strip()
+        h_match = re.match(r'(?<!")(#*)(.*)',lyric)
+        h = len(h_match.group(1))
+        if h>0:
+            self.lyric = h_match.group(2)
+            self.emphasis = f'h{h}'
+        else:
+            star_match = re.match(r'(\**)([^\*]*)(\**)',lyric)
+            self.lyric = star_match.group(2)
+            if len(star_match.group(1)) >= 2 and len(star_match.group(3)) >= 2:
+                self.emphasis = 'b'
+            elif (len(star_match.group(1)) == 1 and len(star_match.group(3)) == 1):
+                self.emphasis = 'i'
 
     def __len__(self):
         return len(self.lyric)
 
+    def __repr__(self):
+        return f'<{self.type}-{self.index}, {len(self)} chars, repeat={self.repeat}>'
+        
     def __str__(self):
-        return f'<{self.type}-{self.index}, {len(self)} chars, repeat={self.repeat}>'                
+        return str(self.get_lyric(strip_html=True))
 
 
 class Harp(Instrument):

@@ -1,6 +1,6 @@
 import io, json, importlib
 from . import song_renderer
-from skymusic import Lang
+from skymusic import Lang, instruments
 from skymusic.renderers.instrument_renderers.skyjson_ir import SkyjsonInstrumentRenderer
 from skymusic.resources import Resources
 
@@ -33,7 +33,7 @@ class SkyjsonSongRenderer(song_renderer.SongRenderer):
         time = 0
         for line in song.get_lines():
             if len(line) > 0:
-                if line[0].get_type().lower().strip() != 'voice':
+                if line[0].get_type().lower().strip() in instruments.HARPS:
                     for instrument in line:
                         instrument.set_index(instrument_index)
                         repeat = instrument.get_repeat()
