@@ -37,9 +37,9 @@ The program requires Python >= 3.6 and the following packages:
 * mido (optional: for generating midi output)
 * requests (optional: for generating a link to skymusic.herokuapp.com)
 
-The program can be installed by simply unzipping the code on your computer, and running the main script file, or by installing it in your Python distribution with pip: `pip install .`
+The program can be installed by simply unzipping the code on your computer, and running the main script file, or by installing it in your Python distribution with pip: `pip install .` in the command line from the top directory.
 
-The program can be installed on a desktop computer,  or a smartphone if a Python IDE is installed (such as [Pythonista](http://omz-software.com/pythonista/)).
+The program can be installed on a desktop computer,  or on a smartphone if a Python IDE is installed (such as [Pythonista](http://omz-software.com/pythonista/)).
 
 The program can also be installed in a virtualenv to mitigate possible dependency clashes with system site-packages.
 
@@ -62,7 +62,7 @@ See [here](https://sky-music.github.io/make-your-own-sheet.html) for further det
 
 If you’re afraid of the command line, there is a [website](https://jmmelko.eu.pythonanywhere.com) running this script.
 There is also a bot running an older version of the program, on thatskygame Discord server, that can be called by typing `!song` in a channel.
-Executable binaries are also available for download at <https://sky-music.github.io>.
+Executable binaries (not always up-to-date) are also available for download at <https://sky-music.github.io>.
 
 ***
 
@@ -100,13 +100,13 @@ After generating a sheet, you are encouraged to publish the file on <https://sky
 
 In contrast with the website or bot versions, the command-line version supports functions for faster processing of songs:
 
-* the default answer to any question can be put in the *skymusic\_preferences.yaml* file. This way, you will no longer be asked this question (for instance the aspect ratio of the visual sheet). You can  even put the notes in there!
+* the default answer to any question can be put in the *skymusic\_preferences.yaml* file. This way, you will no longer be asked this question (for instance the aspect ratio of the visual sheet). You can even put the notes in there! Disable an answer by commenting the line with '#'
 
-* songs can be processed in a batch by placing preference-like *.yaml* files in the *batch\_songs* directory (see the example files in this folder to learn the right keywords) and passing the following flag to  *command\_line\_player.py*:
+* likewise, a song can be processed automatically (no question asked!) by putting a corresponding *.yaml* file in the *batch\_songs* directory (see the example files in this folder to learn the right keywords) and passing the following flag to  *command\_line\_player.py*:
 
         -b/--batch_mode
 
-* HTML visual sheets generated after July, 2020 1st can be read again by the program for further modification. These sheets can be recognized by the \<div class="ascii"> field they contain.
+* HTML visual sheets generated after July, 2020 1st can be read again by the program for further modification. These sheets can be recognized by opening the html file with a text editor and looking for the \<div id="ascii"> field.
 
 Customized configurations for default directory are supported via command line flags, flags that are not passed or are not valid will reference their default fallback values defined in *command\_line\_player.py*:
 
@@ -124,7 +124,6 @@ Customized configurations for default directory are supported via command line f
         -p/--pref_file <path/to/pref/file>
 
 * by default, conversion of the song to a music recording using JSON format is disabled. A link to hear the song being played on https://sky-music.herokuapp.com can be generated, to enable it setting the following flag with the website API key (this key will be given to trusted players):
-
 
         -u/--skyjson_url <API_KEY>
 
@@ -177,7 +176,7 @@ SVG icons are thanks to [madwurmz](http://madwurmz.com).
 
 **Codebase:**
 
-Various contributions from Specy-wot (html & js), Jurassimok (Setup.py), Skyventuree, heronwr (command-line arguments).
+Various contributions from Specy (html & js), Jurassimok (Setup.py), Skyventuree, heronwr (command-line arguments).
 
 Docker images by heronwr aka lambdaw.
 
@@ -190,7 +189,7 @@ This program is not being actively maintained by its original creator Tracey. As
 - skyventuree, a.k.a. こじめ (Vietnamese)
 - jmmelko (French)
 - Kai00 (simplified chinese)
-- we are looking for a japanese translator
+- we are still looking for a japanese translator!
 
 <a id="info"></a>
 ## Info
