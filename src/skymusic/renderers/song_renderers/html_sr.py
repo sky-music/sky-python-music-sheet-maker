@@ -1,5 +1,6 @@
 import io, datetime
 from . import song_renderer, ascii_sr
+from skymusic import instruments
 from skymusic.renderers.instrument_renderers.html_ir import HtmlInstrumentRenderer
 from skymusic.resources import Resources
 from skymusic.modes import CSSMode, RenderMode
@@ -49,8 +50,8 @@ class HtmlSongRenderer(song_renderer.SongRenderer):
         elif css_mode == CSSMode.XML:
             html_buffer.write(f'\n<link href="{rel_css_path}" rel="stylesheet" />')
 
-        html_buffer.write(f'</head>'
-                          f'\n<body>\n'
+        html_buffer.write('</head>'
+                          '\n<body>\n'
                           )
                 
         html_buffer.write(f"<h1>{meta['title'][1]}</h1>")
@@ -97,14 +98,10 @@ class HtmlSongRenderer(song_renderer.SongRenderer):
         non_voice_row = 1
         for i, line in enumerate(song_lines):
             if len(line) > 0:                                
-                if line[0].get_type() == 'voice':
-                    pass
-                    #song_render += '\n<br />'
-                else:
-                    song_render += '\n<hr />'
-                            
-                #song_render += '<div class="line">'            
-            
+                if line[0].get_type() in instruments.HARPS:
+                    song_render += '\n<hr class="sep" />'
+                              
+                #song_render += '<div class="line">'
                 
                 line_render = f'\n<div class="line" id="line-{i :d}">'
                 for instrument in line:
@@ -115,7 +112,7 @@ class HtmlSongRenderer(song_renderer.SongRenderer):
                     instrument_index += 1
                     line_render += instrument_render
                 
-                if num_lines > 10 and line[0].get_type() != 'voice':
+                if num_lines > 10 and line[0].get_type() in instruments.HARPS:
                     line_render += f'\n<div class="num">{non_voice_row :d}</div>'
                     non_voice_row += 1
                 

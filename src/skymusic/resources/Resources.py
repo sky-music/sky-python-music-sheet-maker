@@ -23,8 +23,8 @@ def load_theme(theme):
     '''
     Loads CSS and PNG files as string and bytes buffers respectively, for a theme whose name 'theme' must be defined in the THEMES list
     '''
-    global PNGS, CSS, THEMES
-    global font_color, png_color, text_bkg, song_bkg
+    global PNGS, CSS, SVG, THEMES
+    global font_color, png_color, text_bkg, song_bkg, hr_color
     
     if theme not in THEMES:
         load_theme(get_default_theme())
@@ -40,7 +40,7 @@ def load_theme(theme):
         png_files = [file for file in png_files if os.path.splitext(file)[1] == '.png']
         
         for png_file in png_files:
-            PNGS[os.path.splitext(png_file)[0]] =  io.BytesIO(importlib_resources.read_binary(png_module, png_file))
+            PNGS[os.path.splitext(png_file)[0]] = io.BytesIO(importlib_resources.read_binary(png_module, png_file))
 
         css_module = importlib.import_module('.'+theme, css.__name__)        
         
@@ -51,21 +51,33 @@ def load_theme(theme):
         css_files = [file for file in css_files if os.path.splitext(file)[1] == '.css']
         
         for css_file in css_files:
-            CSS[os.path.splitext(css_file)[0]] =  io.StringIO(importlib_resources.read_text(css_module, css_file))
+            CSS[os.path.splitext(css_file)[0]] = io.StringIO(importlib_resources.read_text(css_module, css_file))
         
+        svg_module = importlib.import_module('.'+theme, svg.__name__)        
+        
+        svg_files = importlib_resources.contents(svg_module)
+        if not svg_files:
+            print(f"\n*** ERROR: could not find any SVG file to embed from {svg_module}. ***\n")     
+        
+        svg_files = [file for file in svg_files if os.path.splitext(file)[1] == '.svg']
+        
+        for svg_file in svg_files:
+            SVG[os.path.splitext(svg_file)[0]] = io.StringIO(importlib_resources.read_text(svg_module, svg_file))
+              
         font_color = COLORS[theme]['font_color']  
         png_color = COLORS[theme]['png_color']
         text_bkg = COLORS[theme]['text_bkg']  
         song_bkg = COLORS[theme]['song_bkg']  
+        hr_color = COLORS[theme]['hr_color']
         
         THEMES[theme] = True
 
 
-try:
-    svg_template = io.StringIO(importlib_resources.read_text(svg, 'template.svg'))
-except FileNotFoundError:
-    svg_template = io.StringIO()
-    print(f"\n*** ERROR: could not find any SVG template to embed from {svg}. ***\n")
+# try:
+#     svg_template = io.StringIO(importlib_resources.read_text(svg, 'template.svg'))
+# except FileNotFoundError:
+#     svg_template = io.StringIO()
+#     print(f"\n*** ERROR: could not find any SVG template to embed from {svg}. ***\n")
 
 try:
     with importlib_resources.path(fonts, 'NotoSansCJKjp-Bold.otf') as fp:
@@ -84,6 +96,8 @@ CSS = {'svg': io.StringIO(), 'html': io.StringIO(), 'common': io.StringIO()}
 # Must be initialized with the base names of the CSS files inside each theme directory in ./css/{theme}/
 # At the moment the svg renderer needs svg.css, the html one html.css, and both need  common.css. The svg to png converter also needs svg.css
 
+SVG = {'template': io.StringIO()}
+
 PNGS = dict()
 #Will be populated by load_theme()
 
@@ -92,12 +106,15 @@ COLORS = {
     	'light': {'font_color': (0, 0, 0),
     			  'png_color': (255, 255, 255),
     			  'text_bkg': (255, 255, 255, 0), #Transparent white
-    			  'song_bkg': (255, 255, 255)},
+    			  'song_bkg': (255, 255, 255),
+                  'hr_color': (0, 0, 0)},
     	'dark': {'font_color': (255, 255, 255), #Discord colors
     			  'png_color': (54, 57, 63),
     			  'text_bkg': (54, 57, 63, 0), #Transparent dark
-    			  'song_bkg': (54, 57, 63)}, #White paper sheet
+    			  'song_bkg': (54, 57, 63),
+                  'hr_color': (255, 255, 255)}, 
 }
+
                                                                       
     
 rel_css_path = '../css/main.css' # For IMPORT and HREF methods of embedding css files
@@ -126,21 +143,24 @@ png_compress = 6
 MAX_FILENAME_LENGTH = 127
 MAX_NUM_FILES = 15
 
-BINARY_EXT = ['.mid', '.midi', '.bin'] # Files that must be opened in binary mode
+BINARY_EXT = ('.mid', '.midi') # Files that must be opened in binary mode
 
-ICON_DELIMITER = '\s'
-PAUSE = '.'
-JIANPU_PAUSE = '0'
-QUAVER_DELIMITER = '-'
-JIANPU_QUAVER_DELIMITER = '^'
-LYRIC_DELIMITER = '#'
-METADATA_DELIMITER = '#$'
-REPEAT_INDICATOR = '*'
-BROKEN_HARP= 'X'
+DELIMITERS = {'icon': '\s',
+              'pause': '.',
+              'quaver': "-",
+              'jianpu_pause': '0',
+              'jianpu_quaver': '^',
+              'lyric': '#',
+              'metadata': '#$',
+              'repeat': '*',
+              'broken_harp': 'X',
+            }
+
 SKYJSON_CHORD_DELAY = 50 #Delay in ms below which 2 notes are considered a chord
 DEFAULT_BPM = 220
 PARSING_START_OCTAVE = 1
 RENDERING_START_OCTAVE = 4
+MARKDOWN_CODES = {'rulers': ['==', '--', '__']} # Supported Markdown characters
 
 MUSIC_MAKER_NAME = 'music_sheet_maker'
 MUSIC_COG_NAME = 'music_cog'

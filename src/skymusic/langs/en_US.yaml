@@ -9,11 +9,11 @@ recipient_specifics:
   skip:
     command_line: leave blank and type enter
     music_cog: answer with - (dash)
-    sky_music_website: press answer
+    sky_music_website: press 'answer'
   skip_number:
     command_line: leave blank and type enter
     music_cog: answer with - (dash)
-    sky_music_website: press answer
+    sky_music_website: press 'answer'
   all_modes:
     command_line: Type choice numbers, or 'all' to select all formats
     music_cog: 
@@ -56,10 +56,10 @@ input_mode:
     long_desc: "Japanese do re mi: ド、ド#／レb、レ、レ#／ミb、ミ、ファ、ファ#／ソb、ソ、ソ#／ラb、ラ、ラ#／シb、シ"
   skyjson:
     short_desc: Sky-Music recording (JSON text)
-    long_desc: "JSON dictionary with time in ms and key number 0-14 used by SkyStudio app and <https://sky-music.herokuapp.com>"
+    long_desc: "JSON dictionary with time in ms and key number 0-14 used by SkyStudio app and <https://specy.github.io/skyMusic/>"
   midi:
     short_desc: Midi file
-    long_desc: Midi file
+    long_desc: Midi file (.mid or .midi)
 render_mode:
   html:
     short_desc: HTML visual sheet
@@ -105,14 +105,16 @@ stock_queries:
       Accepted music notes formats:{input_modes}
       
       Pay attention to these special characters:
-      - Notes composing a chord must be glued together (e.g. A1B1C1).
+      - Notes of a chord must be glued together (e.g. A1B1C1).
       - Separate chords with "{icon_delimiter}".
-      - Use "{pause}" for a silence (rest), except for Jianpu where '0' is the official pause character.
-      - Use "{quaver_delimiter}" to link notes within an icon, for triplets, quavers... (e.g. {quaver_example}). With Jianpu, use "{jianpu_quaver_delimiter}" instead of "-" to avoid confusion with the octave.
+      - Use "{pause}" for a silence (pause), except in Jianpu use '0' instead.
+      - Use "{quaver_delimiter}" to link notes within an icon, for triplets, quavers... (e.g. {quaver_example}). In Jianpu, use "{jianpu_quaver_delimiter}" instead to avoid confusion with the octave.
       - Add "{repeat_indicator}" after a chord to indicate repetition.
-      - Sharps "#" and flats "b" (semitones) are supported for Western and Jianpu notations.
+      - Sharps "#" and flats "b" (semitones) after a note are possible for Western and Jianpu notations.
+      - Lyrics must be started and separated by '{lyric_delimiter}'
+      - Horizontal rulers between song lines can be added with '__' or '=='
       
-      *** Keep your notes in a text file to be able to correct your song later! ***
+      /!\ Keep your notes in a text file to be able to correct your song later! /!\
         
       Type '?' to get help for a particular question
     afterword: =======================================
@@ -124,14 +126,16 @@ stock_queries:
       Accepted music notes formats:{input_modes}
       
       Pay attention to these special characters:
-      - Notes composing a chord must be glued together (e.g. A1B1C1).
+      - Notes in a chord must be glued together (e.g. A1B1C1).
       - Separate chords with "{icon_delimiter}".
-      - Use "{pause}" for a silence (rest), except for Jianpu where '0' is the official pause character.
-      - Use "{quaver_delimiter}" to link notes within an icon, for triplets, quavers... (e.g. {quaver_example}). With Jianpu, use "{jianpu_quaver_delimiter}" instead of "-" to avoid confusion with the octave.
+      - Use "{pause}" for a silence (pause), except for Jianpu use '0' instead.
+      - Use "{quaver_delimiter}" to link notes within an icon, for triplets, quavers... (e.g. {quaver_example}). With Jianpu, use "{jianpu_quaver_delimiter}" instead to avoid confusion with the octave.
       - Add "{repeat_indicator}" after a chord to indicate repetition.
-      - Sharps "#" and flats "b" (semitones) are supported for Western and Jianpu notations.
+      - Sharps "#" and flats "b" (semitones) are possible in Western and Jianpu.
+      - Lyrics must be started and separated by '{lyric_delimiter}'
+      - Horizontal rulers between song lines can be added with '__' or '=='     
       
-      *** Keep your notes in a text file to be able to correct your song later! ***
+      /!\ Keep your notes in a text file to be able to correct your song later! /!\
     afterword:
     input_tip: click OK to acknowledge
     help_text:
@@ -149,12 +153,14 @@ stock_queries:
       Accepted music notes formats:{input_modes}
       
       Pay attention to these special characters:
-      - Notes composing a chord must be glued together (e.g. A1B1C1).
+      - Notes in a chord must be glued together (e.g. A1B1C1).
       - Separate chords with "{icon_delimiter}".
-      - Use "{pause}" for a silence (rest), except for Jianpu where '0' is the official pause character.
-      - Use "{quaver_delimiter}" to link notes within an icon, for triplets, quavers... (e.g. {quaver_example}). With Jianpu, use "{jianpu_quaver_delimiter}" instead of "-" to avoid confusion with the octave.
+      - Use "{pause}" for a silence (pause), except for Jianpu use '0' instead.
+      - Use "{quaver_delimiter}" to link notes within an icon, for triplets, quavers... (e.g. {quaver_example}). With Jianpu, use "{jianpu_quaver_delimiter}" instead to avoid confusion with the octave.
       - Add "{repeat_indicator}" after a chord to indicate repetition.
-      - Sharps "#" and flats "b" (semitones) are supported for Western and Jianpu notations.
+      - Sharps "#" and flats "b" (semitones) are possible in Western and Jianpu.
+      - Lyrics must be started and separated by '{lyric_delimiter}'
+      - Horizontal rulers between song lines can be added with '__' or '=='
   instrument_type:
     foreword:
     question: Please choose your instrument
@@ -239,12 +245,14 @@ stock_queries:
       Accepted music notes formats:{input_modes}
       
       Pay attention to these special characters:
-      - Notes composing a chord must be glued together (e.g. A1B1C1).
+      - Notes in a chord must be glued together (e.g. A1B1C1).
       - Separate chords with "{icon_delimiter}".
-      - Use "{pause}" for a silence (rest), except for Jianpu where '0' is the official pause character.
+      - Use "{pause}" for a silence (rest), except for Jianpu use '0' instead.
       - Use "{quaver_delimiter}" to link notes within an icon, for triplets, quavers... (e.g. {quaver_example}). With Jianpu, use "{jianpu_quaver_delimiter}" instead of "-" to avoid confusion with the octave.
       - Add "{repeat_indicator}" after a chord to indicate repetition.
       - Sharps "#" and flats "b" (semitones) are supported for Western and Jianpu notations.
+      - Lyrics must be separated by '#'
+      - Horizontal lines can be added with '__' or '=='      
   one_input_mode:
     foreword:
     question: |
@@ -331,7 +339,7 @@ stock_queries:
       - If you have specified the octave number, it must be between 1 and 3. If not, try again with an octave shift.
       - If you have changed the musical key (i.e. transposed the song), a +/-1 octave shift might be necessary
       - In Jianpu, pauses are indicated by '0' (zero)
-      - Your song is free of typos. Please check this website for full instructions: 
+      - That your song is free of typos. Please check this website for full instructions: 
       
       <https://sky-music.github.io/make-your-own-sheet.html>
     question: Do you want to continue anyway?

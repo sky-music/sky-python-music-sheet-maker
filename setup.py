@@ -14,7 +14,7 @@ Instructions are available at the project homepage.
 
 setup(
     name = 'skymusic',
-    version = '2.0.0',
+    version = '2.1.0',
     description = 'Make visual music sheets for Sky: Children of The Light',
     long_description = long_description,
     long_description_content_type = 'text/markdown',
@@ -30,7 +30,7 @@ setup(
     package_dir = {"": "src"},
     packages = find_packages('src'),
     include_package_data = True,
-    package_data = {"": ["*.css", "*.png", "*.otf", "*.svg", "*.yaml", "*.txt"],},
+    package_data = {"": ["*.css", "*.png", "*.otf", "*.svg", "*.yaml", "*.txt", "*.js"],},
     python_requires = '>=3.6',
     install_requires = ['pillow', 'pyyaml', 'importlib_resources;python_version<"3.8"'],
     extras_require = {

@@ -81,10 +81,6 @@ class MidiSongParser:
         if len(times) == 0:
             return None
         
-        #print('%%note_on DIFFS')
-        #diffs = [times[i] - times[i-1] for i in range(1, len(times))]
-        #print(diffs)
-        
         intervals = [interval for interval in self.music_theory.analyze_tempo(times, min_interval) if interval > 2*min_interval]
         
         if len(intervals) > 0:
@@ -132,12 +128,12 @@ class MidiSongParser:
         
         metadata = []
         if track.name:
-            metadata.append(Resources.LYRIC_DELIMITER + 'Track name: ' + track.name)
+            metadata.append(Resources.DELIMITERS['lyric'] + 'Track name: ' + track.name)
         
         if self.has_notes(track):
             track_key = self.extract_key(track)
             if track_key:
-                metadata.append(Resources.LYRIC_DELIMITER + 'Track key: ' + track_key)
+                metadata.append(Resources.DELIMITERS['lyric'] + 'Track key: ' + track_key)
         
         return metadata
     
@@ -148,14 +144,14 @@ class MidiSongParser:
         basename = ''
         if midi_file.filename:
             (basename,_) = os.path.splitext(midi_file.filename)
-        metadata.append(Resources.METADATA_DELIMITER + 'Title:' + basename.capitalize())
-        metadata.append(Resources.METADATA_DELIMITER + 'Artist:' + '')
-        metadata.append(Resources.METADATA_DELIMITER + 'Transcript writer:' + '')
+        metadata.append(Resources.DELIMITERS['metadata'] + 'Title:' + basename.capitalize())
+        metadata.append(Resources.DELIMITERS['metadata'] + 'Artist:' + '')
+        metadata.append(Resources.DELIMITERS['metadata'] + 'Transcript writer:' + '')
         
         first_key = self.extract_first_key(midi_file)
         
         if first_key:
-            metadata.append(Resources.METADATA_DELIMITER + 'Musical key: ' + first_key)
+            metadata.append(Resources.DELIMITERS['metadata'] + 'Musical key: ' + first_key)
         
         return metadata
 
@@ -166,7 +162,7 @@ class MidiSongParser:
             if note_msg.time == 0:
                 return ''
             else:
-                return Resources.PAUSE
+                return Resources.DELIMITERS['pause']
 
         octave = int((note_msg.note - self.root_pitch) / 12)
         semi = (note_msg.note - self.root_pitch) % 12
@@ -174,7 +170,7 @@ class MidiSongParser:
         try:
             note = self.note_parser.convert_chromatic_position_into_note_name(semi)
         except KeyError:
-            note = Resources.BROKEN_HARP
+            note = Resources.DELIMITERS['broken_harp']
             
         return note + str(octave-base_octave+Resources.PARSING_START_OCTAVE)
     
@@ -195,28 +191,25 @@ class MidiSongParser:
                 
                 dt = t - prev_t
                 
-                notes += [Resources.PAUSE]*int(dt/note_interval - 1) #parses implicit silences
+                notes += [Resources.DELIMITERS['pause']]*int(dt/note_interval - 1) #parses implicit silences
                 
                 note = self.parse_note_msg(msg, base_octave)
                 
-                #print(msg)
-                #print(f"dt={dt:.1f}, note={note}\n")  
-                
-                if note == Resources.PAUSE:
+                if note == Resources.DELIMITERS['pause']:
                     if dt > 0.5*note_interval:
                         notes.append(note)
                       
                 elif note:
                     
-                    if notes[-1] == Resources.PAUSE:
+                    if notes[-1] == Resources.DELIMITERS['pause']:
                         if (t - prev_prev_t < note_interval):
                             del(notes[-1])
                         notes.append(note)
                     else:
                         if dt == 0: #chord
                             notes[-1] += note
-                        elif (dt <= 0.45*note_interval) and (notes[-1] != Resources.PAUSE):
-                            notes[-1] += Resources.QUAVER_DELIMITER + note
+                        elif (dt <= 0.45*note_interval) and (notes[-1] != Resources.DELIMITERS['pause']):
+                            notes[-1] += Resources.DELIMITERS['quaver'] + note
                         else:
                             notes.append(note)
                   
@@ -295,8 +288,6 @@ class MidiSongParser:
             metadata = self.parse_meta(track)
             
             note_interval = self.extract_note_interval(track, 1)
-            
-            #print(note_interval)
             
             if note_interval is not None:          
                 notes = self.parse_notes(track, note_interval)

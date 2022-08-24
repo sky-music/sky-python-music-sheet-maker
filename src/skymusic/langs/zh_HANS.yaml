@@ -60,7 +60,7 @@ input_mode:
     long_desc: 'SkyStudio app 或 <https://sky-music.herokuapp.com> 使用的文件。该文件需有时间标志 (ms) 和软件中使用的 0-14 数字'
   midi:
     short_desc: Midi 文件
-    long_desc: Midi 文件
+    long_desc: Midi 文件 (.mid / .midi)
 render_mode:
   html:
     short_desc: HTML 乐谱
@@ -112,7 +112,9 @@ stock_queries:
       - 使用 '{quaver_delimiter}' 来连接同一个格子里的音符，例如三连音、八分音符、等等...(举例 {quaver_example})。 简谱使用法：请使用 '{jianpu_quaver_delimiter}'，非 '-' 来避免与八度打乱。
       - 和弦过后加入 '{repeat_indicator}' 以表注重复。
       - 西方乐谱和简谱支持使用升号 "#" 和降号 "b" (变音记号)。
-      
+      - Lyrics must be separated by '{lyric_delimiter}'
+      - Horizontal lines can be added with '__' or '=='
+            
       *** 请把您的乐谱文案存入文字档以方便更改 ***
         
       输入 '?' 如对以上有疑惑
@@ -131,6 +133,8 @@ stock_queries:
       - 使用 '{quaver_delimiter}' 来连接同一个格子里的音符，例如三连音、八分音符、等等...(举例 {quaver_example})。 简谱使用法：请使用 '{jianpu_quaver_delimiter}'，非 '-' 来避免与八度打乱。
       - 和弦过后加入 '{repeat_indicator}' 以表注重复。
       - 西方乐谱和简谱支持使用升号 "#" 和降号 "b" (变音记号)。
+      - Lyrics must be separated by '{lyric_delimiter}'
+      - Horizontal lines can be added with '__' or '=='      
       
       *** 请把您的乐谱文案存入文字档以方便更改 ***
     afterword:
@@ -156,6 +160,8 @@ stock_queries:
       - 使用 '{quaver_delimiter}' 来连接同一个格子里的音符，例如三连音、八分音符、等等...(举例 {quaver_example})。 简谱使用法：请使用 '{jianpu_quaver_delimiter}'，非 '-' 来避免与八度打乱。
       - 和弦过后加入 '{repeat_indicator}' 以表注重复。
       - 西方乐谱和简谱支持使用升号 "#" 和降号 "b" (变音记号)。
+      - Lyrics must be separated by '{lyric_delimiter}'
+      - Horizontal lines can be added with '__' or '=='      
   instrument_type:
     foreword:
     question: Please choose your instrument

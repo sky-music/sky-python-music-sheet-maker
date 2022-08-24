@@ -3,25 +3,40 @@ from skymusic.communication import QueryOpen, QueryChoice, QueryMultipleChoices,
 from skymusic import Lang
 
 """
-NOTE ABOUT LIMITS
+A DICTIONARY OF STANDARD QUESTIONS, perused by a Communicator when calling send_stock_query
 
-Limits should be a list (even though entering another iterable is possible)
-For QueryChoice, it will be a list of choices
-For QueryBoolean, it is a list of keywords grouped by pairs (yes, no, oui, non)
+class: class of Query object
+        - Information: text is displayed, no answer expected ('ok' by default)
+        - QueryChoice: you have to choose 1 answer
+        - QueryMultipleChoices: you have to choose one or several answers (list in prompt, checkboxes on the web server)
+        - QueryOpen: you have to type some text
+        
+handler: The name of the method that must be executed by the recipient
+question: the question, as a prompt
+foreword: optional text to display before the question
+afterword: optional text to display after the question
+help_text: text displayed when user asks for help by typing '?' or clicking help on the web servet
+input_tip: hovering help text displayed on the web server
+reply_type: type of the data expected for an answer, defined in the modes.ReplyType enum
 
-If a ReplyType is specified in reply_type, limits must be of the same type
+limits: a list of acceptable values for an answer
 
-For ReplyType.FILEPATH, it contains valid search directories and valid file extensions, in any order
+Limits should be a list (even though any iterable object is supported)
+For QueryChoice, it must be a list of choices
+For QueryBoolean, it must be a list of keywords, that will be grouped by pairs (yes, no, oui, non)
 
-For ReplyType.NUMBER, it is a list of [min, max, default], default being optional.
-If the limits and the default value are integers, floats will be rejected. Do not mix int and floats in limits and default
+If a ReplyType enum is specified in reply_type, limits items must be of the same type
 
-For ReplyType.TEXT, limits can be a (compilable) regular expression
+With ReplyType.FILEPATH, limits must contain valid search directories and valid file extensions, in any order
 
+With ReplyType.NUMBER, limits must be a list of numerical values [min, max, default], the default value being optional.
+If all numbers in limits are integers, floats will be rejected. Do not mix int and floats in limits and default
+
+With ReplyType.TEXT, limits can be strings or  a (compilable) regular expression
 If a non-None value for 'default' is set, then a blank answer will revert to this value.
 Otherwise, blank answers are forbidden
 
-'expect_long_answer' is a special setting to display a textarea on the website
+'expect_long_answer' is a special setting to display a textarea field on the web server (eg for entering song notes)
 
 """
 

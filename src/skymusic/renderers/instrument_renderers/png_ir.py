@@ -26,6 +26,7 @@ class PngInstrumentRenderer(instrument_renderer.InstrumentRenderer):
         self.harp_font_size = Resources.harp_font_size
         self.repeat_height = None
         self.voice_font_size = Resources.voice_font_size
+        self.hr_color = Resources.hr_color  # Transparent white
         try:
             self.voice_font = ImageFont.truetype(self.font_path, self.voice_font_size)
             self.harp_font = ImageFont.truetype(self.font_path, self.harp_font_size)
@@ -86,8 +87,40 @@ class PngInstrumentRenderer(instrument_renderer.InstrumentRenderer):
         fnt = self.voice_font
         return fnt.getsize('HQfgjyp')[1] #Uppercase H and characters with tails
    
+   
+    def render_ruler(self, ruler, rescale=1.0, max_size=None): # Should add options
+        """Renders an horizontal ruler"""
+        code = ruler.get_code()
 
-    def render_voice(self, instrument, rescale=1.0):
+        #harp_size = self.get_png_harp_size() # Will be replaced by option
+        hr_render = Image.new('RGBA', (int(max_size[0]), int(max_size[1])),
+                             color=self.text_bkg)
+        draw = ImageDraw.Draw(hr_render)
+        
+        rulerH = 2
+        rulerW = int(max_size[0])
+        
+        if code == '__':
+            draw.line([(0,0),(rulerW,0)], fill=self.hr_color, width=rulerH)
+        elif code == '--':
+            xl = 0
+            dashW = max(1,rulerW/200)
+            dashS = dashW # 50% dash
+            while xl < rulerW:
+                draw.line([(xl,0),(xl+dashW,0)], fill=self.hr_color, width=rulerH)
+                xl += dashW + dashS
+            
+        elif code == '==':
+            draw.line([(0,0),(rulerW,0)], fill=self.hr_color, width=rulerH)
+            draw.line([(0,4*rulerH),(rulerW,4*rulerH)], fill=self.hr_color, width=rulerH)
+        else:
+            raise KeyError(code)
+
+        # No rescaling for the ruler (which is 1D and should extend to the full page width)
+            
+        return hr_render
+
+    def render_voice(self, instrument, rescale=1.0, max_size=None):
         """Renders the lyrics text in PNG"""
         lyric = instrument.get_lyric(strip_html=True)
         harp_size = self.get_png_harp_size()
@@ -95,9 +128,9 @@ class PngInstrumentRenderer(instrument_renderer.InstrumentRenderer):
         fnt = self.voice_font
         lyric_width = fnt.getsize(lyric)[0]
 
-        lyric_im = Image.new('RGBA', (int(max(harp_size[0], lyric_width)), int(self.get_lyric_height())),
+        lyric_render = Image.new('RGBA', (int(max(harp_size[0], lyric_width)), int(self.get_lyric_height())),
                              color=self.text_bkg)
-        draw = ImageDraw.Draw(lyric_im)
+        draw = ImageDraw.Draw(lyric_render)
 
         if lyric_width < harp_size[0]:
             # Draws centered text
@@ -106,13 +139,18 @@ class PngInstrumentRenderer(instrument_renderer.InstrumentRenderer):
             # Draws left-aligned text that spilles over the next icon
             draw.text((0, 0), lyric, font=fnt, fill=self.font_color)
 
+        # Rescaling
+        if max_size is not None:
+            rescale =  min(rescale,max_size[0]/lyric_render.size[0])
+            rescale =  min(rescale,max_size[1]/lyric_render.size[1])
+
         if rescale != 1:
-            lyric_im = lyric_im.resize((int(lyric_im.size[0] * rescale), int(lyric_im.size[1] * rescale)),
+            lyric_render = lyric_render.resize((int(lyric_render.size[0] * rescale), int(lyric_render.size[1] * rescale)),
                                        resample=Image.LANCZOS)
-        return lyric_im
+        return lyric_render
 
 
-    def render_harp(self, instrument, rescale=1.0):
+    def render_harp(self, instrument, rescale=1.0, max_size=None):
 
         harp_silent = instrument.get_is_silent()
         harp_broken = instrument.get_is_broken()
@@ -164,9 +202,17 @@ class PngInstrumentRenderer(instrument_renderer.InstrumentRenderer):
                         note_render = note_renderer.render(note=note, rescale=note_rescale)
                         harp_render = self.trans_paste(harp_render, note_render, (int(round(xn)), int(round(yn))))
 
+        # Rescaling
+        if max_size is not None:
+            rescale =  min(rescale,max_size[0]/harp_render.size[0])
+            rescale =  min(rescale,max_size[1]/harp_render.size[1])
+
         if rescale != 1:
             harp_render = harp_render.resize((int(harp_render.size[0] * rescale), int(harp_render.size[1] * rescale)),
                                              resample=Image.LANCZOS)
 
+            
         return harp_render
                 
+
+

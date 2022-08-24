@@ -23,8 +23,8 @@ class InputMode(Enum):
         self.long_desc_yaml = long_desc
         self.note_parser_method = note_parser_method
 
-    def __str__(self):
-        return self.get_short_desc('en_US')
+    def __str__(self, locale='en_US'):
+        return self.get_short_desc(locale)
 
     def get_is_chromatic(self):
         return self.chromatic
@@ -61,8 +61,8 @@ class RenderMode(Enum):
         self.extension = extension
         self.note_parser_method = note_parser_method
 
-    def __str__(self):
-        return self.get_short_desc('en_US')
+    def __str__(self, locale='en_US'):
+        return self.get_short_desc(locale)
 
     def get_is_image(self):
         return self.image_mode
@@ -106,8 +106,8 @@ class InstrumentType(Enum):
         self.long_desc_yaml = long_desc_yaml
         self.instrument_class = instrument_class
 
-    def __str__(self):
-        return self.get_short_desc('en_US')
+    def __str__(self, locale='en_US'):
+        return self.get_short_desc(locale)
 
     def get_short_desc(self, locale='en_US'):
         return Lang.get_string(self.short_desc_yaml, locale)
@@ -130,8 +130,8 @@ class AspectRatio(Enum):
         self.short_desc_yaml = short_desc_yaml
         self.ratio = ratio
 
-    def __str__(self):
-        return self.get_short_desc('en_US')
+    def __str__(self, locale='en_US'):
+        return self.get_short_desc(locale)
 
     def get_short_desc(self, locale='en_US'):
         return Lang.get_string(self.short_desc_yaml, locale)

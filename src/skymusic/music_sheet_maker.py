@@ -4,7 +4,7 @@ from skymusic.communicator import Communicator, QueriesExecutionAbort
 from skymusic.parsers.song_parser import SongParser
 from skymusic.renderers.song_renderers.song_renderer import SongRenderer
 from skymusic.renderers.song_renderers import skyjson_sr
-from skymusic import Lang
+from skymusic import Lang, FileUtils
 from skymusic.resources import Resources
 
 # placeholder for skyjson_sr if required by submodules
@@ -134,23 +134,6 @@ class MusicSheetMaker:
 
     def get_name(self):
         return self.name
-
-    def shortest_path(self, path):
-
-        abs_path = os.path.abspath(path)
-
-        try:
-            relpath = os.path.relpath(path,start=self.application_root)
-        except ValueError:
-            relpath = abs_path
-
-        try:
-            home_relpath = os.path.relpath(path,start=os.path.expanduser("~"))
-        except ValueError:
-            home_relpath = abs_path
-
-        return sorted([relpath,abs_path,home_relpath],key=len)[0]
-
 
     def get_locale(self):
         return self.locale
@@ -368,8 +351,9 @@ class MusicSheetMaker:
                         'pause': self.get_song_parser().get_pause().replace('\s','<space>'),
                         'quaver_delimiter': self.get_song_parser().get_quaver_delimiter().replace('\s','<space>'),
                         'quaver_example': self.get_song_parser().get_quaver_delimiter().replace('\s','<space>').join(['A1', 'B1', 'C1']),
-                        'jianpu_quaver_delimiter': Resources.JIANPU_QUAVER_DELIMITER,
-                        'repeat_indicator': self.get_song_parser().get_repeat_indicator() + '2'
+                        'jianpu_quaver_delimiter': Resources.DELIMITERS['jianpu_quaver'],
+                        'repeat_indicator': self.get_song_parser().get_repeat_indicator() + '2',
+                        'lyric_delimiter': Resources.DELIMITERS['lyric']
                         }
         if self.is_command_line(recipient):
             i_instr = self.communicator.send_stock_query('instructions_command_line', recipient=recipient,
@@ -395,8 +379,9 @@ class MusicSheetMaker:
                         'pause': self.get_song_parser().get_pause().replace('\s','<space>'),
                         'quaver_delimiter': self.get_song_parser().get_quaver_delimiter().replace('\s','<space>'),
                         'quaver_example': self.get_song_parser().get_quaver_delimiter().replace('\s','<space>').join(['A1', 'B1', 'C1']),
-                        'jianpu_quaver_delimiter': Resources.JIANPU_QUAVER_DELIMITER,
-                        'repeat_indicator': self.get_song_parser().get_repeat_indicator() + '2'
+                        'jianpu_quaver_delimiter': Resources.DELIMITERS['jianpu_quaver'],
+                        'repeat_indicator': self.get_song_parser().get_repeat_indicator() + '2',
+                        'lyric_delimiter': Resources.DELIMITERS['lyric']
                         }
         replacements.update({'skip': Lang.get_string(f"recipient_specifics/skip/{recipient.get_name()}", self.locale)})
 
@@ -411,7 +396,7 @@ class MusicSheetMaker:
 
     def ask_file(self, recipient, prerequisites=None, execute=True):
 
-        replacements = {'songs_in': self.shortest_path(self.song_in_dir),
+        replacements = {'songs_in': FileUtils.shortest_path(self.song_in_dir, self.application_root),
                         'put_in_songs_in': Lang.get_string(f"recipient_specifics/put_in_songs_in/{recipient.get_name()}", self.locale)
                         }
         
@@ -428,27 +413,6 @@ class MusicSheetMaker:
         else:
             return q_file, None
 
-    def read_file(self, file_path):
-
-        isfile = os.path.isfile(file_path)
-        
-        _, ext = os.path.splitext(file_path)
-        
-        if not isfile:
-            MusicSheetMakerError("File does not exist: %s" % os.path.abspath(file_path))
-        else:
-            # load file
-            try:
-                if ext in Resources.BINARY_EXT:
-                    with open(file_path, mode='rb') as fp:
-                        lines = fp.readlines()  # Returns a list of bytes
-                else:
-                    with open(file_path, mode='r', encoding='utf-8', errors='ignore') as fp:
-                        lines = fp.readlines()  # Returns a list of strings
-            except (OSError, IOError) as err:
-                raise err
-
-            return lines
 
     def ask_notes_or_file(self, recipient, prerequisites=None, execute=True):
         """
@@ -462,8 +426,9 @@ class MusicSheetMaker:
                         'pause': self.get_song_parser().get_pause().replace('\s','<space>'),
                         'quaver_delimiter': self.get_song_parser().get_quaver_delimiter().replace('\s','<space>'),
                         'quaver_example': self.get_song_parser().get_quaver_delimiter().replace('\s','<space>').join(['A1', 'B1', 'C1']),
-                        'jianpu_quaver_delimiter': Resources.JIANPU_QUAVER_DELIMITER,
-                        'repeat_indicator': self.get_song_parser().get_repeat_indicator() + '2'
+                        'jianpu_quaver_delimiter': Resources.DELIMITERS['jianpu_quaver'],
+                        'repeat_indicator': self.get_song_parser().get_repeat_indicator() + '2',
+                        'lyric_delimiter': Resources.DELIMITERS['lyric']
                         }
         replacements.update({'put_in_songs_in': Lang.get_string(f"recipient_specifics/put_in_songs_in/{recipient.get_name()}", self.locale)})
 
@@ -473,7 +438,7 @@ class MusicSheetMaker:
 
         else:
 
-            replacements.update({'songs_in': self.shortest_path(self.song_in_dir)})
+            replacements.update({'songs_in': FileUtils.shortest_path(self.song_in_dir, self.application_root)})
             q_notes = self.communicator.send_stock_query('notes_file', recipient=recipient, replacements=replacements, prerequisites=prerequisites)
 
             if not execute:
@@ -486,22 +451,21 @@ class MusicSheetMaker:
                 if self.is_music_cog(recipient):
                     isfile = False # Don't allow reading files stored on system path on the music-cog
                 else:                
-                    # Detects if the result is a file path
+                    # Detects if the result is a valid filepath, or a tentative one
                     file_path = os.path.join(self.song_in_dir, os.path.normpath(result))
-                    isfile = os.path.isfile(file_path)
 
-                    if not isfile:
-                        splitted = os.path.splitext(result)
-                        if len(splitted[0]) > 0 and 2 < len(splitted[1]) <= 5 and re.search('\\.', splitted[0]) is None:
-                            # then certainly a file name
-                            self.communicator.memory.erase(q_notes)
-
-                            q_notes, file_path = self.ask_file(recipient=recipient, prerequisites=prerequisites,
-                                                               execute=execute)
-                            isfile = True  # ask_file only returns when a valid file path is found                   
+                    file_path, isfile = FileUtils.file_status(file_path)
+                    
+                    if isfile == -1:
+                        # a file name, but there was a typo
+                        self.communicator.memory.erase(q_notes)
+                        q_notes, file_path = self.ask_file(recipient=recipient, prerequisites=prerequisites, execute=execute)
+                        isfile = True  # ask_file loops until a valid file path is found
+                    else:
+                        isfile = bool(isfile)
 
                 if isfile: 
-                    notes = self.read_file(file_path)
+                    notes = FileUtils.read_file(file_path, Resources.BINARY_EXT)
                     if self.is_command_line(recipient):
                         print(Lang.get_string("open_file", self.locale).format(file_path=os.path.abspath(file_path)))
                 else:
@@ -881,7 +845,7 @@ class MusicSheetMaker:
         if numfiles == 1:
 
             replacements = {'render_mode': render_mode.get_short_desc(self.locale),
-                            'song_file': str(self.shortest_path(file_paths[0]))
+                            'song_file': str(FileUtils.shortest_path(file_paths[0], self.application_root))
                             }
 
             i_song_files = self.communicator.send_stock_query('one_song_file', recipient=recipient,
@@ -890,7 +854,7 @@ class MusicSheetMaker:
         elif numfiles > 1:
 
             replacements = {'render_mode': render_mode.get_short_desc(self.locale),
-                            'songs_out': str(self.shortest_path(self.song_out_dir)),
+                            'songs_out': str(FileUtils.shortest_path(self.song_out_dir, self.application_root)),
                             'num_files': str(numfiles),
                             'first_file': str(os.path.split(file_paths[0])[1]),
                             'last_file': str(os.path.split(file_paths[-1])[1])
@@ -1000,7 +964,7 @@ class MusicSheetMaker:
             isfile = os.path.isfile(file_path)
 
             if isfile and self.is_command_line(recipient):
-                notes = self.read_file(file_path)
+                notes = FileUtils.read_file(file_path, Resources.BINARY_EXT)
             else:
                 notes = result.split(os.linesep)
             return notes
