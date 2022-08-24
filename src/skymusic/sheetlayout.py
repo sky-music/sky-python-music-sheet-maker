@@ -1,27 +1,19 @@
 from skymusic.resources import Resources
+"""A collection of objects that can be put in song lines in lieu of instruments"""
 
-class Ruler():
-    
+class PseudoInstrument():
+
     def __init__(self):
-        super().__init__()
-        self.type = 'ruler'
-        self.code = None
-        self.content = ""
-        self.index = 0
-        self.repeat = 0
-    
+        self.type = None #mandatory
+        self.index = 0 # mandatory to avoid errors
+        self.repeat = 0 # Mandatory to avoid errors
+        
     def get_type(self):
         return self.type
     
     def set_index(self, index):
         self.index = index
         
-    def set_content(self, text: str):
-        text = text[:64]
-
-    def get_content(self):
-        return self.content
-
     def get_index(self):
         """ index in the song"""
         return self.index 
@@ -31,7 +23,22 @@ class Ruler():
 
     def get_repeat(self):
         """Returns the number of times the instrument must be played"""
-        return self.repeat    
+        return self.repeat
+        
+        
+class Ruler(PseudoInstrument):
+    
+    def __init__(self):
+        super().__init__()
+        self.type = 'ruler' #mandatory
+        self.code = None
+        self.content = ""
+    
+    def set_content(self, text: str):
+        text = text[:64]
+
+    def get_content(self):
+        return self.content
     
     def set_code(self, text):
         if text not in Resources.MARKDOWN_CODES['rulers']:

@@ -10,7 +10,7 @@ recipient_specifics:
   skip:
     command_line: laissez vide et tapez entrée
     music_cog: répondez avec - (tiret)
-    sky_music_website: appuyez sur 'send answer'
+    sky_music_website: appuyez sur 'send choice'
   skip_number:
     command_line: laissez blanc et tapez entrée
     music_cog: répondez avec - (tiret)
@@ -57,10 +57,10 @@ input_mode:
     long_desc: "do re mi en japonais: ド、ド#／レb、レ、レ#／ミb、ミ、ファ、ファ#／ソb、ソ、ソ#／ラb、ラ、ラ#／シb、シ"
   skyjson:
     short_desc: 'Enregistrement Sky-Music  (JSON text)'
-    long_desc: "Dictionaire JSON avec le temps en ms et la touche 0-14 comme sur l'app SkyStudio et <https://sky-music.herokuapp.com>"
+    long_desc: "Dictionaire JSON avec le temps en ms et la touche 0-14 comme sur l'app SkyStudio et <https://specy.github.io/skyMusic/"
   midi:
     short_desc: Midi file
-    long_desc: Midi file
+    long_desc: Fichier Midi (.mid ou .midi)
 render_mode:
   html:
     short_desc: partition graphique en HTML
@@ -108,11 +108,13 @@ stock_queries:
       - Les notes composant un accord doivent être attachées (e.g. A1B1C1).
       - Separez les accords avec {icon_delimiter}
       - Tapez "{pause}" pour marquer une pause (silence), sauf en notation Jianpu où '0' (zéro) est utilisé conventionellement
-      - Tapez "{quaver_delimiter}" pour relier les notes entre elles, pour les triplets... (e.g. {quaver_example}). En Jianpu, utilisez "{jianpu_quaver_delimiter}" au lieu de '-' pour éviter la confusion avec l'octave.
+      - Tapez "{quaver_delimiter}" pour relier les notes entre elles, pour les triplets... (e.g. {quaver_example}). En Jianpu, utilisez "{jianpu_quaver_delimiter}" pour éviter la confusion avec l'octave.
       - Tapez "{repeat_indicator}" après un groupe de notes pour indiquer la répétition.
       - Les dièses "#" et les bémoles "b" (demi-tons) sont possibles pour les notations autres que Sky ABC-15.
+      - Les paroles doivent être commencées et séparée par "{lyric_delimiter}"
+      - Des lignes de séparations simple avec '__' ou double avec '==' 
  
-      ** Gardez vos notes dans un fichier texte pour pouvoir modifier la chanson plus tard ! **   
+       /!\ Gardez vos notes dans un fichier texte pour pouvoir modifier la chanson plus tard ! /!\   
           
       Tapez '?' pour obtenir de l'aide après une question
     afterword: =======================================
@@ -129,8 +131,10 @@ stock_queries:
       - Tapez "{quaver_delimiter}" pour relier les notes entre elles, pour les triplets... (e.g. {quaver_example}). En Jianpu, utilisez "{jianpu_quaver_delimiter}" au lieu de '-' pour éviter la confusion avec l'octave.
       - Tapez "{repeat_indicator}" après un groupe de notes pour indiquer la répétition.
       - Les dièses "#" et les bémoles "b" (demi-tons) sont possibles pour les notations autres que Sky ABC-15.
+      - Les paroles doivent être commencées et séparée par "{lyric_delimiter}"
+      - Des lignes de séparations simple avec '__' ou double avec '=='  
       
-      ** Gardez vos notes dans un fichier texte pour pouvoir modifier la chanson plus tard ! **         
+       /!\ Gardez vos notes dans un fichier texte pour pouvoir modifier la chanson plus tard ! /!\     
     afterword:
     input_tip: cliquez sur OK pour passer
     help_text:
@@ -149,10 +153,11 @@ stock_queries:
     
       - Les notes composant un accord doivent être attachées (e.g. A1B1C1).
       - Separate chords with {icon_delimiter}
-      - Tapez "{pause}" pour marquer une pause (silence), sauf en notation Jianpu où '0' (zéro) est utilisé conventionellement
-      - Tapez "{quaver_delimiter}" pour relier les notes entre elles, pour les triplets... (e.g. {quaver_example}). En Jianpu, utilisez "{jianpu_quaver_delimiter}" au lieu de '-' pour éviter la confusion avec l'octave.
+      - Tapez "{pause}" pour marquer une pause (silence), sauf en notation Jianpu où '0' (zéro) est utilisé
+      - Tapez "{quaver_delimiter}" pour relier les notes entre elles, pour les triplets... (e.g. {quaver_example}). En Jianpu, utilisez "{jianpu_quaver_delimiter}" pour éviter la confusion avec l'octave.
       - Tapez "{repeat_indicator}" après un groupe de notes pour indiquer la répétition.
       - Les dièses "#" et les bémoles "b" (demi-tons) sont possibles pour les notations autres que Sky ABC-15.
+      - Les paroles doivent être commencées et séparées par "{lyric_delimiter}"
   instrument_type:
     foreword:
     question: Merci de choisir votre instrument
@@ -217,10 +222,12 @@ stock_queries:
     
       - Les notes composant un accord doivent être attachées (e.g. A1B1C1).
       - Separate chords with {icon_delimiter}
-      - Tapez "{pause}" pour marquer une pause (silence), sauf en notation Jianpu où '0' (zéro) est utilisé conventionellement
-      - Tapez "{quaver_delimiter}" pour relier les notes entre elles, pour les triplets... (e.g. {quaver_example}). En Jianpu, utilisez "{jianpu_quaver_delimiter}" au lieu de '-' pour éviter la confusion avec l'octave.
+      - Tapez "{pause}" pour marquer une pause (silence), sauf en notation Jianpu où '0' (zéro) est utilisé.
+      - Tapez "{quaver_delimiter}" pour relier les notes entre elles, pour les triplets... (e.g. {quaver_example}). En Jianpu, utilisez "{jianpu_quaver_delimiter}" pour éviter la confusion avec l'octave.
       - Tapez "{repeat_indicator}" après un groupe de notes pour indiquer la répétition.
       - Les dièses "#" et les bémoles "b" (demi-tons) sont possibles pour les notations autres que Sky ABC-15.
+      - Les paroles doivent être commencées et séparée par ''{lyric_delimiter}''
+      - Des lignes de séparations simple avec '__' ou double avec '=='     
   file:
     foreword:
     question: "Entrez un nom de fichier valide{put_in_songs_in} (sensible à la casse)"
@@ -235,10 +242,10 @@ stock_queries:
     help_text: |
       Formats de notes acceptés :{input_modes}
     
-      - Les notes composant un accord doivent être attachées (e.g. A1B1C1).
+      - Les notes d'un accord doivent être attachées (e.g. A1B1C1).
       - Separate chords with {icon_delimiter}
-      - Tapez "{pause}" pour marquer une pause (silence), sauf en notation Jianpu où '0' (zéro) est utilisé conventionellement
-      - Tapez "{quaver_delimiter}" pour relier les notes entre elles, pour les triplets... (e.g. {quaver_example}). En Jianpu, utilisez "{jianpu_quaver_delimiter}" au lieu de '-' pour éviter la confusion avec l'octave.
+      - Tapez "{pause}" pour marquer une pause (silence), sauf en notation Jianpu où '0' (zéro) est utilisé.
+      - Tapez "{quaver_delimiter}" pour relier les notes entre elles, pour les triplets... (e.g. {quaver_example}). En Jianpu, utilisez "{jianpu_quaver_delimiter}" pour éviter la confusion avec l'octave.
       - Tapez "{repeat_indicator}" après un groupe de notes pour indiquer la répétition.
       - Les dièses "#" et les bémoles "b" (demi-tons) sont possibles pour les notations autres que Sky ABC-15.
   one_input_mode:

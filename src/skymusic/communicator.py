@@ -1,5 +1,5 @@
-import io, re
-from skymusic.modes import InputMode, RenderMode, ReplyType
+import io
+from skymusic.modes import RenderMode, ReplyType
 from skymusic.communication import QueryOpen, QueryChoice, QueryBoolean, QueryMultipleChoices, QueryMemory, Information
 from skymusic import Lang, QueryStock
 
@@ -207,12 +207,12 @@ class Communicator:
                 multiple_choices = True
             else:
                 multiple_choices = False
-			
+
             if (query.get_reply_type() == ReplyType.FILEPATH) or (query.get_reply_type() == ReplyType.OTHER and 'file' in query.get_name()):
                 accepts_file = True
             else:
                 accepts_file = False
-			
+
             question_dict = {'foreword': query.get_foreword().strip(), 'question': query.get_question().strip(),
                              'afterword': query.get_afterword().strip(),
                              'help_text': query.get_help_text().strip(), 'input_tip': query.get_input_tip().strip(),
@@ -220,12 +220,10 @@ class Communicator:
                              'expect_answer': query.get_expect_reply(), 'multiple_choices': multiple_choices}
 
             # Choices keyword arguments dictionary
-            if isinstance(query, (QueryMultipleChoices, QueryChoice)):                    
-                if isinstance(limits[0], InputMode):
-                    choices_dicts = [{'number': i, 'text': limit.get_short_desc(self.locale)} for i, limit in enumerate(limits)]
-                elif isinstance(limits[0], RenderMode):
-                    choices_dicts = [{'number': i, 'text': limit.get_short_desc(self.locale)} for i, limit in enumerate(limits)]
-                else:
+            if isinstance(query, (QueryMultipleChoices, QueryChoice)):
+                try:
+                    choices_dicts = [{'number': i, 'text': str(limit,self.locale)} for i, limit in enumerate(limits)]
+                except TypeError:
                     choices_dicts = [{'number': i, 'text': str(limit).strip()} for i, limit in enumerate(limits)]
             else:
                 choices_dicts = []
@@ -254,7 +252,7 @@ class Communicator:
         """
         Returns a text that can be sent to a Discord utils.Question model
         """
-        result = {}
+        output = {}
         
         limits = query.get_limits()
         if query.help_required:
@@ -262,15 +260,15 @@ class Communicator:
         else:
             question_text = '\n'.join([query.get_foreword().strip(), query.get_question().strip()])
             
-        result.update({'question': question_text})
+        output.update({'question': question_text})
 
         # options keyword arguments dictionary
         if isinstance(query, QueryBoolean):
-            result.update({'yesnos': [{'number': i, 'text': str(limit).strip()} for i, limit in enumerate(limits)]})
+            output.update({'yesnos': [{'number': i, 'text': str(limit).strip()} for i, limit in enumerate(limits)]})
         elif isinstance(query, (QueryMultipleChoices, QueryChoice)) and query.get_reply_type() is not ReplyType.NOTE:
-            result.update({'options': [{'number': i, 'text': str(limit).strip()} for i, limit in enumerate(limits)]})
+            output.update({'options': [{'number': i, 'text': str(limit).strip()} for i, limit in enumerate(limits)]})
 
-        result.update({'result': query.get_result()})
+        output.update({'result': query.get_result()})
 
-        return result
+        return output
 

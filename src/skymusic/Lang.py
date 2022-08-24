@@ -18,7 +18,7 @@ def check_locale(locale):
         print(f"\n***WARNING: locale code '{locale}' too short")
         return None
 
-	# Sanitization: correct case and replacement of - in case the locale is a IETF language tag
+    # Sanitization: correct case and replacement of - in case the locale is a IETF language tag
     matchobj = re.match('([^_|-]*)[_|-]*([^_|-]*)', locale.strip())
     locale = '_'.join(filter(None,(matchobj.group(1).lower(), matchobj.group(2).upper())))
 
