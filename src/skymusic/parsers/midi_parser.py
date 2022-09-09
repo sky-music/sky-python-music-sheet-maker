@@ -216,8 +216,8 @@ class MidiSongParser:
                 if note:
                     prev_prev_t = prev_t
                     prev_t = t
-                
-        return ' '.join(filter(None,notes))                
+                      
+        return self.icon_delimiter.join(filter(None,notes))
 
     def sanitize_midi_lines(self, midi_lines):
         
@@ -269,7 +269,7 @@ class MidiSongParser:
                         if note:
                             song.append(note)
             
-            return [' '.join(song)]
+            return [self.icon_delimiter.join(song)]
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
     def parse_midi(self, midi_lines):
         

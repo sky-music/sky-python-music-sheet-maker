@@ -6,7 +6,7 @@ __
 G1 A1 B1 G1 C2 E2 D2 B1 . G1 A1 B1 D2 B1 C2 A1 G1
 A1 B1 G1 C2 E2 D2 B1 G1 A1 B1 D2
 #
-==
+--
 # *Verse*
 A1-G1-F1-E1 F1 G1 G1 A1 A1 G1-F1-E1 F1 G1
 #old pirates yes #they #rob #I #sold #I #to the mer- #chant #ships

@@ -1,6 +1,6 @@
-import re
+#import re
 from . import instrument_renderer
-from skymusic.resources import Resources
+#from skymusic.resources import Resources
 from skymusic.renderers.note_renderers.html_nr import HtmlNoteRenderer
 
 class HtmlInstrumentRenderer(instrument_renderer.InstrumentRenderer):

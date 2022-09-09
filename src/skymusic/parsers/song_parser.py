@@ -29,9 +29,6 @@ class SongParser:
         self.maker = maker
         self.instrument_type = InstrumentType.NORMAL
         self.silent_warnings = silent_warnings
-        #Delimiters must be character or strings
-        #The backslash character is forbidden
-        #Only regex with the following format are supported: \x, where x is s, t, w, d, n, r, a, r, f, v, or R
         self.input_mode = None
         self.note_parser = None
         self.icon_delimiter = Resources.DELIMITERS['icon']
@@ -40,7 +37,11 @@ class SongParser:
         self.lyric_delimiter = Resources.DELIMITERS['lyric']
         self.metadata_delimiter = Resources.DELIMITERS['metadata']
         self.repeat_indicator = Resources.DELIMITERS['repeat']
+        self.layer_delimiter = Resources.DELIMITERS['layer']
         self.default_key = Resources.DEFAULT_KEY
+        #Delimiters must be character or strings
+        #The backslash character is forbidden
+        #Only regex with the following format are supported: \x, where x is s, t, w, d, n, r, a, r, f, v, or R
         self.allowed_regex = ['\s', '\t', '\w', '\d', '\n', '\r', '\a', '\e', '\f', '\v', '\R']
         self.ruler_regex = Resources.DELIMITERS['lyric'] + r'{0,1}\s*(' + r'|'.join(Resources.MARKDOWN_CODES['rulers']) + r')+\s*(.*)'
         self.music_theory = music_theory.MusicTheory(self)
@@ -326,6 +327,8 @@ class SongParser:
         
         if self.icon_delimiter in self.allowed_regex:
             delimiter = self.icon_delimiter
+        elif self.icon_delimiter==' ':
+            delimiter = '\s'
         else:
             delimiter = re.escape(self.icon_delimiter)       
 
@@ -340,34 +343,26 @@ class SongParser:
         Splits a song line into icons
         An icon is a made of 1 note, several notes (chord), or several chords played rapidly (triplet, quaver)
         Icons will be visually split in SkyGrid renders (aka Harps), possibly with pauses between them
-        """    
-        if self.input_mode == InputMode.SKYJSON:
-            from . import json_parser
-            parser = json_parser.JsonSongParser(self.maker, self.silent_warnings)
-            parser.set_input_mode(self.input_mode)
-            return parser.split_line(line)
-            
-        else:
-            
-            if delimiter is None:
-                if line[0] == self.lyric_delimiter:
-                    delimiter = self.lyric_delimiter
-                else:
-                    delimiter = self.icon_delimiter
-                
-            if delimiter in self.allowed_regex:
-                return re.compile(delimiter).split(line)
-            elif delimiter=="#":# to allow HTML/CSS hex color codes
-                return re.compile(r'(?<!"|\'|:|#)#').split(line)
-            elif delimiter=="%":# to allow percentages in HTML/CSS size attributes
-                return re.compile(r'%(?!"|\')').split(line)
+        """
+        if delimiter is None:
+            if line[0] == self.lyric_delimiter:
+                delimiter = self.lyric_delimiter
             else:
-                return line.split(delimiter)
-                
+                delimiter = self.icon_delimiter
+            
+        if delimiter in self.allowed_regex:
+            return re.compile(delimiter).split(line)
+        elif delimiter=="#":# to allow HTML/CSS hex color codes
+            return re.compile(r'(?<!"|\'|:|#)#').split(line)
+        elif delimiter=="%":# to allow percentages in HTML/CSS size attributes
+            return re.compile(r'%(?!"|\')').split(line)
+        else:
+            return line.split(delimiter)
 
 
     def parse_line(self, line, song_key=Resources.DEFAULT_KEY, note_shift=0):
         """
+        Takes a single string
         Returns instrument_line: a list of  'skygrid' objects (1 skygrid = 1 dict)
         """
         instrument_line = []
@@ -461,8 +456,7 @@ class SongParser:
             from . import json_parser
             parser = json_parser.JsonSongParser(self.maker, self.silent_warnings)
             song_lines = parser.sanitize_lines(song_lines,join=True)
-        
-        # At this point all lines should be strings
+            
         english_song_key = self.english_note_name(song_key)
 
         note_shift = self.get_note_parser().get_base_of_western_major_scale() * octave_shift
@@ -475,7 +469,19 @@ class SongParser:
         if changed:
             song.set_meta(**meta_data)
             song.set_meta_changed(True)
-                
+         
+        if self.input_mode == InputMode.SKYJSON:
+            from . import json_parser
+            parser = json_parser.JsonSongParser(self.maker, self.silent_warnings)
+            parser.set_input_mode(self.input_mode)
+            song_lines = parser.parse_layers(song_lines[0])
+            
+        #TODO : add HR between layers
+        #print('%%DEBUG JSON')
+        #print(song_lines)
+        #raise Exception('STOP DEBUG')                                                  
+        
+        # IMPORTANT: at this point song_lines is a list of strings                                                                                                                                                                                                                                                                                                                                                                  
         for song_line in song_lines:
             instrument_line = self.parse_line(song_line, song_key,
                                               note_shift)  # The song key must be in the original format

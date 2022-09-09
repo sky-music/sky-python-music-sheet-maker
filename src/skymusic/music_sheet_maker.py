@@ -347,10 +347,10 @@ class MusicSheetMaker:
     def ask_instructions(self, recipient, prerequisites=None, execute=True):
 
         replacements = {'input_modes':'\n'.join(['\n* ' + input_mode.get_long_desc(self.locale) for input_mode in InputMode]),
-                        'icon_delimiter': self.get_song_parser().get_icon_delimiter().replace('\s','<space>'),
-                        'pause': self.get_song_parser().get_pause().replace('\s','<space>'),
-                        'quaver_delimiter': self.get_song_parser().get_quaver_delimiter().replace('\s','<space>'),
-                        'quaver_example': self.get_song_parser().get_quaver_delimiter().replace('\s','<space>').join(['A1', 'B1', 'C1']),
+                        'icon_delimiter': self.get_song_parser().get_icon_delimiter().replace(' ','<space>'),
+                        'pause': self.get_song_parser().get_pause().replace(' ','<space>'),
+                        'quaver_delimiter': self.get_song_parser().get_quaver_delimiter().replace(' ','<space>'),
+                        'quaver_example': self.get_song_parser().get_quaver_delimiter().replace(' ','<space>').join(['A1', 'B1', 'C1']),
                         'jianpu_quaver_delimiter': Resources.DELIMITERS['jianpu_quaver'],
                         'repeat_indicator': self.get_song_parser().get_repeat_indicator() + '2',
                         'lyric_delimiter': Resources.DELIMITERS['lyric']
@@ -375,10 +375,10 @@ class MusicSheetMaker:
     def ask_notes(self, recipient, prerequisites=None, execute=True):
 
         replacements = {'input_modes':'\n'.join(['\n* ' + input_mode.get_long_desc(self.locale) for input_mode in InputMode]),
-                        'icon_delimiter': self.get_song_parser().get_icon_delimiter().replace('\s','<space>'),
-                        'pause': self.get_song_parser().get_pause().replace('\s','<space>'),
-                        'quaver_delimiter': self.get_song_parser().get_quaver_delimiter().replace('\s','<space>'),
-                        'quaver_example': self.get_song_parser().get_quaver_delimiter().replace('\s','<space>').join(['A1', 'B1', 'C1']),
+                        'icon_delimiter': self.get_song_parser().get_icon_delimiter().replace(' ','<space>'),
+                        'pause': self.get_song_parser().get_pause().replace(' ','<space>'),
+                        'quaver_delimiter': self.get_song_parser().get_quaver_delimiter().replace(' ','<space>'),
+                        'quaver_example': self.get_song_parser().get_quaver_delimiter().replace(' ','<space>').join(['A1', 'B1', 'C1']),
                         'jianpu_quaver_delimiter': Resources.DELIMITERS['jianpu_quaver'],
                         'repeat_indicator': self.get_song_parser().get_repeat_indicator() + '2',
                         'lyric_delimiter': Resources.DELIMITERS['lyric']
@@ -422,10 +422,10 @@ class MusicSheetMaker:
         """
 
         replacements = {'input_modes':'\n'.join(['\n* ' + input_mode.get_long_desc(self.locale) for input_mode in InputMode]),
-                        'icon_delimiter': self.get_song_parser().get_icon_delimiter().replace('\s','<space>'),
-                        'pause': self.get_song_parser().get_pause().replace('\s','<space>'),
-                        'quaver_delimiter': self.get_song_parser().get_quaver_delimiter().replace('\s','<space>'),
-                        'quaver_example': self.get_song_parser().get_quaver_delimiter().replace('\s','<space>').join(['A1', 'B1', 'C1']),
+                        'icon_delimiter': self.get_song_parser().get_icon_delimiter().replace(' ','<space>'),
+                        'pause': self.get_song_parser().get_pause().replace(' ','<space>'),
+                        'quaver_delimiter': self.get_song_parser().get_quaver_delimiter().replace(' ','<space>'),
+                        'quaver_example': self.get_song_parser().get_quaver_delimiter().replace(' ','<space>').join(['A1', 'B1', 'C1']),
                         'jianpu_quaver_delimiter': Resources.DELIMITERS['jianpu_quaver'],
                         'repeat_indicator': self.get_song_parser().get_repeat_indicator() + '2',
                         'lyric_delimiter': Resources.DELIMITERS['lyric']

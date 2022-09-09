@@ -19,7 +19,7 @@ def check_locale(locale):
         return None
 
     # Sanitization: correct case and replacement of - in case the locale is a IETF language tag
-    matchobj = re.match('([^_|-]*)[_|-]*([^_|-]*)', locale.strip())
+    matchobj = re.match(r'([^_-]*)[_|-]*([^_-]*)', locale.strip())
     locale = '_'.join(filter(None,(matchobj.group(1).lower(), matchobj.group(2).upper())))
 
     if locale not in locales:

@@ -23,7 +23,8 @@ class SkyJson(noteparser.NoteParser):
             (2, 0): '1Key10', (2, 1): '1Key11', (2, 2): '1Key12', (2, 3): '1Key13', (2, 4): '1Key14'
         }
 
-
+        #Layer information is discarded
+        self.note_name_with_layer_regex = re.compile(r'(\d{,2})(Key\d{2})', re.IGNORECASE)
         self.note_name_with_octave_regex = re.compile(r'\d{,2}(Key\d{2})', re.IGNORECASE)
         self.note_name_regex = self.note_name_with_octave_regex
         self.single_note_name_regex = re.compile(r'\b\d{,2}(Key\d{2}\b)', re.IGNORECASE)
@@ -77,3 +78,11 @@ class SkyJson(noteparser.NoteParser):
         sanitized_note = re.sub(r'([^\d])(\d)\b', r'\g<1>0\g<2>', sanitized_note)
         
         return sanitized_note
+        
+    def get_layer(self,note,default=''):
+        
+        g = self.note_name_with_layer_regex.match(note)
+        if g:
+            return g.group(1)
+        else:
+            return default

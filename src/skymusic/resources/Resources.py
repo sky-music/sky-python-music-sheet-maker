@@ -145,7 +145,9 @@ MAX_NUM_FILES = 15
 
 BINARY_EXT = ('.mid', '.midi') # Files that must be opened in binary mode
 
-DELIMITERS = {'icon': '\s',
+MARKDOWN_CODES = {'rulers': ['--', '__']} # Supported Markdown characters
+
+DELIMITERS = {'icon': ' ',
               'pause': '.',
               'quaver': "-",
               'jianpu_pause': '0',
@@ -154,13 +156,13 @@ DELIMITERS = {'icon': '\s',
               'metadata': '#$',
               'repeat': '*',
               'broken_harp': 'X',
+              'layer': '==',
             }
 
 SKYJSON_CHORD_DELAY = 50 #Delay in ms below which 2 notes are considered a chord
 DEFAULT_BPM = 220
 PARSING_START_OCTAVE = 1
 RENDERING_START_OCTAVE = 4
-MARKDOWN_CODES = {'rulers': ['==', '--', '__']} # Supported Markdown characters
 
 MUSIC_MAKER_NAME = 'music_sheet_maker'
 MUSIC_COG_NAME = 'music_cog'
