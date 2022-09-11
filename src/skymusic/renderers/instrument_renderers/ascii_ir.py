@@ -30,14 +30,12 @@ class AsciiInstrumentRenderer(instrument_renderer.InstrumentRenderer):
             
         return ascii_render
 
-    def render_voice(self, instrument, note_parser=None):
+    def __render_markdown__(self, text, emphasis):
         
-        text = instrument.get_lyric()
-        emphasis = instrument.emphasis
         start = ''
         end = ''
         if emphasis:
-            if emphasis[0] == 'h':
+            if emphasis.startswith('h'):
                 start = '#'*int(emphasis[1])
                 end = ''
             elif emphasis == 'i':
@@ -46,12 +44,18 @@ class AsciiInstrumentRenderer(instrument_renderer.InstrumentRenderer):
             elif emphasis == 'b':
                 start = '**'
                 end = '**'
-                
-        voice_render = Resources.DELIMITERS['lyric']+start+text+end  # Lyrics marked as comments in output text files
-            
+        return start+text+end
+
+    def render_voice(self, instrument, note_parser=None):        
+        text = self.__render_markdown__(instrument.get_lyric(), instrument.emphasis)
+        voice_render = Resources.DELIMITERS['lyric']+text  # Lyrics marked as comments in output text files    
         return voice_render
 
-
-    def render_ruler(self, ruler, note_parser=None):
+    def render_ruler(self, ruler, note_parser=None): 
+        render = str(ruler)
+        text = self.__render_markdown__(ruler.get_text(), ruler.get_emphasis())
+        if text: render +=  '\n' + text
+        return render
         
-        return str(ruler)
+    def render_layer(self,*args,**kwargs):
+        return self.render_ruler(*args,**kwargs)

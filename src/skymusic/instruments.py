@@ -81,17 +81,17 @@ class Voice(Instrument):  # Lyrics or comments
     def set_lyric(self, lyric):
         
         lyric = lyric.strip()
-        h_match = re.match(r'(?<!")(#*)(.*)',lyric)
-        h = len(h_match.group(1))
+        h_match = re.match(r'(?<!")(?P<emphasis>#*)(?P<lyric>.*)',lyric)
+        h = len(h_match.group('emphasis'))
         if h>0:
-            self.lyric = h_match.group(2)
+            self.lyric = h_match.group('lyric')
             self.emphasis = f'h{h}'
         else:
-            star_match = re.match(r'(\**)([^\*]*)(\**)',lyric)
-            self.lyric = star_match.group(2)
-            if len(star_match.group(1)) >= 2 and len(star_match.group(3)) >= 2:
+            star_match = re.match(r'(?P<start>\**)(?P<lyric>[^\*]*)(?P<end>\**)',lyric)
+            self.lyric = star_match.group('lyric')
+            if len(star_match.group('start')) >= 2 and len(star_match.group('end')) >= 2:
                 self.emphasis = 'b'
-            elif (len(star_match.group(1)) == 1 and len(star_match.group(3)) == 1):
+            elif (len(star_match.group('start')) == 1 and len(star_match.group('end')) == 1):
                 self.emphasis = 'i'
 
     def __len__(self):

@@ -20,9 +20,26 @@ class SvgInstrumentRenderer(instrument_renderer.InstrumentRenderer):
         elif code == '==':
             hr_render += '<line x1="0%" y1="10%" x2="100%" y2="10%" class="double" />'
             hr_render += '<line x1="0%" y1="90%" x2="100%" y2="90%" class="double" />'
-        hr_render += '</svg>'
+                        
+        text = ruler.get_text()
+        emphasis = ruler.get_emphasis()
+        if text:
+            class_suffix = ''
+            if emphasis == 'b':
+                class_suffix = ' bold'
+            elif emphasis == 'i':
+                class_suffix = ' italic'
+            elif emphasis != None:
+                class_suffix = ' '+emphasis
+            
+            text_render = (f'\n<text x="0%" y="50%" class="ruler text {class_suffix}">{text}</text>')        
+            hr_render += text_render
+        
+        hr_render += '</svg>'            
         return hr_render
 
+    def render_layer(self,*args,**kwargs):
+        return self.render_ruler(*args,**kwargs)
 
     def render_voice(self, instrument, x, width: str, height: str, aspect_ratio):
         """Renders the lyrics text in SVG"""

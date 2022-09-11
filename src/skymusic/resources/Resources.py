@@ -136,8 +136,9 @@ skyjson_api_key = ""
 
 harp_font_size = 38
 voice_font_size = 32
+png_h1_font_size = 48
+png_h2_font_size = 42
 png_font_size = 36
-png_title_font_size = 48
 png_compress = 6
 
 MAX_FILENAME_LENGTH = 127

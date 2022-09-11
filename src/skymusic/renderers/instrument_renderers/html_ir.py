@@ -64,9 +64,14 @@ class HtmlInstrumentRenderer(instrument_renderer.InstrumentRenderer):
             hr_render = '<hr class="dashed" />'            
         elif code == '==':    
             hr_render = '<hr class="double" />'
-        
-        #if ruler.get_content():
-        #    hr_render += '\n'+self.content
-        
+        #TODO : add text below if there is text
+        text = ruler.get_text()
+        if text:
+            emphasis = ruler.get_emphasis()
+            hr_render += f'<p><{emphasis}>'+text+f'</{emphasis}></p>'        
+            
         return hr_render
+        
+    def render_layer(self,*args,**kwargs):
+        return self.render_ruler(*args,**kwargs)        
         

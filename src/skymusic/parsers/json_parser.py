@@ -170,7 +170,10 @@ class JsonSongParser(song_parser.SongParser):
         
         # The existence of this field has already been assessed by MusicTheory
         bpm = json_dict.get('bpm',200)
-            
+        
+        instruments = json_dict.get('instruments',[])
+        instr_names = iter([instr.get("name","") for instr in instruments])
+        
         if 'columns' in json_dict:
             layered_notes = self.convert_to_old_format(json_dict['columns'], bpm)
         elif 'songNotes' in json_dict:
@@ -210,9 +213,12 @@ class JsonSongParser(song_parser.SongParser):
                         icons += [keys[i]]
             icons = self.sanitize_layer(icons)
             icons = ''.join(icons) #merge icons into a string
-            if len(layers) > 1:
-                layers += [self.layer_delimiter]
-                layers += ['##Layer %s##' % layer]
+            if len(layered_notes) > 1:
+                try:
+                    instr_name = next(instr_names)
+                except StopIteration:
+                    instr_name = ""
+                layers += [self.layer_delimiter + ' ##Layer %s: %s' % (layer, instr_name)]
             layers += [icons]
             
         return layers

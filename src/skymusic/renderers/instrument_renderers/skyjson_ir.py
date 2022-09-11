@@ -31,11 +31,13 @@ class SkyjsonInstrumentRenderer(instrument_renderer.InstrumentRenderer):
                         
         return json_render
 
-
-    def render_voice(self, *args, **kwargs):    
-
+    def render_voice(self, *args, **kwargs):   
         return NotImplemented
         
-    def render_ruler(self, *args, **kwargs):    
-
+    def render_ruler(self, *args, **kwargs):   
         return NotImplemented
+        
+    def render_layer(self,*args,**kwargs):
+        #TODO: handle layers: either here or in the song_parser
+        return self.render_ruler(*args,**kwargs)
+            

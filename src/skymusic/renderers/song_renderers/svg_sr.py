@@ -129,7 +129,7 @@ class SvgSongRenderer(song_renderer.SongRenderer):
         else:
             song_header += f"\n<text x=\"{x :.2f}\" y=\"{y :.2f}\" class=\"title\">{meta['title'][1]} (page {(filenum + 1)})</text>"
         
-        # Dividing line
+        # Dividing line after title
         y += self.SVG_text_height
                 
         song_header += (f'\n<svg x="0" y="{y :.2f}" width="{self.SVG_line_width :.2f}" height="{(self.SVG_harp_spacings[1] / 2.0) :.2f}">'
@@ -158,6 +158,7 @@ class SvgSongRenderer(song_renderer.SongRenderer):
         page_break = False
         
         non_voice_row = 1
+        prev_line = 'ruler' #Because headers have been separated with a ruler (see above)
         for row in range(start_row, end_row):
 
             line = song.get_line(row)
@@ -171,32 +172,33 @@ class SvgSongRenderer(song_renderer.SongRenderer):
             if linetype in instruments.TEXT:
                 
                 song_render += (f'\n<svg x="0" y="{y :.2f}" width="{self.SVG_line_width :.2f}" height="{self.SVG_text_height :.2f}"'
-                                f' class="line" id="line-{row}">'
-                               )
+                                f' class="line" id="line-{row}">')
                 y += self.SVG_text_height + self.SVG_harp_spacings[1] / 2.0
                 
             elif linetype == 'ruler':
                 song_render += (f'\n<svg x="0" y="{y :.2f}" width="{self.SVG_line_width :.2f}" height="{3*self.SVG_rule_height :.2f}"'
-                                f' class="line" id="line-{row}">'
-                               )
+                                f' class="line" id="line-{row}">')
+                y += 3*self.SVG_rule_height + self.SVG_harp_spacings[1] / 2.0
+
+            elif linetype == 'layer':
+                song_render += (f'\n<svg x="0" y="{y :.2f}" width="{self.SVG_line_width :.2f}" height="{3*self.SVG_rule_height :.2f}"'
+                                f' class="line" id="line-{row}">')
                 y += 3*self.SVG_rule_height + self.SVG_harp_spacings[1] / 2.0
                 
             else:
-                # Dividing line
-                y += self.SVG_harp_spacings[1] / 4.0
-                song_render += (f'\n<svg x="0" y="{y :.2f}" width="{self.SVG_line_width :.2f}" height="{(self.SVG_harp_spacings[1] / 2.0) :.2f}">'
-                                f'\n<line x1="0" y1="50%" x2="100%" y2="50%" class="sep"/>'
-                                f'\n</svg>'
-                               )
-                y += self.SVG_harp_spacings[1] / 4.0
+                if prev_line not in ('ruler', 'layer'):
+                    # Dividing line
+                    y += self.SVG_harp_spacings[1] / 4.0
+                    song_render += (f'\n<svg x="0" y="{y :.2f}" width="{self.SVG_line_width :.2f}" height="{(self.SVG_harp_spacings[1] / 2.0) :.2f}">'
+                                    f'\n<line x1="0" y1="50%" x2="100%" y2="50%" class="sep"/>'
+                                    f'\n</svg>')
+                    y += self.SVG_harp_spacings[1] / 4.0
+
 
                 y += self.SVG_harp_spacings[1] / 2.0
-                
                 # Instrument-line opening
                 song_render += (f'\n<svg x="0" y="{y :.2f}" width="{self.SVG_line_width :.2f}" height="{self.SVG_harp_size[1] :.2f}"'
-                                f' class="line" id="line-{row}">'
-                                )
-
+                                f' class="line" id="line-{row}">')
                 y += self.SVG_harp_size[1] + self.SVG_harp_spacings[1] / 2.0
 
             line_render = ''
@@ -210,7 +212,6 @@ class SvgSongRenderer(song_renderer.SongRenderer):
 
                 #1. Creating a new line if max number is exceeded
                 if (int(1.0 * (col-start_col) / self.maxIconsPerLine) - sub_line) > 0:
-                    
                     # Closes previous instrument-line SVG
                     line_render += '\n</svg>'
                     sub_line += 1
@@ -219,23 +220,23 @@ class SvgSongRenderer(song_renderer.SongRenderer):
                     # Creating a new line SVG
                     if linetype in instruments.TEXT:
                         line_render += (f'\n<svg x="{x :.2f}" y="{y :.2f}" width="{self.SVG_line_width :.2f}" height="{self.SVG_text_height :.2f}"'
-                                        f' class="line-{row}-{sub_line}">'
-                                        )
+                                        f' class="line-{row}-{sub_line}">')
                         y += self.SVG_text_height + self.SVG_harp_spacings[1] / 2.0
                         
                     elif linetype == 'ruler':
                         line_render += (f'\n<svg x="{x :.2f}" y="{y :.2f}" width="{self.SVG_line_width :.2f}" height="{3*self.SVG_rule_height :.2f}"'
-                                        f' class="line-{row}-{sub_line}">'
-                                        )
+                                        f' class="line-{row}-{sub_line}">')
+                        y += 3*self.SVG_rule_height + self.SVG_harp_spacings[1] / 2.0
+
+                    elif linetype == 'layer':
+                        line_render += (f'\n<svg x="{x :.2f}" y="{y :.2f}" width="{self.SVG_line_width :.2f}" height="{3*self.SVG_rule_height :.2f}"'
+                                        f' class="line-{row}-{sub_line}">')
                         y += 3*self.SVG_rule_height + self.SVG_harp_spacings[1] / 2.0
                         
                     else:
                         y += self.SVG_harp_spacings[1] / 2.0
-
                         line_render += (f'\n<svg x="{x :.2f}" y="{y :.2f}" width="{self.SVG_line_width :.2f}" height="{self.SVG_harp_size[1] :.2f}"'
-                                        f' class="line-{row}-{sub_line}">'
-                                        )
-
+                                        f' class="line-{row}-{sub_line}">')
                         y += self.SVG_harp_size[1] + self.SVG_harp_spacings[1] / 2.0
 
                 #2. Page break
@@ -263,7 +264,6 @@ class SvgSongRenderer(song_renderer.SongRenderer):
                 instrument_index += 1
                 x += self.SVG_harp_size[0] + self.SVG_harp_spacings[0]
 
-
             #end loop on cols
             
             if num_lines > 10 and linetype in instruments.HARPS:
@@ -277,12 +277,13 @@ class SvgSongRenderer(song_renderer.SongRenderer):
             
             line_render += '\n</svg>'  # Closes last instrument-line SVG
             song_render += line_render
-
+            prev_line = linetype
+            
             if page_break:
                 end_row = row
                 break
-
-        #End loop on rows                
+        #End loop on rows  
+              
         song_render += '\n</svg>'  # Close song SVG
         
         svg_buffer.write(song_render)

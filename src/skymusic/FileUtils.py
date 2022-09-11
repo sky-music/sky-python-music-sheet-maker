@@ -1,13 +1,13 @@
 """
 A collection of file utilities for the Music Sheet Maker
 """
-import os, re
+import os
 
 BINARY_EXT = ('.bin',)
 
 def shortest_path(path, start_path):
     """Finds the shortest path expression from 'path', to startpath"""
-    abs_path = os.path.abspath(path)
+    abs_path = os.pathunicodedata_exists = os.path.abspath(path)
 
     try:
         relpath = os.path.relpath(path,start=start_path)
@@ -64,15 +64,18 @@ def read_file(file_path, binary_ext=BINARY_EXT):
         return lines
 
 def closest_file(filepath):
-    
+    '''Fuzzy name matching'''
     filedir, filename = os.path.split(filepath)
     
     best_file = None
-    best_score = 1
+    best_score = 99
     for (root, dirs, files) in os.walk(filedir):
         for file in files:
-            d = edit_distance(file,filename)
-            if d < 0.15:
+            bare_file = __strip_accents__(os.path.splitext(file)[0])
+            bare_filename = __strip_accents__(os.path.splitext(filename)[0])
+            d = edit_distance(bare_file,bare_filename)
+            #print(f"d({file,filename})={d}")
+            if d < 3 or (d<4 and len(filename)>10):
                 if d < best_score:
                     best_file = os.path.join(root, file)
                     best_score = d
@@ -80,6 +83,27 @@ def closest_file(filepath):
     return best_file   
 
 #% Levenshtein
+
+def __strip_accents__(text):
+    try:
+        text = unicode(text, 'utf-8')
+    except (TypeError, NameError): # unicode is a default on python 3 
+        pass
+    try:
+        text = unicodedata.normalize('NFD', text)
+        text = text.encode('ascii', 'ignore')
+        text = text.decode("utf-8")
+    except NameError:
+        accents = {'à':'a','á':'a','â':'a','ä':'a',
+                   'é':'e','è':'e','ê':'e','ë':'e',
+                   'í':'i','ì':'i','î':'i','ï':'i',
+                   'ò':'o','ó':'o','ô':'o','ö':'o',
+                   'ù':'u','ú':'u','û':'u','ü':'u',
+                   'ç':'c','ñ':'n'}
+        for k,v in accents.items(): text = text.replace(k,v)
+     
+    return str(text)
+
 def __memoize__(func):
     mem = {}
     def memoizer(*args, **kwargs):
@@ -108,4 +132,4 @@ def __levenshtein__(s, t):
     
 def edit_distance(s, t):
 
-    return __levenshtein__(s,t)/max(len(s),len(t))
+    return __levenshtein__(s,t)

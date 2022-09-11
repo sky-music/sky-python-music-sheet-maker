@@ -24,7 +24,10 @@ class MidiSongParser:
         root_note = self.note_parser.convert_chromatic_position_into_note_name(0)
         root_note = self.note_parser.english_note_name(root_note)
         self.root_pitch = Resources.MIDI_PITCHES[root_note]
-                
+        
+        self.layer_delimiter = Resources.DELIMITERS['layer']
+        self.icon_delimiter = Resources.DELIMITERS['icon']
+        
     def detect_midi(self, song_line, strict=False):
         if isinstance(song_line, (list,tuple)):
             midi_bytes = song_line[0]
@@ -124,23 +127,23 @@ class MidiSongParser:
         
         return lowest_octave
 
-    def parse_meta(self, track):
+    def parse_track_info(self, track):
         
-        metadata = []
+        track_info = ""
         if track.name:
-            metadata.append(Resources.DELIMITERS['lyric'] + 'Track name: ' + track.name)
+            track_info += '## Track name: ' + track.name
         
         if self.has_notes(track):
             track_key = self.extract_key(track)
             if track_key:
-                metadata.append(Resources.DELIMITERS['lyric'] + 'Track key: ' + track_key)
+                track_info += ', musical key= ' + track_key
         
-        return metadata
+        return track_info
     
     def parse_first_meta(self, midi_file):
         
         metadata = []
-        
+        #TODO : extract copyright
         basename = ''
         if midi_file.filename:
             (basename,_) = os.path.splitext(midi_file.filename)
@@ -257,7 +260,7 @@ class MidiSongParser:
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
     
     def collect_notes(self, midi_lines):
-        
+        '''Only used by Music Theory'''
         mid = self.create_MidiFile(midi_lines)
         
         if mid:
@@ -273,19 +276,14 @@ class MidiSongParser:
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
     def parse_midi(self, midi_lines):
         
-        if no_mido_module:
-            return []
-        
+        if no_mido_module: return []
         mid = self.create_MidiFile(midi_lines)
-        
-        if not mid:
-            return []
-        
+        if not mid: return []
         song = self.parse_first_meta(mid)
         
         for i, track in enumerate(mid.tracks):
             
-            metadata = self.parse_meta(track)
+            track_info = self.parse_track_info(track)
             
             note_interval = self.extract_note_interval(track, 1)
             
@@ -293,8 +291,11 @@ class MidiSongParser:
                 notes = self.parse_notes(track, note_interval)
             else:
                 notes = ''
-         
-            song += metadata + [notes]
+            
+            if (track_info and not notes) and len(mid.tracks) > 2:
+                song += [self.layer_delimiter]
+                
+            song += [track_info] + [notes]
             
         song = list(filter(None,song))
         return song
