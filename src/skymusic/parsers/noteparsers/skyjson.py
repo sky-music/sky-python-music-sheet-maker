@@ -60,7 +60,7 @@ class SkyJson(noteparser.NoteParser):
         except KeyError:
             note = 'X'
             
-        if note != '.': note = '%02d' % layer
+        if note != '.': note = '%02d' % layer + note
 
         return note
 

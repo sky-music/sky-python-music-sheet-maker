@@ -19,6 +19,9 @@ class SongParser:
     """
     For parsing a text format into a Song object
     """
+    _num_errors = 0
+    _max_errors = 30
+    
     def __init__(self, maker, silent_warnings=True):
 
         self.maker = maker
@@ -47,9 +50,17 @@ class SongParser:
             self.locale = Lang.guess_locale()
             print(f"**ERROR: SongParser self.maker has no locale. Reverting to {self.locale}")
 
+    def __print_error__(self,err):
+        if not self.silent_warnings:
+            print(err)
+            self._num_errors += 1
+            if self._num_errors > self._max_errors:
+                self.silent_warnings = True
+                print("Suppressing error logging after %d errors." % self._max_errors)
+
     def get_input_mode(self):
         return self.input_mode
-
+        
     def set_instrument_type(self, instrument_type):
         self.instrument_type = instrument_type
         
@@ -206,8 +217,7 @@ class SongParser:
         try:
             chord = note_parser.note_name_regex.sub(' \\1', chord).split()
         except AttributeError as err:
-            if not self.silent_warnings:
-                print(err)
+            self.__print_error__(err)
 
         return repeat, chord
 
@@ -259,7 +269,7 @@ class SongParser:
                     harp_broken = True
                     harp_silent = False # Harp is broken, so it's not silent
                     if not self.silent_warnings:
-                        print(err)
+                        self.__print_error__(err)
                 
                 if not note_broken:
                     skygrid[highlighted_note_position] = {}
@@ -457,12 +467,7 @@ class SongParser:
             from . import json_parser
             parser = json_parser.JsonSongParser(self.maker, self.silent_warnings)
             parser.set_input_mode(self.input_mode)
-            song_lines = parser.parse_layers(song_lines[0])
-            
-        #TODO : add HR between layers
-        #print('%%DEBUG JSON')
-        #print(song_lines)
-        #raise Exception('STOP DEBUG')                                                  
+            song_lines = parser.parse_layers(song_lines[0])                                          
         
         # IMPORTANT: at this point song_lines is a list of strings                                                                                                                                                                                                                                                                                                                                                                  
         for song_line in song_lines:

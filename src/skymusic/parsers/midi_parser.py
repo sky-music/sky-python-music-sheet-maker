@@ -114,7 +114,18 @@ class MidiSongParser:
                     return track_key
         
         return None
+
+    def extract_copyright(self, midi_file):
+        
+        copyright = ''
+        if midi_file.tracks:
+            for msg in midi_file.tracks[0]:
+                if msg.type == 'copyright':
+                    copyright = msg.text
                     
+        return copyright
+                                         
+                                                            
     def extract_lowest_octave(self, track):
         
         lowest = 128
@@ -148,7 +159,9 @@ class MidiSongParser:
         if midi_file.filename:
             (basename,_) = os.path.splitext(midi_file.filename)
         metadata.append(Resources.DELIMITERS['metadata'] + 'Title:' + basename.capitalize())
-        metadata.append(Resources.DELIMITERS['metadata'] + 'Artist:' + '')
+        
+        artist = self.extract_copyright(midi_file)
+        metadata.append(Resources.DELIMITERS['metadata'] + 'Artist: ' + artist)
         metadata.append(Resources.DELIMITERS['metadata'] + 'Transcript writer:' + '')
         
         first_key = self.extract_first_key(midi_file)

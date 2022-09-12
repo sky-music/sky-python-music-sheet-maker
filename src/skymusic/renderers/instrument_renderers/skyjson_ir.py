@@ -9,10 +9,9 @@ class SkyjsonInstrumentRenderer(instrument_renderer.InstrumentRenderer):
         super().__init__(locale)
         self.note_parser = skyjson_parser.SkyJson()
 
-    def render_harp(self, instrument, time=0):
+    def render_harp(self, instrument, time=0,layer=1):
 
         json_render = []
-
         if instrument.get_is_broken():
             json_render = [{'time':int(time), 'key':'ERROR'}]
         elif instrument.get_is_silent():
@@ -26,7 +25,7 @@ class SkyjsonInstrumentRenderer(instrument_renderer.InstrumentRenderer):
                 if skygrid:                
                     for coord in skygrid:  # Cycle over positions in a frame
                         if skygrid[coord][frame]:  # Button is highlighted
-                            json_render += [{'time':int(time), 'key':self.note_parser.get_note_from_coordinate(coord)}]
+                            json_render += [{'time':int(time), 'key':self.note_parser.get_note_from_coordinate(coord,layer)}]
                     time = time + dt
                         
         return json_render

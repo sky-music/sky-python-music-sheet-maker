@@ -54,7 +54,7 @@ class JsonSongParser(song_parser.SongParser):
             except KeyError:
                 is_encrypted = False            
             if is_encrypted:
-                print("***WARNING: cannot parse an encrypted JSON recording") 
+                print("\n***WARNING: cannot parse an encrypted JSON recording") 
                 json_dict = None
         
         return json_dict

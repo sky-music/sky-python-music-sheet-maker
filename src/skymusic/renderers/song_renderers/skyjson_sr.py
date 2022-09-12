@@ -31,16 +31,20 @@ class SkyjsonSongRenderer(song_renderer.SongRenderer):
 
         instrument_index = 0
         time = 0
+        layer = 0
         for line in song.get_lines():
             if len(line) > 0:
-                if line[0].get_type().lower().strip() in instruments.HARPS:
+                linetype = line[0].get_type().lower().strip()
+                if linetype == 'layer':
+                    layer += 1
+                elif linetype in instruments.HARPS:
                     for instrument in line:
                         instrument.set_index(instrument_index)
                         repeat = instrument.get_repeat()
                         for r in range(repeat):
                             time += dt
                             if not instrument.get_is_silent():
-                                json_dict['songNotes'] += instrument_renderer.render(instrument, time)
+                                json_dict['songNotes'] += instrument_renderer.render(instrument, time, layer)
 
                         instrument_index += 1
 
