@@ -103,15 +103,15 @@ PNGS = dict()
 
 
 COLORS = {
-    	'light': {'font_color': (0, 0, 0),
-    			  'png_color': (255, 255, 255),
-    			  'text_bkg': (255, 255, 255, 0), #Transparent white
-    			  'song_bkg': (255, 255, 255),
+        'light': {'font_color': (0, 0, 0),
+                  'png_color': (255, 255, 255),
+                  'text_bkg': (255, 255, 255, 0), #Transparent white
+                  'song_bkg': (255, 255, 255),
                   'hr_color': (0, 0, 0)},
-    	'dark': {'font_color': (255, 255, 255), #Discord colors
-    			  'png_color': (54, 57, 63),
-    			  'text_bkg': (54, 57, 63, 0), #Transparent dark
-    			  'song_bkg': (54, 57, 63),
+        'dark': {'font_color': (255, 255, 255), #Discord colors
+                  'png_color': (54, 57, 63),
+                  'text_bkg': (54, 57, 63, 0), #Transparent dark
+                  'song_bkg': (54, 57, 63),
                   'hr_color': (255, 255, 255)}, 
 }
 
