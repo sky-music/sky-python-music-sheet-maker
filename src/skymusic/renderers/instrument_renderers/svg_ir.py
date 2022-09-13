@@ -18,8 +18,8 @@ class SvgInstrumentRenderer(instrument_renderer.InstrumentRenderer):
             hr_render += '<line x1="0%" y1="0%" x2="100%" y2="0%" class="dashed" />'
             #hr_render = '<line x1="0%" y1="0%" x2="95%" y2="0%" style="stroke:gray;stroke-width:1;stroke-dasharray=\'10,10\'" />'
         elif code == '==':
-            hr_render += '<line x1="0%" y1="10%" x2="100%" y2="10%" class="double" />'
-            hr_render += '<line x1="0%" y1="90%" x2="100%" y2="90%" class="double" />'
+            hr_render += '<line x1="0%" y1="5%" x2="100%" y2="5%" class="double" />'
+            hr_render += '<line x1="0%" y1="15%" x2="100%" y2="15%" class="double" />'
                         
         text = ruler.get_text()
         emphasis = ruler.get_emphasis()
@@ -32,7 +32,7 @@ class SvgInstrumentRenderer(instrument_renderer.InstrumentRenderer):
             elif emphasis != None:
                 class_suffix = ' '+emphasis
             
-            text_render = (f'\n<text x="0%" y="50%" class="ruler text {class_suffix}">{text}</text>')        
+            text_render = (f'\n<text x="0%" y="55%" class="ruler text {class_suffix}">{text}</text>')        
             hr_render += text_render
         
         hr_render += '</svg>'            

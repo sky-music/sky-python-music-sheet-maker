@@ -76,7 +76,7 @@ class Ruler(PseudoInstrument):
         return str(self.code)
 
     def __repr__(self):
-        return f"<{self.type}, {len(self)} chars, code='{self.code}'>"
+        return f"<{self.type}, {len(self)} chars, code='{self.code}', text='{self.text}'>"
         
 class Layer(Ruler):
     

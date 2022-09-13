@@ -113,7 +113,7 @@ stock_queries:
       - Thêm "{repeat_indicator}" sau một hợp âm để biểu thị sự lập lại (repetition).
       - Dấu thăng "#" và dấu giáng "b" (nửa cung) được hỗ trợ cho hệ kí tự Phương Tây và Jianpu.
       - Lyrics must be separated by '#'
-      - Layers (several instruments) can be separated by '{layer_delimiter}'
+      - Layers (several instruments) can be separated by '{layer_delimiter}', followed by layer name
       - Horizontal rulers between song lines can be added with {ruler_delimiters}      
       
       /!\ Lưu ban nhạc trong một tệp văn bản để có thể sửa lại sau này /!\
@@ -134,7 +134,7 @@ stock_queries:
       - Thêm "{repeat_indicator}" sau một hợp âm để biểu thị sự lập lại (repetition).
       - Dấu thăng "#" và dấu giáng "b" (nửa cung) được hỗ trợ cho hệ kí tự Phương Tây và Jianpu.
       - Lyrics must be separated by '#'
-      - Layers (several instruments) can be separated by '{layer_delimiter}'
+      - Layers (several instruments) can be separated by '{layer_delimiter}', followed by layer name
       - Horizontal rulers between song lines can be added with {ruler_delimiters}      
       
       /!\ Lưu bản nhạc trong một tệp văn bản để có thể sửa lại sau này /!\
@@ -161,7 +161,7 @@ stock_queries:
       - Thêm "{repeat_indicator}" sau một hợp âm để biểu thị sự lập lại (repetition).
       - Dấu thăng "#" và dấu giáng "b" (nửa cung) được hỗ trợ cho hệ kí tự Phương Tây và Jianpu.
       - Lyrics must be separated by '{lyric_delimiter}'
-      - Layers (several instruments) can be separated by '{layer_delimiter}'
+      - Layers (several instruments) can be separated by '{layer_delimiter}', followed by layer name
       - Horizontal rulers between song lines can be added with {ruler_delimiters}      
   instrument_type:
     foreword:

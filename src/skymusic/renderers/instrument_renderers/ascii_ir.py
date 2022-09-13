@@ -53,8 +53,7 @@ class AsciiInstrumentRenderer(instrument_renderer.InstrumentRenderer):
 
     def render_ruler(self, ruler, note_parser=None): 
         render = str(ruler)
-        text = self.__render_markdown__(ruler.get_text(), ruler.get_emphasis())
-        if text: render +=  '\n' + text
+        render += self.__render_markdown__(ruler.get_text(), ruler.get_emphasis())
         return render
         
     def render_layer(self,*args,**kwargs):

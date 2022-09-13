@@ -112,7 +112,7 @@ stock_queries:
       - Add "{repeat_indicator}" after a chord to indicate repetition.
       - Sharps "#" and flats "b" (semitones) after a note are possible for Western and Jianpu notations.
       - Lyrics must be started and separated by '{lyric_delimiter}'
-      - Layers (several instruments) can be separated by '{layer_delimiter}'
+      - Layers (several instruments) can be separated by '{layer_delimiter}', followed by layer name
       - Horizontal rulers between song lines can be added with {ruler_delimiters}
       
       /!\ Keep your notes in a text file to be able to correct your song later! /!\
@@ -134,7 +134,7 @@ stock_queries:
       - Add "{repeat_indicator}" after a chord to indicate repetition.
       - Sharps "#" and flats "b" (semitones) are possible in Western and Jianpu.
       - Lyrics must be started and separated by '{lyric_delimiter}'
-      - Layers (several instruments) can be separated by '{layer_delimiter}'
+      - Layers (several instruments) can be separated by '{layer_delimiter}', followed by layer name
       - Horizontal rulers between song lines can be added with {ruler_delimiters}     
       
       /!\ Keep your notes in a text file to be able to correct your song later! /!\
@@ -162,7 +162,7 @@ stock_queries:
       - Add "{repeat_indicator}" after a chord to indicate repetition.
       - Sharps "#" and flats "b" (semitones) are possible in Western and Jianpu.
       - Lyrics must be started and separated by '{lyric_delimiter}'
-      - Layers (several instruments) can be separated by '{layer_delimiter}'
+      - Layers (several instruments) can be separated by '{layer_delimiter}', followed by layer name
       - Horizontal rulers between song lines can be added with {ruler_delimiters}
   instrument_type:
     foreword:

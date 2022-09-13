@@ -25,6 +25,7 @@ class SvgSongRenderer(song_renderer.SongRenderer):
         self.fontpt = 12
         self.SVG_text_height = self.fontpt * self.pt2px  # In principle this should be in em
         self.SVG_rule_height = self.fontpt * self.pt2px*0.15
+        self.SVG_layer_height = self.fontpt * self.pt2px
         self.maxFiles = Resources.MAX_NUM_FILES
         
         self.harp_relspacings = (0.13, 0.1)# Fraction of the harp width that will be allocated to the spacing between harps
@@ -181,9 +182,9 @@ class SvgSongRenderer(song_renderer.SongRenderer):
                 y += 3*self.SVG_rule_height + self.SVG_harp_spacings[1] / 2.0
 
             elif linetype == 'layer':
-                song_render += (f'\n<svg x="0" y="{y :.2f}" width="{self.SVG_line_width :.2f}" height="{3*self.SVG_rule_height :.2f}"'
+                song_render += (f'\n<svg x="0" y="{y :.2f}" width="{self.SVG_line_width :.2f}" height="{3*self.SVG_layer_height :.2f}"'
                                 f' class="line" id="line-{row}">')
-                y += 3*self.SVG_rule_height + self.SVG_harp_spacings[1] / 2.0
+                y += 3*self.SVG_layer_height + self.SVG_harp_spacings[1] / 2.0
                 
             else:
                 if prev_line not in ('ruler', 'layer'):
@@ -229,9 +230,9 @@ class SvgSongRenderer(song_renderer.SongRenderer):
                         y += 3*self.SVG_rule_height + self.SVG_harp_spacings[1] / 2.0
 
                     elif linetype == 'layer':
-                        line_render += (f'\n<svg x="{x :.2f}" y="{y :.2f}" width="{self.SVG_line_width :.2f}" height="{3*self.SVG_rule_height :.2f}"'
+                        line_render += (f'\n<svg x="{x :.2f}" y="{y :.2f}" width="{self.SVG_line_width :.2f}" height="{3*self.SVG_layer_height :.2f}"'
                                         f' class="line-{row}-{sub_line}">')
-                        y += 3*self.SVG_rule_height + self.SVG_harp_spacings[1] / 2.0
+                        y += 3*self.SVG_layer_height + self.SVG_harp_spacings[1] / 2.0
                         
                     else:
                         y += self.SVG_harp_spacings[1] / 2.0

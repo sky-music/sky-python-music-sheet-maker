@@ -113,8 +113,8 @@ stock_queries:
       - 和弦过后加入 '{repeat_indicator}' 以表注重复。
       - 西方乐谱和简谱支持使用升号 "#" 和降号 "b" (变音记号)。
       - Lyrics must be separated by '{lyric_delimiter}'
-      - Layers (several instruments) can be separated by '{layer_delimiter}'
-      - Horizontal rulers between song lines can be added with {ruler_delimiters}
+      - Layers (several instruments) can be separated by '{layer_delimiter}', followed by layer name
+      - Horizontal rulers between song lines can be added with {ruler_delimiters} 
             
       *** 请把您的乐谱文案存入文字档以方便更改 ***
         
@@ -135,8 +135,8 @@ stock_queries:
       - 和弦过后加入 '{repeat_indicator}' 以表注重复。
       - 西方乐谱和简谱支持使用升号 "#" 和降号 "b" (变音记号)。
       - Lyrics must be separated by '{lyric_delimiter}'
-      - Layers (several instruments) can be separated by '{layer_delimiter}'
-      - Horizontal rulers between song lines can be added with {ruler_delimiters}      
+      - Layers (several instruments) can be separated by '{layer_delimiter}', followed by layer name
+      - Horizontal rulers between song lines can be added with {ruler_delimiters}   
       
       *** 请把您的乐谱文案存入文字档以方便更改 ***
     afterword:
@@ -163,7 +163,7 @@ stock_queries:
       - 和弦过后加入 '{repeat_indicator}' 以表注重复。
       - 西方乐谱和简谱支持使用升号 "#" 和降号 "b" (变音记号)。
       - Lyrics must be separated by '{lyric_delimiter}'
-      - Layers (several instruments) can be separated by '{layer_delimiter}'
+      - Layers (several instruments) can be separated by '{layer_delimiter}', followed by layer name
       - Horizontal rulers between song lines can be added with {ruler_delimiters}      
   instrument_type:
     foreword:
