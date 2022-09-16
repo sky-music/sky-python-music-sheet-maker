@@ -17,7 +17,6 @@ class SkyjsonSongRenderer(song_renderer.SongRenderer):
     def write_buffers(self, song):
 
         meta = song.get_meta()
-        dt = (60000/self.song_bpm)
 
         json_buffer = io.StringIO()
 
@@ -25,34 +24,94 @@ class SkyjsonSongRenderer(song_renderer.SongRenderer):
 
         json_dict = {'name': meta['title'][1], 'author': meta['artist'][1],
                      'arrangedBy':'', 'transcribedBy': meta['transcript'][1],
-                     'permission':'', 'isComposed': False,
-                     'bpm': int(self.song_bpm), 'pitchLevel':0, 'bitsPerPage': 16,
-                     'isEncrypted': False, 'songNotes': []}
-
-        instrument_index = 0
-        time = 0
-        layer = 0
-        for line in song.get_lines():
+                     'permission':'', 'type': 'composed',
+                     'pitch': song.get_music_key(),
+                     'bpm': int(self.song_bpm), 
+                     'data':{"isComposed":True,"isComposedVersion":True,"appName":"VisualSheetMaker"},
+                     'version':2,
+                     'pitchLevel':0, 'bitsPerPage': 16,
+                     'isEncrypted': False, 
+                     'instruments': []}
+        
+        layers = self.build_layers(song.get_lines())
+        # { 6:{'name':'Layer 9', 'instruments':[<skymusic.instruments.Harp object at 0x114682278>,....}, {7:{...} }
+        
+        instruments = [{'name': layers[layer]['name'], 'volume':100,'pitch':'','visible':True} for layer in layers]
+        
+        songNotes = self.render_old_format(layers)
+        
+        columns = self.render_to_new_format(layers)
+        json_dict.update({'instruments':instruments, 'columns': columns, 'songNotes': songNotes})
+        
+        print(json_dict)
+        
+        json_buffer.seek(0)
+        json.dump([json_dict], json_buffer)
+        return [json_buffer]
+    
+    def build_layers(self, song_lines):
+        '''Builds a dictionary of layers, indexed by an integer, each layer value being a list of Instruments'''
+        layers = {1: {'name':'','instruments':[]}}
+        layer_index = 0 # Layers start at 1 in SkyStudio and Specy's SkyMusic, 0 is used for off bounds
+        for line in song_lines:
             if len(line) > 0:
                 linetype = line[0].get_type().lower().strip()
                 if linetype == 'layer':
-                    layer += 1
+                    layer_index += 1
+                    layers[layer_index] = {'name':line[0].get_text(), 'instruments':[]}
                 elif linetype in instruments.HARPS:
-                    for instrument in line:
-                        instrument.set_index(instrument_index)
-                        repeat = instrument.get_repeat()
-                        for r in range(repeat):
-                            time += dt
-                            if not instrument.get_is_silent():
-                                json_dict['songNotes'] += instrument_renderer.render(instrument, time, layer)
+                    if layer_index == 0: layer_index += 1
+                    layers[layer_index]['instruments'] += line
+        
+        return layers         
+    
+    def render_old_format(self, layers):
+        
+        dt = (60000/self.song_bpm)
+        songNotes = []
+        instrument_index = 0
+        time = 0
+        
+        instrument_renderer = SkyjsonInstrumentRenderer(self.locale)
+        
+        for layer_index,layer in layers.items():
+            for instrument in layer['instruments']:
+                instrument.set_index(instrument_index)
+                repeat = instrument.get_repeat()
+                for r in range(repeat):
+                    time += dt
+                    if not instrument.get_is_silent():
+                        songNotes += instrument_renderer.render(instrument, layer_index, time, version='old')
 
-                        instrument_index += 1
-
-        json_buffer.seek(0)
-
-        json.dump([json_dict], json_buffer)
-
-        return [json_buffer]
+                instrument_index += 1
+                
+        return songNotes
+        
+    
+    def render_to_new_format(self, layers):
+        '''Render columns from the layers dictionary'''
+        # layers = {0: {name, instrs}, 1: {name, instrs}
+        # instrs = [instr, instr...]
+        #columns = [0, notes], [0, notes]
+        # notes = [ [key,"hex_layer"],... ]
+        # notes are sorted by order of appearence
+        # a silence everywhere is an empty note list []
+        instrument_renderer = SkyjsonInstrumentRenderer(self.locale)
+        ncols = max([len(layer['instruments']) for layer_index, layer in layers.items()])
+        for layer in layers: layers[layer]['instruments'] += [None]*(ncols-len(layers[layer]['instruments']))
+        
+        tempo_changer = 0 #means no change
+        
+        columns = []
+        for col in range(ncols):
+            notes = []
+            for layer_index in layers:
+                instrument = layers[layer_index]['instruments'][col]
+                if instrument is not None: notes += instrument_renderer.render(instrument, layer_index, version='new')
+            columns.append([tempo_changer, notes])
+        
+        return columns
+        
 
     def generate_url(self, json_buffer, api_key=Resources.skyjson_api_key):
         # clears the sys.meta_path cache to reload packages(directory), does not really apply to top-level libraries

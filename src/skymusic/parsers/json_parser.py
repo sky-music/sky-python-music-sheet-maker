@@ -62,50 +62,52 @@ class JsonSongParser(song_parser.SongParser):
     def convert_to_old_format(self, columns, bpm):
         
         LAYERS_BINMAP = {'100':1, '001':2, '010':2, '011':2, '111':3, '110':3, '111':3,'0000':1, '0010':2, '0110':2, '0100':2, '1010':3, '1000':1, '1110':3, '1100':3, '0001':2,'0011':2, '0111':2,'0101':2, '1011':3, '1001':1, '1111':3, '1101':3}
-        SILENCE = '.'
+        SILENCE = -1
         tempo_changers = [1, 1/2, 1/4, 1/8]
         bpm_ms = int(60000/bpm)
         elapsed_time0 = 100
         
         layered_notes = {}
         
-        col = columns[0]
-        note = col[1][0]
-        try:
-            LAYERS_BINMAP[note[1]]
-            is_hex = False
-        except KeyError:
-            is_hex = True
-        #int('0x'+'8',16)
+        #Detects layer format: hex string or binary string
+        #the loops ensure that we process non empty items
+        for col in columns:
+            if col[1]:
+                for note in col[1]:
+                    try:
+                        LAYERS_BINMAP[note[1]]
+                        is_hex = False
+                    except KeyError:
+                        is_hex = True
+                    break
         
-        layers = {str(k):[] for k in range(100)}
+        layers = {str(k):[] for k in range(1,100)} # Layers start at 1 in SkyStudio and Specy's SkyMusic
         
         for col in columns:
             tempo_changer = tempo_changers[col[0]]
             
-            if not col[1]:
+            if not col[1]: #no notes
                 for layer in layers: layers[layer] += [SILENCE]
                     
             #note = [index, "layer"]
-            for note in col[1]:                
+            for note in col[1]:          
                 layer = str(int('0x'+note[1],16)) if is_hex else layers.get(note[1],1)
-                #format(layer,'04b')
-                layers[layer] += [str(note[0])]
+                layers[layer] += [note[0]]
 
         #old format is 3Key4, 2Key14
+        #Layers start at 1
+        #Notes start at 0
         for layer, note_indices in layers.items():
             elapsed_time = elapsed_time0
             note_dicts = []
             for notei in note_indices:
                 if notei != SILENCE:
-                    note_dicts += [{'time':elapsed_time, 'key':str(layer if is_hex else LAYERS_BINMAP[layer])+"Key"+notei}]
-                elapsed_time += int(bpm_ms*tempo_changer)
-            if note_dicts:
-                try:
-                    layered_notes[layer] += note_dicts
-                except KeyError:
-                    layered_notes[layer] = note_dicts
+                    note_dicts += [{'time':elapsed_time, 'key':str(layer if is_hex else LAYERS_BINMAP[layer])+"Key"+str(notei)}]
+                elapsed_time += int(0.5+bpm_ms*tempo_changer)
             
+            if note_dicts:
+                layered_notes[layer] = layered_notes.get(layer,[]) + note_dicts
+        
         return layered_notes
 
     def sort_by_layer(self, songNotes):
@@ -113,10 +115,7 @@ class JsonSongParser(song_parser.SongParser):
         layered_notes = {}
         for note in songNotes:   
             layer = self.note_parser.get_layer(note['key'],default='1')
-            try:
-                layered_notes[layer] += [note]
-            except KeyError:
-                layered_notes[layer] = [note]
+            layered_notes[layer] = layered_notes.get(layer,[]) + [note]
         
         return layered_notes
         
@@ -218,7 +217,10 @@ class JsonSongParser(song_parser.SongParser):
                     instr_name = next(instr_names)
                 except StopIteration:
                     instr_name = ""
-                layers += [self.layer_delimiter + ' ##Layer %s: %s' % (layer, instr_name)]
+                if instr_name:
+                    layers += [self.layer_delimiter + ' ##%s' % instr_name]
+                else:
+                    layers += [self.layer_delimiter + ' ##Layer %s' % layer]
             layers += [icons]
             
         return layers

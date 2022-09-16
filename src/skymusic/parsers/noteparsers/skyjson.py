@@ -53,14 +53,24 @@ class SkyJson(noteparser.NoteParser):
         else:
             raise KeyError('Note ' + str(note) + ' was not found in the position_map dictionary.')
 
-    def get_note_from_coordinate(self, coord, layer=1):
-
-        try:
-            note = self.inverse_position_map[coord]
-        except KeyError:
-            note = 'X'
-            
-        if note != '.': note = '%02d' % layer + note
+    def get_note_from_coordinate(self, coord, layer_index=0, version='old'):
+        '''string representation of note, using unpadded layer numbers, or list'''
+        note = self.inverse_position_map.get(coord, 'X')
+        
+        if version == 'old':
+            if note == '.':
+                note = ''
+            else:
+                note = '%d' % layer_index + note #no zero padding in rendering
+        elif version == 'new':
+            if note == '.':
+                note = []
+            elif note == 'X':
+                note = [0, '0']
+            else:
+                note = [int(note.replace('Key','')), hex(layer_index).replace('0x','')]
+        else:
+            raise KeyError(version)
 
         return note
 

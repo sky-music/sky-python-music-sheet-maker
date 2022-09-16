@@ -146,12 +146,12 @@ class SongParser:
         if self.input_mode is not None:
             return [self.input_mode]
         else:
+            if not song_lines: return []
             if isinstance(song_lines, str):  # Break newlines and make sure the result is a List
                 song_lines = song_lines.strip().split(os.linesep)
                 
-                return self.music_theory.detect_input_mode(song_lines)
-            else:
-                return []
+            return self.music_theory.detect_input_mode(song_lines)
+            
 
     def set_input_mode(self, input_mode):
         if isinstance(input_mode, InputMode):
