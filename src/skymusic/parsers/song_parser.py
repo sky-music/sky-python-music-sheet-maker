@@ -8,30 +8,25 @@ from skymusic.parsers.html_parser import HtmlSongParser
 from skymusic.parsers.midi_parser import MidiSongParser
 from skymusic.parsers import music_theory
 
-
 class SongParserError(Exception):
     def __init__(self, explanation):
         self.explanation = explanation
-
     def __str__(self):
         return str(self.explanation)
-
     pass
-
 
 class SongParser:
     """
     For parsing a text format into a Song object
     """
-
+    _num_errors = 0
+    _max_errors = 30
+    
     def __init__(self, maker, silent_warnings=True):
 
         self.maker = maker
         self.instrument_type = InstrumentType.NORMAL
         self.silent_warnings = silent_warnings
-        #Delimiters must be character or strings
-        #The backslash character is forbidden
-        #Only regex with the following format are supported: \x, where x is s, t, w, d, n, r, a, r, f, v, or R
         self.input_mode = None
         self.note_parser = None
         self.icon_delimiter = Resources.DELIMITERS['icon']
@@ -40,45 +35,60 @@ class SongParser:
         self.lyric_delimiter = Resources.DELIMITERS['lyric']
         self.metadata_delimiter = Resources.DELIMITERS['metadata']
         self.repeat_indicator = Resources.DELIMITERS['repeat']
+        self.layer_delimiter = Resources.DELIMITERS['layer']
         self.default_key = Resources.DEFAULT_KEY
+        #Delimiters must be character or strings
+        #The backslash character is forbidden
+        #Only regex with the following format are supported: \x, where x is s, t, w, d, n, r, a, r, f, v, or R
         self.allowed_regex = ['\s', '\t', '\w', '\d', '\n', '\r', '\a', '\e', '\f', '\v', '\R']
-        self.ruler_regex = Resources.DELIMITERS['lyric'] + r'{0,1}\s*(' + r'|'.join(Resources.MARKDOWN_CODES['rulers']) + r')+\s*(.*)'
+        self.ruler_regex = Resources.DELIMITERS['lyric'] + r'{0,1}\s*(?P<code>' + r'|'.join(Resources.MARKDOWN_CODES['rulers']) + r')+\s*(?P<text>.*)'
+        self.layer_regex = Resources.DELIMITERS['lyric'] + r'{0,1}\s*(?P<code>' + Resources.DELIMITERS['layer'] + r')+\s*(?P<text>.*)'
         self.music_theory = music_theory.MusicTheory(self)
         try:
             self.locale = self.maker.get_locale()
         except AttributeError:  # Should never happen
             self.locale = Lang.guess_locale()
             print(f"**ERROR: SongParser self.maker has no locale. Reverting to {self.locale}")
-    
-    def get_icon_delimiter(self):
 
+    def __print_error__(self,err):
+        if not self.silent_warnings:
+            print(err)
+            self._num_errors += 1
+            if self._num_errors > self._max_errors:
+                self.silent_warnings = True
+                print("Suppressing error logging after %d errors." % self._max_errors)
+
+    def get_input_mode(self):
+        return self.input_mode
+        
+    def set_instrument_type(self, instrument_type):
+        self.instrument_type = instrument_type
+        
+    def get_instrument_type(self):
+        return self.instrument_type    
+            
+    def get_icon_delimiter(self):
         return self.icon_delimiter
 
     def get_pause(self):
-
         return self.pause
 
     def get_quaver_delimiter(self):
-
         return self.quaver_delimiter
 
     def get_lyric_delimiter(self):
-
         return self.lyric_delimiter
 
     def get_repeat_indicator(self):
-
         return self.repeat_indicator
 
     def get_default_key(self):
-        
         key = self.english_note_name(note_name=self.default_key, reverse=True)
         if not key:
             key = self.default_key
         return key
 
     def get_maker(self):
-
         return self.maker
 
     def check_is_bytes(self, song_line):
@@ -110,7 +120,6 @@ class SongParser:
 
         delims = [self.icon_delimiter, self.pause, self.quaver_delimiter, self.lyric_delimiter, self.repeat_indicator, self.metadata_delimiter]
 
-
         if self.quaver_delimiter == '\s' or re.match('\s', self.quaver_delimiter):
             print("\n***ERROR: You cannot use a blank delimiter to separate notes in a quaver")
         if self.pause == '\s' or re.match('\s', self.pause):
@@ -137,13 +146,14 @@ class SongParser:
         if self.input_mode is not None:
             return [self.input_mode]
         else:
+            if not song_lines: return []
             if isinstance(song_lines, str):  # Break newlines and make sure the result is a List
                 song_lines = song_lines.strip().split(os.linesep)
                 
             return self.music_theory.detect_input_mode(song_lines)
+            
 
     def set_input_mode(self, input_mode):
-
         if isinstance(input_mode, InputMode):
             self.input_mode = input_mode
             self.set_note_parser(self.input_mode)
@@ -151,29 +161,13 @@ class SongParser:
         else:
             raise SongParserError(f"Cannot set input_mode: invalid input_mode: {input_mode}")
 
-    def get_input_mode(self):
-
-        return self.input_mode
-
-    def set_instrument_type(self, instrument_type):
-        
-        self.instrument_type = instrument_type
-        
-    def get_instrument_type(self):
-        
-        return self.instrument_type
-
     def find_key(self, song_lines=None):
-        
         return self.music_theory.find_key(song_lines)
 
     def get_note_parser(self, input_mode=None):
 
-        if self.note_parser is not None:
-            return self.note_parser
-
-        if input_mode is None:
-            input_mode = self.input_mode
+        if self.note_parser is not None: return self.note_parser
+        if input_mode is None: input_mode = self.input_mode
         
         (rows, columns) = self.get_instrument_type().get_instrument().get_dimensions()
         note_parser = input_mode.get_note_parser(locale=self.locale)
@@ -183,8 +177,7 @@ class SongParser:
 
     def set_note_parser(self, input_mode=None):
 
-        if input_mode is None:
-            input_mode = self.input_mode
+        if input_mode is None: input_mode = self.input_mode
 
         if input_mode is None:
             raise SongParserError("cannot set NoteParser: Invalid input_mode {input_mode}")
@@ -221,14 +214,12 @@ class SongParser:
         except (IndexError, ValueError):
             repeat = 1
 
-        if note_parser is None:
-            note_parser = self.note_parser
+        if note_parser is None: note_parser = self.note_parser
 
         try:
             chord = note_parser.note_name_regex.sub(' \\1', chord).split()
         except AttributeError as err:
-            if not self.silent_warnings:
-                print(err)
+            self.__print_error__(err)
 
         return repeat, chord
 
@@ -249,8 +240,7 @@ class SongParser:
         else:
             idx0 = 0  # An isolated chord or note has a frame index==0
 
-        if self.note_parser is None:
-            self.set_note_parser()
+        if self.note_parser is None: self.set_note_parser()
 
         try:
             self.note_parser.decode_chord
@@ -281,7 +271,7 @@ class SongParser:
                     harp_broken = True
                     harp_silent = False # Harp is broken, so it's not silent
                     if not self.silent_warnings:
-                        print(err)
+                        self.__print_error__(err)
                 
                 if not note_broken:
                     skygrid[highlighted_note_position] = {}
@@ -305,10 +295,9 @@ class SongParser:
         return line
     
     def remove_script_tags(self,line):
-        
+        '''Remove HTML script tags in song text to prevent hacking'''
         script_tags = re.compile('<\s*/*\s*script[^>]*>', re.I)
         return script_tags.sub('',line)
-    
     
     def sanitize_line(self, line):
         """
@@ -326,6 +315,8 @@ class SongParser:
         
         if self.icon_delimiter in self.allowed_regex:
             delimiter = self.icon_delimiter
+        elif self.icon_delimiter==' ':
+            delimiter = '\s'
         else:
             delimiter = re.escape(self.icon_delimiter)       
 
@@ -340,34 +331,26 @@ class SongParser:
         Splits a song line into icons
         An icon is a made of 1 note, several notes (chord), or several chords played rapidly (triplet, quaver)
         Icons will be visually split in SkyGrid renders (aka Harps), possibly with pauses between them
-        """    
-        if self.input_mode == InputMode.SKYJSON:
-            from . import json_parser
-            parser = json_parser.JsonSongParser(self.maker, self.silent_warnings)
-            parser.set_input_mode(self.input_mode)
-            return parser.split_line(line)
-            
-        else:
-            
-            if delimiter is None:
-                if line[0] == self.lyric_delimiter:
-                    delimiter = self.lyric_delimiter
-                else:
-                    delimiter = self.icon_delimiter
-                
-            if delimiter in self.allowed_regex:
-                return re.compile(delimiter).split(line)
-            elif delimiter=="#":# to allow HTML/CSS hex color codes
-                return re.compile(r'(?<!"|\'|:|#)#').split(line)
-            elif delimiter=="%":# to allow percentages in HTML/CSS size attributes
-                return re.compile(r'%(?!"|\')').split(line)
+        """
+        if delimiter is None:
+            if line[0] == self.lyric_delimiter:
+                delimiter = self.lyric_delimiter
             else:
-                return line.split(delimiter)
-                
+                delimiter = self.icon_delimiter
+            
+        if delimiter in self.allowed_regex:
+            return re.compile(delimiter).split(line)
+        elif delimiter=="#":# to allow HTML/CSS hex color codes
+            return re.compile(r'(?<!"|\'|:|#)#').split(line)
+        elif delimiter=="%":# to allow percentages in HTML/CSS size attributes
+            return re.compile(r'%(?!"|\')').split(line)
+        else:
+            return line.split(delimiter)
 
 
     def parse_line(self, line, song_key=Resources.DEFAULT_KEY, note_shift=0):
         """
+        Takes a single string
         Returns instrument_line: a list of  'skygrid' objects (1 skygrid = 1 dict)
         """
         instrument_line = []
@@ -376,13 +359,20 @@ class SongParser:
         if len(line) > 0 and not re.match(re.escape(Resources.DELIMITERS['metadata']),line):
                        
             hr_match = re.match(self.ruler_regex, line)
+            lay_match = re.match(self.layer_regex, line)
             
             if hr_match:
                 hr = sheetlayout.Ruler()
-                hr.set_code(hr_match.group(1)) # Markdown code
-                hr.set_content(hr_match.group(2)) # possible text
+                hr.set_code(hr_match.group('code')) # Markdown code
+                hr.set_text(hr_match.group('text')) # possible text
                 instrument_line.append(hr)
-                                
+            
+            elif lay_match:
+                lay = sheetlayout.Layer()
+                lay.set_code(lay_match.group('code')) # Code
+                lay.set_text(lay_match.group('text')) # possible layer name
+                instrument_line.append(lay)   
+                                                                        
             elif line[0] == self.lyric_delimiter:
                 lyrics = self.split_line(line)
                 for lyric in lyrics:
@@ -461,8 +451,7 @@ class SongParser:
             from . import json_parser
             parser = json_parser.JsonSongParser(self.maker, self.silent_warnings)
             song_lines = parser.sanitize_lines(song_lines,join=True)
-        
-        # At this point all lines should be strings
+            
         english_song_key = self.english_note_name(song_key)
 
         note_shift = self.get_note_parser().get_base_of_western_major_scale() * octave_shift
@@ -475,10 +464,18 @@ class SongParser:
         if changed:
             song.set_meta(**meta_data)
             song.set_meta_changed(True)
-                
+         
+        if self.input_mode == InputMode.SKYJSON:
+            from . import json_parser
+            parser = json_parser.JsonSongParser(self.maker, self.silent_warnings)
+            parser.set_input_mode(self.input_mode)
+            song_lines = parser.parse_layers(song_lines[0])                                          
+        
+        # IMPORTANT: at this point song_lines is a list of strings                                                                                                                                                                                                                                                                                                                                                                  
         for song_line in song_lines:
             instrument_line = self.parse_line(song_line, song_key,
                                               note_shift)  # The song key must be in the original format
             song.add_line(instrument_line)
 
         return song
+        

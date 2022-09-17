@@ -113,7 +113,8 @@ stock_queries:
       - Thêm "{repeat_indicator}" sau một hợp âm để biểu thị sự lập lại (repetition).
       - Dấu thăng "#" và dấu giáng "b" (nửa cung) được hỗ trợ cho hệ kí tự Phương Tây và Jianpu.
       - Lyrics must be separated by '#'
-      - Horizontal lines can be added with '__' or '=='      
+      - Layers (several instruments) can be separated by '{layer_delimiter}', followed by layer name
+      - Horizontal rulers between song lines can be added with {ruler_delimiters}      
       
       /!\ Lưu ban nhạc trong một tệp văn bản để có thể sửa lại sau này /!\
       
@@ -133,7 +134,8 @@ stock_queries:
       - Thêm "{repeat_indicator}" sau một hợp âm để biểu thị sự lập lại (repetition).
       - Dấu thăng "#" và dấu giáng "b" (nửa cung) được hỗ trợ cho hệ kí tự Phương Tây và Jianpu.
       - Lyrics must be separated by '#'
-      - Horizontal lines can be added with '__' or '=='      
+      - Layers (several instruments) can be separated by '{layer_delimiter}', followed by layer name
+      - Horizontal rulers between song lines can be added with {ruler_delimiters}      
       
       /!\ Lưu bản nhạc trong một tệp văn bản để có thể sửa lại sau này /!\
     afterword:
@@ -159,7 +161,8 @@ stock_queries:
       - Thêm "{repeat_indicator}" sau một hợp âm để biểu thị sự lập lại (repetition).
       - Dấu thăng "#" và dấu giáng "b" (nửa cung) được hỗ trợ cho hệ kí tự Phương Tây và Jianpu.
       - Lyrics must be separated by '{lyric_delimiter}'
-      - Horizontal lines can be added with '__' or '=='      
+      - Layers (several instruments) can be separated by '{layer_delimiter}', followed by layer name
+      - Horizontal rulers between song lines can be added with {ruler_delimiters}      
   instrument_type:
     foreword:
     question: Vui lòng chọn nhạc cụ
@@ -228,8 +231,7 @@ stock_queries:
       - Sử dụng "{quaver_delimiter}" để nối nốt trong một biểu tượng (liên ba - triplets, láy rền/hát rung - quaver,...) (VD: {quaver_example}). Với Jianpu, sử dụng "{jianpu_quaver_delimiter}" thay vì "-" để không bị nhầm lẫn với quãng tám.
       - Thêm "{repeat_indicator}" sau một hợp âm để biểu thị sự lập lại (repetition).
       - Dấu thăng "#" và dấu giáng "b" (nửa cung) được hỗ trợ cho hệ kí tự Phương Tây và Jianpu.
-      - Lyrics must be separated by '{lyric_delimiter}'
-      - Horizontal lines can be added with '__' or '=='      
+      - Lyrics must be separated by '{lyric_delimiter}'  
   file:
     foreword:
     question: "Nhập tên tệp (phân biệt chữ hoa, thường) {put_in_songs_in}"
@@ -250,8 +252,7 @@ stock_queries:
       - Sử dụng "{quaver_delimiter}" để nối nốt trong một biểu tượng (liên ba - triplets, láy rền/hát rung - quaver,...) (VD: {quaver_example}). Với Jianpu, sử dụng "{jianpu_quaver_delimiter}" thay vì "-" để không bị nhầm lẫn với quãng tám.
       - Thêm "{repeat_indicator}" sau một hợp âm để biểu thị sự lập lại (repetition).
       - Dấu thăng "#" và dấu giáng "b" (nửa cung) được hỗ trợ cho hệ kí tự Phương Tây (tiếng Anh) và Jianpu.
-      - Lyrics must be separated by '{lyric_delimiter}'
-      - Horizontal lines can be added with '__' or '=='      
+      - Lyrics must be separated by '{lyric_delimiter}'     
   one_input_mode:
     foreword:
     question: |

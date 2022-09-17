@@ -347,13 +347,15 @@ class MusicSheetMaker:
     def ask_instructions(self, recipient, prerequisites=None, execute=True):
 
         replacements = {'input_modes':'\n'.join(['\n* ' + input_mode.get_long_desc(self.locale) for input_mode in InputMode]),
-                        'icon_delimiter': self.get_song_parser().get_icon_delimiter().replace('\s','<space>'),
-                        'pause': self.get_song_parser().get_pause().replace('\s','<space>'),
-                        'quaver_delimiter': self.get_song_parser().get_quaver_delimiter().replace('\s','<space>'),
-                        'quaver_example': self.get_song_parser().get_quaver_delimiter().replace('\s','<space>').join(['A1', 'B1', 'C1']),
+                        'icon_delimiter': self.get_song_parser().get_icon_delimiter().replace(' ','<space>'),
+                        'pause': self.get_song_parser().get_pause().replace(' ','<space>'),
+                        'quaver_delimiter': self.get_song_parser().get_quaver_delimiter().replace(' ','<space>'),
+                        'quaver_example': self.get_song_parser().get_quaver_delimiter().replace(' ','<space>').join(['A1', 'B1', 'C1']),
                         'jianpu_quaver_delimiter': Resources.DELIMITERS['jianpu_quaver'],
                         'repeat_indicator': self.get_song_parser().get_repeat_indicator() + '2',
-                        'lyric_delimiter': Resources.DELIMITERS['lyric']
+                        'lyric_delimiter': Resources.DELIMITERS['lyric'],
+                        'layer_delimiter': Resources.DELIMITERS['layer'],
+                        'ruler_delimiters': ", ".join([repr(rul) for rul in Resources.MARKDOWN_CODES['rulers']])
                         }
         if self.is_command_line(recipient):
             i_instr = self.communicator.send_stock_query('instructions_command_line', recipient=recipient,
@@ -375,13 +377,13 @@ class MusicSheetMaker:
     def ask_notes(self, recipient, prerequisites=None, execute=True):
 
         replacements = {'input_modes':'\n'.join(['\n* ' + input_mode.get_long_desc(self.locale) for input_mode in InputMode]),
-                        'icon_delimiter': self.get_song_parser().get_icon_delimiter().replace('\s','<space>'),
-                        'pause': self.get_song_parser().get_pause().replace('\s','<space>'),
-                        'quaver_delimiter': self.get_song_parser().get_quaver_delimiter().replace('\s','<space>'),
-                        'quaver_example': self.get_song_parser().get_quaver_delimiter().replace('\s','<space>').join(['A1', 'B1', 'C1']),
+                        'icon_delimiter': self.get_song_parser().get_icon_delimiter().replace(' ','<space>'),
+                        'pause': self.get_song_parser().get_pause().replace(' ','<space>'),
+                        'quaver_delimiter': self.get_song_parser().get_quaver_delimiter().replace(' ','<space>'),
+                        'quaver_example': self.get_song_parser().get_quaver_delimiter().replace(' ','<space>').join(['A1', 'B1', 'C1']),
                         'jianpu_quaver_delimiter': Resources.DELIMITERS['jianpu_quaver'],
                         'repeat_indicator': self.get_song_parser().get_repeat_indicator() + '2',
-                        'lyric_delimiter': Resources.DELIMITERS['lyric']
+                        'lyric_delimiter': Resources.DELIMITERS['lyric'],
                         }
         replacements.update({'skip': Lang.get_string(f"recipient_specifics/skip/{recipient.get_name()}", self.locale)})
 
@@ -422,10 +424,10 @@ class MusicSheetMaker:
         """
 
         replacements = {'input_modes':'\n'.join(['\n* ' + input_mode.get_long_desc(self.locale) for input_mode in InputMode]),
-                        'icon_delimiter': self.get_song_parser().get_icon_delimiter().replace('\s','<space>'),
-                        'pause': self.get_song_parser().get_pause().replace('\s','<space>'),
-                        'quaver_delimiter': self.get_song_parser().get_quaver_delimiter().replace('\s','<space>'),
-                        'quaver_example': self.get_song_parser().get_quaver_delimiter().replace('\s','<space>').join(['A1', 'B1', 'C1']),
+                        'icon_delimiter': self.get_song_parser().get_icon_delimiter().replace(' ','<space>'),
+                        'pause': self.get_song_parser().get_pause().replace(' ','<space>'),
+                        'quaver_delimiter': self.get_song_parser().get_quaver_delimiter().replace(' ','<space>'),
+                        'quaver_example': self.get_song_parser().get_quaver_delimiter().replace(' ','<space>').join(['A1', 'B1', 'C1']),
                         'jianpu_quaver_delimiter': Resources.DELIMITERS['jianpu_quaver'],
                         'repeat_indicator': self.get_song_parser().get_repeat_indicator() + '2',
                         'lyric_delimiter': Resources.DELIMITERS['lyric']
@@ -472,7 +474,6 @@ class MusicSheetMaker:
                     notes = result.split(os.linesep)  # Returns a list of strings in any case
                     if self.is_command_line(recipient):  # Loop to ask for several lines in the standard input interface
                         while result:
-
                             (q_notes, result) = self.ask_notes(recipient=recipient, prerequisites=prerequisites, execute=execute)
 
                             result = result.split(os.linesep)

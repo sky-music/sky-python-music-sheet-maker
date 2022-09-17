@@ -9,10 +9,20 @@ class SkyjsonInstrumentRenderer(instrument_renderer.InstrumentRenderer):
         super().__init__(locale)
         self.note_parser = skyjson_parser.SkyJson()
 
-    def render_harp(self, instrument, time=0):
+    def render_harp(self, *args, **kwargs):
+
+        version = kwargs.pop('version', 'old')
+        
+        if version == 'old':
+            return self.__render_old_harp__(*args, **kwargs)
+        elif version == 'new':
+            return self.__render_new_harp__(*args, **kwargs)
+        else:
+            raise KeyError(version)
+
+    def __render_old_harp__(self, instrument,layer=1, time=0):
 
         json_render = []
-
         if instrument.get_is_broken():
             json_render = [{'time':int(time), 'key':'ERROR'}]
         elif instrument.get_is_silent():
@@ -26,16 +36,37 @@ class SkyjsonInstrumentRenderer(instrument_renderer.InstrumentRenderer):
                 if skygrid:                
                     for coord in skygrid:  # Cycle over positions in a frame
                         if skygrid[coord][frame]:  # Button is highlighted
-                            json_render += [{'time':int(time), 'key':self.note_parser.get_note_from_coordinate(coord)}]
+                            json_render += [{'time':int(time), 'key':self.note_parser.get_note_from_coordinate(coord,layer)}]
                     time = time + dt
                         
         return json_render
 
+    def __render_new_harp__(self, instrument, layer_index=0):
+        '''Split the instrument chord into a list of notes, along with the provided layer_index'''
+        notes = []
+        if not instrument:
+            notes = []
+        elif instrument.get_is_broken():
+            notes = []
+        elif instrument.get_is_silent():
+            notes = []
+        else:
+            for frame in range(instrument.get_frame_count()):
+                skygrid = instrument.get_skygrid(frame)                
+                if skygrid:                
+                    for coord in skygrid:  # Cycle over positions in a frame
+                        if skygrid[coord][frame]:  # Button is highlighted
+                            notes.append(self.note_parser.get_note_from_coordinate(coord,layer_index, version='new'))
+        #TODO: convert layer to hex string
+        return notes  
 
-    def render_voice(self, *args, **kwargs):    
-
+    def render_voice(self, *args, **kwargs):   
         return NotImplemented
         
-    def render_ruler(self, *args, **kwargs):    
-
+    def render_ruler(self, *args, **kwargs):   
         return NotImplemented
+        
+    def render_layer(self,*args,**kwargs):
+        #TODO: handle layers: either here or in the song_parser
+        return self.render_ruler(*args,**kwargs)
+            

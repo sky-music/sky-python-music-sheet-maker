@@ -30,8 +30,7 @@ class MidiSongRenderer(song_renderer.SongRenderer):
             self.midi_key = None
 
 
-    def write_header(self, mid, track, tempo):
-                
+    def __write_header__(self, mid, track, tempo, instrument=None):
         track.append(mido.MetaMessage('set_tempo', tempo=tempo))
 
         try:
@@ -39,8 +38,33 @@ class MidiSongRenderer(song_renderer.SongRenderer):
         except ValueError:
             print(f"\n***ERROR: invalid key passed to MIDI renderer. Using {Resources.DEFAULT_KEY} instead.")
             track.append(mido.MetaMessage('key_signature', key=Resources.DEFAULT_KEY))
-            track.append(mido.Message('program_change', program=self.midi_instrument, time=0))
+            
+            if instrument:
+                track.append(mido.Message('program_change', program=instrument, time=0))
+                
 
+    def __copyright_track__(self, mid, song):
+        
+        copytrack = mido.MidiTrack()
+        mid.tracks.append(copytrack)
+        
+        song_meta = song.get_meta()
+        
+        artist = song_meta['artist']
+        if artist: artist = artist[1]
+        transcript = song_meta['transcript']
+        if transcript: transcript = transcript[1]
+        copytrack.append(mido.MetaMessage('copyright', text=artist+'/'+transcript))
+        
+        return mid
+
+    def __new_track__(self,mid,tempo,instrument=None):
+        
+        track = mido.MidiTrack()
+        mid.tracks.append(track)
+        
+        self.__write_header__(mid, track, tempo, instrument) 
+        return track
 
     def write_buffers(self, song):
         global no_mido_module
@@ -61,20 +85,21 @@ class MidiSongRenderer(song_renderer.SongRenderer):
             print(f"\n***ERROR: invalid tempo passed to MIDI renderer. Using {Resources.DEFAULT_BPM} bpm instead.")
             tempo = mido.bpm2tempo(Resources.DEFAULT_BPM)
 
-        mid = mido.MidiFile(type=0)
-        track = mido.MidiTrack()
-        mid.tracks.append(track)
+        mid = mido.MidiFile(type=1)
+        self.__copyright_track__(mid, song)
+        track = self.__new_track__(mid, tempo, self.midi_instrument)
 
         sec = mido.second2tick(1, ticks_per_beat=mid.ticks_per_beat, tempo=tempo)  # 1 second in ticks
         note_ticks = self.midi_note_duration * sec * Resources.DEFAULT_BPM / self.midi_bpm  # note duration in ticks
-                        
-        self.write_header(mid, track, tempo)
-
         instrument_renderer = MidiInstrumentRenderer(self.locale, note_ticks=note_ticks, music_key=song.get_music_key())
+        
         song_lines = song.get_lines()
         for line in song_lines:
             if len(line) > 0:
-                if line[0].get_type().lower().strip() in instruments.HARPS:
+                linetype = line[0].get_type().lower().strip()
+                if linetype == 'layer':
+                    track = self.__new_track__(mid, tempo)#no instrument change yet
+                elif linetype in instruments.HARPS:
                     instrument_index = 0
                     for instrument in line:
                         instrument.set_index(instrument_index)

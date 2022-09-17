@@ -103,15 +103,15 @@ PNGS = dict()
 
 
 COLORS = {
-    	'light': {'font_color': (0, 0, 0),
-    			  'png_color': (255, 255, 255),
-    			  'text_bkg': (255, 255, 255, 0), #Transparent white
-    			  'song_bkg': (255, 255, 255),
+        'light': {'font_color': (0, 0, 0),
+                  'png_color': (255, 255, 255),
+                  'text_bkg': (255, 255, 255, 0), #Transparent white
+                  'song_bkg': (255, 255, 255),
                   'hr_color': (0, 0, 0)},
-    	'dark': {'font_color': (255, 255, 255), #Discord colors
-    			  'png_color': (54, 57, 63),
-    			  'text_bkg': (54, 57, 63, 0), #Transparent dark
-    			  'song_bkg': (54, 57, 63),
+        'dark': {'font_color': (255, 255, 255), #Discord colors
+                  'png_color': (54, 57, 63),
+                  'text_bkg': (54, 57, 63, 0), #Transparent dark
+                  'song_bkg': (54, 57, 63),
                   'hr_color': (255, 255, 255)}, 
 }
 
@@ -136,8 +136,9 @@ skyjson_api_key = ""
 
 harp_font_size = 38
 voice_font_size = 32
+png_h1_font_size = 48
+png_h2_font_size = 42
 png_font_size = 36
-png_title_font_size = 48
 png_compress = 6
 
 MAX_FILENAME_LENGTH = 127
@@ -145,7 +146,9 @@ MAX_NUM_FILES = 15
 
 BINARY_EXT = ('.mid', '.midi') # Files that must be opened in binary mode
 
-DELIMITERS = {'icon': '\s',
+MARKDOWN_CODES = {'rulers': ['--', '__']} # Supported Markdown characters
+
+DELIMITERS = {'icon': ' ',
               'pause': '.',
               'quaver': "-",
               'jianpu_pause': '0',
@@ -154,13 +157,13 @@ DELIMITERS = {'icon': '\s',
               'metadata': '#$',
               'repeat': '*',
               'broken_harp': 'X',
+              'layer': '==',
             }
 
 SKYJSON_CHORD_DELAY = 50 #Delay in ms below which 2 notes are considered a chord
 DEFAULT_BPM = 220
 PARSING_START_OCTAVE = 1
 RENDERING_START_OCTAVE = 4
-MARKDOWN_CODES = {'rulers': ['==', '--', '__']} # Supported Markdown characters
 
 MUSIC_MAKER_NAME = 'music_sheet_maker'
 MUSIC_COG_NAME = 'music_cog'

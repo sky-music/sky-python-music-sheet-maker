@@ -1,0 +1,5 @@
+#$My Song
+==#Layer 1
+A1-B1C3 . 
+#**Hello**
+B3 . . D1 A3

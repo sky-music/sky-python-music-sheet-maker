@@ -113,9 +113,12 @@ class MidiInstrumentRenderer(instrument_renderer.InstrumentRenderer):
 
 
     def render_voice(self, *args, **kwargs):    
-
         return NotImplemented
 
     def render_ruler(self, *args, **kwargs):    
-
         return NotImplemented
+        
+    def render_layer(self, *args, **kwargs):    
+        #TODO: implement layers as tracks
+        return NotImplemented
+            

@@ -42,14 +42,17 @@ class PngSongRenderer(song_renderer.SongRenderer):
             self.font_color = Resources.font_color
             self.png_color = Resources.png_color
             self.png_font_size = Resources.png_font_size
-            self.png_title_font_size = Resources.png_title_font_size
+            self.png_h1_font_size = Resources.png_h1_font_size
+            self.png_h2_font_size = Resources.png_h2_font_size
             self.png_font_path = Resources.font_path
             
             try:
-                self.title_font = ImageFont.truetype(self.png_font_path, self.png_title_font_size)
+                self.h1_font = ImageFont.truetype(self.png_font_path, self.png_h1_font_size)
+                self.h2_font = ImageFont.truetype(self.png_font_path, self.png_h2_font_size)
                 self.text_font = ImageFont.truetype(self.png_font_path, self.png_font_size)
             except OSError:
-                self.title_font = ImageFont.load_default()
+                self.h1_font = ImageFont.load_default()
+                self.h2_font = ImageFont.load_default()
                 self.text_font = ImageFont.load_default()
                 
             self.switch_harp('harp')            
@@ -124,7 +127,7 @@ class PngSongRenderer(song_renderer.SongRenderer):
         if filenum == 0:
 
             title = meta['title'][1]
-            fnt = self.title_font
+            fnt = self.h1_font
             title, numlines = self.wrap_text(title, fnt.getsize(title)[0], int(line_width/harp_rescale))               
             h = self.get_png_text_height(fnt)
             title_header = Image.new('RGBA', (int(line_width/harp_rescale), int(h*numlines)))
@@ -140,7 +143,7 @@ class PngSongRenderer(song_renderer.SongRenderer):
             for k in meta:
                 if k != 'title':
                     meta_text = meta[k][0] + ' ' + meta[k][1]
-                    #fnt = ImageFont.truetype(self.png_font_path, self.png_font_size)
+                    #fnt = ImageFont.truetype(self.png_font_path, self.)
                     fnt = self.text_font
                     meta_text, numlines = self.wrap_text(meta_text, fnt.getsize(meta_text)[0], int(line_width/harp_rescale))
                     h = self.get_png_text_height(fnt)
@@ -194,6 +197,11 @@ class PngSongRenderer(song_renderer.SongRenderer):
         # Determines png size as a function of the numer of icons per line
         self.set_png_harp_size(song.get_max_instruments_per_line())
         self.set_png_voice_size()
+        
+        text_font_height = self.get_png_text_height(self.text_font)
+        h1_font_height = self.get_png_text_height(self.h1_font)
+        h2_font_height = self.get_png_text_height(self.h2_font)
+        
         harp_rescale = self.get_png_harp_rescale()
         song_render = Image.new('RGBA', self.png_size, self.png_color)
 
@@ -222,6 +230,7 @@ class PngSongRenderer(song_renderer.SongRenderer):
         # Creating a new song image, located at x_in_song, yline_in_song
         xline_in_song = x_in_png
         yline_in_song = ysong
+        prev_line = ''
         for row in range(start_row, end_row):
 
             line = song.get_line(row)
@@ -236,15 +245,29 @@ class PngSongRenderer(song_renderer.SongRenderer):
             if linetype in instruments.TEXT:
                 line_height = int(self.png_lyric_size[1])
             elif linetype == 'ruler':
-                line_height = int(self.png_lyric_size[1])  
+                line_height = int(self.png_lyric_size[1])
+            elif linetype == 'layer':
+                line_height = int(self.png_lyric_size[1]) 
             elif linetype in instruments.HARPS:
-                line_height = int(self.png_harp_size[1])                
+                line_height = int(self.png_harp_size[1])               
+
                 # Forced dividing line after each line of harps
-                yline_in_song += self.png_harp_spacings[1] / 4.0
-                song_render.paste(hr_line, (int(xline_in_song), int(yline_in_song)))
-                yline_in_song += hr_line.size[1] + self.png_harp_spacings[1] / 2.0
+                if prev_line not in ('ruler', 'layer'):
+                    yline_in_song += self.png_harp_spacings[1] / 4.0
+                    song_render.paste(hr_line, (int(xline_in_song), int(yline_in_song)))
+                    yline_in_song += hr_line.size[1] + self.png_harp_spacings[1] / 2.0
             else:
                 raise TypeError("Unkown linetype type: "+linetype)
+
+            # More line height in case ruler or layer has text
+            if linetype in ('ruler', 'layer'):
+                if line[0].get_text():
+                    if line[0].get_emphasis().lower() == 'h1':
+                        line_height += int(h1_font_height)
+                    elif line[0].get_emphasis().lower() == 'h2':
+                        line_height += int(h2_font_height)
+                    else:
+                        line_height += int(text_font_height) 
 
             # Line image
             line_render = Image.new('RGBA', (line_width, line_height), self.png_color)
@@ -270,13 +293,14 @@ class PngSongRenderer(song_renderer.SongRenderer):
                     # New line
                     line_render = Image.new('RGBA', (line_width, line_height), self.png_color)
                     
-
                 #NEW
                 ypredict = yline_in_song +  self.png_harp_spacings[1]
                 
                 if linetype in instruments.TEXT:
                     ypredict += self.png_lyric_size[1]
                 elif linetype == 'ruler':
+                    ypredict += hr_line.size[1]
+                elif linetype == 'layer':
                     ypredict += hr_line.size[1]
                 elif linetype in instruments.HARPS:
                     ypredict += self.png_harp_size[1]
@@ -312,6 +336,7 @@ class PngSongRenderer(song_renderer.SongRenderer):
             if linetype in instruments.HARPS:
                 yline_in_song += self.png_harp_spacings[1] / 2.0
 
+            prev_line = linetype
             if page_break:
                 end_row = row
                 break

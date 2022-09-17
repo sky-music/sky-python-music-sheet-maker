@@ -18,12 +18,13 @@ class SkyJson(noteparser.NoteParser):
         #Only one digit because it is the format chosen by Specy
         self.inverse_position_map = {
             (-1, -1): '.',
-            (0, 0): '1Key0', (0, 1): '1Key1', (0, 2): '1Key2', (0, 3): '1Key3', (0, 4): '1Key4',
-            (1, 0): '1Key5', (1, 1): '1Key6', (1, 2): '1Key7', (1, 3): '1Key8', (1, 4): '1Key9',
-            (2, 0): '1Key10', (2, 1): '1Key11', (2, 2): '1Key12', (2, 3): '1Key13', (2, 4): '1Key14'
+            (0, 0): 'Key0', (0, 1): 'Key1', (0, 2): 'Key2', (0, 3): 'Key3', (0, 4): 'Key4',
+            (1, 0): 'Key5', (1, 1): 'Key6', (1, 2): 'Key7', (1, 3): 'Key8', (1, 4): 'Key9',
+            (2, 0): 'Key10', (2, 1): 'Key11', (2, 2): 'Key12', (2, 3): 'Key13', (2, 4): 'Key14'
         }
 
-
+        #Layer information is discarded
+        self.note_name_with_layer_regex = re.compile(r'(\d{,2})(Key\d{2})', re.IGNORECASE)
         self.note_name_with_octave_regex = re.compile(r'\d{,2}(Key\d{2})', re.IGNORECASE)
         self.note_name_regex = self.note_name_with_octave_regex
         self.single_note_name_regex = re.compile(r'\b\d{,2}(Key\d{2}\b)', re.IGNORECASE)
@@ -52,12 +53,24 @@ class SkyJson(noteparser.NoteParser):
         else:
             raise KeyError('Note ' + str(note) + ' was not found in the position_map dictionary.')
 
-    def get_note_from_coordinate(self, coord):
-
-        try:
-            note = self.inverse_position_map[coord]
-        except KeyError:
-            note = 'X'
+    def get_note_from_coordinate(self, coord, layer_index=0, version='old'):
+        '''string representation of note, using unpadded layer numbers, or list'''
+        note = self.inverse_position_map.get(coord, 'X')
+        
+        if version == 'old':
+            if note == '.':
+                note = ''
+            else:
+                note = '%d' % layer_index + note #no zero padding in rendering
+        elif version == 'new':
+            if note == '.':
+                note = []
+            elif note == 'X':
+                note = [0, '0']
+            else:
+                note = [int(note.replace('Key','')), hex(layer_index).replace('0x','')]
+        else:
+            raise KeyError(version)
 
         return note
 
@@ -77,3 +90,11 @@ class SkyJson(noteparser.NoteParser):
         sanitized_note = re.sub(r'([^\d])(\d)\b', r'\g<1>0\g<2>', sanitized_note)
         
         return sanitized_note
+        
+    def get_layer(self,note,default=''):
+        
+        g = self.note_name_with_layer_regex.match(note)
+        if g:
+            return g.group(1)
+        else:
+            return default

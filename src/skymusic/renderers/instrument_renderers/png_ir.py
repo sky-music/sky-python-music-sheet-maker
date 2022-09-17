@@ -24,15 +24,25 @@ class PngInstrumentRenderer(instrument_renderer.InstrumentRenderer):
         self.font_color = Resources.font_color        
         self.font_path = Resources.font_path
         self.harp_font_size = Resources.harp_font_size
+        self.png_font_size = Resources.png_font_size
+        self.png_h1_font_size = Resources.png_h1_font_size
+        self.png_h2_font_size = Resources.png_h2_font_size
+        self.png_font_path = Resources.font_path
         self.repeat_height = None
         self.voice_font_size = Resources.voice_font_size
         self.hr_color = Resources.hr_color  # Transparent white
         try:
             self.voice_font = ImageFont.truetype(self.font_path, self.voice_font_size)
             self.harp_font = ImageFont.truetype(self.font_path, self.harp_font_size)
+            self.h1_font = ImageFont.truetype(self.png_font_path, self.png_h1_font_size)
+            self.h2_font = ImageFont.truetype(self.png_font_path, self.png_h2_font_size)
+            self.text_font = ImageFont.truetype(self.png_font_path, self.png_font_size)
         except OSError:
             self.voice_font = ImageFont.load_default()
             self.harp_font = ImageFont.load_default()
+            self.h1_font = ImageFont.load_default()
+            self.h2_font = ImageFont.load_default()
+            self.text_font = ImageFont.load_default()
 
         self.png_harp_size = None
         self.harp_type = harp_type
@@ -86,12 +96,12 @@ class PngInstrumentRenderer(instrument_renderer.InstrumentRenderer):
         #fnt = ImageFont.truetype(self.font_path, self.voice_font_size)
         fnt = self.voice_font
         return fnt.getsize('HQfgjyp')[1] #Uppercase H and characters with tails
-   
+
+    def __scaled_font__(self, font_size, rescale):
+        return ImageFont.truetype(self.png_font_path, int(font_size*rescale))
    
     def render_ruler(self, ruler, rescale=1.0, max_size=None): # Should add options
         """Renders an horizontal ruler"""
-        code = ruler.get_code()
-
         #harp_size = self.get_png_harp_size() # Will be replaced by option
         hr_render = Image.new('RGBA', (int(max_size[0]), int(max_size[1])),
                              color=self.text_bkg)
@@ -100,6 +110,7 @@ class PngInstrumentRenderer(instrument_renderer.InstrumentRenderer):
         rulerH = 2
         rulerW = int(max_size[0])
         
+        code = ruler.get_code()
         if code == '__':
             draw.line([(0,0),(rulerW,0)], fill=self.hr_color, width=rulerH)
         elif code == '--':
@@ -117,8 +128,22 @@ class PngInstrumentRenderer(instrument_renderer.InstrumentRenderer):
             raise KeyError(code)
 
         # No rescaling for the ruler (which is 1D and should extend to the full page width)
-            
+        text = ruler.get_text()
+        emphasis = ruler.get_emphasis().lower()
+        if text: 
+            if emphasis == 'h1':
+                fnt = self.__scaled_font__(self.png_h1_font_size, rescale)
+            elif emphasis == 'h2':
+                fnt = self.__scaled_font__(self.png_h2_font_size, rescale)   
+            else:
+                fnt = self.__scaled_font__(self.png_font_size, rescale)
+                
+            draw.text((0, 6*rulerH), text, font=fnt, fill=self.font_color)
+        
         return hr_render
+
+    def render_layer(self,*args,**kwargs):
+        return self.render_ruler(*args,**kwargs)
 
     def render_voice(self, instrument, rescale=1.0, max_size=None):
         """Renders the lyrics text in PNG"""

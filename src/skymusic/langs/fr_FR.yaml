@@ -111,8 +111,9 @@ stock_queries:
       - Tapez "{quaver_delimiter}" pour relier les notes entre elles, pour les triplets... (e.g. {quaver_example}). En Jianpu, utilisez "{jianpu_quaver_delimiter}" pour éviter la confusion avec l'octave.
       - Tapez "{repeat_indicator}" après un groupe de notes pour indiquer la répétition.
       - Les dièses "#" et les bémoles "b" (demi-tons) sont possibles pour les notations autres que Sky ABC-15.
-      - Les paroles doivent être commencées et séparée par "{lyric_delimiter}"
-      - Des lignes de séparations simple avec '__' ou double avec '==' 
+      - Les paroles doivent être commencées et séparées par "{lyric_delimiter}"
+      - Les differents instruments sont séparés par "{layer_delimiter}", followed by layer name
+      - Des lignes de séparations avec {ruler_delimiters}
  
        /!\ Gardez vos notes dans un fichier texte pour pouvoir modifier la chanson plus tard ! /!\   
           
@@ -132,7 +133,8 @@ stock_queries:
       - Tapez "{repeat_indicator}" après un groupe de notes pour indiquer la répétition.
       - Les dièses "#" et les bémoles "b" (demi-tons) sont possibles pour les notations autres que Sky ABC-15.
       - Les paroles doivent être commencées et séparée par "{lyric_delimiter}"
-      - Des lignes de séparations simple avec '__' ou double avec '=='  
+      - Les differents instruments sont séparés par "{layer_delimiter}", followed by layer name
+      - Des lignes de séparations avec {ruler_delimiters}  
       
        /!\ Gardez vos notes dans un fichier texte pour pouvoir modifier la chanson plus tard ! /!\     
     afterword:
@@ -227,7 +229,6 @@ stock_queries:
       - Tapez "{repeat_indicator}" après un groupe de notes pour indiquer la répétition.
       - Les dièses "#" et les bémoles "b" (demi-tons) sont possibles pour les notations autres que Sky ABC-15.
       - Les paroles doivent être commencées et séparée par ''{lyric_delimiter}''
-      - Des lignes de séparations simple avec '__' ou double avec '=='     
   file:
     foreword:
     question: "Entrez un nom de fichier valide{put_in_songs_in} (sensible à la casse)"

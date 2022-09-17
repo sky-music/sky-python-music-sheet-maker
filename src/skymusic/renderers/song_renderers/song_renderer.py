@@ -23,7 +23,6 @@ class SongRenderer():
 
 
     def write_buffers(self, song, **kwargs):
-        
         return
         
     

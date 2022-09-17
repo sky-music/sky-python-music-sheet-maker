@@ -96,9 +96,11 @@ class HtmlSongRenderer(song_renderer.SongRenderer):
         instrument_renderer = HtmlInstrumentRenderer(self.locale)
         
         non_voice_row = 1
+        prev_type = ''
         for i, line in enumerate(song_lines):
-            if len(line) > 0:                                
-                if line[0].get_type() in instruments.HARPS:
+            if len(line) > 0: 
+                linetype =   line[0].get_type()                             
+                if linetype in instruments.HARPS and (prev_type not in ('ruler', 'layer')):
                     song_render += '\n<hr class="sep" />'
                               
                 #song_render += '<div class="line">'
@@ -117,12 +119,9 @@ class HtmlSongRenderer(song_renderer.SongRenderer):
                     non_voice_row += 1
                 
                 line_render += "\n</div>"
-                
-                song_render += line_render                
-                
-                #song_render += '\n'
-                #song_render += '\n</div>'
-                
+                song_render += line_render
+                prev_type = linetype
+        # End loop on rows        
 
         html_buffer.write(song_render)
         html_buffer.write('\n</div>')

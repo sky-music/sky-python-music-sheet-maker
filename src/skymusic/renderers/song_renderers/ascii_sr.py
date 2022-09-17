@@ -39,9 +39,10 @@ class AsciiSongRenderer(song_renderer.SongRenderer):
                 repeat = instrument.get_repeat()
                 if repeat > 1:
                     instrument_render += Resources.DELIMITERS['repeat'] + str(repeat)
-                line_render += instrument_render + re.sub('\\\\s', ' ', Resources.DELIMITERS['icon'])
-                line_render = line_render.rstrip(Resources.DELIMITERS['icon'])
+                line_render += instrument_render + Resources.DELIMITERS['icon']
                 instrument_index += 1
+                
+            line_render = line_render.rstrip(Resources.DELIMITERS['icon'])#Remove last space
             song_render += '\n' + line_render
 
         ascii_buffer.write(song_render)
