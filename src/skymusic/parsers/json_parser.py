@@ -184,7 +184,7 @@ class JsonSongParser(song_parser.SongParser):
             raise Exception('JSON file contains an invalid music sheet format.')
         
         layers = []
-        for i, notes in enumerate(layered_notes.values()):
+        for i, (layer_index, notes) in enumerate(layered_notes.items()):
             
             times = [note['time'] for note in notes]
             keys = [note['key'] for note in notes]
@@ -225,7 +225,7 @@ class JsonSongParser(song_parser.SongParser):
                 if instr_name:
                     layers += [self.layer_delimiter + ' ##%s' % instr_name]
                 else:
-                    layers += [self.layer_delimiter + ' ##Layer %s' % layer]
+                    layers += [self.layer_delimiter + ' ##Layer %s' % layer_index]
             layers += [icons]
             
         return layers
