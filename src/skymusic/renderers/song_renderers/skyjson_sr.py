@@ -43,8 +43,6 @@ class SkyjsonSongRenderer(song_renderer.SongRenderer):
         columns = self.render_to_new_format(layers)
         json_dict.update({'instruments':instruments, 'columns': columns, 'songNotes': songNotes})
         
-        print(json_dict)
-        
         json_buffer.seek(0)
         json.dump([json_dict], json_buffer)
         return [json_buffer]

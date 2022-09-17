@@ -21,9 +21,10 @@ class JsonSongParser(song_parser.SongParser):
             lines = [''.join(lines)]
         return lines
 
-    def sanitize_layer(self, layer,join=False):
-        layer = self.sanitize_lines(layer,join=False)
-        return self.icon_delimiter.join(layer)
+    def join_icons(self, icons):
+        '''join icons in a string'''
+        layer = self.sanitize_lines(icons,join=False)
+        return self.icon_delimiter.join(icons)
                         
     def detect_json(self, song_lines):
         
@@ -103,7 +104,7 @@ class JsonSongParser(song_parser.SongParser):
             for notei in note_indices:
                 if notei != SILENCE:
                     note_dicts += [{'time':elapsed_time, 'key':str(layer if is_hex else LAYERS_BINMAP[layer])+"Key"+str(notei)}]
-                elapsed_time += int(0.5+bpm_ms*tempo_changer)
+                elapsed_time += round(bpm_ms*tempo_changer)
             
             if note_dicts:
                 layered_notes[layer] = layered_notes.get(layer,[]) + note_dicts
@@ -168,7 +169,7 @@ class JsonSongParser(song_parser.SongParser):
             return [line]
         
         # The existence of this field has already been assessed by MusicTheory
-        bpm = json_dict.get('bpm',200)
+        bpm = json_dict.get('bpm',220)
         
         instruments = json_dict.get('instruments',[])
         instr_names = iter([instr.get("name","") for instr in instruments])
@@ -183,7 +184,7 @@ class JsonSongParser(song_parser.SongParser):
             raise Exception('JSON file contains an invalid music sheet format.')
         
         layers = []
-        for i, (layer,notes) in enumerate(layered_notes.items()):
+        for i, notes in enumerate(layered_notes.values()):
             
             times = [note['time'] for note in notes]
             keys = [note['key'] for note in notes]
@@ -210,8 +211,12 @@ class JsonSongParser(song_parser.SongParser):
                             icons += [self.pause + (self.repeat_indicator + str(n_pauses) if n_pauses > 1 else '')]
                         
                         icons += [keys[i]]
-            icons = self.sanitize_layer(icons)
-            icons = ''.join(icons) #merge icons into a string
+            
+            icons = self.join_icons(icons) # merge icons
+            
+            # self.icon_delimiter.join(icons)
+            #merge icons into a string
+            
             if len(layered_notes) > 1:
                 try:
                     instr_name = next(instr_names)

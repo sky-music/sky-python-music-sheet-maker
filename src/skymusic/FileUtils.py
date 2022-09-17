@@ -71,8 +71,8 @@ def closest_file(filepath):
     best_score = 99
     for (root, dirs, files) in os.walk(filedir):
         for file in files:
-            bare_file = __strip_accents__(os.path.splitext(file)[0])
-            bare_filename = __strip_accents__(os.path.splitext(filename)[0])
+            bare_file = __strip_accents__(os.path.splitext(os.path.splitext(file)[0])[0]).lower()
+            bare_filename = __strip_accents__(os.path.splitext(os.path.splitext(filename)[0])[0]).lower()
             d = edit_distance(bare_file,bare_filename)
             #print(f"d({file,filename})={d}")
             if d < 3 or (d<4 and len(filename)>10):
