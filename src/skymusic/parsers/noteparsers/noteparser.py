@@ -11,7 +11,7 @@ class NoteParser:
     def __init__(self, locale='en_US', start_octave=Resources.PARSING_START_OCTAVE):
 
         self.locale = locale
-        self.rows = 3 #Can be overridden by set_dimensions()
+        self.rows = 3 #Can be overridden by set_shape()
         self.columns = 5
 
         self.CHROMATIC_SCALE_DICT = None
@@ -63,13 +63,13 @@ class NoteParser:
 
         return self.rows
 
-    def get_dimensions(self):
+    def get_shape(self):
         
         return (self.rows, self.columns)
 
-    def set_dimensions(self, dimensions=(3,5)):
+    def set_shape(self, shape=(3,5)):
         
-        (self.rows, self.columns) = dimensions
+        (self.rows, self.columns) = shape
 
     def get_default_starting_octave(self):
 

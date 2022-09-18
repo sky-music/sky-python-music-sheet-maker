@@ -23,7 +23,7 @@ class JsonSongParser(song_parser.SongParser):
 
     def join_icons(self, icons):
         '''join icons in a string'''
-        layer = self.sanitize_lines(icons,join=False)
+        icons = self.sanitize_lines(icons,join=False)
         return self.icon_delimiter.join(icons)
                         
     def detect_json(self, song_lines):

@@ -61,19 +61,12 @@ class MidiInstrumentRenderer(instrument_renderer.InstrumentRenderer):
         
         for frame in range(instrument.get_frame_count()):
             
-            skygrid = instrument.get_skygrid(frame)
-            
-            if skygrid:
-                for coord in skygrid:  # Cycle over (row, col) positions in an icon
-                    
-                    if skygrid[coord][frame]:  # Button is highlighted
-                        note = instrument.get_note_from_position(coord)
-                        
-                        render_args.append({'note':note,'event_type':'note_on','t':t})
-                        
-                        note_duration = self.delta_times['note_off'] if frame == 0 else self.delta_times['quaver_off']
-                        render_args.append({'note':note,'event_type':'note_off','t':t+note_duration})
-                        
+                coords = instrument.get_highlighted_coords(frame)
+                notes = [instrument.get_note_from_position(coord) for coord in coords]
+                for note in notes:                                     
+                    render_args.append({'note':note,'event_type':'note_on','t':t})                
+                    note_duration = self.delta_times['note_off'] if frame == 0 else self.delta_times['quaver_off']
+                    render_args.append({'note':note,'event_type':'note_off','t':t+note_duration})                        
                 if frame > 0:
                     t += self.delta_times['quaver_on']
         

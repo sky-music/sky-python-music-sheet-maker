@@ -169,9 +169,9 @@ class SongParser:
         if self.note_parser is not None: return self.note_parser
         if input_mode is None: input_mode = self.input_mode
         
-        (rows, columns) = self.get_instrument_type().get_instrument().get_dimensions()
+        (rows, columns) = self.get_instrument_type().get_instrument().get_shape()
         note_parser = input_mode.get_note_parser(locale=self.locale)
-        note_parser.set_dimensions((rows, columns))
+        note_parser.set_shape((rows, columns))
 
         return note_parser
 
@@ -233,26 +233,19 @@ class SongParser:
         # An isolated chord is a single element list: chords=['B1A1A3']
         # Triplets and quavers have been decomposed into a list of notes or chords: chords=['B2', 'B3B1', 'B4', 'B5', 'C1', 'C2']
         harp_broken = True
-        skygrid = {}
 
-        if len(chords) > 1:
-            idx0 = 1  # Chords in quavers and triplets have a frame index>1
-        else:
-            idx0 = 0  # An isolated chord or note has a frame index==0
+        # Notes/chords in quavers and triplets have a frame index >= 1
+        # A black/white note or chord has a frame index == 0
+        start_frame = 1 if len(chords) > 1 else 0     
 
         if self.note_parser is None: self.set_note_parser()
+        is_chord_parser = hasattr(self.note_parser, 'decode_chord')
+        skygrid = instruments.Skygrid(shape=self.note_parser.get_shape())
 
-        try:
-            self.note_parser.decode_chord
-            is_chord_parser = True
-        except AttributeError:
-            is_chord_parser = False
 
         for chord_idx, chord in enumerate(chords):
 
-            if is_chord_parser:
-                chord = self.note_parser.decode_chord(chord)
-
+            if is_chord_parser: chord = self.note_parser.decode_chord(chord)
             repeat, chord = self.split_chord(chord)
             # Now the real chord has been split in notes (1 note = 1 list slot)
 
@@ -262,24 +255,20 @@ class SongParser:
                 note_broken = False
                 try:
                     if note == self.pause:
-                        highlighted_note_position = (-1, -1)
+                        highlighted_coords = (-1, -1)
                     else:
-                        highlighted_note_position = self.note_parser.calculate_coordinate_for_note(note, song_key,
-                                                                                                   note_shift, False)
+                        highlighted_coords = self.note_parser.calculate_coordinate_for_note(note, song_key,
+                                                                             note_shift, False)
                 except (KeyError, SyntaxError) as err:
                     note_broken = True
                     harp_broken = True
                     harp_silent = False # Harp is broken, so it's not silent
-                    if not self.silent_warnings:
-                        self.__print_error__(err)
+                    if not self.silent_warnings: self.__print_error__(err)
                 
                 if not note_broken:
-                    skygrid[highlighted_note_position] = {}
-                    skygrid[highlighted_note_position][idx0 + chord_idx] = True
-                    harp_silent = False # There's a note, so the harp is a priori not silent
-                    if highlighted_note_position[0] < 0 and highlighted_note_position[1] < 0:  # Note is a silence
-                        skygrid[highlighted_note_position][idx0 + chord_idx] = False
-                        harp_silent = True
+                    highlighted = (highlighted_coords[0] >= 0 and highlighted_coords[1] >= 0)
+                    skygrid.set_note(highlighted_coords, start_frame + chord_idx, highlighted)
+                    if highlighted: harp_silent = False
 
         results = [skygrid, harp_broken, harp_silent, repeat]
         return results
