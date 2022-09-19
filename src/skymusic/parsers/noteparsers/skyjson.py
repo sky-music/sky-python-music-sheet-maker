@@ -43,9 +43,10 @@ class SkyJson(noteparser.NoteParser):
             if (pos[0] < 0) and (pos[1] < 0):  # Special character
                 return pos
             else:
-                idx = pos[0] * self.columns + pos[1]
+                columns = self.get_column_count()
+                idx = pos[0] * columns + pos[1]
                 idx = idx + note_shift
-                pos = (int(idx / self.columns), idx - self.columns * int(idx / self.columns))
+                pos = (int(idx / columns), idx - columns * int(idx / columns))
                 if (0, 0) <= pos <= (2, 4):
                     return pos
                 else:

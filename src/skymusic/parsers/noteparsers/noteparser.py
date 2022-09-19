@@ -11,8 +11,7 @@ class NoteParser:
     def __init__(self, locale='en_US', start_octave=Resources.PARSING_START_OCTAVE):
 
         self.locale = locale
-        self.rows = 3 #Can be overridden by set_shape()
-        self.columns = 5
+        self.shape = (3,5)
 
         self.CHROMATIC_SCALE_DICT = None
         self.SEMITONE_INTERVAL_TO_MAJOR_SCALE_INTERVAL_DICT = {
@@ -39,57 +38,31 @@ class NoteParser:
         self.note_name_regex = None
         self.note_octave_regex = None
 
-    def get_chromatic_scale_dict(self):
+    def get_chromatic_scale_dict(self): return self.CHROMATIC_SCALE_DICT
 
-        return self.CHROMATIC_SCALE_DICT
+    def get_inverse_chromatic_scale_dict(self): return self.INVERSE_CHROMATIC_SCALE_DICT
 
-    def get_inverse_chromatic_scale_dict(self):
+    def get_semitone_interval_to_major_scale_interval_dict(self):  return self.SEMITONE_INTERVAL_TO_MAJOR_SCALE_INTERVAL_DICT
 
-        return self.INVERSE_CHROMATIC_SCALE_DICT
+    def get_chromatic_scale_count(self): return self.CHROMATIC_SCALE_COUNT
 
-    def get_semitone_interval_to_major_scale_interval_dict(self):
+    def get_column_count(self): return self.shape[1]
 
-        return self.SEMITONE_INTERVAL_TO_MAJOR_SCALE_INTERVAL_DICT
+    def get_row_count(self): return self.shape[0]
 
-    def get_chromatic_scale_count(self):
+    def get_shape(self): return self.shape
 
-        return self.CHROMATIC_SCALE_COUNT
+    def set_shape(self, shape=(3,5)): self.shape = shape
 
-    def get_column_count(self):
+    def get_default_starting_octave(self): return self.default_starting_octave
 
-        return self.columns
+    def get_base_of_western_major_scale(self): return self.BASE_OF_MAJOR_SCALE
 
-    def get_row_count(self):
+    def get_note_name_with_octave_regex(self): return self.note_name_with_octave_regex
 
-        return self.rows
+    def get_note_name_regex(self): return self.note_name_regex
 
-    def get_shape(self):
-        
-        return (self.rows, self.columns)
-
-    def set_shape(self, shape=(3,5)):
-        
-        (self.rows, self.columns) = shape
-
-    def get_default_starting_octave(self):
-
-        return self.default_starting_octave
-
-    def get_base_of_western_major_scale(self):
-
-        return self.BASE_OF_MAJOR_SCALE
-
-    def get_note_name_with_octave_regex(self):
-
-        return self.note_name_with_octave_regex
-
-    def get_note_name_regex(self):
-
-        return self.note_name_regex
-
-    def get_note_octave_regex(self):
-
-        return self.note_octave_regex
+    def get_note_octave_regex(self): return self.note_octave_regex
 
     def get_note_name(self, note):
 

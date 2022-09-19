@@ -100,8 +100,8 @@ HARPS = ['harp','drum']
 
 class Instrument():
 
+    type = 'GenericInstrument'
     def __init__(self):
-        self.type = 'undefined'
         self.repeat = 1
         self.index = 0
         self.is_silent = True
@@ -146,12 +146,11 @@ class Instrument():
 
 
 class Voice(Instrument):  # Lyrics or comments
-
+    type = 'voice'
+    TAG_RE = re.compile(r'<[^>]+>')
     def __init__(self):
         super().__init__()
-        self.type = 'voice'
         self.lyric = ''
-        self.TAG_RE = re.compile(r'<[^>]+>')
         self.emphasis = None
 
     def get_lyric(self, strip_html=False):
@@ -188,10 +187,10 @@ class Voice(Instrument):  # Lyrics or comments
 
 class Harp(Instrument):
     '''Any harmonic instrument with a 3x5 grid'''
+    type = 'harp'
+    shape = (3, 5)
     def __init__(self):
         super().__init__()
-        self.type = 'harp'
-        self.shape = (3, 5)
         self.skygrid = Skygrid(shape=self.shape)
         
     def __getattr__(self, attr_name):
@@ -228,10 +227,9 @@ class Harp(Instrument):
         self.skygrid = skygrid        
 
 class Drum(Harp):
-    
+    type = 'drum'
+    shape = (2,4)
     def __init__(self):
         super().__init__()
-        self.type = 'drum'
-        self.shape = (2,4)
-        self.skygrid = Skygrid(shape=(self.row_count, self.column_count))
+        self.skygrid = Skygrid(shape=self.shape)
     
