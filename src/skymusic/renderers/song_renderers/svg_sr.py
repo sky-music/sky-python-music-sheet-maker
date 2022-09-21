@@ -132,10 +132,15 @@ class SvgSongRenderer(song_renderer.SongRenderer):
         
         # Dividing line after title
         y += self.SVG_text_height
-                
-        song_header += (f'\n<svg x="0" y="{y :.2f}" width="{self.SVG_line_width :.2f}" height="{(self.SVG_harp_spacings[1] / 2.0) :.2f}">'
-                        f'\n<line x1="0" y1="50%" x2="100%" y2="50%" class="sep" /> '
-                        f'\n</svg>')
+        
+        # Special code to check whether the next line is not a layer or rule drawing an horizontal line
+        if song.get_num_lines() > 0:
+            line = song.get_line(start_row)
+            linetype = line[0].get_type().lower().strip()
+            if linetype not in ('layer', 'ruler'):
+                song_header += (f'\n<svg x="0" y="{y :.2f}" width="{self.SVG_line_width :.2f}" height="{(self.SVG_harp_spacings[1] / 2.0) :.2f}">'
+                                f'\n<line x1="0" y1="50%" x2="100%" y2="50%" class="sep" /> '
+                                f'\n</svg>')
                 
         y += self.SVG_text_height
 
