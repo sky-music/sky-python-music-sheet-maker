@@ -101,7 +101,7 @@ class CommandLinePlayer:
         """
         try:
             locale = self.preferences['locale']
-        except KeyError:
+        except (TypeError,KeyError):
             locale = None
 
         return locale        

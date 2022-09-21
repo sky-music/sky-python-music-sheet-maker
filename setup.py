@@ -14,7 +14,7 @@ Instructions are available at the project homepage.
 
 setup(
     name = 'skymusic',
-    version = '2.1.0',
+    version = '2.2.0',
     description = 'Make visual music sheets for Sky: Children of The Light',
     long_description = long_description,
     long_description_content_type = 'text/markdown',

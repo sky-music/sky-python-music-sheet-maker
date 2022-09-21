@@ -5,33 +5,41 @@ from . import noteparser
 
 class English(noteparser.NoteParser):
 
-    def __init__(self, **kwargs):
+    MAJOR_NOTES = ['C', 'D', 'E', 'F', 'G', 'A', 'B']
+    #self.MAJOR_NOTES = list(OrderedDict({k:None for k in [k.strip('#').strip('b') for k in self.CHROMATIC_SCALE.keys()]}).keys())    
 
-        super().__init__(**kwargs)
-
-        self.CHROMATIC_SCALE_DICT = {'C': 0, 'C#': 1, 'Db': 1, 'D': 2, 'D#': 3, 'Eb': 3, 'E': 4, 'F': 5, 'F#': 6,
+    CHROMATIC_SCALE = {'C': 0, 'C#': 1, 'Db': 1, 'D': 2, 'D#': 3, 'Eb': 3, 'E': 4, 'F': 5, 'F#': 6,
                                      'Gb': 6, 'G': 7, 'G#': 8, 'Ab': 8, 'A': 9, 'A#': 10, 'Bb': 10, 'B': 11}
+    # I have to use a function because names in class scope are not accessible to list comprehension: they are resolved in the innermost enclosing function scope, while list comprehension have a local namespace.
+    def inv_scale(scale):
+        return {scale[k]:k for k in reversed(OrderedDict(scale))}
 
+    INVERSE_CHROMATIC_SCALE = inv_scale(CHROMATIC_SCALE)
+
+    # Compile regexes for notes to save before using
+    note_name_with_octave_regex = re.compile(r'([ABCDEFGabcdefg][b#♭♯]?\d)')
+    note_name_regex = re.compile(r'([ABCDEFGabcdefg][b#♭♯]?)')
+    single_note_name_regex = re.compile(r'(\b[ABCDEFGabcdefg][b#♭♯]?\d?\b)')
+    note_octave_regex = re.compile(r'\d')
+    not_note_name_regex = re.compile(r'[^ABCDEFGabcdefgb#♭♯]+')
+    not_octave_regex = re.compile(r'[^\d]+')
+
+    def __init__(self, *args, **kwargs):
+
+        super().__init__(*args, **kwargs)
+        self.__set_coord_maps__(self.shape)
+
+    def __set_coord_maps__(self, shape=None):
+        '''Creates the correspondance dict between the (row,col) coordinates and the Western CDEFGAB notes'''
+        if shape is None: shape=self.shape
+        self.inv_coord_map = {(-1, -1): '.'}
         oct_int = self.get_default_starting_octave()
-        self.INVERSE_CHROMATIC_SCALE_DICT = {self.CHROMATIC_SCALE_DICT[k]:k for k in reversed(OrderedDict(self.CHROMATIC_SCALE_DICT))}
-        self.MAJOR_NOTES = ['C', 'D', 'E', 'F', 'G', 'A', 'B']
-        #self.MAJOR_NOTES = list(OrderedDict({k:None for k in [k.strip('#').strip('b') for k in self.CHROMATIC_SCALE_DICT.keys()]}).keys())
-        
-        self.inverse_position_map = {}
-        for i in range(self.get_row_count()):
-            for j in range(self.get_column_count()):
+        for i in range(0,shape[0]):
+            for j in range(0,shape[1]):
                 (quotient, remainder) = divmod(i*self.get_column_count()+j, len(self.MAJOR_NOTES))
                 note_name = self.MAJOR_NOTES[remainder]
                 oct_str = str(oct_int + quotient) if (oct_int + quotient) > 1 else ''
-                self.inverse_position_map[(i,j)] = note_name + oct_str
-
-        # Compile regexes for notes to save before using
-        self.note_name_with_octave_regex = re.compile(r'([ABCDEFGabcdefg][b#♭♯]?\d)')
-        self.note_name_regex = re.compile(r'([ABCDEFGabcdefg][b#♭♯]?)')
-        self.single_note_name_regex = re.compile(r'(\b[ABCDEFGabcdefg][b#♭♯]?\d?\b)')
-        self.note_octave_regex = re.compile(r'\d')
-        self.not_note_name_regex = re.compile(r'[^ABCDEFGabcdefgb#♭♯]+')
-        self.not_octave_regex = re.compile(r'[^\d]+')
+                self.inv_coord_map[(i,j)] = note_name + oct_str
 
     def sanitize_note_name(self, note_name):
         # make sure the first letter of the note is uppercase, for english note's dictionary keys
@@ -41,8 +49,9 @@ class English(noteparser.NoteParser):
     def get_note_from_coordinate(self, coord):
 
         try:
-            note = self.inverse_position_map[coord]
+            note = self.inv_coord_map[coord]
         except KeyError:
             note = 'X'
 
         return note
+

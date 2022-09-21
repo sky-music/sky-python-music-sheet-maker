@@ -67,7 +67,8 @@ class MusicTheory():
                                     good_notes[idx] += sum(
                                         [int(note in possible_parsers[idx].chords.keys()) for note in notes])
                                 else:
-                                    _, notes = song_parser.split_chord(chord, possible_parsers[idx])
+                                    _, chord = song_parser.split_repeat(chord)
+                                    notes = song_parser.split_chord(chord, possible_parsers[idx])
                                     good_notes[idx] += sum(
                                         [int(possible_regex[idx].match(note) is not None) for note in notes if
                                          note != song_parser.pause])
@@ -129,7 +130,7 @@ class MusicTheory():
         not_note_regex = note_parser.not_note_name_regex
 
         try:           
-            chromatic_dict = note_parser.CHROMATIC_SCALE_DICT
+            chromatic_dict = note_parser.get_chromatic_scale()
             if not chromatic_dict:
                 return None #When case note_parser is undefined, default chromatic_dict is empty
         except AttributeError:

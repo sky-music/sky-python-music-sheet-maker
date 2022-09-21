@@ -7,6 +7,7 @@ class JsonSongParser(song_parser.SongParser):
     """
     For parsing a text format into a Song object
     """
+    LAYERS_BINMAP = {'100':1, '001':2, '010':2, '011':2, '111':3, '110':3, '111':3,'0000':1, '0010':2, '0110':2, '0100':2, '1010':3, '1000':1, '1110':3, '1100':3, '0001':2,'0011':2, '0111':2,'0101':2, '1011':3, '1001':1, '1111':3, '1101':3}
 
     def __init__(self, maker, instrument_type=Resources.DEFAULT_INSTRUMENT, silent_warnings=True):
 
@@ -60,9 +61,8 @@ class JsonSongParser(song_parser.SongParser):
         
         return json_dict
 
-    def convert_to_old_format(self, columns, bpm):
+    def parse_columns(self, columns, bpm):
         
-        LAYERS_BINMAP = {'100':1, '001':2, '010':2, '011':2, '111':3, '110':3, '111':3,'0000':1, '0010':2, '0110':2, '0100':2, '1010':3, '1000':1, '1110':3, '1100':3, '0001':2,'0011':2, '0111':2,'0101':2, '1011':3, '1001':1, '1111':3, '1101':3}
         SILENCE = -1
         tempo_changers = [1, 1/2, 1/4, 1/8]
         bpm_ms = int(60000/bpm)
@@ -76,7 +76,7 @@ class JsonSongParser(song_parser.SongParser):
             if col[1]:
                 for note in col[1]:
                     try:
-                        LAYERS_BINMAP[note[1]]
+                        self.LAYERS_BINMAP[note[1]]
                         is_hex = False
                     except KeyError:
                         is_hex = True
@@ -103,7 +103,7 @@ class JsonSongParser(song_parser.SongParser):
             note_dicts = []
             for notei in note_indices:
                 if notei != SILENCE:
-                    note_dicts += [{'time':elapsed_time, 'key':str(layer if is_hex else LAYERS_BINMAP[layer])+"Key"+str(notei)}]
+                    note_dicts += [{'time':elapsed_time, 'key':str(layer if is_hex else self.LAYERS_BINMAP[layer])+"Key"+str(notei)}]
                 elapsed_time += round(bpm_ms*tempo_changer)
             
             if note_dicts:
@@ -117,6 +117,24 @@ class JsonSongParser(song_parser.SongParser):
         for note in songNotes:   
             layer = self.note_parser.get_layer(note['key'],default='1')
             layered_notes[layer] = layered_notes.get(layer,[]) + [note]
+        
+        return layered_notes
+
+    def parse_recorded(self, notes):
+        layered_notes = {}
+        if not notes: return layered_notes
+        try:
+            layer = self.LAYERS_BINMAP[notes[0][2]]
+            is_hex = False
+        except KeyError:
+            layer = int('0x'+notes[0][2],16)
+            is_hex = True
+        
+        note_dicts = []
+        for note in notes:
+            note_dicts += [{'time':note[1], 'key':str(layer)+"Key"+str(note[0])}]
+        
+        layered_notes[layer] = note_dicts
         
         return layered_notes
         
@@ -175,7 +193,9 @@ class JsonSongParser(song_parser.SongParser):
         instr_names = iter([instr.get("name","") for instr in instruments])
         
         if 'columns' in json_dict:
-            layered_notes = self.convert_to_old_format(json_dict['columns'], bpm)
+            layered_notes = self.parse_columns(json_dict['columns'], bpm)
+        elif 'notes' in json_dict:
+            layered_notes = self.parse_recorded(json_dict['notes'])
         elif 'songNotes' in json_dict:
             layered_notes = self.sort_by_layer(json_dict['songNotes'])
         elif 'tracks' in json_dict:
@@ -217,7 +237,7 @@ class JsonSongParser(song_parser.SongParser):
             # self.icon_delimiter.join(icons)
             #merge icons into a string
             
-            if len(layered_notes) > 1:
+            if layered_notes:
                 try:
                     instr_name = next(instr_names)
                 except StopIteration:

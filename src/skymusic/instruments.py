@@ -31,7 +31,7 @@ class Skygrid():
         where each key is the note position (tuple of row/index),
         the value is a dictionary with key=frame, value=True/False,
         where True/False means whether the note is played or not.
-        The dictionarybis is sparse:
+        The dictionary is sparse:
         - Inactive notes are not in the dictionary at all
         - Inactive frames are not in the keys of the value dict, so in principle {0:False} should not exist
         Full Example: {(0,0):{0:True}, (1,1):{0:True}}

@@ -2,9 +2,9 @@ from . import english
 
 class EnglishChords(english.English):
 
-    def __init__(self, **kwargs):
+    def __init__(self, *args, **kwargs):
 
-        super().__init__(**kwargs)
+        super().__init__(*args, **kwargs)
         
         oct_int = self.get_default_starting_octave()
         if oct_int > 1:
@@ -12,6 +12,7 @@ class EnglishChords(english.English):
         else:
             x = ""
         y = str(oct_int + 1)
+        z = str(oct_int + 2)
 
         self.chords = {
             'C': f"C{x}E{x}G{x}", 'D': f"D{x}A{x}", 'F': f"F{x}A{x}C{y}", 'G': f"G{x}B{x}D{y}",
@@ -24,13 +25,18 @@ class EnglishChords(english.English):
             'D7sus{x}': f"D{x}G{x}A{x}C{y}", 'E7sus{x}': f"E{x}A{x}B{x}D{y}",
             'G7sus{x}': f"G{x}C{y}D{y}F{y}", 'A7sus{x}': f"A{x}D{y}E{y}G{y}",
             'C6': f"C{x}E{x}G{x}A{x}", 'F6': f"F{x}A{x}C{y}D{y}", 'Fmaj6': f"F{x}A{x}C{y}D{y}", 'G6': f"G{x}B{x}D{y}E{y}",
-            'G7': f"G{x}B{x}D{y}F{y}", 'G9': f"G{x}B{x}D{y}F{y}A{y}",
+            'G7': f"G{x}B{x}D{y}F{y}", 'G9': f"G{x}B{x}D{y}F{y}A{y}",'G13': f"G{x}B{x}D{y}F{y}A{y}C{z}E{z}",
+            'Gadd9': f"G{x}B{x}D{y}A{y}",
+            'Gadd2': f"G{x}A{x}B{x}D{y}",
+            'Gadd4': f"G{x}B{x}C{y}D{y}",
+            'Gadd11': f"G{x}B{x}D{y}C{y}",
             'Cmaj7': f"C{x}E{x}G{x}B{x}", 'Fmaj7': f"F{x}A{x}C{y}E{y}",
             'Cmaj9': f"C{x}E{x}G{x}B{x}D{y}", 'Fmaj9': f"F{x}A{x}C{y}E{y}G{y}",
-            'Cmaj11': f"C{x}E{x}G{x}B{x}D{y}F{y}", 'Dm6': f"D{x}F{x}A{x}B{x}",
+            'Cmaj11': f"C{x}E{x}G{x}B{x}D{y},F{y}", 'Cmaj13': f"C{x}E{x}G{x}B{x}D{y}A{y},F{y}", 'Dm6': f"D{x}F{x}A{x}B{x}",
             'Dm7': f"D{x}F{x}A{x}C{y}", 'Em7': f"E{x}G{x}B{x}D{y}", 'Am7': f"A{x}C{y}E{y}G{y}",
             'Dm9': f"D{x}F{x}A{x}C{y}E{y}", 'Am9': f"A{x}C{y}E{y}G{y}B{y}",
-            'Dm11': f"D{x}F{x}A{x}C{y}E{y}G{y}", 'Am11': f"D{x}A{x}C{y}E{y}G{y}B{y}",
+            'Dm11': f"D{x}F{x}A{x}C{y}E{y}G{y}", 'Dm13': f"D{x}F{x}A{x}C{y}E{y}G{y}B{z}",
+             'Am11': f"D{x}A{x}C{y}E{y}G{y}B{y}",
             'Cmaj': f"C{x}E{x}G{x}", 'Dmaj': f"D{x}A{x}", 'Fmaj': f"F{x}A{x}C{y}", 'Gmaj': f"G{x}B{x}D{y}",
             'Aaug': f"A{x}C{y}F{y}", 'Csus': f"C{x}F{x}G{x}", 'Dsus': f"D{x}G{x}A{x}",
             'Esus': f"E{x}A{x}B{x}", 'Gsus': f"G{x}C{y}D{y}", 'Asus': f"A{x}D{y}E{y}",
@@ -47,7 +53,7 @@ class EnglishChords(english.English):
         chord = self.sanitize_chord_name(chord)
         try:
             return self.chords[chord]
-        except:
+        except KeyError:
             return chord
 
     def sanitize_chord_name(self, chord):
@@ -57,3 +63,4 @@ class EnglishChords(english.English):
     def calculate_coordinate_for_note(self, note, song_key='C', note_shift=0, is_finding_key=False):
 
         return self.helper_parser.calculate_coordinate_for_note(note, song_key, note_shift, is_finding_key)
+        

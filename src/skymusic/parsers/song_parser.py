@@ -169,9 +169,9 @@ class SongParser:
         if self.note_parser is not None: return self.note_parser
         if input_mode is None: input_mode = self.input_mode
         
-        (rows, columns) = self.get_instrument_type().get_instrument().get_shape()
-        note_parser = input_mode.get_note_parser(locale=self.locale)
-        note_parser.set_shape((rows, columns))
+        shape = self.get_instrument_type().get_shape()
+        note_parser = input_mode.get_note_parser(locale=self.locale, shape=shape)
+        #note_parser.set_shape(shape)
 
         return note_parser
 
@@ -203,17 +203,24 @@ class SongParser:
             else:
                 return icon.split(delimiter)
 
+    def split_repeat(self, chord):
+        """
+        Separates the chords from its repeat indicator
+        """
+        try:
+            repeat = int(re.split(re.escape(self.repeat_indicator), chord)[1])
+        except (IndexError, ValueError):
+            repeat = 1
+        else:
+            chord = re.split(re.escape(self.repeat_indicator), chord)[0]
+
+        return repeat, chord
+
     def split_chord(self, chord, note_parser=None):
         """
         A chord is a collection of notes glued together:  ['A1C2', 'F3D4', 'C#4B4', 'Gb3A2']
         This method splits each chord into a list of notes: [['A1',C2'], ['F3','D4'],...]
         """
-        try:
-            repeat = int(re.split(re.escape(self.repeat_indicator), chord)[1])
-            chord = re.split(re.escape(self.repeat_indicator), chord)[0]
-        except (IndexError, ValueError):
-            repeat = 1
-
         if note_parser is None: note_parser = self.note_parser
 
         try:
@@ -221,7 +228,7 @@ class SongParser:
         except AttributeError as err:
             self.__print_error__(err)
 
-        return repeat, chord
+        return chord
 
     def parse_chords(self, chords, song_key=Resources.DEFAULT_KEY, note_shift=0):
         """
@@ -242,16 +249,16 @@ class SongParser:
         is_chord_parser = hasattr(self.note_parser, 'decode_chord')
         skygrid = instruments.Skygrid(shape=self.note_parser.get_shape())
 
-
         for chord_idx, chord in enumerate(chords):
 
-            if is_chord_parser: chord = self.note_parser.decode_chord(chord)
-            repeat, chord = self.split_chord(chord)
+            repeat, chord = self.split_repeat(chord)
+            if is_chord_parser: chord = self.note_parser.decode_chord(chord) #Cmaj7': f"C{x}E{x}G{x}B{x}" 
+            notes = self.split_chord(chord)
             # Now the real chord has been split in notes (1 note = 1 list slot)
 
             harp_broken = False # No probllem detected yet, so the Harp is a priori OK
             harp_silent = True  # No note detected yet, so the Harp is a priori silent
-            for note in chord:  # Chord is a list of notes
+            for note in notes:  # Chord is a list of notes
                 note_broken = False
                 try:
                     if note == self.pause:

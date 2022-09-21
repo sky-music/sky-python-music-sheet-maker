@@ -5,16 +5,16 @@ from skymusic.resources import Resources
 class NoteParser:
     """
     A generic NoteParser for parsing notes of a chromatic/major scale, and turning them into the corresponding
-    coordinate on Sky's 3*5 piano.
+    coordinates in Sky's 3*5 piano (or in another instrument using set_shape)
     """
+    # Compile regexes for notes to save before using
+    # these regexes are used for validating whether an individual note is formatted correctly.
+    note_name_with_octave_regex = None
+    note_name_regex = None
+    note_octave_regex = None
 
-    def __init__(self, locale='en_US', start_octave=Resources.PARSING_START_OCTAVE):
-
-        self.locale = locale
-        self.shape = (3,5)
-
-        self.CHROMATIC_SCALE_DICT = None
-        self.SEMITONE_INTERVAL_TO_MAJOR_SCALE_INTERVAL_DICT = {
+    #CHROMATIC_SCALE = None
+    SEMITONE_INTERVAL_TO_MAJOR_SCALE_INTERVAL = {
             0: 0,  # 0 semitones means it’s the root note
             2: 1,  # 2 semitones means it’s a 2nd interval
             4: 2,  # 4 semitones means it’s a 3rd interval
@@ -24,27 +24,18 @@ class NoteParser:
             11: 6  # 11 semitones means it’s a 7th interval
         }
 
-        # Number of notes in the chromatic scale, and number of notes in a major scale
-        self.CHROMATIC_SCALE_COUNT = 12
-        self.BASE_OF_MAJOR_SCALE = 7
+    # Number of notes in the chromatic scale, and number of notes in a major scale
+    CHROMATIC_SCALE_COUNT = 12
+    BASE_OF_MAJOR_SCALE = 7
+
+    def __init__(self, locale='en_US', start_octave=Resources.PARSING_START_OCTAVE, shape=(3,5)):
+
+        self.locale = locale
+        self.shape = shape if shape else (3,5)#Can be overridden  by a call to set_shape. Only used to check bound
 
         # Specify the default starting octave of the harp, for instance 1 (C1 D1 E1 etc.), or 4 (C4 D4 E4).
         #Octave-less notes will be assigned to this octave, e.g. F == F1
         self.default_starting_octave = start_octave
-
-        # Compile regexes for notes to save before using
-        # these regexes are used for validating whether an individual note is formatted correctly.
-        self.note_name_with_octave_regex = None
-        self.note_name_regex = None
-        self.note_octave_regex = None
-
-    def get_chromatic_scale_dict(self): return self.CHROMATIC_SCALE_DICT
-
-    def get_inverse_chromatic_scale_dict(self): return self.INVERSE_CHROMATIC_SCALE_DICT
-
-    def get_semitone_interval_to_major_scale_interval_dict(self):  return self.SEMITONE_INTERVAL_TO_MAJOR_SCALE_INTERVAL_DICT
-
-    def get_chromatic_scale_count(self): return self.CHROMATIC_SCALE_COUNT
 
     def get_column_count(self): return self.shape[1]
 
@@ -52,7 +43,16 @@ class NoteParser:
 
     def get_shape(self): return self.shape
 
-    def set_shape(self, shape=(3,5)): self.shape = shape
+    def set_shape(self, shape=(3,5)): self.shape = shape if shape else (3,5)
+
+    def get_chromatic_scale(self): return self.CHROMATIC_SCALE
+
+    def get_inverse_chromatic_scale(self): return self.INVERSE_CHROMATIC_SCALE
+
+    def get_semitone_interval_to_major_scale_interval(self):  return self.SEMITONE_INTERVAL_TO_MAJOR_SCALE_INTERVAL
+
+    def get_chromatic_scale_count(self): return self.CHROMATIC_SCALE_COUNT
+
 
     def get_default_starting_octave(self): return self.default_starting_octave
 
@@ -116,9 +116,9 @@ class NoteParser:
             return notes_string
 
         try:
-            chromatic_value = native_parser.get_chromatic_scale_dict()[note_name]
-            foreign_dict = foreign_parser.get_chromatic_scale_dict()
-            foreign_note_name = list(foreign_dict.keys())[list(foreign_dict.values()).index(chromatic_value)]
+            chromatic_value = native_parser.get_chromatic_scale()[note_name]
+            foreign_scale = foreign_parser.get_chromatic_scale()
+            foreign_note_name = list(foreign_scale.keys())[list(foreign_scale.values()).index(chromatic_value)]
         except:
             foreign_note_name = foreign_parser.note_name_regex.match(str(note_name))
             if foreign_note_name is not None:
@@ -198,26 +198,26 @@ class NoteParser:
             # Error: note is not formatted right, output broken harp
             raise SyntaxError(f"ParsingError: Note {note_name} was not formatted correctly.")
 
-        chromatic_scale_dict = self.get_chromatic_scale_dict()
+        chromatic_scale = self.get_chromatic_scale()
 
-        if note_name in chromatic_scale_dict.keys():
-            return chromatic_scale_dict[note_name]
+        if note_name in chromatic_scale.keys():
+            return chromatic_scale[note_name]
         else:
             raise KeyError(f"ParsingError: Note {note_name} was not found in the chromatic scale.")
 
     def convert_chromatic_position_into_note_name(self, chromatic_position):
         
-        inverse_chromatic_scale_dict = self.get_inverse_chromatic_scale_dict()
+        inverse_chromatic_scale = self.get_inverse_chromatic_scale()
 
         try:
-            return inverse_chromatic_scale_dict[chromatic_position]
+            return inverse_chromatic_scale[chromatic_position]
         except KeyError:
             raise KeyError(f"ParsingError: Chromatic position {chromatic_position} was not found in the inverse chromatic scale.")        
         
 
     def convert_semitone_interval_to_major_scale_interval(self, semitone_interval):
 
-        conversion_dict = self.get_semitone_interval_to_major_scale_interval_dict()
+        conversion_dict = self.get_semitone_interval_to_major_scale_interval()
 
         if semitone_interval in conversion_dict.keys():
             return conversion_dict[semitone_interval]
@@ -231,7 +231,7 @@ class NoteParser:
         For a note in the format self.note_name_with_octave_regex, this method returns the corresponding coordinate
         on the Sky piano (in the form of a tuple)
 
-        song_key will be determined by the find_keys method, and is expected to match CHROMATIC_SCALE_DICT,
+        song_key will be determined by the find_keys method, and is expected to match CHROMATIC_SCALE,
         otherwise the default key will be C. note_shift is the variable set by the user.
 
         When this method is being used to find the key, `is_finding_key` should be set to True.
@@ -328,7 +328,7 @@ class NoteParser:
 
     def sanitize_note_name(self, note_name):
 
-        # Do any work here to sanitize the note_name so that it matches the keys of self.CHROMATIC_SCALE_DICT
+        # Do any work here to sanitize the note_name so that it matches the keys of self.CHROMATIC_SCALE
 
         return note_name
 

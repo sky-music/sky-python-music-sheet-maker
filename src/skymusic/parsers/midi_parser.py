@@ -18,7 +18,11 @@ class MidiSongParser:
     def __init__(self, maker, silent_warnings=True):
         self.maker = maker
         self.silent_warnings = silent_warnings
-        self.note_parser = InputMode.MIDI.get_note_parser()
+        try:
+            shape = maker.get_song_parser().get_instrument_type().get_shape()
+        except AttributeError:
+            shape = None
+        self.note_parser = InputMode.MIDI.get_note_parser(shape=shape)
         self.music_theory = music_theory.MusicTheory(self)
         
         root_note = self.note_parser.convert_chromatic_position_into_note_name(0)
