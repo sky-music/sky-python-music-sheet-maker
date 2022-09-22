@@ -1,29 +1,111 @@
 import re
 from skymusic import notes
 
-'''
+
 class Skygrid():
     
-    def __init__(self, size=(3,5)):
+    def __init__(self, shape=(3,5)):
         
-        self.size = size
-        self.skygrid = {}
+        self.shape = shape #rows*columns, excluding negative coordinates, reserved for silences
+        self.grid = {}
+        self.frame_count = 0
+        self.num_highlighted = None
+
+    def get_row_count(self):
+        return self.shape[0]
+
+    def get_column_count(self):
+        return self.shape[1]
+
+    def get_shape(self):
+        return self.shape
+
+    def set_note(self, coord, frame=None, highlighted=True):
         
-    def reset(self):
-'''
+        frames = [frame] if frame is not None else range(0,max(1,self.get_frame_count()))
+        for frame in frames: self.grid[coord] = {frame: highlighted}        
+
+    def get_grid(self, frame=None):
+        """
+        Returns the dictionary for the instrument:
+        where each key is the note position (tuple of row/index),
+        the value is a dictionary with key=frame, value=True/False,
+        where True/False means whether the note is played or not.
+        The dictionary is sparse:
+        - Inactive notes are not in the dictionary at all
+        - Inactive frames are not in the keys of the value dict, so in principle {0:False} should not exist
+        Full Example: {(0,0):{0:True}, (1,1):{0:True}}
+        0 frame is the normal frame
+        >1 frames are for notes of a triplet or quaver
+        """
+        if frame is None:
+            return self.grid
+        else:
+            if frame < 0 or frame > self.get_frame_count()-1:
+                return None
+            else:
+                #return {coord:frames for coord,frames in self.grid.items() if frame in list(filter(lambda k:frames[k] is True, frames))}
+                return {coord:frames for coord,frames in self.grid.items() if frame in frames.keys()}
+
+    def get_num_highlighted(self):
+        '''Returns the number of highlighted notes, whatever the frame'''
+        if self.num_highlighted is None:
+            num = 0
+            for coord in self.grid.keys():
+                for frame in self.grid[coord].keys():
+                    if self.grid[coord][frame]:
+                        num += 1
+            self.num_highlighted = num
+        
+        return self.num_highlighted
+
+    def get_frame_count(self):
+        '''Returns the number of frames'''
+        if not self.frame_count:        
+            frame_counts = [max(list(self.grid[coord].keys()))+1 for coord in self.grid.keys()]
+            if frame_counts:
+                self.frame_count = max(frame_counts)
+            else:
+                self.frame_count = 0
+            
+        return self.frame_count 
+  
+    def get_highlighted_frames(self, note_coord):
+        '''Returns a list of frame numbers in which the note at coord is highlighted'''
+        try:
+            note_frames = self.grid[note_coord]  # Is note at 'position' highlighted or not
+            highlighted_frames = [frame_index for frame_index in note_frames.keys()]
+        except KeyError:  # Note is not in the grid dictionary: so it is not highlighted
+            highlighted_frames = []
+        return highlighted_frames
+
+
+    def get_highlighted_coords(self, frame=None):
+        '''Returns a list of coordinates of highlighted notes, only in the specified frame'''   
+        #grid = instrument.get_grid(frame)
+        highlighted_coords = []
+        frames = [frame] if frame is not None else range(0,self.get_frame_count())
+        #grid = self.get_grid(frame)
+        if self.grid:
+            for frame in frames:
+                for coord in self.grid:  # Cycle over (row, col) positions in an icon
+                    highlighted = self.grid[coord].get(frame,False)  # Button is highlighted
+                    if highlighted: highlighted_coords += [coord]
+        return highlighted_coords
+        
+        
 
 TEXT = ['voice','lyric']
 HARPS = ['harp','drum']
 
 class Instrument():
 
+    type = 'GenericInstrument'
     def __init__(self):
-        self.type = 'undefined'
         self.repeat = 1
         self.index = 0
         self.is_silent = True
         self.is_broken = False
-        self.num_highlighted = None
 
     def get_type(self):
         return self.type
@@ -32,44 +114,43 @@ class Instrument():
         self.repeat = repeat
 
     def get_repeat(self):
-        """Returns the number of times the instrument must be played"""
+        '''Returns the number of times the instrument must be played'''
         return self.repeat
 
     def set_index(self, index):
         self.index = index
 
     def get_index(self):
-        """Instrument index in the song"""
+        '''Instrument index in the song'''
         return self.index
 
     def get_is_silent(self):
-        """Returns whether the Harp is empty of notes (silent)"""
+        '''Returns whether the Harp is empty of notes (silent)'''
         return self.is_silent
 
     def get_is_broken(self):
-        """Returns whether the Harp is broken (notes were not recognized by the Parser)"""
+        '''Returns whether the Harp is broken (notes were not recognized by the Parser)'''
         return self.is_broken
     
     def get_is_dead(self):
-        
+        '''Returns whether the instrument is broken (=its skygrid contains invalid notes)'''
         return self.get_is_broken()
 
     def set_is_broken(self, is_broken=True):
-        """Returns a boolean whether the harp could be translated"""
+        '''Returns a boolean whether the harp could be translated'''
         self.is_broken = is_broken
 
     def set_is_silent(self, is_silent=True):
-        """Returns a boolean whether the harp is empty in this frame"""
+        '''Returns a boolean whether the harp is empty in this frame'''
         self.is_silent = is_silent
 
 
 class Voice(Instrument):  # Lyrics or comments
-
+    type = 'voice'
+    TAG_RE = re.compile(r'<[^>]+>')
     def __init__(self):
         super().__init__()
-        self.type = 'voice'
         self.lyric = ''
-        self.TAG_RE = re.compile(r'<[^>]+>')
         self.emphasis = None
 
     def get_lyric(self, strip_html=False):
@@ -105,81 +186,24 @@ class Voice(Instrument):  # Lyrics or comments
 
 
 class Harp(Instrument):
-
+    '''Any harmonic instrument with a 3x5 grid'''
+    type = 'harp'
+    shape = (3, 5)
     def __init__(self):
         super().__init__()
-        self.type = 'harp'
-        self.column_count = 5
-        self.row_count = 3
-        self.skygrid = {}
-        self.frame_count = 0
-
-    def get_row_count(self):
-        return self.row_count
-
-    def get_column_count(self):
-        return self.column_count
-
-    def get_shape(self):
-        return (self.row_count, self.column_count)
-
-    def set_skygrid(self, skygrid):
-        self.skygrid = skygrid
-
-    def get_skygrid(self, frame=None):
-        """
-        Returns the dictionary for the instrument:
-        where each key is the note position (tuple of row/index),
-        the value is a dictionary with key=frame, value=True/False,
-        where True/False means whether the note is played or not.
-        Inactive notes are actually not in the dictionary at all.
-        Example: {(0,0):{0:True}, (1,1):{0:True}}
-        """
-        if frame is None:
-            return self.skygrid
-        else:
-            if frame < 0 or frame > self.get_frame_count()-1:
-                return None
-            else:
-                #return {coord:frames for coord,frames in self.skygrid.items() if frame in list(filter(lambda k:frames[k] is True, frames))}
-                return {coord:frames for coord,frames in self.skygrid.items() if frame in frames.keys()}
+        self.skygrid = Skygrid(shape=self.shape)
         
-
-    def get_num_highlighted(self):
-        if self.num_highlighted is None:
-            num = 0
-            for coord in self.skygrid.keys():
-                for frame in self.skygrid[coord].keys():
-                    if self.skygrid[coord][frame]:
-                        num += 1
-            self.num_highlighted = num
-        
-        return self.num_highlighted
+    def __getattr__(self, attr_name):
+        return getattr(self.skygrid, attr_name)
 
     def get_is_dead(self):
-        
         return self.get_is_broken() and self.get_num_highlighted() == 0
 
-    def get_frame_count(self):
-        
-        if not self.frame_count:
-            
-            frame_counts = [max(list(self.skygrid[coord].keys()))+1 for coord in self.skygrid.keys()]
-            if frame_counts:
-                self.frame_count = max(frame_counts)
-            else:
-                self.frame_count = 0
-            
-        return self.frame_count    
-
-    def get_dimensions(self):
-        return (self.row_count, self.column_count)
-
     def get_aspect_ratio(self):
-        return self.column_count/self.row_count
+        return self.shape[1]/self.shape[0]
 
     def __len__(self):
-        return self.column_count * self.row_count
+        return self.shape[1] * self.shape[0]
 
     def __str__(self):
         if self.get_is_dead():
@@ -189,21 +213,23 @@ class Harp(Instrument):
         else:
             broken = ''
         silent = ' broken' if self.get_is_silent() else ''
-        return f'<{self.type}-{self.index}, {self.get_row_count()}*{self.get_column_count()}, {self.get_num_highlighted()} ON, repeat={self.repeat}, {broken}{silent}>'
-        
+        return f'<{self.type}-{self.index}, {self.get_row_count()}*{self.get_column_count()}, {self.get_num_highlighted()} ON, repeat={self.repeat}, {broken}{silent}>'       
 
     def get_note_from_position(self, pos):
-        """Returns the note type Root, Diamond, Circle from the position in Sky grid"""
+        '''Returns the note type Root, Diamond, Circle from the position in Sky grid'''
         # Calculate the note's overall index in the harp (0 to 14)              
         
         return notes.Note(self, pos)
-        
+
+    def set_skygrid(self, skygrid):
+        if self.shape != skygrid.shape:
+            raise ValueError(f"Skygrid shape {skygrid.shape} is not equal to instrument shape {self.shape}")
+        self.skygrid = skygrid        
 
 class Drum(Harp):
-    
+    type = 'drum'
+    shape = (2,4)
     def __init__(self):
         super().__init__()
-        self.type = 'drum'
-        self.column_count = 4
-        self.row_count = 2
+        self.skygrid = Skygrid(shape=self.shape)
     

@@ -4,7 +4,7 @@
 Created on Fri Nov 22 20:39:43 2019
 A dev file to transpose in the chromatic scale
 @author: jmmelko
-THIS SCRIPTS IS COMPLETELY OBSOLETE AND SHOULD BE REWRITTEN
+THIS SCRIPTS DOES NOT WORK WITH PIANO OR GUITARD CHORDS, e.g. Asus7, Dm, Cmaj
 """
 if __name__ == '__main__':    
     import os, sys
@@ -37,7 +37,8 @@ def parse_chords(song_parser, chords, note_shift=0, song_jet='C'):
     splitted_chords = []
     n = len(dodeca_sharps)
     for chord_idx, chord in enumerate(chords):
-        repeat, chord = song_parser.split_chord(chord)
+        repeat, chord = song_parser.split_repeat(chord)
+        chord = song_parser.split_chord(chord)
         for idx_in_chord, note in enumerate(chord):  # Chord is a list of notes
             if note_shift != 0:
                 try:

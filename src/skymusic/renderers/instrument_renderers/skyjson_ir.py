@@ -32,11 +32,9 @@ class SkyjsonInstrumentRenderer(instrument_renderer.InstrumentRenderer):
             dt = Resources.SKYJSON_CHORD_DELAY/max([instrument.get_num_highlighted(),5])
             
             for frame in range(instrument.get_frame_count()):
-                skygrid = instrument.get_skygrid(frame)                
-                if skygrid:                
-                    for coord in skygrid:  # Cycle over positions in a frame
-                        if skygrid[coord][frame]:  # Button is highlighted
-                            json_render += [{'time':int(time), 'key':self.note_parser.get_note_from_coordinate(coord,layer)}]
+                coords = instrument.get_highlighted_coords(frame)
+                if coords:
+                    json_render += [{'time':int(time), 'key':self.note_parser.get_note_from_coordinate(coord,layer)} for coord in coords]
                     time = time + dt
                         
         return json_render
@@ -52,12 +50,10 @@ class SkyjsonInstrumentRenderer(instrument_renderer.InstrumentRenderer):
             notes = []
         else:
             for frame in range(instrument.get_frame_count()):
-                skygrid = instrument.get_skygrid(frame)                
-                if skygrid:                
-                    for coord in skygrid:  # Cycle over positions in a frame
-                        if skygrid[coord][frame]:  # Button is highlighted
-                            notes.append(self.note_parser.get_note_from_coordinate(coord,layer_index, version='new'))
-        #TODO: convert layer to hex string
+                coords = instrument.get_highlighted_coords(frame)              
+                if coords:      
+                    notes += [self.note_parser.get_note_from_coordinate(coord,layer_index, version='new') for coord in coords]
+       
         return notes  
 
     def render_voice(self, *args, **kwargs):   

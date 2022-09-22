@@ -7,7 +7,7 @@
 #Pauses:
 2b 0 3b 0 0 4
 #Repetitions:
-2b*2 3b*14 .*2 4*1 .*1
+2b*2 3b*14 0*2 4*1 0*1
 #Errors:
 X + - : 0 1-2 9
 #Out of range #notes:

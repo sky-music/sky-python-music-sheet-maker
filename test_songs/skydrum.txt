@@ -1,0 +1,16 @@
+#All Notes:
+A1 A2 A3 A4 B1 B2 B3 B4
+#Chords:
+A1A2 A3A4B3
+#Some quavers #and chords:
+A1-A2-A3-A4 B1-B2B3
+#Pauses:
+A1 . A2 . . A3
+#Repetitions:
+A1*2 A2*14 .*2 A3*1 .*1
+# typos:
+X + 0 a
+#out of #range:
+A5 C1
+#lowercase and #multiple spaces:
+   a1-a2-a3-a4  b1-B2b3

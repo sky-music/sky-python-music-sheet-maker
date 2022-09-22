@@ -28,27 +28,27 @@ class SvgNoteRenderer(note_renderer.NoteRenderer):
                 highlighted_classes = [f'r{row+1 :d}']
             else:
                 highlighted_classes = [f'q{frame :d}' for frame in highlighted_frames]
-        except KeyError:  # Note is not in the skygrid dictionary: so it is not highlighted
+        except KeyError:  # highlighted_frames==[]: note is not highlighted
             highlighted_classes = []
 
-        if note.instrument_is_broken and ((row, col) == note.get_middle_position()):           
+        if note.instrument.get_is_broken() and ((row, col) == note.get_middle_position()):           
             highlighted_classes = []
             # Draws a special symbol when harp is broken
             note_core_render = self.get_harpbroken_svg(xs, ys, widths)
             
-        elif note.instrument_is_silent and ((row, col) == note.get_middle_position()):            
+        elif note.instrument.get_is_silent() and ((row, col) == note.get_middle_position()):            
             highlighted_classes = []
             # Draws a special symbol when harp is silent
             note_core_render = self.get_silentsymbol_svg(xs, ys, widths)
             
         else:
             
-            if note.instrument_is_broken:
+            if note.instrument.get_is_broken():
                 # Draws a small button (will be grey thanks to CSS)
                 highlighted_classes = []
                 note_core_render = self.get_nonote_svg()              
                 
-            elif note.instrument_is_silent:                
+            elif note.instrument.get_is_silent():                
                 # Draws a small button (will be grey thanks to CSS)
                 highlighted_classes = []
                 note_core_render = self.get_nonote_svg()               

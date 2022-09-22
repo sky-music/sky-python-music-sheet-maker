@@ -105,6 +105,10 @@ class InstrumentType(Enum):
         self.short_desc_yaml = short_desc_yaml
         self.long_desc_yaml = long_desc_yaml
         self.instrument_class = instrument_class
+        try:
+            self.shape = self.instrument_class.shape
+        except AttributeError:
+            self.shape = None
 
     def __str__(self, locale='en_US'):
         return self.get_short_desc(locale)
@@ -118,6 +122,9 @@ class InstrumentType(Enum):
     def get_instrument(self):
         return self.instrument_class()
 
+    def get_shape(self):
+        return self.shape
+        
 
 class AspectRatio(Enum):
     WIDESCREEN = ("aspect_ratio/widescreen/short_desc", 16/9.0)

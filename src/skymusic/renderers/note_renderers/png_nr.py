@@ -64,7 +64,7 @@ class PngNoteRenderer(note_renderer.NoteRenderer):
         
         note_position = note.get_position()
 
-        if not note.instrument_is_broken and not note.instrument_is_silent:
+        if not note.instrument.get_is_broken() and not note.instrument.get_is_silent():
             if not note.is_highlighted():
                 # Draws a small button (will be colored thanks to CSS)
                 png_render = self.get_unhighlighted_png(note_position)

@@ -127,7 +127,7 @@ class MusicSheetMaker:
         """
         Default function to call in case no one else is found.
         """
-        if 'communicator' in self.__dict__.keys():
+        if hasattr(self, 'communicator'):
             return getattr(self.communicator, attr_name)
         else:
             raise AttributeError(f"type object '{type(self).__name__}' has no attribute 'communicator'")
