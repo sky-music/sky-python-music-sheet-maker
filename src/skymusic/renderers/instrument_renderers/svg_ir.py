@@ -85,7 +85,8 @@ class SvgInstrumentRenderer(instrument_renderer.InstrumentRenderer):
 
         # The harp rectangle with rounded edges
         #harp_render += f'<rect x="0.7%" y="0.7%" width="98.6%" height="98.6%" rx="7.5%" ry="{7.5 * aspect_ratio :.2f}%" class="{instrument.get_type()} {instrument.get_type()}-{instrument.get_index()}"/>'
-        harp_render += '\n<use xlink:href="#instr" />'
+        if not instr_broken and not instr_silent:
+            harp_render += '\n<use xlink:href="#instr" />'
 
         for row in range(instrument.get_row_count()):
             harp_render += '\n'

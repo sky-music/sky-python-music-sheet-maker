@@ -8,6 +8,7 @@ class JsonSongParser(song_parser.SongParser):
     For parsing a text format into a Song object
     """
     LAYERS_BINMAP = {'100':1, '001':2, '010':2, '011':2, '111':3, '110':3, '111':3,'0000':1, '0010':2, '0110':2, '0100':2, '1010':3, '1000':1, '1110':3, '1100':3, '0001':2,'0011':2, '0111':2,'0101':2, '1011':3, '1001':1, '1111':3, '1101':3}
+    JOIN_LAYERS = True
 
     def __init__(self, maker, instrument_type=Resources.DEFAULT_INSTRUMENT, silent_warnings=True):
 
@@ -61,50 +62,84 @@ class JsonSongParser(song_parser.SongParser):
         
         return json_dict
 
-    def parse_columns(self, columns, bpm):
+    def parse_columns(self, columns, bpm, layer_names=[]):
         
         SILENCE = -1
+        MAX_LAYERS = 100
+        LAYER_START = 1 #Not 0
         tempo_changers = [1, 1/2, 1/4, 1/8]
         bpm_ms = int(60000/bpm)
         elapsed_time0 = 100
+        TEMPO_IDX = 0 #tempo_changer position in column array
+        CHORD_IDX = 1 #chord position in column array
+        LAYER_IDX = 1 #layer string position in chord array
+        NOTE_IDX = 0 #note number position in chord array
+        
+        #Creates a dictionary of mapping consecutive identical instruments names to the first one
+        joint_layers = {}
+        if JsonSongParser.JOIN_LAYERS:
+            prev_name = ""
+            j = 0
+            for i, name in enumerate(layer_names):
+                if name == prev_name and i>=1:
+                    joint_layers[str(i+LAYER_START)] = str(j+LAYER_START)
+                else:
+                    j = i
+                prev_name = name
+        
         
         layered_notes = {}
-        
+ 
         #Detects layer format: hex string or binary string
         #the loops ensure that we process non empty items
         for col in columns:
-            if col[1]:
-                for note in col[1]:
+            if col[CHORD_IDX]:
+                for note in col[CHORD_IDX]:
                     try:
-                        self.LAYERS_BINMAP[note[1]]
+                        self.LAYERS_BINMAP[note[LAYER_IDX]]
                         is_hex = False
                     except KeyError:
                         is_hex = True
                     break
         
-        layers = {str(k):[] for k in range(1,100)} # Layers start at 1 in SkyStudio and Specy's SkyMusic
-        
-        for col in columns:
-            tempo_changer = tempo_changers[col[0]]
+        layers = {str(k):[] for k in range(LAYER_START,MAX_LAYERS-LAYER_START)} # Layers start at 1 in SkyStudio and Specy's SkyMusic
+        #layers = {"1": [1,[6,11]], "2": [3,6,9], ...}
+
+        #JSON structure:
+        #column = [tempo_changer, chord]
+        #chord = [note, note, note]
+        #note = [index, "layer"]
             
-            if not col[1]: #no notes
-                for layer in layers: layers[layer] += [SILENCE]
+        for col in columns:
+            tempo_changer = tempo_changers[col[TEMPO_IDX]]
+            
+            if not col[CHORD_IDX]: #no notes
+                for layer in layers: layers[layer].append([SILENCE])
+            else:
+                visited_layers = set()
+                for i, note in enumerate(col[CHORD_IDX]):          
+                    layer = str(int('0x'+note[LAYER_IDX],16)) if is_hex else layers.get(note[LAYER_IDX],1)              
                     
-            #note = [index, "layer"]
-            for note in col[1]:          
-                layer = str(int('0x'+note[1],16)) if is_hex else layers.get(note[1],1)
-                layers[layer] += [note[0]]
+                    if layer in joint_layers: layer = joint_layers[layer]
+                    
+                    if layer in visited_layers:
+                        layers[layer][-1].append(note[NOTE_IDX]) #Continues last chord
+                    else:
+                        layers[layer].append([note[NOTE_IDX]]) #Creates a chords
+                    visited_layers.update(layer)
 
         #old format is 3Key4, 2Key14
-        #Layers start at 1
+        #Layers numbers start at LAYER_START=1
         #Notes start at 0
-        for layer, note_indices in layers.items():
+        #So first layer, first note is 1Key0
+        for layer, chords in layers.items():
             elapsed_time = elapsed_time0
             note_dicts = []
-            for notei in note_indices:
-                if notei != SILENCE:
-                    note_dicts += [{'time':elapsed_time, 'key':str(layer if is_hex else self.LAYERS_BINMAP[layer])+"Key"+str(notei)}]
-                elapsed_time += round(bpm_ms*tempo_changer)
+            for chord in chords:
+                for note in chord:
+                    if note != SILENCE:
+                        note_dicts += [{'time':elapsed_time, 'key':str(layer if is_hex else self.LAYERS_BINMAP[layer])+"Key"+str(note)}]
+                elapsed_time += round(bpm_ms*tempo_changer) #Increment time at next chord
             
             if note_dicts:
                 layered_notes[layer] = layered_notes.get(layer,[]) + note_dicts
@@ -179,6 +214,7 @@ class JsonSongParser(song_parser.SongParser):
             
         return note_interval
 
+
     def parse_layers(self, line):
         
         json_dict = self.load_dict(line)
@@ -190,10 +226,10 @@ class JsonSongParser(song_parser.SongParser):
         bpm = json_dict.get('bpm',220)
         
         instruments = json_dict.get('instruments',[])
-        instr_names = iter([instr.get("name","") for instr in instruments])
+        instr_names = [instr.get("name","") for instr in instruments]
         
         if 'columns' in json_dict:
-            layered_notes = self.parse_columns(json_dict['columns'], bpm)
+            layered_notes = self.parse_columns(json_dict['columns'], bpm, instr_names)
         elif 'notes' in json_dict:
             layered_notes = self.parse_recorded(json_dict['notes'])
         elif 'songNotes' in json_dict:
@@ -237,9 +273,16 @@ class JsonSongParser(song_parser.SongParser):
             # self.icon_delimiter.join(icons)
             #merge icons into a string
             
+            instr_names = iter(instr_names)
+            last_name = ""
+            instr_name = last_name
             if layered_notes:
                 try:
-                    instr_name = next(instr_names)
+                    if JsonSongParser.JOIN_LAYERS:
+                        while instr_name == last_name: instr_name = next(instr_names)
+                        last_name = instr_name
+                    else:
+                        instr_name = next(instr_names)
                 except StopIteration:
                     instr_name = ""
                 if instr_name:
