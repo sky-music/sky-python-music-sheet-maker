@@ -133,7 +133,7 @@ stock_queries:
       - Tapez "{repeat_indicator}" après un groupe de notes pour indiquer la répétition.
       - Les dièses "#" et les bémoles "b" (demi-tons) sont possibles pour les notations autres que Sky ABC-15.
       - Les paroles doivent être commencées et séparée par "{lyric_delimiter}"
-      - Les differents instruments sont séparés par "{layer_delimiter}", followed by layer name
+      - Les differents instruments sont séparés par "{layer_delimiter}", suivi du nom de la piste
       - Des lignes de séparations avec {ruler_delimiters}  
       
        /!\ Gardez vos notes dans un fichier texte pour pouvoir modifier la chanson plus tard ! /!\     
