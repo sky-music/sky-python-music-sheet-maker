@@ -417,7 +417,7 @@ class Query:
         valid_classes = self.reply_type.get_classes()
         if valid_classes:
             if not isinstance(limits[0], valid_classes):
-                raise InvalidQueryTypeError("incorrect limits type", limits[0], valid_classes)
+                raise InvalidQueryTypeError("incorrect limits type", limits[0], valid_classes[0])
         
         if self.reply_type == ReplyType.FILEPATH:
             if os.path.isdir(limits[0]):

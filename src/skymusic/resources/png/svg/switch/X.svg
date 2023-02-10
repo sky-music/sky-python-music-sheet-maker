@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="100" height="110" viewBox="0 0 100 110" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<style type="text/css">
+@import url('svg.css');
+</style>
+</defs>
+<circle class="sw-fill" cx="50" cy="55" r="50" />
+<path style="fill:white"  d="M 49.861264,60.161448 37.157415,78.736138 H 29.052392 L 45.882138,54.714612 29.05242,31.263994 h 8.104813 l 13.552041,18.493018 12.067841,-18.49315 h 8.170254 L 54.6884,55.203849 70.947608,78.736138 h -8.170589 z" />
+</svg>

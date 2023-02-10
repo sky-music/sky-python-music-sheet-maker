@@ -17,10 +17,10 @@ class AsciiInstrumentRenderer(instrument_renderer.InstrumentRenderer):
             ascii_render = Resources.DELIMITERS['pause']
         else:
 
-            for frame in range(instrument.get_frame_count()): #Cycle over triplets & quavers
+            for frame in instrument.get_highlighted_frames(): #Cycle over triplets & quavers
                 coords = instrument.get_highlighted_coords(frame)
                 if coords:
-                    ascii_render += "".join((note_parser.get_note_from_coordinate(coord) for coord in coords))
+                    ascii_render += "".join((note_parser.get_note_from_position(coord) for coord in coords))
                     if frame > 0: ascii_render += Resources.DELIMITERS['quaver']
             ascii_render = ascii_render.rstrip(Resources.DELIMITERS['quaver'])
             

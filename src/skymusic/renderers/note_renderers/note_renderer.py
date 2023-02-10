@@ -1,5 +1,5 @@
 class NoteRenderer:
-
+    
     def __init__(self):
         pass
 
@@ -16,9 +16,10 @@ class NoteRenderer:
         if note_index % 7 == 0:  # the 7 comes from the heptatonic scale of Sky's music (no semitones)
             # Note is a root note
             return 'root'
-        elif note_index % note.instrument.get_column_count() % 2 == 0:
+        elif note_index % note.instrument.get_num_columns() % 2 == 0:
             # Note is in an odd column, so it is a circle
             return 'circle'
         else:
             # Note is in an even column, so it is a diamond
             return 'diamond'
+

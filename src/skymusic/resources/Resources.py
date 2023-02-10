@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
-import io, os, importlib
+import io, os, importlib, re
 try:
     from importlib import resources as importlib_resources
 except ImportError:
     import importlib_resources
 from skymusic.resources import fonts, png, css, js, svg
+#from skymusic import modes
 
 def get_default_theme():
     global THEMES
@@ -19,29 +20,36 @@ def detect_themes():
     themes = [content for content in contents if os.path.isdir(os.path.join(css_dir, content))]
     return themes
 
-def load_theme(theme):
+def load_theme(theme, platform='mobile'):
     '''
     Loads CSS and PNG files as string and bytes buffers respectively, for a theme whose name 'theme' must be defined in the THEMES list
     '''
-    global PNGS, CSS, SVG, THEMES
-    global font_color, png_color, text_bkg, song_bkg, hr_color
+    global PNGS, CSS, SVG, THEMES, PNG_SETTINGS, BYPASS_GAMEPAD_PNG
     
     if theme not in THEMES:
-        load_theme(get_default_theme())
+        load_theme(get_default_theme(), 'mobile')
     elif THEMES[theme] is False:
         
-        png_module = importlib.import_module('.'+theme, png.__name__)
         
-        png_files = importlib_resources.contents(png_module)
+        if BYPASS_GAMEPAD_PNG:
+            png_module = importlib.import_module('.'+theme+'.'+platform.get_default().get_name(), png.__name__)       
+            png_files = importlib_resources.contents(png_module)  
+        else: 
+            png_module = importlib.import_module('.'+theme+'.'+platform.get_name(), png.__name__)       
+            png_files = importlib_resources.contents(png_module)        
+            
         
         if not png_files:
             print(f"\n*** ERROR: could not find any PNG file to embed from {png_module}. ***\n")   
         
         png_files = [file for file in png_files if os.path.splitext(file)[1] == '.png']
         
-        for png_file in png_files:
+        for png_file in png_files: #Populates the PNG dictionary using extension stripped filenames as keys
             PNGS[os.path.splitext(png_file)[0]] = io.BytesIO(importlib_resources.read_binary(png_module, png_file))
 
+        if not platform.has_gamepad:
+            PNG_SETTINGS['png_max_quavers'] = len([PNGS[name] for name in PNGS if re.match(r'root\-highlighted\-[\d]+', name)])
+            
         css_module = importlib.import_module('.'+theme, css.__name__)        
         
         css_files = importlib_resources.contents(css_module)
@@ -64,44 +72,32 @@ def load_theme(theme):
         for svg_file in svg_files:
             SVG[os.path.splitext(svg_file)[0]] = io.StringIO(importlib_resources.read_text(svg_module, svg_file))
               
-        font_color = COLORS[theme]['font_color']  
-        png_color = COLORS[theme]['png_color']
-        text_bkg = COLORS[theme]['text_bkg']  
-        song_bkg = COLORS[theme]['song_bkg']  
-        hr_color = COLORS[theme]['hr_color']
+        PNG_SETTINGS['font_color'] = COLORS[theme]['font_color']  
+        PNG_SETTINGS['png_color'] = COLORS[theme]['png_color']
+        PNG_SETTINGS['text_bkg'] = COLORS[theme]['text_bkg']  
+        PNG_SETTINGS['song_bkg'] = COLORS[theme]['song_bkg']  
+        PNG_SETTINGS['hr_color'] = COLORS[theme]['hr_color']
+        PNG_SETTINGS['typical_note'] = 'A-root' if 'A-root' in PNGS else 'X'
         
         THEMES[theme] = True
 
 
-# try:
-#     svg_template = io.StringIO(importlib_resources.read_text(svg, 'template.svg'))
-# except FileNotFoundError:
-#     svg_template = io.StringIO()
-#     print(f"\n*** ERROR: could not find any SVG template to embed from {svg}. ***\n")
-
-try:
-    with importlib_resources.path(fonts, 'NotoSansCJKjp-Bold.otf') as fp:
-        font_path = str(fp)
-except FileNotFoundError:
-    font_path = os.path.join(os.path.dirname(fonts.__file__), 'NotoSansCJKjp-Bold.otf')
-    print(f"***ERROR: Could not find: 'fonts/{os.path.relpath(font_path, start=os.path.dirname(fonts.__file__))}'")
-
 # %% Parameters
-
 THEMES = {'light': False, 'dark': False}
 # THEMES = detect_themes()
 # Must be initialized with the theme names, which must correspond to directories in tue css and png folders
 
-CSS = {'svg': io.StringIO(), 'html': io.StringIO(), 'common': io.StringIO()}
-# Must be initialized with the base names of the CSS files inside each theme directory in ./css/{theme}/
-# At the moment the svg renderer needs svg.css, the html one html.css, and both need  common.css. The svg to png converter also needs svg.css
+CSS = {'svg': io.StringIO(), 'html_base': io.StringIO(), 'html_mobile': io.StringIO(),  'html_gamepad': io.StringIO()}
+"""
+CSS Must be initialized with the base names of the CSS files inside each theme directory in ./css/{theme}/
+At the moment the svg renderer needs svg.css
+The html renderer needs html_base.css, html_gamepad.css, html_base.css
+The svg to png converter also needs svg.css
+"""
 
-SVG = {'template': io.StringIO()}
-
+SVG = {'mobile': io.StringIO()} # Names of the SVG templates to load
 PNGS = dict()
 #Will be populated by load_theme()
-
-
 COLORS = {
         'light': {'font_color': (0, 0, 0),
                   'png_color': (255, 255, 255),
@@ -113,9 +109,7 @@ COLORS = {
                   'text_bkg': (54, 57, 63, 0), #Transparent dark
                   'song_bkg': (54, 57, 63),
                   'hr_color': (255, 255, 255)}, 
-}
-
-                                                                      
+}                  
     
 rel_css_path = '../css/main.css' # For IMPORT and HREF methods of embedding css files
 offline_scripts_urls = [] #Embedded in HTML files
@@ -134,12 +128,30 @@ for script in offline_scripts_urls:
 skyjson_api_url = "https://sky-music.herokuapp.com/api/generateTempSong"
 skyjson_api_key = ""    
 
-harp_font_size = 38
-voice_font_size = 32
-png_h1_font_size = 48
-png_h2_font_size = 42
-png_font_size = 36
-png_compress = 6
+
+PNG_SETTINGS = {'png_color': None,  # theme dependent
+                'font_color': None, # theme dependent
+                'text_bkg': None,   # theme dependent
+                'song_bkg': None,   # theme dependent
+                'hr_color': None,   # theme dependent
+                'harp_font_size':38,
+                'voice_font_size':32,
+                'png_h1_font_size':48,
+                'png_h2_font_size':42,
+                'png_font_size':36,
+                'font_path': None,
+                'png_compress':6,
+                'png_max_quavers':6, #Default value is 6 for gamepad, will be calculated according to number of png files for mobile
+                'row_names': ['A', 'B', 'C'],
+                'typical_note': None,
+                }
+
+try:
+    with importlib_resources.path(fonts, 'NotoSansCJKjp-Bold.otf') as fp:
+        PNG_SETTINGS['font_path'] = str(fp)
+except FileNotFoundError:
+    PNG_SETTINGS['font_path'] = os.path.join(os.path.dirname(fonts.__file__), 'NotoSansCJKjp-Bold.otf')
+    print(f"***ERROR: Could not find: 'fonts/{os.path.relpath(PNG_SETTINGS['font_path'], start=os.path.dirname(fonts.__file__))}'")
 
 MAX_FILENAME_LENGTH = 127
 MAX_NUM_FILES = 15
@@ -181,3 +193,5 @@ DEFAULT_INSTRUMENT = 'harp'
 MIDI_PITCHES = {'C': 60, 'C#': 61, 'Db': 61, 'D': 62, 'D#': 63, 'Eb': 63, 'E': 64, 'F': 65, 'F#': 66, 'Gb': 66, 'G': 67, 'G#': 68, 'Ab': 68, 'A': 69, 'A#': 70, 'Bb': 70, 'B': 71}
 MIDI_SEMITONES = [0, 2, 4, 5, 7, 9, 11]  # May no longer be used when Western_scales is merged
 
+BYPASS_GAMEPAD_SVG = True #Debug: bypass platform for SVG renderer while it's not done
+BYPASS_GAMEPAD_PNG = True #Debug: bypass platform for PNG renderer while it's not done

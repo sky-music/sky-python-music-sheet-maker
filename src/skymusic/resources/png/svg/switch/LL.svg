@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 100 110" width="100" height="110">
+<defs>
+<style type="text/css">
+@import url('svg.css');
+</style>
+</defs>
+<circle class="sw-fill" cx="60.25" cy="50" r="27.5" />
+<circle class="sw-stroke" style="fill:none;stroke-width:3.5;" cx="60.25" cy="50" r="38" />
+<polygon class="sw-fill" points="13.9,36.9 13.9,62.04 0,50.00 "/>
+<path style="fill:white;" d="m 57.05,61.06 h 13.46 l 0.73,3.92 H 52.08 V 34.65 h 4.97 z" />
+</svg>

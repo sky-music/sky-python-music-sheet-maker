@@ -8,92 +8,145 @@ class Skygrid():
         
         self.shape = shape #rows*columns, excluding negative coordinates, reserved for silences
         self.grid = {}
-        self.frame_count = 0
-        self.num_highlighted = None
+        self.inverse_grid = {} #Only highlighted notes
+        #self._num_frames = 0
+        self._num_by_frame = {}
 
-    def get_row_count(self):
-        return self.shape[0]
+    def get_num_rows(self): return self.shape[0]
 
-    def get_column_count(self):
-        return self.shape[1]
+    def get_num_columns(self): return self.shape[1]
 
-    def get_shape(self):
-        return self.shape
+    def get_shape(self): return self.shape
 
     def set_note(self, coord, frame=None, highlighted=True):
         
-        frames = [frame] if frame is not None else range(0,max(1,self.get_frame_count()))
-        for frame in frames: self.grid[coord] = {frame: highlighted}        
+        frames = [frame] if frame is not None else range(0,max(1,self.get_num_frames()))
+        for frame in frames: self.grid[coord] = {frame: highlighted}
+        # Reset counters
+        self._num_by_frame = {}
+        #self._num_frames = 0
+        self.inverse_grid = {}
+
 
     def get_grid(self, frame=None):
         """
         Returns the dictionary for the instrument:
         where each key is the note position (tuple of row/index),
-        the value is a dictionary with key=frame, value=True/False,
-        where True/False means whether the note is played or not.
+        each value is a dictionary {frame: state} where state=True/False,
+        meaning whether the note is played or not.
         The dictionary is sparse:
         - Inactive notes are not in the dictionary at all
         - Inactive frames are not in the keys of the value dict, so in principle {0:False} should not exist
-        Full Example: {(0,0):{0:True}, (1,1):{0:True}}
+        Full Example: {(0,0):{0:True}, (1,1):{0:True, 1:True}}
         0 frame is the normal frame
         >1 frames are for notes of a triplet or quaver
         """
         if frame is None:
             return self.grid
         else:
-            if frame < 0 or frame > self.get_frame_count()-1:
+            if frame < 0 or frame > self.get_num_frames()-1:
                 return None
             else:
                 #return {coord:frames for coord,frames in self.grid.items() if frame in list(filter(lambda k:frames[k] is True, frames))}
                 return {coord:frames for coord,frames in self.grid.items() if frame in frames.keys()}
 
-    def get_num_highlighted(self):
-        '''Returns the number of highlighted notes, whatever the frame'''
-        if self.num_highlighted is None:
-            num = 0
-            for coord in self.grid.keys():
-                for frame in self.grid[coord].keys():
-                    if self.grid[coord][frame]:
-                        num += 1
-            self.num_highlighted = num
-        
-        return self.num_highlighted
 
-    def get_frame_count(self):
-        '''Returns the number of frames'''
-        if not self.frame_count:        
-            frame_counts = [max(list(self.grid[coord].keys()))+1 for coord in self.grid.keys()]
-            if frame_counts:
-                self.frame_count = max(frame_counts)
-            else:
-                self.frame_count = 0
-            
-        return self.frame_count 
-  
-    def get_highlighted_frames(self, note_coord):
+    def get_inverse_grid(self):
+        '''Builds the inverse dictionary, keeping None notes'''
+        if not self.inverse_grid:
+            inverse_grid = {}
+            for coord in self.grid:
+                for f in self.grid[coord]:
+                    if self.grid[coord][f]: inverse_grid[f] = inverse_grid.get(f,[]) + [coord]
+            self.inverse_grid = inverse_grid 
+        return self.inverse_grid
+
+
+    def get_highlighted_frames(self, note_coord=None):
         '''Returns a list of frame numbers in which the note at coord is highlighted'''
-        try:
-            note_frames = self.grid[note_coord]  # Is note at 'position' highlighted or not
-            highlighted_frames = [frame_index for frame_index in note_frames.keys()]
-        except KeyError:  # Note is not in the grid dictionary: so it is not highlighted
-            highlighted_frames = []
-        return highlighted_frames
+        if note_coord is None: # Try all coords
+            #note_coords = self.grid.keys()
+            return sorted(self.get_inverse_grid().keys())
+        else: # Test for specified note only
+            note_frames = self.grid.get(note_coord, {})
+            highlighted_frames = sorted([f for f in note_frames.keys() if note_frames[f] is True])
+
+
+
+
+        # if note_coord is None: # Try all coords
+        #     note_coords = self.grid.keys()
+        # else: # Test for specified note only
+        #     note_coords = [note_coord] 
+        
+        # highlighted_frames = []
+        # for note_coord in note_coords:
+        #     note_frames = self.grid.get(note_coord, {})
+        #     highlighted_frames += [f for f in note_frames.keys() if note_frames[f] is True]
+    
+        return sorted(list(set(highlighted_frames)))
 
 
     def get_highlighted_coords(self, frame=None):
-        '''Returns a list of coordinates of highlighted notes, only in the specified frame'''   
-        #grid = instrument.get_grid(frame)
+        '''Returns a list of coordinates of highlighted notes, only in the specified frame, removing invalid notes'''
+        
+        inverse_grid = self.get_inverse_grid()
+        frames = [frame] if frame is not None else range(0,self.get_num_frames())
         highlighted_coords = []
-        frames = [frame] if frame is not None else range(0,self.get_frame_count())
+        for frame in frames:
+            highlighted_coords += list(filter(None,inverse_grid[frame]))
+        #grid = instrument.get_grid(frame)
+        #highlighted_coords = []
+        #frames = [frame] if frame is not None else range(0,self.get_num_frames())
         #grid = self.get_grid(frame)
-        if self.grid:
-            for frame in frames:
-                for coord in self.grid:  # Cycle over (row, col) positions in an icon
-                    highlighted = self.grid[coord].get(frame,False)  # Button is highlighted
-                    if highlighted: highlighted_coords += [coord]
-        return highlighted_coords
+        #if self.grid:
+            #for frame in frames:
+                #for coord in self.grid:  # Cycle over (row, col) positions in an icon
+                    #highlighted = self.grid[coord].get(frame,False)  # Button is highlighted
+                    #if highlighted: highlighted_coords += [coord]
         
-        
+        return sorted(highlighted_coords)
+
+
+    def get_num_frames(self):
+        '''Returns the number of highlighted frames'''
+        #if not self._num_frames:
+            
+        return len(self.get_inverse_grid())    
+            #num_frames = [max(list(self.grid[coord].keys()))+1 for coord in self.grid.keys()]
+            
+            #if num_frames:
+                #self._num_frames = max(num_frames)
+            #else:
+                #self._num_frames = 0
+            
+        #return self._num_frames 
+
+    def get_num_highlighted(self, frame=None):
+        '''Returns the number of highlighted notes, in specified frame or all frames'''
+        if not self._num_by_frame: self.get_num_by_frame()
+        return self._num_by_frame.get(frame, None) if frame is not None else sum(self._num_by_frame.values())
+
+
+    def get_num_by_frame(self):
+        '''number of highlighted notes in a frame'''
+        if not self._num_by_frame: 
+            #num_highlighted = {f:0 for f in range(0,self.get_num_frames())}
+            #for coord in self.grid:
+                #for f in self.grid[coord]:
+                    #if self.grid[coord][f]: num_highlighted[f] += 1
+            inverse_grid = self.get_inverse_grid()
+            self._num_by_frame = {f: len(inverse_grid[f]) for f in inverse_grid}
+        return self._num_by_frame
+
+
+    def get_max_num_by_frame(self):
+        num_by_frame = self.get_num_by_frame()
+        if num_by_frame:
+            return max(num_by_frame.values())
+        else:
+            return 0
+                 
 
 TEXT = ['voice','lyric']
 HARPS = ['harp','drum']
@@ -213,18 +266,26 @@ class Harp(Instrument):
         else:
             broken = ''
         silent = ' broken' if self.get_is_silent() else ''
-        return f'<{self.type}-{self.index}, {self.get_row_count()}*{self.get_column_count()}, {self.get_num_highlighted()} ON, repeat={self.repeat}, {broken}{silent}>'       
+        return f'<{self.type}-{self.index}, {self.get_num_rows()}*{self.get_num_columns()}, {self.get_num_highlighted()} ON, repeat={self.repeat}, {broken}{silent}>'       
+
+    def get_middle_position(self):
+        return (int(self.get_num_rows()/2.0), int(self.get_num_columns()/2.0))
+
+    def get_middle_index(self):
+        """Returns the index at the center of Sky grid"""
+        return int(self.get_num_rows() * self.get_num_columns() / 2.0)
 
     def get_note_from_position(self, pos):
         '''Returns the note type Root, Diamond, Circle from the position in Sky grid'''
-        # Calculate the note's overall index in the harp (0 to 14)              
-        
         return notes.Note(self, pos)
 
     def set_skygrid(self, skygrid):
         if self.shape != skygrid.shape:
             raise ValueError(f"Skygrid shape {skygrid.shape} is not equal to instrument shape {self.shape}")
         self.skygrid = skygrid        
+
+    def get_skygrid(self):
+        return self.skygrid
 
 class Drum(Harp):
     type = 'drum'

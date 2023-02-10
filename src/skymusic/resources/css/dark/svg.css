@@ -25,7 +25,7 @@ svg rect[class*="-png"] {
 }
 
 /* <!-- Makes the table disappear in case of broken instrument  --> */
-svg.broken rect, svg.broken {
+svg.broken rect {
   fill:none;
   stroke-width:0;
   stroke:white;
@@ -33,7 +33,7 @@ svg.broken rect, svg.broken {
 }
 
 /* <!-- Silent table --> */
-svg.silent rect:not([class*="-background"]), svg.silent {
+svg.silent rect:not([class*="-background"]) {
   stroke: grey;
   stroke-width:0;
   fill: none;
@@ -150,3 +150,15 @@ svg line.double {
     stroke: white;
     stroke-width: 0.15em;
 }
+
+/* <!-- 
+svg .ps-fill, svg .sw-fill { fill:rgb(4,80,124); filter:brightness(140%); }
+svg .ps-stroke, svg .sw-stroke { stroke:rgb(4,80,124); filter:brightness(140%); }
+--> */
+
+svg .ps-fill, svg .sw-fill { fill:rgb(6,112,173); }
+svg .ps-stroke, svg .sw-stroke { stroke:rgb(6,112,173); }
+
+
+
+

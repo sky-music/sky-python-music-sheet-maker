@@ -28,4 +28,3 @@ class InstrumentRenderer():
             return self.render_layer(*args, **kwargs)    
         else:
             return self.render_harp(*args, **kwargs)
-            

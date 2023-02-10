@@ -1,10 +1,10 @@
 import io
 import textwrap
 from . import song_renderer
-from skymusic import instruments, sheetlayout
+from skymusic import instruments
 from skymusic.renderers.instrument_renderers.png_ir import PngInstrumentRenderer
 from skymusic.resources import Resources
-
+from skymusic.modes import GamePlatform
 
 try:
     from PIL import Image, ImageDraw, ImageFont
@@ -17,10 +17,15 @@ except (ImportError, ModuleNotFoundError):
 
 class PngSongRenderer(song_renderer.SongRenderer):
 
-    def __init__(self, locale=None, aspect_ratio=16/9.0, theme=Resources.get_default_theme()):
+    def __init__(self, locale=None, aspect_ratio=16/9.0, gamepad=None, theme=Resources.get_default_theme()):
         
         super().__init__(locale)
-        Resources.load_theme(theme)
+        platform = gamepad.platform if gamepad else GamePlatform.get_default()
+        self.gamepad = gamepad
+        
+        if Resources.BYPASS_GAMEPAD_PNG:
+            self.gamepad = None
+            platform = GamePlatform.get_default()
         
         self.harp_AspectRatio = 1.455
         self.harp_relspacings = (0.13, 0.1)  # Fraction of the harp width that will be allocated to the spacing between harps
@@ -30,7 +35,7 @@ class PngSongRenderer(song_renderer.SongRenderer):
         self.maxFiles = Resources.MAX_NUM_FILES
 
         if not no_PIL_module:
-            Resources.load_theme(theme)
+            Resources.load_theme(theme, platform)
             
             self.png_margins = (13, 7)
             self.png_size = (round(self.aspect_ratio*750 * 2), 750 * 2)  # must be an integer tuple
@@ -38,13 +43,13 @@ class PngSongRenderer(song_renderer.SongRenderer):
             
             self.png_lyric_size = None
             self.png_dpi = (96 * 2, 96 * 2)
-            self.png_compress = Resources.png_compress
-            self.font_color = Resources.font_color
-            self.png_color = Resources.png_color
-            self.png_font_size = Resources.png_font_size
-            self.png_h1_font_size = Resources.png_h1_font_size
-            self.png_h2_font_size = Resources.png_h2_font_size
-            self.png_font_path = Resources.font_path
+            self.png_compress = Resources.PNG_SETTINGS['png_compress']
+            self.font_color = Resources.PNG_SETTINGS['font_color']
+            self.png_color = Resources.PNG_SETTINGS['png_color']
+            self.png_font_size = Resources.PNG_SETTINGS['png_font_size']
+            self.png_h1_font_size = Resources.PNG_SETTINGS['png_h1_font_size']
+            self.png_h2_font_size = Resources.PNG_SETTINGS['png_h2_font_size']
+            self.png_font_path = Resources.PNG_SETTINGS['font_path']
             
             try:
                 self.h1_font = ImageFont.truetype(self.png_font_path, self.png_h1_font_size)
@@ -60,7 +65,7 @@ class PngSongRenderer(song_renderer.SongRenderer):
 
     def switch_harp(self, harp_type):
         
-            png_instrument_renderer = PngInstrumentRenderer(self.locale, harp_type=harp_type)            
+            png_instrument_renderer = PngInstrumentRenderer(self.locale, harp_type=harp_type, gamepad=self.gamepad)            
             self.png_harp_size0 = png_instrument_renderer.get_png_harp_size()  # A tuple
             self.png_harp_spacings0 = (int(self.harp_relspacings[0] * self.png_harp_size0[0]),
                                        int(self.harp_relspacings[1] * self.png_harp_size0[1]))
@@ -191,7 +196,7 @@ class PngSongRenderer(song_renderer.SongRenderer):
             return buffer_list
         
         harp_type = song.get_harp_type()
-        instrument_renderer = PngInstrumentRenderer(locale=self.locale, harp_type=harp_type)
+        instrument_renderer = PngInstrumentRenderer(locale=self.locale, harp_type=harp_type, gamepad=self.gamepad)
         self.switch_harp(harp_type)
         
         # Determines png size as a function of the numer of icons per line

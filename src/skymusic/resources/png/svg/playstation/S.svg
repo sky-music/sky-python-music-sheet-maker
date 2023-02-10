@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="110" viewBox="0 -5 100 110">
+<defs>
+<style type="text/css">
+@import url('svg.css')
+</style>
+</defs>
+<circle class="ps-fill" cx="50" cy="50" r="50" />
+<rect class="ps" style="fill:none;stroke:white;stroke-width:6.5;" x="28.25" y="28.25" width="43.5" height="43.5" rx="0.50" />
+</svg>

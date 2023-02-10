@@ -4,13 +4,13 @@ do1 re1 mi1 fa1 sol1 la1 si1 do2 re2 mi2 fa2 sol2 la2 si2 do3
 Do re mi fa so la ti do
 #si versus ti:
 si2 ti2
-#Chords:
+#Two Chords:
 do1re1 mi1fa1sol1
 #Some quavers #and chords:
 do1-re1-mi1-fa1 sol1-la1si1do1
-#Pauses:
+#Pauses, 1 simple and 1 repeated:
 do1 . re1 . . mi1
-#Repetitions:
+#Repetitions of #notes and pauses:
 do1*2 re1*14 .*2 mi1*1 .*1
 #Notes #without #octave:
 do re mi fa sol la si
@@ -18,7 +18,7 @@ do re mi fa sol la si
 dore mifasol
 #quavers #without #octaves:
 do-re mifasol-lasidore
-#Errors:
+#Invalid characters:
 X + : 0 HIK
 #Out of range #notes:
 do0 do6 do7 do8

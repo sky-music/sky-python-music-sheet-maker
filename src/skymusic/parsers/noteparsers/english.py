@@ -36,7 +36,7 @@ class English(noteparser.NoteParser):
         oct_int = self.get_default_starting_octave()
         for i in range(0,shape[0]):
             for j in range(0,shape[1]):
-                (quotient, remainder) = divmod(i*self.get_column_count()+j, len(self.MAJOR_NOTES))
+                (quotient, remainder) = divmod(i*self.get_num_columns()+j, len(self.MAJOR_NOTES))
                 note_name = self.MAJOR_NOTES[remainder]
                 oct_str = str(oct_int + quotient) if (oct_int + quotient) > 1 else ''
                 self.inv_coord_map[(i,j)] = note_name + oct_str
@@ -46,7 +46,7 @@ class English(noteparser.NoteParser):
         note_name = note_name.capitalize()
         return note_name
 
-    def get_note_from_coordinate(self, coord):
+    def get_note_from_position(self, coord):
 
         try:
             note = self.inv_coord_map[coord]

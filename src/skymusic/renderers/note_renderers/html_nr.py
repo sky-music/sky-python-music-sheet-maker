@@ -1,16 +1,23 @@
 from . import note_renderer
+#from skymusic.modes import GamePlatform
 
 class HtmlNoteRenderer(note_renderer.NoteRenderer):
 
-    def __init__(self):
+    def __init__(self, gamepad=None):
+        super().__init__()
+        self.gamepad = gamepad
         
-        pass
-
-    def get_silentsymbol_svg(self):
+    def get_silent_svg(self):
         return '<silence></silence>'
+        
+    def get_silent_gamepad_svg(self):
+        return '<gpsilence class="gppause"></gpsilence>' #Same whatever the platform
 
     def get_nonote_svg(self):
         return '<crc class="n"></crc>'
+
+    def get_nonote_gamepad_svg(self):
+        return ''
 
     def get_dead_svg(self):
         return '<dn></dn>'
@@ -18,10 +25,22 @@ class HtmlNoteRenderer(note_renderer.NoteRenderer):
     def get_harpbroken_svg(self):
         return '<text x="45.4" y="81" class="broken">?</text>'
 
+    def get_harpbroken_gamepad_svg(self):
+        return '<text x="45.4" y="81" class="broken">?</text>'
+
     def get_unhighlighted_svg(self, row_num):
         return f"<d{row_num}></d{row_num}>"
+        
+    def get_unhighlighted_gamepad_svg(self):
+        return "<gpblank></gpblank>"    
 
-    def render(self, note, x=0, y=0, width=None):
+    def render(self, note, note_parser=None):
+        
+        gamepad = self.gamepad
+        
+        #if note has no position then it's a filler for the gamepad vertical layout:
+        if not note.get_position() and gamepad:
+            return self.get_unhighlighted_gamepad_svg()
         
         (row, col) = note.get_position()
         try:
@@ -33,59 +52,69 @@ class HtmlNoteRenderer(note_renderer.NoteRenderer):
         except KeyError:  # highlighted_frames==[]: note is not highlighted
             highlighted_classes = []
 
-        if note.instrument.get_is_broken() and ((row, col) == note.get_middle_position()):
+        if note.instrument.get_is_broken() and ((row, col) == note.instrument.get_middle_position()):
             highlighted_classes = []
             # Draws a special symbol when harp is broken
-            note_core_render = self.get_harpbroken_svg()
+            note_core_render = self.get_harpbroken_svg() if gamepad is None else self.get_harpbroken_gamepad_svg()
             
-        elif note.instrument.get_is_silent() and ((row, col) == note.get_middle_position()):
+        elif note.instrument.get_is_silent() and ((row, col) == note.instrument.get_middle_position()):
             highlighted_classes = []
             # Draws a special symbol when harp is silent
-            note_core_render = self.get_silentsymbol_svg()
+            note_core_render = self.get_silent_svg() if gamepad is None else self.get_silent_gamepad_svg() 
             
-        else:
-            
-            if note.instrument.get_is_broken():
+        elif note.instrument.get_is_broken():
                 # Draws a small button (will be grey thanks to CSS)
                 highlighted_classes = []
-                note_core_render = self.get_nonote_svg()              
+                note_core_render = self.get_nonote_svg() if not gamepad else self.get_nonote_gamepad_svg() 
                 
-            elif note.instrument.get_is_silent():                
-                # Draws a small button (will be grey thanks to CSS)
-                highlighted_classes = []
-                note_core_render = self.get_nonote_svg()               
+        elif note.instrument.get_is_silent():                
+            # Draws a small button (will be grey thanks to CSS)
+            highlighted_classes = []
+            note_core_render = self.get_nonote_svg() if not gamepad else self.get_nonote_gamepad_svg()
                 
-            else:
-                
-                if len(highlighted_classes) == 0:                    
-                    # Draws a small button (will be colored thanks to CSS)
-                    note_core_render = self.get_unhighlighted_svg(f'{row+1 :d}')                    
-                    
+        else: #Instrument is OK
+            # All notes have been muted
+            if len(highlighted_classes) == 0:                    
+                # Draws a small button (will be colored thanks to CSS)
+                if not gamepad:
+                    note_core_render = self.get_unhighlighted_svg(f'{row+1 :d}') 
                 else:
-                    # Draws an highlighted note
+                    note_core_render = self.get_unhighlighted_gamepad_svg()
+                
+            else: # Draws an highlighted note
+                if not gamepad:
                     aspect = self.get_aspect(note)
-                    note_core_render = self.get_svg(aspect, highlighted_classes)
+                    note_core_render = self.get_mobile_svg(aspect, highlighted_classes)
+                else:
+                    button = note_parser.get_note_from_position((row,col))
+                    note_core_render = self.get_gamepad_svg(gamepad, button, highlighted_classes)
         
-           
-        svg_render = note_core_render
-
-        return svg_render
+        return note_core_render
 
 
-    def get_svg(self, aspect, highlighted_classes):
+    def get_mobile_svg(self, aspect, highlighted_classes):
         
         highlighted_classes_str = ' '.join(highlighted_classes).rstrip() 
         
         if aspect == 'circle':
             note_svg = (f'<crc class="{highlighted_classes_str}"></crc>')
-
         elif aspect == 'diamond': 
-            note_svg = (f'<dmn class="{highlighted_classes_str}"></dmn>')
-            
+            note_svg = (f'<dmn class="{highlighted_classes_str}"></dmn>')      
         elif aspect == 'root':
-            note_svg = (f'<crdm class="{highlighted_classes_str}"></crdm>')
-            
+            note_svg = (f'<crdm class="{highlighted_classes_str}"></crdm>')  
         else:
             note_svg = ''
-              
+                
         return note_svg
+
+
+    def get_gamepad_svg(self, gamepad, button, highlighted_classes):
+        
+        #highlighted_classes_str = ' '.join(highlighted_classes).rstrip() 
+        highlighted_classes_str = gamepad.platform.get_nickname()
+        
+        tag = gamepad.platform.get_nickname() + str(button)
+        note_svg = (f'<{tag} class="{highlighted_classes_str}"></{tag}>')
+                
+        return note_svg
+

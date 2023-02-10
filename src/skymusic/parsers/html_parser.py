@@ -78,5 +78,5 @@ class HtmlSongParser(html.parser.HTMLParser):
                     
     def close(self):
     
-        self.init()
+        self.__init__()
         super().close()

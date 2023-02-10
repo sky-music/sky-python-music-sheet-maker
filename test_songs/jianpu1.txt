@@ -1,16 +1,16 @@
 #All Notes:
 1 2 3 4 5 6 7 1+ 2+ 3+ 4+ 5+ 6+ 7+ 1++
-#Chords:
+#Two Chords:
 12 345
-#Some quavers #and chords:
+#Some quavers #and quavered chords:
 1^2^3^4 5^671+
 #Pauses (0 in Jianpu, not '.'):
 1 0 2 0 0 3
-#Repetitions:
+#Repetitions of #notes and pauses:
 1*2 2*14 0*2 3*1 0*1
 #Notes #without #octave:
 1 2 3 4 5 6 7
-#Errors:
+#Invalid characters:
 X + - : . 1-2 9
-#out of range:
+#out of range #single notes:
 1-- 2+++++++

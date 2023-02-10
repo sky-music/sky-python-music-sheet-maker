@@ -10,7 +10,7 @@ svg rect.note-background, svg rect.note-background {
   fill: white;
 }
 
-/* <!-- Sky instrument chart: a table with rounded edges --> */
+/* <!-- Sky instrument chart: a table with rounded edges (SVG only) --> */
 svg rect.harp, svg rect.drum {
   fill: white;
   stroke-width: 1;
@@ -24,15 +24,15 @@ svg rect[class*="-png"] {
   stroke: black;
 }
 
-/* <!-- Makes the table disappear in case of broken instrument --> */
-svg.broken rect, svg.broken {
+/* <!-- Makes the table disappear in case of broken instrument (SVG only)--> */
+svg.broken rect {
   fill: none;
   stroke-width: 0;
   stroke: white;
 }
 
 /* <!-- Silent table (SVG only)--> */
-svg.silent rect:not([class*="-background"]), svg.silent {
+svg.silent rect:not([class*="-background"]) {
   stroke: grey;
   stroke-width: 0;
   fill: none;
@@ -46,7 +46,7 @@ svg[class*="harp"].silent svg.button-7 .silent.icon {
   opacity: 1;
 }
 
-/* <!-- Middle note button when the drum is silent --> */
+/* <!-- Middle note button when the drum is silent (SVG only) --> */
 svg[class*="drum"].silent svg.button-5 .silent.icon {
   stroke-width: 0;
   stroke: white;
@@ -148,3 +148,6 @@ svg line.double {
     stroke: black;
     stroke-width: 0.15em;
 }
+
+svg .ps-fill, svg .sw-fill { fill:rgb(4,80,124); }
+svg .ps-stroke, svg .sw-stroke { stroke:rgb(4,80,124); }

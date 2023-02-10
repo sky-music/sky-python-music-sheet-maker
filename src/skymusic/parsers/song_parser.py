@@ -282,12 +282,8 @@ class SongParser:
 
     def convert_bracket_chords(self, line):
         
-        bracket_chord = re.compile('((\(|\[)(?:\w|\s)+(\)|\]))')
-        brackets_blanks = re.compile('\[|\]|\(|\)|\s')
-        chord_matches = bracket_chord.finditer(line)
-        for match in chord_matches:
-            notes = brackets_blanks.sub('',match.group(0))
-            line = line.replace(match.group(0), notes)
+        bracket_chord = re.compile(r'(?:\(|\[)((?:\w+\s*)+)(?:\)|\])')
+        line = bracket_chord.sub(lambda mo:re.sub(r'\s','',mo.group(1)), line)
         return line
     
     def remove_script_tags(self,line):

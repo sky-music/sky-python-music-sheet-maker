@@ -2,11 +2,11 @@ from . import note_renderer
 
 class SvgNoteRenderer(note_renderer.NoteRenderer):
 
-    def __init__(self):
-        
-        pass
+    def __init__(self, gamepad=None):
+        super().__init__()
+        self.gamepad=gamepad
 
-    def get_silentsymbol_svg(self, xs="0%", ys="0%", widths="10%"):
+    def get_silent_svg(self, xs="0%", ys="0%", widths="10%"):
         return f'<use xlink:href="#silent" x="{xs}" y="{ys}" width="{widths}" height="{widths}" />'
 
     def get_nonote_svg(self):
@@ -31,15 +31,15 @@ class SvgNoteRenderer(note_renderer.NoteRenderer):
         except KeyError:  # highlighted_frames==[]: note is not highlighted
             highlighted_classes = []
 
-        if note.instrument.get_is_broken() and ((row, col) == note.get_middle_position()):           
+        if note.instrument.get_is_broken() and ((row, col) == note.instrument.get_middle_position()):           
             highlighted_classes = []
             # Draws a special symbol when harp is broken
             note_core_render = self.get_harpbroken_svg(xs, ys, widths)
             
-        elif note.instrument.get_is_silent() and ((row, col) == note.get_middle_position()):            
+        elif note.instrument.get_is_silent() and ((row, col) == note.instrument.get_middle_position()):            
             highlighted_classes = []
             # Draws a special symbol when harp is silent
-            note_core_render = self.get_silentsymbol_svg(xs, ys, widths)
+            note_core_render = self.get_silent_svg(xs, ys, widths)
             
         else:
             

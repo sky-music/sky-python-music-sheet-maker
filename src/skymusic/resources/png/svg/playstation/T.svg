@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="110" viewBox="0 -5 100 110">
+<defs>
+<style type="text/css">
+@import url('svg.css')
+</style>
+</defs>
+   <circle class="ps-fill" cx="50" cy="50" r="50" />
+   <rect class="ps" style="fill:white" x="23" y="63" width="54" height="5.5" rx="3" />
+   <rect class="ps" style="fill:white" x="23" y="63" width="54" height="5.5" rx="3" transform="rotate(-60,25.75,65.75)" />
+   <rect class="ps" style="fill:white" x="23" y="63" width="54" height="5.5" rx="3" transform="rotate(60,74.25,65.75)" />
+</svg>

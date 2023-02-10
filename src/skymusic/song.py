@@ -146,17 +146,16 @@ class Song():
         except (KeyError, AttributeError):
             aspect_ratio = 16/9.0
         
-        try:
-            theme = kwargs['theme']
-        except KeyError:
-            theme = Resources.get_default_theme()
+        theme = kwargs.get('theme', Resources.get_default_theme())
+        
+        gamepad = kwargs.get('gamepad', None)
         
         if render_mode == RenderMode.HTML:
-            buffers = html_sr.HtmlSongRenderer(locale=self.locale, theme=theme).write_buffers(song=self, css_mode=kwargs['css_mode'])
+            buffers = html_sr.HtmlSongRenderer(locale=self.locale, gamepad=gamepad, theme=theme).write_buffers(song=self, css_mode=kwargs['css_mode'])
         elif render_mode == RenderMode.SVG:
-            buffers = svg_sr.SvgSongRenderer(locale=self.locale, aspect_ratio=aspect_ratio, theme=theme).write_buffers(song=self, css_mode=kwargs['css_mode'])
+            buffers = svg_sr.SvgSongRenderer(locale=self.locale, gamepad=gamepad, aspect_ratio=aspect_ratio, theme=theme).write_buffers(song=self, css_mode=kwargs['css_mode'])
         elif render_mode == RenderMode.PNG:
-            buffers = png_sr.PngSongRenderer(locale=self.locale, aspect_ratio=aspect_ratio, theme=theme).write_buffers(song=self)
+            buffers = png_sr.PngSongRenderer(locale=self.locale, gamepad=gamepad, aspect_ratio=aspect_ratio, theme=theme).write_buffers(song=self)
         elif render_mode == RenderMode.MIDI:
             buffers = midi_sr.MidiSongRenderer(self.locale, kwargs['song_bpm']).write_buffers(song=self)
         elif render_mode == RenderMode.SKYJSON:

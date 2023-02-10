@@ -3,9 +3,9 @@ from skymusic.renderers.note_renderers.svg_nr import SvgNoteRenderer
 
 class SvgInstrumentRenderer(instrument_renderer.InstrumentRenderer):
     
-    def __init__(self, locale=None):
+    def __init__(self, locale=None, gamepad=None):
         super().__init__(locale)
-
+        self.gamepad=gamepad
 
     def render_ruler(self, ruler, x, width: str, height: str, aspect_ratio):
         
@@ -78,7 +78,7 @@ class SvgInstrumentRenderer(instrument_renderer.InstrumentRenderer):
             
         css_class = " ".join(filter(None,["instr", instr_type, instr_state]))
 
-        note_renderer = SvgNoteRenderer()
+        note_renderer = SvgNoteRenderer(gamepad=self.gamepad)
 
         # The harp SVG container
         harp_render = f'<svg x="{x :.2f}" y="0" width="{harp_width}" height="{harp_height}" class="{css_class}" id="instr-{instrument.get_index()}">'
@@ -88,17 +88,17 @@ class SvgInstrumentRenderer(instrument_renderer.InstrumentRenderer):
         if not instr_broken and not instr_silent:
             harp_render += '\n<use xlink:href="#instr" />'
 
-        for row in range(instrument.get_row_count()):
+        for row in range(instrument.get_num_rows()):
             harp_render += '\n'
-            for col in range(instrument.get_column_count()):
+            for col in range(instrument.get_num_columns()):
                 note = instrument.get_note_from_position((row, col))
                 
                 rescale_ratio = (instrument.get_aspect_ratio()/(5/3))**2
                 note_width = 0.21*rescale_ratio
                 xn0 = 0.12*rescale_ratio
                 yn0 = 0.15*rescale_ratio
-                xn = xn0 + col * (1 - 2 * xn0) / (instrument.get_column_count() - 1) - note_width / 2.0
-                yn = yn0 + row * (1 - 2 * yn0*1.07) / (instrument.get_row_count() - 1) - note_width / 2.0
+                xn = xn0 + col * (1 - 2 * xn0) / (instrument.get_num_columns() - 1) - note_width / 2.0
+                yn = yn0 + row * (1 - 2 * yn0*1.07) / (instrument.get_num_rows() - 1) - note_width / 2.0
 
                 # NOTE RENDER
                 harp_render += note_renderer.render(note, xs=f"{100*xn :.2f}%", ys=f"{100*yn :.2f}%", widths=f"{100*note_width :.2f}%")

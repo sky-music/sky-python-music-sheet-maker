@@ -2,16 +2,23 @@ import io, re
 from . import song_renderer
 from skymusic import instruments
 from skymusic.renderers.instrument_renderers.svg_ir import SvgInstrumentRenderer
-from skymusic.modes import CSSMode
+from skymusic.modes import CSSMode, GamePlatform
 from skymusic.resources import Resources
 
 
 class SvgSongRenderer(song_renderer.SongRenderer):
 
-    def __init__(self, locale=None, aspect_ratio=16/9.0, theme=Resources.get_default_theme()):
+    def __init__(self, locale=None, aspect_ratio=16/9.0, gamepad=None, theme=Resources.get_default_theme()):
         
         super().__init__(locale)
-        Resources.load_theme(theme)
+        platform = gamepad.platform if gamepad else GamePlatform.get_default()
+        
+        if Resources.BYPASS_GAMEPAD_SVG:
+            self.gamepad = None
+            platform = GamePlatform.get_default()
+        
+        Resources.load_theme(theme, platform)
+        self.gamepad = gamepad
 
         self.aspect_ratio = aspect_ratio
         self.maxIconsPerLine = round(10*aspect_ratio/(16/9.0))
@@ -37,12 +44,12 @@ class SvgSongRenderer(song_renderer.SongRenderer):
         #self.harp_AspectRatio = 1.455       
         self.set_harp_AspectRatio(5/3, self.harp_relAspectRatio)
 
-        self.svg_defs = self.load_svg_template()
+        self.svg_defs = self.load_svg_template(platform.get_name())
 
 
-    def load_svg_template(self):
-        
-        svg_template = Resources.SVG['template'].getvalue()
+    def load_svg_template(self, platform='mobile'):
+        '''Loads the symbols inside resources/svg/theme/template.svg '''
+        svg_template = Resources.SVG[platform].getvalue()
         match = re.search("<defs[^>]*>(.*(?=</defs>))", svg_template, re.DOTALL)
         try:
             return match.group(1)
@@ -80,7 +87,6 @@ class SvgSongRenderer(song_renderer.SongRenderer):
         svg_buffer.write(self.svg_defs) #SVG definitions to be reused: <symbol>, 
         if css_mode == CSSMode.EMBED:
             svg_buffer.write('\n<style type="text/css"><![CDATA[\n')
-            svg_buffer.write(Resources.CSS['common'].getvalue())
             svg_buffer.write(Resources.CSS['svg'].getvalue())
             svg_buffer.write('\n]]></style>')
         elif css_mode == CSSMode.IMPORT:
@@ -100,7 +106,7 @@ class SvgSongRenderer(song_renderer.SongRenderer):
             print(f"\n***WARNING: Your song is too long. Stopping at {self.maxFiles} files.")
             return buffer_list
 
-        instrument_renderer = SvgInstrumentRenderer(self.locale)
+        instrument_renderer = SvgInstrumentRenderer(self.locale,gamepad=self.gamepad)
         self.set_harp_AspectRatio(song.get_harp_aspect_ratio(), self.harp_relAspectRatio)
         #self.set_harp_AspectRatio(1.455)
 

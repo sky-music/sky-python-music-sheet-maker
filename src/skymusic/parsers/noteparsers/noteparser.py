@@ -37,9 +37,9 @@ class NoteParser:
         #Octave-less notes will be assigned to this octave, e.g. F == F1
         self.default_starting_octave = start_octave
 
-    def get_column_count(self): return self.shape[1]
+    def get_num_columns(self): return self.shape[1]
 
-    def get_row_count(self): return self.shape[0]
+    def get_num_rows(self): return self.shape[0]
 
     def get_shape(self): return self.shape
 
@@ -142,10 +142,9 @@ class NoteParser:
             return False
 
     def parse_note(self, note, song_key, is_finding_key=False):
-
         """
         Returns a tuple containing note_name, note_name for a note in the format self.note_name_with_octave_regex
-
+        note is a string (not a Note object)
         When is_finding_key is True, the handle_note_name_without_octave method should be used
         """
 
@@ -287,7 +286,7 @@ class NoteParser:
         # Apply the note shift whether the octave has been explicitely written or not
         note_in_base_10 += note_shift
 
-        note_coordinate = self.convert_base_10_to_coordinate_of_another_base(note_in_base_10, self.get_column_count())
+        note_coordinate = self.convert_base_10_to_coordinate_of_another_base(note_in_base_10, self.get_num_columns())
 
         if self.is_coordinate_in_range(note_coordinate):
             return note_coordinate
@@ -341,7 +340,7 @@ class NoteParser:
 
         """
 
-        if 0 <= coordinate[0] <= self.get_row_count() - 1 and 0 <= coordinate[1] <= self.get_column_count() - 1:
+        if 0 <= coordinate[0] <= self.get_num_rows() - 1 and 0 <= coordinate[1] <= self.get_num_columns() - 1:
             # Check if the row number and column number of the coordinates are within the instrument's range
             return True
         else:

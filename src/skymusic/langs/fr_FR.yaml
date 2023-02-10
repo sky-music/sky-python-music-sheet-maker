@@ -23,6 +23,32 @@ recipient_specifics:
     command_line: ", rangé dans '{songs_in}/'"
     music_cog: 
     sky_music_website: 
+game_platform:
+  mobile:
+    short_desc: "Normal"
+    long_desc: "Smartphone, tablet or computer"
+  playstation:
+    short_desc: "PlayStation"
+    long_desc: "Sony PlayStation"
+  switch:
+    short_desc: "Switch"
+    long_desc: "Nintendo Switch"
+gamepad_layout:
+  playstation:
+    normal:
+      ps1: Ends with R
+      ps2: Ends with LR
+      ps3: Ends with L2
+      ps4: Ends with R2
+    drum:
+      ps1: Ends with R2
+  switch:
+    normal:
+      sw1: Ends with LR
+      sw2: Ends with LR, layout mimicks gamepad
+      sw3: Ends with ZR
+    drum:
+      sw1: Ends with ZR
 instrument_type:
   normal:
     short_desc: Instrument normal
@@ -167,6 +193,20 @@ stock_queries:
     input_tip: Merci de choisir votre instrument
     help_text: |
       Les percussions n'ont que 2 lignes et 4 colonnes
+  game_platform:
+    foreword:
+    question: Please choose your gaming platform
+    afterword:
+    input_tip: choose one platform
+    help_text: |
+      Unless you play on PlayStation or Switch, keep the default choice 
+  gamepad_layout:
+    foreword:
+    question: Please choose your gamepad buttons layout
+    afterword:
+    input_tip: choose one layout
+    help_text: |
+      They are usually 4 buttons layouts. Do not get mistaken or your song will not sound right!
   render_modes:
     foreword:
     question: Choisissez les formats d'exportation de la chanson. {all_modes}
