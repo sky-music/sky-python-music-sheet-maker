@@ -24,18 +24,18 @@ def load_theme(theme, platform='mobile'):
     '''
     Loads CSS and PNG files as string and bytes buffers respectively, for a theme whose name 'theme' must be defined in the THEMES list
     '''
-    global PNGS, CSS, SVG, THEMES, PNG_SETTINGS, BYPASS_GAMEPAD_PNG
+    global PNGS, CSS, SVG, THEMES, PLATFORMS, PNG_SETTINGS, BYPASS_GAMEPAD_PNG
     
     if theme not in THEMES:
-        load_theme(get_default_theme(), 'mobile')
-    elif THEMES[theme] is False:
+        load_theme(get_default_theme(), platform)
+    elif (THEMES[theme] is False) or (PLATFORMS[platform] is False):
         
         
         if BYPASS_GAMEPAD_PNG:
-            png_module = importlib.import_module('.'+theme+'.'+platform.get_default().get_name(), png.__name__)       
+            png_module = importlib.import_module('.'+theme+'.'+'mobile', png.__name__)       
             png_files = importlib_resources.contents(png_module)  
         else: 
-            png_module = importlib.import_module('.'+theme+'.'+platform.get_name(), png.__name__)       
+            png_module = importlib.import_module('.'+theme+'.'+platform, png.__name__)       
             png_files = importlib_resources.contents(png_module)        
             
         
@@ -45,10 +45,10 @@ def load_theme(theme, platform='mobile'):
         png_files = [file for file in png_files if os.path.splitext(file)[1] == '.png']
         
         for png_file in png_files: #Populates the PNG dictionary using extension stripped filenames as keys
-            PNGS[os.path.splitext(png_file)[0]] = io.BytesIO(importlib_resources.read_binary(png_module, png_file))
+            PNGS[platform][os.path.splitext(png_file)[0]] = io.BytesIO(importlib_resources.read_binary(png_module, png_file))
 
-        if not platform.has_gamepad:
-            PNG_SETTINGS['png_max_quavers'] = len([PNGS[name] for name in PNGS if re.match(r'root\-highlighted\-[\d]+', name)])
+        if platform == 'mobile':
+            PNG_SETTINGS['png_max_quavers'] = len([PNGS[platform][name] for name in PNGS[platform] if re.match(r'root\-highlighted\-[\d]+', name)])
             
         css_module = importlib.import_module('.'+theme, css.__name__)        
         
@@ -77,13 +77,14 @@ def load_theme(theme, platform='mobile'):
         PNG_SETTINGS['text_bkg'] = COLORS[theme]['text_bkg']  
         PNG_SETTINGS['song_bkg'] = COLORS[theme]['song_bkg']  
         PNG_SETTINGS['hr_color'] = COLORS[theme]['hr_color']
-        PNG_SETTINGS['typical_note'] = 'A-root' if 'A-root' in PNGS else 'X'
         
         THEMES[theme] = True
+        PLATFORMS[platform] = True
 
 
 # %% Parameters
 THEMES = {'light': False, 'dark': False}
+PLATFORMS = {'mobile': False, 'playstation': False, 'switch': False}
 # THEMES = detect_themes()
 # Must be initialized with the theme names, which must correspond to directories in tue css and png folders
 
@@ -92,11 +93,11 @@ CSS = {'svg': io.StringIO(), 'html_base': io.StringIO(), 'html_mobile': io.Strin
 CSS Must be initialized with the base names of the CSS files inside each theme directory in ./css/{theme}/
 At the moment the svg renderer needs svg.css
 The html renderer needs html_base.css, html_gamepad.css, html_base.css
-The svg to png converter also needs svg.css
+The svg to png converter needs svg2png.css
 """
 
 SVG = {'mobile': io.StringIO()} # Names of the SVG templates to load
-PNGS = dict()
+PNGS = {'mobile': dict(), 'playstation': dict(), 'switch': dict()}
 #Will be populated by load_theme()
 COLORS = {
         'light': {'font_color': (0, 0, 0),
@@ -142,8 +143,9 @@ PNG_SETTINGS = {'png_color': None,  # theme dependent
                 'font_path': None,
                 'png_compress':6,
                 'png_max_quavers':6, #Default value is 6 for gamepad, will be calculated according to number of png files for mobile
+                'png_max_chord_size':6, #maximum number of notes in a chord
                 'row_names': ['A', 'B', 'C'],
-                'typical_note': None,
+                'typical_notes': {'mobile': 'A-root', 'playstation': 'X', 'switch': 'X'},
                 }
 
 try:
@@ -184,7 +186,7 @@ COMMAND_LINE_NAME = 'command_line'
 
 MUSIC_COG_THEME = 'dark'
 SKY_MUSIC_WEBSITE_THEME = 'light'
-COMMAND_LINE_THEME = 'light'
+COMMAND_LINE_THEME = 'dark'
 
 DEFAULT_KEY = 'C' # The default proposed song key, to parse notes when the song key cannot be retrieved, not to be confused with the 0 index of the English/Jianpu/doremi chromatic scales, which is C by convention 
 
@@ -194,4 +196,4 @@ MIDI_PITCHES = {'C': 60, 'C#': 61, 'Db': 61, 'D': 62, 'D#': 63, 'Eb': 63, 'E': 6
 MIDI_SEMITONES = [0, 2, 4, 5, 7, 9, 11]  # May no longer be used when Western_scales is merged
 
 BYPASS_GAMEPAD_SVG = True #Debug: bypass platform for SVG renderer while it's not done
-BYPASS_GAMEPAD_PNG = True #Debug: bypass platform for PNG renderer while it's not done
+BYPASS_GAMEPAD_PNG = False #Debug: bypass platform for PNG renderer while it's not done

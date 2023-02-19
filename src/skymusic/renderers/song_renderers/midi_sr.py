@@ -99,7 +99,7 @@ class MidiSongRenderer(song_renderer.SongRenderer):
                 linetype = line[0].get_type().lower().strip()
                 if linetype == 'layer':
                     track = self.__new_track__(mid, tempo)#no instrument change yet
-                elif linetype in instruments.HARPS:
+                elif line[0].is_tonal():
                     instrument_index = 0
                     for instrument in line:
                         instrument.set_index(instrument_index)

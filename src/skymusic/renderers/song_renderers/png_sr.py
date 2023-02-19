@@ -1,10 +1,11 @@
 import io
 import textwrap
 from . import song_renderer
-from skymusic import instruments
+#from skymusic import instruments
 from skymusic.renderers.instrument_renderers.png_ir import PngInstrumentRenderer
 from skymusic.resources import Resources
 from skymusic.modes import GamePlatform
+from skymusic.sheetlayout import Ruler
 
 try:
     from PIL import Image, ImageDraw, ImageFont
@@ -20,27 +21,30 @@ class PngSongRenderer(song_renderer.SongRenderer):
     def __init__(self, locale=None, aspect_ratio=16/9.0, gamepad=None, theme=Resources.get_default_theme()):
         
         super().__init__(locale)
-        platform = gamepad.platform if gamepad else GamePlatform.get_default()
+        self.platform_name = gamepad.platform.get_name() if gamepad else GamePlatform.get_default().get_name()
         self.gamepad = gamepad
         
         if Resources.BYPASS_GAMEPAD_PNG:
             self.gamepad = None
-            platform = GamePlatform.get_default()
+            self.platform_name = GamePlatform.get_default().get_name()
         
-        self.harp_AspectRatio = 1.455
-        self.harp_relspacings = (0.13, 0.1)  # Fraction of the harp width that will be allocated to the spacing between harps
-
-        self.aspect_ratio = aspect_ratio
+        self._harp_aspect_ratio_ = 1.455
+        self._harp_rel_spacings_ = (0.13, 0.1)  # Fraction of the harp width that will be allocated to the spacing between harps
+        self.png_gamepad_spacings = tuple()
+        self.png_harp_spacings = tuple()
+        
+        self.aspect_ratio = aspect_ratio # Aspect ratio of the song sheet
         self.maxIconsPerLine = round(10*aspect_ratio/(16/9.0))
         self.maxFiles = Resources.MAX_NUM_FILES
 
+
         if not no_PIL_module:
-            Resources.load_theme(theme, platform)
+            Resources.load_theme(theme, self.platform_name)
             
             self.png_margins = (13, 7)
             self.png_size = (round(self.aspect_ratio*750 * 2), 750 * 2)  # must be an integer tuple
-            self.png_line_width = int(self.png_size[0] - 2*self.png_margins[0])  # self.png_lyric_relheight = instruments.Voice().lyric_relheight
-            
+            self.png_line_width = round(self.png_size[0] - 2*self.png_margins[0])  # self.png_lyric_relheight = instruments.Voice().lyric_relheight
+                        
             self.png_lyric_size = None
             self.png_dpi = (96 * 2, 96 * 2)
             self.png_compress = Resources.PNG_SETTINGS['png_compress']
@@ -60,15 +64,16 @@ class PngSongRenderer(song_renderer.SongRenderer):
                 self.h2_font = ImageFont.load_default()
                 self.text_font = ImageFont.load_default()
                 
-            self.switch_harp('harp')            
+            self.switch_harp('harp')   
+            self.set_png_gamepad_spacings()
             
 
     def switch_harp(self, harp_type):
         
-            png_instrument_renderer = PngInstrumentRenderer(self.locale, harp_type=harp_type, gamepad=self.gamepad)            
+            png_instrument_renderer = PngInstrumentRenderer(self.locale, harp_type=harp_type, platform_name=self.platform_name, gamepad=self.gamepad)            
             self.png_harp_size0 = png_instrument_renderer.get_png_harp_size()  # A tuple
-            self.png_harp_spacings0 = (int(self.harp_relspacings[0] * self.png_harp_size0[0]),
-                                       int(self.harp_relspacings[1] * self.png_harp_size0[1]))
+            self.png_harp_spacings0 = (round(self._harp_rel_spacings_[0] * self.png_harp_size0[0]),
+                                       round(self._harp_rel_spacings_[1] * self.png_harp_size0[1]))
             self.png_harp_size = None
             self.png_harp_spacings = None
             self.png_lyric_size0 = (self.png_harp_size0[0], png_instrument_renderer.get_lyric_height())        
@@ -79,11 +84,20 @@ class PngSongRenderer(song_renderer.SongRenderer):
         if self.png_harp_size is None or self.png_harp_spacings is None:
             Nmax = max(1, min(self.maxIconsPerLine, max_instruments_per_line))
             new_harp_width = min(self.png_harp_size0[0],
-                                 (self.png_size[0] - self.png_margins[0]) / (Nmax * (1.0 + self.harp_relspacings[0])))
-            self.png_harp_size = (new_harp_width, new_harp_width / self.harp_AspectRatio)
+                                 (self.png_size[0] - self.png_margins[0]) / (Nmax * (1.0 + self._harp_rel_spacings_[0])))
+            self.png_harp_size = (new_harp_width, new_harp_width / self._harp_aspect_ratio_)
             self.png_harp_spacings = (
-                self.harp_relspacings[0] * self.png_harp_size[0], self.harp_relspacings[1] * self.png_harp_size[1])
+                self._harp_rel_spacings_[0] * self.png_harp_size[0], self._harp_rel_spacings_[1] * self.png_harp_size[1])
             self.png_lyric_size = (self.png_harp_size[0], (self.png_harp_size[1] / self.png_harp_size0[1]))
+
+
+    def set_png_gamepad_spacings(self):
+        
+        if not self.png_gamepad_spacings:
+            instrument_renderer = PngInstrumentRenderer(locale=self.locale, harp_type='harp', platform_name=self.platform_name, gamepad=self.gamepad)
+            gaps = instrument_renderer.get_png_gaps()
+            self.png_gamepad_spacings = (gaps['note-gapH'], gaps['line-gapV'])
+
 
     def set_png_voice_size(self):
         self.png_lyric_size = (
@@ -92,8 +106,11 @@ class PngSongRenderer(song_renderer.SongRenderer):
 
     def get_png_harp_rescale(self):
         """Gets the rescale factor to from the original .png Harp image"""
-        if self.png_harp_size[0] is not None:
-            return 1.0 * self.png_harp_size[0] / self.png_harp_size0[0]
+        if self.gamepad is None:       
+            if self.png_harp_size[0] is not None:
+                return 1.0 * self.png_harp_size[0] / self.png_harp_size0[0]
+            else:
+                return 1.0
         else:
             return 1.0
 
@@ -128,17 +145,21 @@ class PngSongRenderer(song_renderer.SongRenderer):
         meta = song.get_meta()
         harp_rescale = self.get_png_harp_rescale()
         line_width = self.png_line_width
+        if self.gamepad is None:
+            instrument_spacings = self.png_harp_spacings
+        else:
+            instrument_spacings = self.png_gamepad_spacings
     
         if filenum == 0:
 
             title = meta['title'][1]
             fnt = self.h1_font
-            title, numlines = self.wrap_text(title, fnt.getsize(title)[0], int(line_width/harp_rescale))               
+            title, numlines = self.wrap_text(title, fnt.getsize(title)[0], round(line_width/harp_rescale))               
             h = self.get_png_text_height(fnt)
-            title_header = Image.new('RGBA', (int(line_width/harp_rescale), int(h*numlines)))
+            title_header = Image.new('RGBA', (round(line_width/harp_rescale), round(h*numlines)))
             draw = ImageDraw.Draw(title_header)
             draw.text((0, 0), title, font=fnt, fill=self.font_color)
-            if harp_rescale != 1:
+            if harp_rescale != 1 and harp_rescale > 0:
                 title_header = title_header.resize(
                     (int(title_header.size[0] * harp_rescale), int(title_header.size[1] * harp_rescale)),
                     resample=Image.LANCZOS)
@@ -155,7 +176,7 @@ class PngSongRenderer(song_renderer.SongRenderer):
                     header = Image.new('RGBA', (int(line_width/harp_rescale), int(h*numlines)))
                     draw = ImageDraw.Draw(header)
                     draw.text((0, 0), meta_text, font=fnt, fill=self.font_color)
-                    if harp_rescale != 1:
+                    if harp_rescale != 1 and harp_rescale > 0:
                         header = header.resize((int(header.size[0] * harp_rescale), int(header.size[1] * harp_rescale)),
                                                resample=Image.LANCZOS)
                     song_render = self.trans_paste(song_render, header, (int(x_in_png), int(y_in_png)))
@@ -170,12 +191,12 @@ class PngSongRenderer(song_renderer.SongRenderer):
             title_header = Image.new('RGBA', (int(line_width), int(h)))
             draw = ImageDraw.Draw(title_header)
             draw.text((0, 0), f"{meta['title'][1]} (page {filenum+1 :d})", font=fnt, fill=self.font_color)
-            if harp_rescale != 1:
+            if harp_rescale != 1 and harp_rescale > 0:
                 title_header = title_header.resize(
                     (int(title_header.size[0] * harp_rescale), int(title_header.size[1] * harp_rescale)),
                     resample=Image.LANCZOS)
             song_render = self.trans_paste(song_render, title_header, (int(x_in_png), int(y_in_png)))
-            y_in_png += h * harp_rescale + self.png_harp_spacings[1]    
+            y_in_png += h * harp_rescale + instrument_spacings[1]    
     
         return (song_render, x_in_png, y_in_png)
     
@@ -196,12 +217,17 @@ class PngSongRenderer(song_renderer.SongRenderer):
             return buffer_list
         
         harp_type = song.get_harp_type()
-        instrument_renderer = PngInstrumentRenderer(locale=self.locale, harp_type=harp_type, gamepad=self.gamepad)
+        instrument_renderer = PngInstrumentRenderer(locale=self.locale, harp_type=harp_type, platform_name=self.platform_name, gamepad=self.gamepad)
         self.switch_harp(harp_type)
         
         # Determines png size as a function of the numer of icons per line
         self.set_png_harp_size(song.get_max_instruments_per_line())
         self.set_png_voice_size()
+        
+        if self.gamepad is None:
+            instrument_spacings = self.png_harp_spacings
+        else:
+            instrument_spacings = self.png_gamepad_spacings
         
         text_font_height = self.get_png_text_height(self.text_font)
         h1_font_height = self.get_png_text_height(self.h1_font)
@@ -211,16 +237,11 @@ class PngSongRenderer(song_renderer.SongRenderer):
         song_render = Image.new('RGBA', self.png_size, self.png_color)
 
         # Horizontal ruler drawing, to be used several times later
-        rulerH = max(1,int(4*harp_rescale))
-        hr_line = Image.new('RGBA', (int(self.png_line_width), 3*rulerH))
-        draw = ImageDraw.Draw(hr_line)
-        draw = draw.line(
-                        [(0, int(hr_line.size[1]/2)), (self.png_line_width, int(hr_line.size[1]/2))],
-                        fill=(150, 150, 150),
-                        width=rulerH)
+        rulerH = max(1,round(4*harp_rescale))
+        hr_line = instrument_renderer.render_ruler(ruler=Ruler(code='__'), max_size= (self.png_line_width, round(3*rulerH/2)))
 
-        x_in_png = int(self.png_margins[0])
-        y_in_png = int(self.png_margins[0])
+        x_in_png = round(self.png_margins[0])
+        y_in_png = round(self.png_margins[0])
         
         (song_render, x_in_png, y_in_png) = self.write_header(song_render, filenum, song, x_in_png, y_in_png)
 
@@ -242,25 +263,37 @@ class PngSongRenderer(song_renderer.SongRenderer):
             if row > start_row:
                 start_col = 0            
             linetype = line[0].get_type().lower().strip()
-            line_width = int(self.png_line_width)
+            line_width = round(self.png_line_width)
             ncols = len(line) - start_col
             end_col = len(line)
             
             # Instrument(s) line
-            if linetype in instruments.TEXT:
-                line_height = int(self.png_lyric_size[1])
+            if line[0].is_textual():
+                line_height = round(self.png_lyric_size[1])
             elif linetype == 'ruler':
-                line_height = int(self.png_lyric_size[1])
+                line_height = round(self.png_lyric_size[1])
             elif linetype == 'layer':
-                line_height = int(self.png_lyric_size[1]) 
-            elif linetype in instruments.HARPS:
-                line_height = int(self.png_harp_size[1])               
+                line_height = round(self.png_lyric_size[1]) 
+            elif line[0].is_tonal(): #Harp or gamepad
+                if self.gamepad is None:
+                    line_height = round(self.png_harp_size[1]) 
+                else:
+                    
+                    # Special calculation for gamepad
+                    instr_sizes = [instrument_renderer.get_png_gamepad_size(instr) for instr in line]
+                    gapH = self.png_gamepad_spacings[0]
+                    lineW_predict = 0
+                    line_height = 0
+                    for instr_size in instr_sizes:
+                        lineW_predict += instr_size[0] + gapH
+                        if lineW_predict > line_width: break
+                        line_height = max(line_height, instr_size[1])
 
                 # Forced dividing line after each line of harps
                 if prev_line not in ('ruler', 'layer'):
-                    yline_in_song += self.png_harp_spacings[1] / 4.0
-                    song_render.paste(hr_line, (int(xline_in_song), int(yline_in_song)))
-                    yline_in_song += hr_line.size[1] + self.png_harp_spacings[1] / 2.0
+                    yline_in_song += instrument_spacings[1] / 4.0
+                    song_render.paste(hr_line, (round(xline_in_song), round(yline_in_song)))
+                    yline_in_song += hr_line.size[1] + instrument_spacings[1] / 2.0
             else:
                 raise TypeError("Unkown linetype type: "+linetype)
 
@@ -268,11 +301,11 @@ class PngSongRenderer(song_renderer.SongRenderer):
             if linetype in ('ruler', 'layer'):
                 if line[0].get_text():
                     if line[0].get_emphasis().lower() == 'h1':
-                        line_height += int(h1_font_height)
+                        line_height += round(h1_font_height)
                     elif line[0].get_emphasis().lower() == 'h2':
-                        line_height += int(h2_font_height)
+                        line_height += round(h2_font_height)
                     else:
-                        line_height += int(text_font_height) 
+                        line_height += round(text_font_height) 
 
             # Line image
             line_render = Image.new('RGBA', (line_width, line_height), self.png_color)
@@ -287,11 +320,11 @@ class PngSongRenderer(song_renderer.SongRenderer):
                 instrument.set_index(instrument_index)
                 
                 # Creating a new line if max number is exceeded
-                if x + self.png_harp_size[0] + self.png_harp_spacings[0] / 2.0 > line_width:
+                if x + self.png_harp_size[0] + instrument_spacings[0] / 2.0 > line_width:
                     x = 0
-                    song_render = self.trans_paste(song_render, line_render, (int(xline_in_song), int(yline_in_song)))
-                    yline_in_song += line_render.size[1] + self.png_harp_spacings[1] / 2.0
-                    if linetype in instruments.HARPS: yline_in_song += self.png_harp_spacings[1] / 2.0
+                    song_render = self.trans_paste(song_render, line_render, (round(xline_in_song), round(yline_in_song)))
+                    yline_in_song += line_render.size[1] + instrument_spacings[1] / 2.0
+                    if line[0].is_tonal(): yline_in_song += instrument_spacings[1] / 2.0
 
                     sub_line += 1
 
@@ -299,15 +332,15 @@ class PngSongRenderer(song_renderer.SongRenderer):
                     line_render = Image.new('RGBA', (line_width, line_height), self.png_color)
                     
                 #NEW
-                ypredict = yline_in_song +  self.png_harp_spacings[1]
+                ypredict = yline_in_song +  instrument_spacings[1]
                 
-                if linetype in instruments.TEXT:
+                if line[0].is_textual():
                     ypredict += self.png_lyric_size[1]
                 elif linetype == 'ruler':
                     ypredict += hr_line.size[1]
                 elif linetype == 'layer':
                     ypredict += hr_line.size[1]
-                elif linetype in instruments.HARPS:
+                elif line[0].is_tonal():
                     ypredict += self.png_harp_size[1]
                 else:
                     raise TypeError("Unkown linetype type: "+linetype)
@@ -320,26 +353,34 @@ class PngSongRenderer(song_renderer.SongRenderer):
                 # INSTRUMENT RENDER
                 instrument_render = instrument_renderer.render(instrument, harp_rescale, max_size=(line_width,line_height))
                 # should add a special case for horizontal ruler
-                line_render = self.trans_paste(line_render, instrument_render, (int(x), int(y)))
+                line_render = self.trans_paste(line_render, instrument_render, (round(x), round(y)))
 
-                x += max(self.png_harp_size[0], instrument_render.size[0])
+                if self.gamepad is None:
+                    x += max(self.png_harp_size[0], instrument_render.size[0])
+                else:
+                    x += instrument_render.size[0]
 
                 # REPEAT
                 if instrument.get_repeat() > 1:
-                    repeat_im = instrument_renderer.get_repeat_png(instrument, self.png_harp_spacings[0], harp_rescale)
+                    repeat_im = instrument_renderer.get_repeat_png(instrument, instrument_spacings[0]*3, harp_rescale)
+                    
                     line_render = self.trans_paste(line_render, repeat_im,
-                                              (int(x), int(y + self.png_harp_size[1] - repeat_im.size[1])))
-                    x += max(repeat_im.size[0], self.png_harp_spacings[0])
+                                              (round(x), round(y + self.png_harp_size[1] - repeat_im.size[1])))
+                    
+                    # Tighter layout for 3x5 skygrid
+                    x += max(repeat_im.size[0], instrument_spacings[0])
+                    # Relaxed layout for gamepad
+                    if self.gamepad and not instrument.get_is_silent(): x+= instrument_spacings[0]
                 else:
-                    x += self.png_harp_spacings[0]
+                    x += instrument_spacings[0]
 
                 instrument_index += 1
 
             #end loop on cols: pasting line
-            song_render = self.trans_paste(song_render, line_render,(int(xline_in_song), int(yline_in_song)))
-            yline_in_song += line_render.size[1] + self.png_harp_spacings[1] / 2.0
-            if linetype in instruments.HARPS:
-                yline_in_song += self.png_harp_spacings[1] / 2.0
+            song_render = self.trans_paste(song_render, line_render,(round(xline_in_song), round(yline_in_song)))
+            yline_in_song += line_render.size[1] + instrument_spacings[1] / 2.0
+            if line[0].is_tonal():
+                yline_in_song += instrument_spacings[1] / 2.0
 
             prev_line = linetype
             if page_break:

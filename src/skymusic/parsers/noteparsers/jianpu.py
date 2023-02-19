@@ -56,7 +56,7 @@ class Jianpu(noteparser.NoteParser):
                 note_octave = self.get_default_starting_octave()
                 return note_octave
 
-    def get_note_from_position(self, coord):
+    def get_note_from_coord(self, coord):
         '''Gets note symbol from note coordinates (row, col)'''
         try:
             note = self.inv_coord_map[coord]

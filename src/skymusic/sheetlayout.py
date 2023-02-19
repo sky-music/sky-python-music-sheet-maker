@@ -12,15 +12,16 @@ class PseudoInstrument():
     def get_type(self):
         return self.type
     
-    def set_index(self, index):
-        self.index = index
+    #Mandatory because called by Song.get_harp_type()
+    def is_tonal(self): return False
+    
+    def is_textual(self): return False
+    
+    def set_index(self, index): self.index = index
         
-    def get_index(self):
-        """ index in the song"""
-        return self.index 
+    def get_index(self): return self.index 
  
-    def set_repeat(self, repeat):
-        self.repeat = repeat
+    def set_repeat(self, repeat): self.repeat = repeat
 
     def get_repeat(self):
         """Returns the number of times the instrument must be played"""
@@ -31,10 +32,11 @@ class Ruler(PseudoInstrument):
     
     codes = Resources.MARKDOWN_CODES['rulers']
     
-    def __init__(self):
+    def __init__(self, code=None):
         super().__init__()
         self.type = 'ruler' #mandatory
         self.code = None
+        if code: self.set_code(code)
         self.text = ""
         self.emphasis = ''
     
@@ -65,6 +67,7 @@ class Ruler(PseudoInstrument):
             raise KeyError("Invalid %s code:'%s'. Valid codes are: %s" % (self.type, code, ','.join(self.codes)))
         else:
             self.code = code
+        return code
 
     def get_code(self):
         return self.code

@@ -57,7 +57,7 @@ class SkyjsonSongRenderer(song_renderer.SongRenderer):
                 if linetype == 'layer':
                     layer_index += 1
                     layers[layer_index] = {'name':line[0].get_text(), 'instruments':[]}
-                elif linetype in instruments.HARPS:
+                elif line[0].is_tonal():
                     if layer_index == 0: layer_index += 1
                     layers[layer_index]['instruments'] += line
         

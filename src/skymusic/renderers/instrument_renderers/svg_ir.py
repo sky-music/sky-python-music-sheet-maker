@@ -91,7 +91,7 @@ class SvgInstrumentRenderer(instrument_renderer.InstrumentRenderer):
         for row in range(instrument.get_num_rows()):
             harp_render += '\n'
             for col in range(instrument.get_num_columns()):
-                note = instrument.get_note_from_position((row, col))
+                note = instrument.get_note_from_coord((row, col))
                 
                 rescale_ratio = (instrument.get_aspect_ratio()/(5/3))**2
                 note_width = 0.21*rescale_ratio

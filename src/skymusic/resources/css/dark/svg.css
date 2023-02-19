@@ -1,28 +1,3 @@
-/* <!-- Element background color for icons in ../elements
-Set to none to have a transparent SVG, and a transparent PNG with alpha layer (RGBA) later
-Set to white to make the background white in RGB mode, and the PNG background white when converted to RGB
---> */
-svg rect.harp-background, svg rect.drum-background {
-  fill:rgb(54, 57, 63);
-}
-
-svg rect.note-background, svg rect.drum-background {
-  fill:rgb(54, 57, 63);
-}
-
-/* <!-- Sky instrument chart: a table with rounded edges --> */
-svg rect.harp, svg rect.drum {
-  fill:rgb(54, 57, 63);
-  stroke-width:1;
-  stroke:white;
-}
-
-/* <!-- Sky instrument chart: a table with rounded edges and thick edges (for rendering PNG from SVG only) --> */
-svg rect[class*="-png"] {
-  fill:rgb(54, 57, 63);
-  stroke-width:3;
-  stroke:white;
-}
 
 /* <!-- Makes the table disappear in case of broken instrument  --> */
 svg.broken rect {
@@ -150,15 +125,5 @@ svg line.double {
     stroke: white;
     stroke-width: 0.15em;
 }
-
-/* <!-- 
-svg .ps-fill, svg .sw-fill { fill:rgb(4,80,124); filter:brightness(140%); }
-svg .ps-stroke, svg .sw-stroke { stroke:rgb(4,80,124); filter:brightness(140%); }
---> */
-
-svg .ps-fill, svg .sw-fill { fill:rgb(6,112,173); }
-svg .ps-stroke, svg .sw-stroke { stroke:rgb(6,112,173); }
-
-
 
 

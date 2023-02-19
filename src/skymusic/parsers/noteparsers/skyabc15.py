@@ -75,7 +75,7 @@ class SkyABC15(noteparser.NoteParser):
         else:
             raise KeyError('Note ' + str(note) + ' was not found in the coord_map dictionary.')
 
-    def get_note_from_position(self, coord):
+    def get_note_from_coord(self, coord):
 
         return self.inv_coord_map.get(coord,'X')
         

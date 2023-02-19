@@ -123,7 +123,12 @@ class CommandLinePlayer:
         try:
             with open(filepath, mode='r', encoding='utf-8', errors='ignore') as file:
                 print(f"(Loaded preferences file from {filepath})")
-                return yaml.safe_load(file)
+                prefs = yaml.safe_load(file)
+                #Fixes a bug in YAML < 1.2
+                for k in prefs:
+                    if prefs[k] is True: prefs[k] = 'yes'
+                    if prefs[k] is False: prefs[k] = 'no'
+                return prefs
         except (FileNotFoundError, PermissionError):
             return None
 

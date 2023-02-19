@@ -199,8 +199,8 @@ class Query:
         else:
             answer_string = "invalid"
         
-        string = (f"<{self.__class__.__name__} {self.get_identifier()} from {sender_name} to {recipient_name}:"
-                  f" {repr(self.question)[:20]}..., {self.reply_type} expected{limits_string}, answer={answer_string}>"
+        string = (f"<{self.__class__.__name__} {self.get_identifier()} from '{sender_name}' to '{recipient_name}': '{self.name}':"
+                  f" {repr(self.question)[:25]}..., {self.reply_type} expected{limits_string}, answer={answer_string}>"
                   )
         return string
 

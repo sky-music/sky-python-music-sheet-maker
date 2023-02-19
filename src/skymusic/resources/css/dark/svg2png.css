@@ -1,16 +1,46 @@
-@media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
+/* <!-- Element background color for icons in ../elements
+Set to none to have a transparent SVG, and a transparent PNG with alpha layer (RGBA) later
+Set to white to make the background white in RGB mode, and the PNG background white when converted to RGB
+--> */
+svg rect.harp-background, svg rect.drum-background {
+  fill:#282828;
 }
 
-/* <!-- Song title --> */
-h1, svg text.title {
-    font-family: "Noto Sans", "Noto Sans CJK JP", "Noto Sans CJK KR", "Noto Sans CJK SC", "Noto Sans CJK TC", "Avenir", Arial, sans-serif;
-    font-size: 1.3em;
-    font: bold;
+svg rect.note-background, svg rect.drum-background {
+  fill:#282828;
 }
 
+/* <!-- Sky instrument chart: a table with rounded edges and thick edges (for rendering PNG from SVG only) --> */
+svg rect[class*="-png"] {
+  fill:#282828;
+  stroke-width:3;
+  stroke:white;
+}
+
+/* <!-- Silent table (SVG only)--> */
+svg.silent rect:not([class*="-background"]) {
+  stroke: grey;
+  stroke-width:0;
+  fill:none;
+}
+
+/* <!-- Middle note button when the harp is silent (SVG only) --> */
+svg[class*="harp"].silent svg.button-7 .silent.icon {
+  stroke-width: 0;
+  stroke: white;
+  fill: #BBBBBB;
+  opacity: 1;
+}
+
+/* <!-- Middle note button when the drum is silent (SVG only) --> */
+svg[class*="drum"].silent svg.button-5 .silent.icon {
+  stroke-width: 0;
+  stroke: white;
+  fill: #BBBBBB;
+  opacity: 1;
+}
+
+/* <!-- Note symbols --> */
 .root, .diamond, .circle {
   transform: scale(1.0);
   -ms-transform: scale(1.0);
@@ -213,3 +243,13 @@ svg.button-14 path.ON-0 {
   fill: none;
 }
 
+/* <!-- 
+svg .ps-fill, svg .sw-fill { fill:rgb(4,80,124); filter:brightness(140%); }
+svg .ps-stroke, svg .sw-stroke { stroke:rgb(4,80,124); filter:brightness(140%); }
+--> */
+
+/* <!-- Gamepad styles, dark theme --> */
+
+svg .ps-fill, svg .sw-fill { fill:hsl(202 90% 60%); }
+svg .ps-stroke, svg .sw-stroke { stroke:hsl(202 90% 60%);  }
+svg .ps-unpressed, svg .sw-unpressed { fill:hsl(0 0% 33%); }

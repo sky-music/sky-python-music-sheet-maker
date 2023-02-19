@@ -34,7 +34,7 @@ class SkyjsonInstrumentRenderer(instrument_renderer.InstrumentRenderer):
             for frame in instrument.get_highlighted_frames():
                 coords = instrument.get_highlighted_coords(frame)
                 if coords:
-                    json_render += [{'time':int(time), 'key':self.note_parser.get_note_from_position(coord,layer)} for coord in coords]
+                    json_render += [{'time':int(time), 'key':self.note_parser.get_note_from_coord(coord,layer)} for coord in coords]
                     time = time + dt
                         
         return json_render
@@ -52,7 +52,7 @@ class SkyjsonInstrumentRenderer(instrument_renderer.InstrumentRenderer):
             for frame in instrument.get_highlighted_frames():
                 coords = instrument.get_highlighted_coords(frame)              
                 if coords:      
-                    notes += [self.note_parser.get_note_from_position(coord,layer_index, version='new') for coord in coords]
+                    notes += [self.note_parser.get_note_from_coord(coord,layer_index, version='new') for coord in coords]
        
         return notes
 

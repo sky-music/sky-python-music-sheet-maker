@@ -7,9 +7,11 @@ This folder should NOT be tempered with or moved.
 
 The CSS folder contains a subfolder for each color theme used in the program.
 Each theme folder contains all the necessary CSS files for this theme. Currently, they are:
-* html.css
+* html_mobile.css
+* html_gamepad.css
+* html_base.css
 * svg.css
-* common.css
+* svg2png.css
 
 Each folder must contain a __init__.py file because they are imported as modules.
 

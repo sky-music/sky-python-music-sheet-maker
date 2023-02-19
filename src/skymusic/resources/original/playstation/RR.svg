@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 100 110" width="100" height="110">
+<defs>
+<style type="text/css">
+@import url(svg2png.css)
+</style>
+</defs>
+<circle class="ps-fill" cx="39.75" cy="50" r="27.5" />
+<circle class="ps-stroke" style="fill:none;stroke-width:3.5;" cx="39.75" cy="50" r="38" />
+<polygon class="ps-fill" points="86.1,36.9 86.1,62.04 100,50.00 "/>
+<path class="ps" style="fill:white;" d="m 29.42,65.09 v -30.40 h 9.09 c 6.66,-0.02 11.64,2.60 11.76,9.17 -0.02,4.26 -1.88,6.59 -5.205,7.99 l 7.57,13.24 h -5.41 l -6.62,-11.97 c -2.08,0.19 -3.90,0.12 -6.13,0.12 v 11.85 z m 15.56,-21 c 0.01,-6.36 -6.92,-5.20 -10.55,-5.19 v 10.23 c 4.57,-0.28 10.48,0.87 10.55,-5.05 z" />
+</svg>
+

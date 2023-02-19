@@ -7,4 +7,4 @@ Each theme folder must contain a __init__.py file because they are imported as m
 
 The only reason for which an advanced user may want to modify these SVG templates is to change colors, font size, or the note size in html or svg output.
 
-(This directory must not be confused with the png/svg directory that contains the original SVG elememts used to generate PNG files)
+(This directory must not be confused with the original directory that also SVG elememts used to generate PNG files)

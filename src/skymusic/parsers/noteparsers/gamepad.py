@@ -42,7 +42,7 @@ class Gamepad(noteparser.NoteParser):
         note_name = note_name.capitalize()
         return note_name
 
-    def get_note_from_position(self, coord):
+    def get_note_from_coord(self, coord):
         try:
             note = self.inv_coord_map[coord]
         except KeyError:

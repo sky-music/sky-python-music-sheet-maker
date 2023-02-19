@@ -10,7 +10,7 @@ class HtmlSongRenderer(song_renderer.SongRenderer):
     def __init__(self, locale=None, gamepad=None, theme=Resources.get_default_theme()):
         super().__init__(locale)
         platform = gamepad.platform if gamepad else GamePlatform.get_default()
-        Resources.load_theme(theme, platform)
+        Resources.load_theme(theme, platform.get_name())
         self.gamepad = gamepad
 
     def write_headers(self, html_buffer, song, css_mode):
@@ -51,7 +51,7 @@ class HtmlSongRenderer(song_renderer.SongRenderer):
            
         elif css_mode == CSSMode.IMPORT:
             html_buffer.write('\n<style type="text/css">')
-            html_buffer.write("@import url(\'%s\');</style>" % rel_css_path.replace('\\','/'))
+            html_buffer.write("@import url(%s);</style>" % rel_css_path.replace('\\','/'))
         elif css_mode == CSSMode.XML:
             html_buffer.write(f'\n<link href="{rel_css_path}" rel="stylesheet" />')
 
@@ -106,7 +106,7 @@ class HtmlSongRenderer(song_renderer.SongRenderer):
         for i, line in enumerate(song_lines):
             if len(line) > 0: 
                 linetype =   line[0].get_type()                             
-                if linetype in instruments.HARPS and (prev_type not in ('ruler', 'layer')):
+                if line[0].is_tonal() and (prev_type not in ('ruler', 'layer')):
                     song_render += '\n<hr class="sep" />'
                               
                 #song_render += '<div class="line">'
@@ -120,8 +120,8 @@ class HtmlSongRenderer(song_renderer.SongRenderer):
                     instrument_index += 1
                     line_render += instrument_render
                 
-                if num_lines > 10 and line[0].get_type() in instruments.HARPS:
-                    line_render += f'\n<div class="num">{non_voice_row :d}</div>'
+                if num_lines > 10 and not line[0].is_textual():
+                    line_render += f'\n<div class="{"gp " if self.gamepad else ""}num">{non_voice_row :d}</div>'
                     non_voice_row += 1
                 
                 line_render += "\n</div>"

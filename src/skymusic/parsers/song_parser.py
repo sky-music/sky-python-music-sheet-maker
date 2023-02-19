@@ -25,7 +25,7 @@ class SongParser:
     def __init__(self, maker, silent_warnings=True):
 
         self.maker = maker
-        self.instrument_type = InstrumentType.NORMAL
+        self.instrument_type = InstrumentType.HARP
         self.silent_warnings = silent_warnings
         self.input_mode = None
         self.note_parser = None

@@ -38,11 +38,11 @@ class HtmlNoteRenderer(note_renderer.NoteRenderer):
         
         gamepad = self.gamepad
         
-        #if note has no position then it's a filler for the gamepad vertical layout:
-        if not note.get_position() and gamepad:
+        #if note has no coord then it's a filler for the gamepad vertical layout:
+        if not note.get_coord() and gamepad:
             return self.get_unhighlighted_gamepad_svg()
         
-        (row, col) = note.get_position()
+        (row, col) = note.get_coord()
         try:
             highlighted_frames = note.get_highlighted_frames()
             if len(highlighted_frames) == 1 and highlighted_frames[0] == 0:
@@ -52,12 +52,12 @@ class HtmlNoteRenderer(note_renderer.NoteRenderer):
         except KeyError:  # highlighted_frames==[]: note is not highlighted
             highlighted_classes = []
 
-        if note.instrument.get_is_broken() and ((row, col) == note.instrument.get_middle_position()):
+        if note.instrument.get_is_broken() and ((row, col) == note.instrument.get_middle_coord()):
             highlighted_classes = []
             # Draws a special symbol when harp is broken
             note_core_render = self.get_harpbroken_svg() if gamepad is None else self.get_harpbroken_gamepad_svg()
             
-        elif note.instrument.get_is_silent() and ((row, col) == note.instrument.get_middle_position()):
+        elif note.instrument.get_is_silent() and ((row, col) == note.instrument.get_middle_coord()):
             highlighted_classes = []
             # Draws a special symbol when harp is silent
             note_core_render = self.get_silent_svg() if gamepad is None else self.get_silent_gamepad_svg() 
@@ -86,7 +86,7 @@ class HtmlNoteRenderer(note_renderer.NoteRenderer):
                     aspect = self.get_aspect(note)
                     note_core_render = self.get_mobile_svg(aspect, highlighted_classes)
                 else:
-                    button = note_parser.get_note_from_position((row,col))
+                    button = note_parser.get_note_from_coord((row,col))
                     note_core_render = self.get_gamepad_svg(gamepad, button, highlighted_classes)
         
         return note_core_render

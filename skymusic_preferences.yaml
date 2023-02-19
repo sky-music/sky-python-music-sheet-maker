@@ -5,7 +5,7 @@
 # To disable a default answer, start the whole line with an hashtag #
 #==========================================
 #locale: fr_FR #Forces default language
-instrument_type: NORMAL #An instrument short name among NORMAL, DRUM
+instrument_type: HARP #An instrument short name among HARP, DRUM
 aspect_ratio: WIDESCREEN # an aspect ratio short name among WIDESCREEN, OLDTV, SQUARE, A4, VERTPANEL
 song_bpm: 120 # an integer value between 12 and 1200
 octave_shift: 0 # an integer between -12 and +12
@@ -18,6 +18,9 @@ render_modes: all # 'all' to activate all modes, otherwise a comma-separated lis
 #possible_keys: C
 #many_errors: yes #Carry on even if many errors are found
 #transcript_writer: transcript # Persons who arranged the notes and transcribed them
-#original_artist: artist # Artist
-#keep_meta: oui # Keep meta data found in the file
-#game_platform: playstation #Gameplatform, among playstation, switch, mobile
+%original_yes: artist # Artist
+keep_meta: yes # Keep meta data found in the file
+#song_title: happy new year
+transcript_writer: kimu
+#game_platform: mobile #Gameplatform, among playstation, switch, mobile
+gamepad_layout: 0

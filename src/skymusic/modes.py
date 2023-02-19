@@ -106,11 +106,11 @@ class RenderMode(Enum):
 
 class InstrumentType(Enum):
     '''A class of possible instrument types, typically having different grid sizes'''
-    NORMAL = ("instrument_type/normal/short_desc", "instrument_type/normal/long_desc", skymusic.instruments.Harp)
+    HARP = ("instrument_type/normal/short_desc", "instrument_type/normal/long_desc", skymusic.instruments.Harp)
     DRUM = ("instrument_type/drum/short_desc", "instrument_type/drum/long_desc", skymusic.instruments.Drum)
 
     @classmethod
-    def get_default(cls): return cls.NORMAL    
+    def get_default(cls): return cls.HARP    
 
     def __init__(self, short_desc_yaml, long_desc_yaml, instrument_class):
         self.short_desc_yaml = short_desc_yaml
@@ -134,6 +134,8 @@ class InstrumentType(Enum):
         return self.instrument_class() #Returns object and not class
 
     def get_shape(self): return self.shape
+    
+    def get_type(self): return self.instrument_class.type
         
 
 class AspectRatio(Enum):
@@ -195,20 +197,20 @@ class GamePlatform(Enum):
 
 class GamepadLayout(Enum):
     '''A class of possible gamepad buttons layout, for different gaming platforms'''
-    PS1 = ('PS1',GamePlatform.PLAYSTATION, InstrumentType.NORMAL, "gamepad_layout/playstation/normal/ps1", skymusic.parsers.noteparsers.gamepad.Playstation)
-    PS2 = ('PS2', GamePlatform.PLAYSTATION, InstrumentType.NORMAL, "gamepad_layout/playstation/normal/ps2", skymusic.parsers.noteparsers.gamepad.Playstation)
-    PS3 = ('PS3',GamePlatform.PLAYSTATION, InstrumentType.NORMAL, "gamepad_layout/playstation/normal/ps3", skymusic.parsers.noteparsers.gamepad.Playstation)
-    PS4 = ('PS4',GamePlatform.PLAYSTATION, InstrumentType.NORMAL, "gamepad_layout/playstation/normal/ps4", skymusic.parsers.noteparsers.gamepad.Playstation)
-    SW1 = ('SW1',GamePlatform.SWITCH, InstrumentType.NORMAL, "gamepad_layout/switch/normal/sw1", skymusic.parsers.noteparsers.gamepad.Switch)
-    SW2 = ('SW2',GamePlatform.SWITCH, InstrumentType.NORMAL, "gamepad_layout/switch/normal/sw2", skymusic.parsers.noteparsers.gamepad.Switch)
-    SW3 = ('SW3',GamePlatform.SWITCH, InstrumentType.NORMAL, "gamepad_layout/switch/normal/sw3", skymusic.parsers.noteparsers.gamepad.Switch)
+    PS1 = ('PS1',GamePlatform.PLAYSTATION, InstrumentType.HARP, "gamepad_layout/playstation/normal/ps1", skymusic.parsers.noteparsers.gamepad.Playstation)
+    PS2 = ('PS2', GamePlatform.PLAYSTATION, InstrumentType.HARP, "gamepad_layout/playstation/normal/ps2", skymusic.parsers.noteparsers.gamepad.Playstation)
+    PS3 = ('PS3',GamePlatform.PLAYSTATION, InstrumentType.HARP, "gamepad_layout/playstation/normal/ps3", skymusic.parsers.noteparsers.gamepad.Playstation)
+    PS4 = ('PS4',GamePlatform.PLAYSTATION, InstrumentType.HARP, "gamepad_layout/playstation/normal/ps4", skymusic.parsers.noteparsers.gamepad.Playstation)
+    SW1 = ('SW1',GamePlatform.SWITCH, InstrumentType.HARP, "gamepad_layout/switch/normal/sw1", skymusic.parsers.noteparsers.gamepad.Switch)
+    SW2 = ('SW2',GamePlatform.SWITCH, InstrumentType.HARP, "gamepad_layout/switch/normal/sw2", skymusic.parsers.noteparsers.gamepad.Switch)
+    SW3 = ('SW3',GamePlatform.SWITCH, InstrumentType.HARP, "gamepad_layout/switch/normal/sw3", skymusic.parsers.noteparsers.gamepad.Switch)
 
     PS1_DRUM = ('PS1',GamePlatform.PLAYSTATION, InstrumentType.DRUM, "gamepad_layout/playstation/drum/ps1", skymusic.parsers.noteparsers.gamepad.Playstation)
     
     SW1_DRUM = ('SW1',GamePlatform.SWITCH, InstrumentType.DRUM, "gamepad_layout/playstation/drum/ps1", skymusic.parsers.noteparsers.gamepad.Switch)
 
     @classmethod
-    def get_layouts(cls,platform=GamePlatform.PLAYSTATION, instrument=InstrumentType.NORMAL):
+    def get_layouts(cls,platform=GamePlatform.PLAYSTATION, instrument=InstrumentType.HARP):
         return list(filter(lambda lay: (lay.platform==platform) and (lay.instrument==instrument), list(cls)))
     
     @classmethod

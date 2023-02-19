@@ -90,7 +90,7 @@ hr.dashed { border-top: thin dashed black; }
 
 @media (prefers-color-scheme: dark)
 {
-	body { background-color: #121212; }
+	body { background-color: #282828; }
 	.instr.harp { border-color: white; }
 	p, body, td, text.headers { color: white; }
 }

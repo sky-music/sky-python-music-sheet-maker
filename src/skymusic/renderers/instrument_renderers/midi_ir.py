@@ -35,7 +35,7 @@ class MidiInstrumentRenderer(instrument_renderer.InstrumentRenderer):
             t = self.delta_times[event_type]
             for row in range(instrument.get_num_rows()):
                 for col in range(instrument.get_num_columns()):
-                    note = instrument.get_note_from_position((row, col))
+                    note = instrument.get_note_from_coord((row, col))
                     frames = note.get_highlighted_frames()
                     if frames:
                         if frames[0] == 0:
@@ -62,7 +62,7 @@ class MidiInstrumentRenderer(instrument_renderer.InstrumentRenderer):
         for frame in instrument.get_highlighted_frames():
             
                 coords = instrument.get_highlighted_coords(frame)
-                notes = [instrument.get_note_from_position(coord) for coord in coords]
+                notes = [instrument.get_note_from_coord(coord) for coord in coords]
                 for note in notes:                                     
                     render_args.append({'note':note,'event_type':'note_on','t':t})                
                     note_duration = self.delta_times['note_off'] if frame == 0 else self.delta_times['quaver_off']

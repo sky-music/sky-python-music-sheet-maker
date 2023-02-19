@@ -21,7 +21,7 @@ class SvgNoteRenderer(note_renderer.NoteRenderer):
 
     def render(self, note, xs="0%", ys="0%", widths="10%"):
         
-        (row, col) = note.get_position()
+        (row, col) = note.get_coord()
         try:
             highlighted_frames = note.get_highlighted_frames()
             if len(highlighted_frames) == 1 and highlighted_frames[0] == 0:
@@ -31,12 +31,12 @@ class SvgNoteRenderer(note_renderer.NoteRenderer):
         except KeyError:  # highlighted_frames==[]: note is not highlighted
             highlighted_classes = []
 
-        if note.instrument.get_is_broken() and ((row, col) == note.instrument.get_middle_position()):           
+        if note.instrument.get_is_broken() and ((row, col) == note.instrument.get_middle_coord()):           
             highlighted_classes = []
             # Draws a special symbol when harp is broken
             note_core_render = self.get_harpbroken_svg(xs, ys, widths)
             
-        elif note.instrument.get_is_silent() and ((row, col) == note.instrument.get_middle_position()):            
+        elif note.instrument.get_is_silent() and ((row, col) == note.instrument.get_middle_coord()):            
             highlighted_classes = []
             # Draws a special symbol when harp is silent
             note_core_render = self.get_silent_svg(xs, ys, widths)

@@ -20,7 +20,7 @@ class AsciiInstrumentRenderer(instrument_renderer.InstrumentRenderer):
             for frame in instrument.get_highlighted_frames(): #Cycle over triplets & quavers
                 coords = instrument.get_highlighted_coords(frame)
                 if coords:
-                    ascii_render += "".join((note_parser.get_note_from_position(coord) for coord in coords))
+                    ascii_render += "".join((note_parser.get_note_from_coord(coord) for coord in coords))
                     if frame > 0: ascii_render += Resources.DELIMITERS['quaver']
             ascii_render = ascii_render.rstrip(Resources.DELIMITERS['quaver'])
             

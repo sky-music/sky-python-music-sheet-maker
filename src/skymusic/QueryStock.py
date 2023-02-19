@@ -117,7 +117,7 @@ def load(locale):
                              'help_text': Lang.get_string("stock_queries/instrument_type/help_text", locale),
                              'reply_type': ReplyType.INSTRUMENT,
                              'limits': list(InstrumentType),
-                             'default': InstrumentType.NORMAL
+                             'default': InstrumentType.HARP
                              },
 
             'game_platform': {'class': QueryChoice,

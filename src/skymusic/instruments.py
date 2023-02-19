@@ -31,7 +31,7 @@ class Skygrid():
     def get_grid(self, frame=None):
         """
         Returns the dictionary for the instrument:
-        where each key is the note position (tuple of row/index),
+        where each key is the note coord (tuple of row/index),
         each value is a dictionary {frame: state} where state=True/False,
         meaning whether the note is played or not.
         The dictionary is sparse:
@@ -71,18 +71,6 @@ class Skygrid():
             note_frames = self.grid.get(note_coord, {})
             highlighted_frames = sorted([f for f in note_frames.keys() if note_frames[f] is True])
 
-
-
-
-        # if note_coord is None: # Try all coords
-        #     note_coords = self.grid.keys()
-        # else: # Test for specified note only
-        #     note_coords = [note_coord] 
-        
-        # highlighted_frames = []
-        # for note_coord in note_coords:
-        #     note_frames = self.grid.get(note_coord, {})
-        #     highlighted_frames += [f for f in note_frames.keys() if note_frames[f] is True]
     
         return sorted(list(set(highlighted_frames)))
 
@@ -101,7 +89,7 @@ class Skygrid():
         #grid = self.get_grid(frame)
         #if self.grid:
             #for frame in frames:
-                #for coord in self.grid:  # Cycle over (row, col) positions in an icon
+                #for coord in self.grid:  # Cycle over (row, col) coords in an icon
                     #highlighted = self.grid[coord].get(frame,False)  # Button is highlighted
                     #if highlighted: highlighted_coords += [coord]
         
@@ -148,9 +136,6 @@ class Skygrid():
             return 0
                  
 
-TEXT = ['voice','lyric']
-HARPS = ['harp','drum']
-
 class Instrument():
 
     type = 'GenericInstrument'
@@ -163,8 +148,14 @@ class Instrument():
     def get_type(self):
         return self.type
 
-    def set_repeat(self, repeat):
-        self.repeat = repeat
+    def is_tonal(self):
+        return hasattr(self, 'skygrid')
+        
+    def is_textual(self):
+        #Another definition could be envsioned, but currently .lyric is too specific to be relied on
+        return not hasattr(self, 'skygrid')
+
+    def set_repeat(self, repeat): self.repeat = repeat
 
     def get_repeat(self):
         '''Returns the number of times the instrument must be played'''
@@ -244,7 +235,7 @@ class Harp(Instrument):
     shape = (3, 5)
     def __init__(self):
         super().__init__()
-        self.skygrid = Skygrid(shape=self.shape)
+        self.skygrid = Skygrid(shape=self.shape) #do not change name as it is used by is_tonal() and is_textual()
         
     def __getattr__(self, attr_name):
         return getattr(self.skygrid, attr_name)
@@ -268,16 +259,16 @@ class Harp(Instrument):
         silent = ' broken' if self.get_is_silent() else ''
         return f'<{self.type}-{self.index}, {self.get_num_rows()}*{self.get_num_columns()}, {self.get_num_highlighted()} ON, repeat={self.repeat}, {broken}{silent}>'       
 
-    def get_middle_position(self):
+    def get_middle_coord(self):
         return (int(self.get_num_rows()/2.0), int(self.get_num_columns()/2.0))
 
     def get_middle_index(self):
         """Returns the index at the center of Sky grid"""
         return int(self.get_num_rows() * self.get_num_columns() / 2.0)
 
-    def get_note_from_position(self, pos):
-        '''Returns the note type Root, Diamond, Circle from the position in Sky grid'''
-        return notes.Note(self, pos)
+    def get_note_from_coord(self, coord):
+        '''Returns the note type Root, Diamond, Circle from the coords in Sky grid'''
+        return notes.Note(self, coord)
 
     def set_skygrid(self, skygrid):
         if self.shape != skygrid.shape:
@@ -288,9 +279,14 @@ class Harp(Instrument):
         return self.skygrid
 
 class Drum(Harp):
+    '''Any harmonic instrument with a 2x4 grid'''    
     type = 'drum'
     shape = (2,4)
     def __init__(self):
         super().__init__()
-        self.skygrid = Skygrid(shape=self.shape)
+        self.skygrid = Skygrid(shape=self.shape) #do not change name as it is used by is_tonal() and is_textual()
     
+
+#TEXTS = ['voice','lyric']
+#HARPS = ['harp','drum']
+

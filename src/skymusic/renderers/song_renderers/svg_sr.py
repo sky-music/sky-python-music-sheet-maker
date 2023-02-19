@@ -12,13 +12,14 @@ class SvgSongRenderer(song_renderer.SongRenderer):
         
         super().__init__(locale)
         platform = gamepad.platform if gamepad else GamePlatform.get_default()
+        self.platform_name = platform.get_name()
+        self.gamepad = gamepad
         
         if Resources.BYPASS_GAMEPAD_SVG:
             self.gamepad = None
-            platform = GamePlatform.get_default()
+            self.platform_name = GamePlatform.get_default().get_name()
         
-        Resources.load_theme(theme, platform)
-        self.gamepad = gamepad
+        Resources.load_theme(theme, self.platform_name)
 
         self.aspect_ratio = aspect_ratio
         self.maxIconsPerLine = round(10*aspect_ratio/(16/9.0))
@@ -44,12 +45,12 @@ class SvgSongRenderer(song_renderer.SongRenderer):
         #self.harp_AspectRatio = 1.455       
         self.set_harp_AspectRatio(5/3, self.harp_relAspectRatio)
 
-        self.svg_defs = self.load_svg_template(platform.get_name())
+        self.svg_defs = self.load_svg_template()
 
 
-    def load_svg_template(self, platform='mobile'):
+    def load_svg_template(self):
         '''Loads the symbols inside resources/svg/theme/template.svg '''
-        svg_template = Resources.SVG[platform].getvalue()
+        svg_template = Resources.SVG[self.platform_name].getvalue()
         match = re.search("<defs[^>]*>(.*(?=</defs>))", svg_template, re.DOTALL)
         try:
             return match.group(1)
@@ -91,7 +92,7 @@ class SvgSongRenderer(song_renderer.SongRenderer):
             svg_buffer.write('\n]]></style>')
         elif css_mode == CSSMode.IMPORT:
             svg_buffer.write('\n<style type="text/css">')
-            svg_buffer.write("@import url(\'%s\');</style></defs>" % rel_css_path.replace('\\','/'))
+            svg_buffer.write("@import url(%s);</style></defs>" % rel_css_path.replace('\\','/'))
         else:
             pass
         svg_buffer.write('</defs>')
@@ -181,7 +182,7 @@ class SvgSongRenderer(song_renderer.SongRenderer):
             end_col = len(line)
             
             # Line SVG container
-            if linetype in instruments.TEXT:
+            if line[0].is_textual():
                 
                 song_render += (f'\n<svg x="0" y="{y :.2f}" width="{self.SVG_line_width :.2f}" height="{self.SVG_text_height :.2f}"'
                                 f' class="line" id="line-{row}">')
@@ -230,7 +231,7 @@ class SvgSongRenderer(song_renderer.SongRenderer):
                     x = 0
 
                     # Creating a new line SVG
-                    if linetype in instruments.TEXT:
+                    if line[0].is_textual():
                         line_render += (f'\n<svg x="{x :.2f}" y="{y :.2f}" width="{self.SVG_line_width :.2f}" height="{self.SVG_text_height :.2f}"'
                                         f' class="line-{row}-{sub_line}">')
                         y += self.SVG_text_height + self.SVG_harp_spacings[1] / 2.0
@@ -278,7 +279,7 @@ class SvgSongRenderer(song_renderer.SongRenderer):
 
             #end loop on cols
             
-            if num_lines > 10 and linetype in instruments.HARPS:
+            if num_lines > 10 and line[0].is_tonal():
                 line_num_str = f'{non_voice_row :d}'
                 line_render += (f'\n<svg x="{x :.2f}" y="0%" width="{len(line_num_str)}em" height="100%">'
                                )
