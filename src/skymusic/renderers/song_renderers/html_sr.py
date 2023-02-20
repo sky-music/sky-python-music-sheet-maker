@@ -101,11 +101,12 @@ class HtmlSongRenderer(song_renderer.SongRenderer):
         
         instrument_renderer = HtmlInstrumentRenderer(locale=self.locale, gamepad=self.gamepad)
         
-        non_voice_row = 1
+        non_voice_row = 0
         prev_type = ''
         for i, line in enumerate(song_lines):
             if len(line) > 0: 
-                linetype =   line[0].get_type()                             
+                linetype =   line[0].get_type()
+                if line[0].is_tonal(): non_voice_row += 1                 
                 if line[0].is_tonal() and (prev_type not in ('ruler', 'layer')):
                     song_render += '\n<hr class="sep" />'
                               
@@ -120,9 +121,9 @@ class HtmlSongRenderer(song_renderer.SongRenderer):
                     instrument_index += 1
                     line_render += instrument_render
                 
-                if num_lines > 10 and not line[0].is_textual():
+                #Add line number at the end
+                if num_lines > 5 and  line[0].is_tonal():
                     line_render += f'\n<div class="{"gp " if self.gamepad else ""}num">{non_voice_row :d}</div>'
-                    non_voice_row += 1
                 
                 line_render += "\n</div>"
                 song_render += line_render

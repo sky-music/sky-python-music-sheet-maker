@@ -84,15 +84,15 @@ class HtmlNoteRenderer(note_renderer.NoteRenderer):
             else: # Draws an highlighted note
                 if not gamepad:
                     aspect = self.get_aspect(note)
-                    note_core_render = self.get_mobile_svg(aspect, highlighted_classes)
+                    note_core_render = self._get_mobile_svg_(aspect, highlighted_classes)
                 else:
                     button = note_parser.get_note_from_coord((row,col))
-                    note_core_render = self.get_gamepad_svg(gamepad, button, highlighted_classes)
+                    note_core_render = self._get_gamepad_svg_(gamepad, button, highlighted_classes)
         
         return note_core_render
 
 
-    def get_mobile_svg(self, aspect, highlighted_classes):
+    def _get_mobile_svg_(self, aspect, highlighted_classes):
         
         highlighted_classes_str = ' '.join(highlighted_classes).rstrip() 
         
@@ -108,7 +108,7 @@ class HtmlNoteRenderer(note_renderer.NoteRenderer):
         return note_svg
 
 
-    def get_gamepad_svg(self, gamepad, button, highlighted_classes):
+    def _get_gamepad_svg_(self, gamepad, button, highlighted_classes):
         
         #highlighted_classes_str = ' '.join(highlighted_classes).rstrip() 
         highlighted_classes_str = gamepad.platform.get_nickname()

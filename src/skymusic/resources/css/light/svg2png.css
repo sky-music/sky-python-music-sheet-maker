@@ -265,4 +265,5 @@ svg .ps-stroke, svg .sw-stroke { stroke:#0D47A1; }
 
 svg .ps-fill, svg .sw-fill { fill:hsl(202 90% 30%); }
 svg .ps-stroke, svg .sw-stroke { stroke:hsl(202 90% 30%);  }
-svg .ps-unpressed, svg .sw-unpressed { fill:hsl(202 40% 84%); }
+svg .ps-unpressed, svg .sw-unpressed { fill:hsl(202 75% 80%); fill-opacity:0.45; }
+svg .background { fill:#FFFFFF; }

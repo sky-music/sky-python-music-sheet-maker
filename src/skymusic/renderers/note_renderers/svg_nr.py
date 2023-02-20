@@ -19,7 +19,7 @@ class SvgNoteRenderer(note_renderer.NoteRenderer):
         return f'<use xlink:href="#d{row_num}" x="{xs}" y="{ys}" width="{widths}" height="{widths}" />'
 
 
-    def render(self, note, xs="0%", ys="0%", widths="10%"):
+    def render(self, note, xs="0%", ys="0%", widths="10%", note_parser=None):
         
         (row, col) = note.get_coord()
         try:
@@ -61,16 +61,24 @@ class SvgNoteRenderer(note_renderer.NoteRenderer):
                     
                 else:
                     # Draws an highlighted note
-                    aspect = self.get_aspect(note)
-                    note_core_render = self.get_svg(aspect, xs, ys, widths, highlighted_classes)
-        
+                    if not self.gamepad:
+                        aspect = self.get_aspect(note)
+                        note_core_render = self._get_mobile_svg_(aspect, xs, ys, widths, highlighted_classes)
+                    else:
+                        note_button = note_parser.get_note_from_coord(note_coord)
+                        png_render = self._get_gamepad_png_(note_button)
            
         svg_render = note_core_render
 
         return svg_render
 
+    def _get_gamepad_svg_(self, button, xs="0%", ys="0%", widths="10%"):
+    #TODO
+        class_str = gamepad.platform.get_nickname() + buttom
+        
+        return f'<use xlink:href="{class_str}" x="{xs}" y="{ys}" width="{widths}" height="{widths}" />'
 
-    def get_svg(self, aspect, xs="0%", ys="0%", widths="10%", highlighted_classes=""):
+    def _get_mobile_svg_(self, aspect, xs="0%", ys="0%", widths="10%", highlighted_classes=""):
         
         highlighted_classes_str = ' '.join(highlighted_classes).rstrip() 
         

@@ -60,8 +60,19 @@ class SvgInstrumentRenderer(instrument_renderer.InstrumentRenderer):
 
         return voice_render
 
+    def render_harp(self, *args, **kwargs):
+        if self.gamepad is None: # Normal Grid
+            harp_render = self._render_mobile_harp_(*args, **kwargs)
+        else : #Gamepad
+            harp_render = self._render_gamepad_harp_(*args, **kwargs)
 
-    def render_harp(self, instrument, x, harp_width, harp_height, aspect_ratio):
+        return harp_render
+
+    def _render_gamepad_harp_(self, instrument, x, harp_width, harp_height, aspect_ratio):
+        #TODO
+        return ''
+
+    def _render_mobile_harp_(self, instrument, x, harp_width, harp_height, aspect_ratio):
         """
         Renders the Instrument in SVG
         """

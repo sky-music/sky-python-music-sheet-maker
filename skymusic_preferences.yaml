@@ -18,7 +18,7 @@ render_modes: all # 'all' to activate all modes, otherwise a comma-separated lis
 #possible_keys: C
 #many_errors: yes #Carry on even if many errors are found
 #transcript_writer: transcript # Persons who arranged the notes and transcribed them
-%original_yes: artist # Artist
+#original_yes: artist # Artist
 keep_meta: yes # Keep meta data found in the file
 #song_title: happy new year
 transcript_writer: kimu

@@ -72,46 +72,58 @@ class SVGMerger(html.parser.HTMLParser):
         
         attr_strs = [(attr[0]+'="'+attr[1]+'"') for attr in attrs]
         return ' '.join(attr_strs)
+
+
+    def _handle_starttags_(self, tag, attrs, startend=False):
+
+         if tag in self.stop_tags: # Stops parsing
+             self.recording = False
+             self.finished = True
+             return
+         
+         if not self.recording and tag in self.recording_gate:
+             self.recording = True # Entering recording gate
+             self.add_line_feed()
+        
+         if tag in self.suspend_gate:
+             self.recording = False # Pausing recording
+         
+         if self.recording:
+                  
+             if tag in self.drawing_tags: # tag must be recorded in extenso
+                 if not self.css:            
+                     self.ascii += self._roundoff_(self.get_starttag_text().strip())
+                 else:
+                     if self.css: attrs = self._class_to_inline_(attrs)
+                     attrs_str = self.format_attrs(attrs)
+                     self.ascii += f"<{tag} {attrs_str}{' /' if startend else ''}>"
+             
+             else:
+                 if tag in self.valid_attrs_lc: # tag has a limit set of valid tags
+                     valid_attrs_lc = self.valid_attrs_lc[tag]
+                     attrs_str = " " + self.format_attrs([attr for attr in attrs if attr[0] in valid_attrs_lc])
+                 else:
+                     attrs_str = "" # By default all attributes are ditched
+                 
+                 if tag == 'svg' and self.mode == "svg":
+                     for attr in attrs:
+                         if attr[0].lower() == 'viewbox': self.svg_viewBox = attr[1]
+                 else:
+                    self.ascii += f"<{tag} {attrs_str}{' /' if startend else ''}>"
+        
+             
+             self.add_line_feed()
     
     def handle_starttag(self, tag, attrs):
         
-        if tag in self.stop_tags: # Stops parsing
-            self.recording = False
-            self.finished = True
-            return
+        return self._handle_starttags_(tag, attrs, False)
+       
+    def handle_startendtag(self, tag, attrs):
         
-        if not self.recording and tag in self.recording_gate:
-            self.recording = True # Entering recording gate
-            self.add_line_feed()
-
         if tag in self.suspend_gate:
-            self.recording = False # Pausing recording
-        
-        if self.recording:
-                 
-            if tag in self.drawing_tags: # tag must be recorded in extenso
-                if not self.css:            
-                    self.ascii += self._roundoff_(self.get_starttag_text().strip())
-                else:
-                    if self.css: attrs = self._class_to_inline_(attrs)
-                    attrs_str = self.format_attrs(attrs)
-                    self.ascii += f"<{tag} {attrs_str}>"
-            
-            else:
-                if tag in self.valid_attrs_lc: # tag has a limit set of valid tags
-                    valid_attrs_lc = self.valid_attrs_lc[tag]
-                    attrs_str = " " + self.format_attrs([attr for attr in attrs if attr[0] in valid_attrs_lc])
-                else:
-                    attrs_str = "" # By default all attributes are ditched
-                
-                if tag == 'svg' and self.mode == "svg":
-                    for attr in attrs:
-                        if attr[0].lower() == 'viewbox': self.svg_viewBox = attr[1]
-                else:
-                   self.ascii += f"<{tag}{attrs_str}>"
-
-            
-            self.add_line_feed()
+            self.recording = False
+        else:
+            return self._handle_starttags_(tag, attrs, True) #Do not add an end tag, thank you
 
 
     def _search_css_(self, css_classes):
@@ -150,12 +162,6 @@ class SVGMerger(html.parser.HTMLParser):
         if self.recording and tag in self.recording_gate: self.recording = False #Pausing recording
         if tag in self.suspend_gate:  self.recording = True #We passed the suspend gate, resuming recording
 
-    def handle_startendtag(self, tag, attrs):
-        
-        if tag in self.suspend_gate:
-            self.recording = False
-        else:
-            self.handle_starttag(tag, attrs) #Do not add an end tag, thank you
             
 
     def handle_data(self, data):
@@ -207,46 +213,54 @@ if __name__ == '__main__':
     #%% User parameters
     float_precision = 2
     
-    platform = GamePlatform.PLAYSTATION
-    theme = 'light'
-    mode = 'html' #'html, svg'
+    platforms = [GamePlatform.SWITCH, GamePlatform.PLAYSTATION]
+    themes = ['light','dark']
+    modes = ['html','svg'] #'html, svg'
     css_files = ['svg2png.css'] # for html only
+    excluded_svgs = ['unhighlighted-drum', 'unhighlighted-harp', 'empty-drum', 'empty-harp', 'silent-symbol', 'broken-symbol', 'blank']
     
-    svg_dir = os.path.join('../resources/original', platform.get_name())
-    css_dir = os.path.join('../resources/css', theme)
-
-
-    #%% MAIN
-    if mode == 'html':
-        escape_html = True
-        css_paths = [os.path.join(css_dir, css_file) for css_file in css_files]
-        for css_path in css_paths:
-            if not os.path.isfile(css_path):
-                print("*** WARNING: {css_path} not found.")
-    else:
-        escape_html = False
-        css_paths = []
-        
-    merger = SVGMerger(float_precision=float_precision, mode=mode, css_paths=css_paths)
-    # Parse SVG files one by one
-    dirpath, _, filenames = next(os.walk(svg_dir), (None, None, []))
-    for filename in filenames: # Remove non SVG files
-        if os.path.splitext(filename)[1].lower().strip() != '.svg':  filenames.remove(filename)
-    
-    merged_file = ''
-    for filename in filenames:
-        svg_name = os.path.splitext(filename)[0]
-        path = os.path.join(dirpath, filename)
-        
-        # Parse SVG file
-        with open(path,'r+') as fp:
-            merged_file += merger.parse(fp, platform.get_nickname() + svg_name) #eg psX, psLL
+    for platform in platforms:
+        for theme in themes:
+            for mode in modes:
+                svg_dir = os.path.join('../resources/original', platform.get_name())
+                css_dir = os.path.join('../resources/css', theme)
             
-            merger.close()
-        merged_file += os.linesep
-    
-    #Write output file
-    out_name = platform.get_name() + '_' + theme + '_' + mode + '.txt'
-    out = os.path.normpath(os.path.join(svg_dir,out_name))
-    with open(out,'w+') as fp: fp.write(merged_file)
-    
+            
+                #%% MAIN
+                if mode == 'html':
+                    escape_html = True
+                    css_paths = [os.path.join(css_dir, css_file) for css_file in css_files]
+                    for css_path in css_paths:
+                        if not os.path.isfile(css_path):
+                            print("*** WARNING: {css_path} not found.")
+                else:
+                    escape_html = False
+                    css_paths = []
+                    
+                # Parse SVG files one by one
+                dirpath, _, filenames = next(os.walk(svg_dir), (None, None, []))
+                for filename in filenames: # Remove non SVG files
+                    if os.path.splitext(filename)[1].lower().strip() != '.svg':  filenames.remove(filename)
+                
+                #Collecting and merging
+                merger = SVGMerger(float_precision=float_precision, mode=mode, css_paths=css_paths)
+                
+                merged_file = ''
+                for filename in filenames:
+                    svg_name = os.path.splitext(filename)[0]
+                    path = os.path.join(dirpath, filename)
+                    
+                    if svg_name not in excluded_svgs:
+                    
+                        # Parse SVG file
+                        with open(path,'r+') as fp:
+                            merged_file += merger.parse(fp, platform.get_nickname() + svg_name) #eg psX, psLL
+                            
+                            merger.close()
+                        merged_file += os.linesep
+                
+                #Write output file
+                out_name = platform.get_name() + '_' + theme + '_' + mode + '.txt'
+                out = os.path.normpath(os.path.join(svg_dir,out_name))
+                with open(out,'w+') as fp: fp.write(merged_file)
+            

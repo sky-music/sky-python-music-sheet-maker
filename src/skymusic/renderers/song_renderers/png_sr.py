@@ -49,6 +49,7 @@ class PngSongRenderer(song_renderer.SongRenderer):
             self.png_dpi = (96 * 2, 96 * 2)
             self.png_compress = Resources.PNG_SETTINGS['png_compress']
             self.font_color = Resources.PNG_SETTINGS['font_color']
+            self.dimmed_font_color = Resources.PNG_SETTINGS['dimmed_font_color']
             self.png_color = Resources.PNG_SETTINGS['png_color']
             self.png_font_size = Resources.PNG_SETTINGS['png_font_size']
             self.png_h1_font_size = Resources.PNG_SETTINGS['png_h1_font_size']
@@ -59,10 +60,12 @@ class PngSongRenderer(song_renderer.SongRenderer):
                 self.h1_font = ImageFont.truetype(self.png_font_path, self.png_h1_font_size)
                 self.h2_font = ImageFont.truetype(self.png_font_path, self.png_h2_font_size)
                 self.text_font = ImageFont.truetype(self.png_font_path, self.png_font_size)
+                self.dimmed_text_font = ImageFont.truetype(self.png_font_path, self.png_font_size)
             except OSError:
                 self.h1_font = ImageFont.load_default()
                 self.h2_font = ImageFont.load_default()
                 self.text_font = ImageFont.load_default()
+                self.dimmed_text_font = ImageFont.load_default()
                 
             self.switch_harp('harp')   
             self.set_png_gamepad_spacings()
@@ -201,7 +204,7 @@ class PngSongRenderer(song_renderer.SongRenderer):
         return (song_render, x_in_png, y_in_png)
     
 
-    def write_buffers(self, song, start_row=0, start_col=0, buffer_list=None):
+    def write_buffers(self, song, start_row=0, start_col=0, tonal_row=0, buffer_list=None):
         
         if buffer_list is None:
             buffer_list = []
@@ -261,8 +264,9 @@ class PngSongRenderer(song_renderer.SongRenderer):
 
             line = song.get_line(row)
             if row > start_row:
-                start_col = 0            
-            linetype = line[0].get_type().lower().strip()
+                start_col = 0 
+            linetype = line[0].get_type()
+            if line[0].is_tonal(): tonal_row += 1
             line_width = round(self.png_line_width)
             ncols = len(line) - start_col
             end_col = len(line)
@@ -280,11 +284,11 @@ class PngSongRenderer(song_renderer.SongRenderer):
                 else:
                     
                     # Special calculation for gamepad
-                    instr_sizes = [instrument_renderer.get_png_gamepad_size(instr) for instr in line]
+                    gamepad_instr_sizes = [instrument_renderer.get_png_gamepad_size(instr) for instr in line]
                     gapH = self.png_gamepad_spacings[0]
                     lineW_predict = 0
                     line_height = 0
-                    for instr_size in instr_sizes:
+                    for instr_size in gamepad_instr_sizes:
                         lineW_predict += instr_size[0] + gapH
                         if lineW_predict > line_width: break
                         line_height = max(line_height, instr_size[1])
@@ -314,13 +318,22 @@ class PngSongRenderer(song_renderer.SongRenderer):
             sub_line = 0
             x = 0
             y = 0
+            
             for col in range(start_col, end_col):
 
                 instrument = song.get_instrument(row, col)
                 instrument.set_index(instrument_index)
                 
                 # Creating a new line if max number is exceeded
-                if x + self.png_harp_size[0] + instrument_spacings[0] / 2.0 > line_width:
+                x_predict = x + instrument_spacings[0] / 2.0 + self.dimmed_text_font.getsize('99')[0]
+                if self.gamepad is None or (not instrument.is_tonal()):
+                    last_instr_size = self.png_harp_size
+                    #TODO: predict text length
+                else:
+                    last_instr_size = instrument_renderer.get_png_gamepad_size(instrument)
+                x_predict += last_instr_size[0]
+                
+                if x_predict > line_width:
                     x = 0
                     song_render = self.trans_paste(song_render, line_render, (round(xline_in_song), round(yline_in_song)))
                     yline_in_song += line_render.size[1] + instrument_spacings[1] / 2.0
@@ -376,6 +389,11 @@ class PngSongRenderer(song_renderer.SongRenderer):
 
                 instrument_index += 1
 
+            if num_lines > 5 and line[0].is_tonal():
+                num_im = Image.new('RGBA', self.text_font.getsize(str(tonal_row)))
+                draw = ImageDraw.Draw(line_render)
+                draw.text((x, y+last_instr_size[1]/2), str(tonal_row), font=self.text_font, fill=self.dimmed_font_color)
+
             #end loop on cols: pasting line
             song_render = self.trans_paste(song_render, line_render,(round(xline_in_song), round(yline_in_song)))
             yline_in_song += line_render.size[1] + instrument_spacings[1] / 2.0
@@ -397,6 +415,6 @@ class PngSongRenderer(song_renderer.SongRenderer):
 
         # Open new file
         if end_row < song.get_num_lines() or 0 < end_col < ncols:
-            buffer_list = self.write_buffers(song, end_row, end_col, buffer_list)
+            buffer_list = self.write_buffers(song, end_row, end_col, tonal_row, buffer_list)
 
         return buffer_list

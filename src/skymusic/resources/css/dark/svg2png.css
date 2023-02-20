@@ -250,6 +250,7 @@ svg .ps-stroke, svg .sw-stroke { stroke:rgb(4,80,124); filter:brightness(140%); 
 
 /* <!-- Gamepad styles, dark theme --> */
 
-svg .ps-fill, svg .sw-fill { fill:hsl(202 90% 60%); }
-svg .ps-stroke, svg .sw-stroke { stroke:hsl(202 90% 60%);  }
-svg .ps-unpressed, svg .sw-unpressed { fill:hsl(0 0% 33%); }
+svg .ps-fill, svg .sw-fill { fill:hsl(202 90% 62%); }
+svg .ps-stroke, svg .sw-stroke { stroke:hsl(202 90% 62%);  }
+svg .ps-unpressed, svg .sw-unpressed { fill:hsl(0 0% 55%); }
+

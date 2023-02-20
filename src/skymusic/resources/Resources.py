@@ -72,7 +72,8 @@ def load_theme(theme, platform='mobile'):
         for svg_file in svg_files:
             SVG[os.path.splitext(svg_file)[0]] = io.StringIO(importlib_resources.read_text(svg_module, svg_file))
               
-        PNG_SETTINGS['font_color'] = COLORS[theme]['font_color']  
+        PNG_SETTINGS['font_color'] = COLORS[theme]['font_color']
+        PNG_SETTINGS['dimmed_font_color'] = COLORS[theme]['dimmed_font_color']  
         PNG_SETTINGS['png_color'] = COLORS[theme]['png_color']
         PNG_SETTINGS['text_bkg'] = COLORS[theme]['text_bkg']  
         PNG_SETTINGS['song_bkg'] = COLORS[theme]['song_bkg']  
@@ -101,11 +102,13 @@ PNGS = {'mobile': dict(), 'playstation': dict(), 'switch': dict()}
 #Will be populated by load_theme()
 COLORS = {
         'light': {'font_color': (0, 0, 0),
+                  'dimmed_font_color': (128, 128, 128),
                   'png_color': (255, 255, 255),
                   'text_bkg': (255, 255, 255, 0), #Transparent white
                   'song_bkg': (255, 255, 255),
                   'hr_color': (0, 0, 0)},
-        'dark': {'font_color': (255, 255, 255), #Discord colors
+        'dark': {'font_color': (255, 255, 255),
+                  'dimmed_font_color': (128, 128, 128),
                   'png_color': (54, 57, 63),
                   'text_bkg': (54, 57, 63, 0), #Transparent dark
                   'song_bkg': (54, 57, 63),
@@ -186,7 +189,7 @@ COMMAND_LINE_NAME = 'command_line'
 
 MUSIC_COG_THEME = 'dark'
 SKY_MUSIC_WEBSITE_THEME = 'light'
-COMMAND_LINE_THEME = 'dark'
+COMMAND_LINE_THEME = 'light'
 
 DEFAULT_KEY = 'C' # The default proposed song key, to parse notes when the song key cannot be retrieved, not to be confused with the 0 index of the English/Jianpu/doremi chromatic scales, which is C by convention 
 

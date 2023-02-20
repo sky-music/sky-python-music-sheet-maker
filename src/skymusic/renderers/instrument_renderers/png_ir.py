@@ -101,7 +101,7 @@ class PngInstrumentRenderer(instrument_renderer.InstrumentRenderer):
             repeat_im = Image.new('RGBA', (Hsize, Vsize), color=self.text_bkg)
             draw = ImageDraw.Draw(repeat_im)
             draw.text((0, repeat_im.size[1] - 1.05 * Vsize), repeat_str, font=fnt, fill=self.font_color)
-            rescale = rescale * max_rescaled_width / Hsize
+            rescale = rescale * min(1, max_rescaled_width / Hsize)
 
         if rescale != 1 and rescale > 0:
             repeat_im = repeat_im.resize((round(repeat_im.size[0] * rescale), round(repeat_im.size[1] * rescale)), resample=Image.LANCZOS)

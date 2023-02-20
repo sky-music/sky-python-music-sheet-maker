@@ -59,7 +59,7 @@ class PngNoteRenderer(note_renderer.NoteRenderer):
             return Image.open(note_png)
          
         
-    def get_mobile_png(self, aspect, coord, highlighted_frames):
+    def _get_mobile_png_(self, aspect, coord, highlighted_frames):
                 
         if highlighted_frames[0] == 0:
             row_name = self.rows_names[coord[0]]
@@ -79,7 +79,7 @@ class PngNoteRenderer(note_renderer.NoteRenderer):
         return Image.open(note_png) if note_png else None
 
 
-    def get_gamepad_png(self, button):
+    def _get_gamepad_png_(self, button):
         
         try:
             note_png = Resources.PNGS[self.platform_name][button]        
@@ -103,10 +103,10 @@ class PngNoteRenderer(note_renderer.NoteRenderer):
                 if not self.gamepad:
                     note_aspect = self.get_aspect(note)
                     highlighted_frames = note.get_highlighted_frames()
-                    png_render = self.get_mobile_png(note_aspect, note_coord, highlighted_frames)
+                    png_render = self._get_mobile_png_(note_aspect, note_coord, highlighted_frames)
                 else:
                     note_button = note_parser.get_note_from_coord(note_coord)
-                    png_render = self.get_gamepad_png(note_button)
+                    png_render = self._get_gamepad_png_(note_button)
                     
         else:
             png_render = self.get_dead_png()
