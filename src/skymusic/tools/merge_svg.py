@@ -217,7 +217,8 @@ if __name__ == '__main__':
     themes = ['light','dark']
     modes = ['html','svg'] #'html, svg'
     css_files = ['svg2png.css'] # for html only
-    excluded_svgs = ['unhighlighted-drum', 'unhighlighted-harp', 'empty-drum', 'empty-harp', 'silent-symbol', 'broken-symbol', 'blank']
+    excluded_svgs = ['unhighlighted-drum', 'unhighlighted-harp', 'empty-drum', 'empty-harp', 'blank']
+    strip_text = ['-symbol']
     
     for platform in platforms:
         for theme in themes:
@@ -239,7 +240,7 @@ if __name__ == '__main__':
                     
                 # Parse SVG files one by one
                 dirpath, _, filenames = next(os.walk(svg_dir), (None, None, []))
-                for filename in filenames: # Remove non SVG files
+                for filename in filenames.copy(): # Remove non SVG files
                     if os.path.splitext(filename)[1].lower().strip() != '.svg':  filenames.remove(filename)
                 
                 #Collecting and merging
@@ -251,7 +252,9 @@ if __name__ == '__main__':
                     path = os.path.join(dirpath, filename)
                     
                     if svg_name not in excluded_svgs:
-                    
+                        for txt in strip_text:
+                            svg_name = svg_name.replace(txt,'')
+                        
                         # Parse SVG file
                         with open(path,'r+') as fp:
                             merged_file += merger.parse(fp, platform.get_nickname() + svg_name) #eg psX, psLL

@@ -257,13 +257,6 @@ svg rect.note-background {
 }
 
 /* <!-- Gamepad styles, light theme --> */
-
-/* <!-- Kimu's colors -->
-svg .ps-fill, svg .sw-fill { fill:#0D47A1; }
-svg .ps-stroke, svg .sw-stroke { stroke:#0D47A1; }
-*/
-
 svg .ps-fill, svg .sw-fill { fill:hsl(202 90% 30%); }
 svg .ps-stroke, svg .sw-stroke { stroke:hsl(202 90% 30%);  }
-svg .ps-unpressed, svg .sw-unpressed { fill:hsl(202 75% 80%); fill-opacity:0.45; }
-svg .background { fill:#FFFFFF; }
+svg .ps-unpressed, svg .sw-unpressed { fill:hsl(202 75% 75%); fill-opacity: 0.34; }

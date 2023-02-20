@@ -97,7 +97,7 @@ The html renderer needs html_base.css, html_gamepad.css, html_base.css
 The svg to png converter needs svg2png.css
 """
 
-SVG = {'mobile': io.StringIO()} # Names of the SVG templates to load
+SVG = {'mobile': io.StringIO(), 'playstation': io.StringIO(), 'switch': io.StringIO()} # Names of the SVG templates to load
 PNGS = {'mobile': dict(), 'playstation': dict(), 'switch': dict()}
 #Will be populated by load_theme()
 COLORS = {
@@ -149,6 +149,10 @@ PNG_SETTINGS = {'png_color': None,  # theme dependent
                 'png_max_chord_size':6, #maximum number of notes in a chord
                 'row_names': ['A', 'B', 'C'],
                 'typical_notes': {'mobile': 'A-root', 'playstation': 'X', 'switch': 'X'},
+                }
+
+SVG_SETTINGS = {'font_size': 12,
+                'gp_note_aspectRatio':100/110,
                 }
 
 try:

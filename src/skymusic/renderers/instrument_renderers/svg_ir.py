@@ -6,6 +6,8 @@ class SvgInstrumentRenderer(instrument_renderer.InstrumentRenderer):
     def __init__(self, locale=None, gamepad=None):
         super().__init__(locale)
         self.gamepad=gamepad
+        #Gaps, must end with V or H
+        self.gamepad_gaps = {'note-gapH': 0.43, 'note-gapV': 0.4, 'quaver-gapH': 0.2, 'line-gapV': 2, 'pauseH': 0.7-0.43} #Relative to note size
 
     def render_ruler(self, ruler, x, width: str, height: str, aspect_ratio):
         
@@ -68,9 +70,51 @@ class SvgInstrumentRenderer(instrument_renderer.InstrumentRenderer):
 
         return harp_render
 
-    def _render_gamepad_harp_(self, instrument, x, harp_width, harp_height, aspect_ratio):
+    def _render_gamepad_harp_(self, instrument, x, harp_width, harp_height, note_aspectRatio):
         #TODO
-        return ''
+        harp_silent = instrument.get_is_silent()
+        harp_broken = instrument.get_is_broken()
+        
+        note_renderer = SvgNoteRenderer(gamepad=self.gamepad)
+        
+        # Required to get gamepad button name from note coord in the Skygrid
+        note_parser = self.gamepad.get_note_parser(locale=self.locale, shape=instrument.get_shape()) #Cannot be sooner because we need instrument shape
+        
+        # The harp SVG container
+        css_class = "gp instr"
+        
+        harp_render = f'<svg x="{x :.2f}" y="0" width="{harp_width}" height="{harp_height}" class="{css_class}" id="instr-{instrument.get_index()}">'
+        
+        xn0 = 0
+        yn0 = 0
+        
+        frames = instrument.get_skygrid().get_highlighted_frames()
+        num_frames = max(1, len(frames))
+        num_buttons = max(1, instrument.get_skygrid().get_max_num_by_frame())
+        
+        note_width = 1/num_frames
+        note_height = (1/num_buttons)*note_aspectRatio
+        
+        xn = xn0
+        # Render harp in vertical layout mode
+        for ix, frame in enumerate(frames): # cols
+            harp_render += '\n'
+            coords = instrument.get_skygrid().get_highlighted_coords(frame)
+            yn = yn0
+            for iy, coord in enumerate(coords): #rows
+
+                note = instrument.get_note_from_coord(coord)
+                # NOTE RENDER
+                if len(note.get_highlighted_frames()) > 0:  # Only paste highlighted notes  
+                    harp_render += note_renderer.render(note, xs=f"{xn :.2f}%", ys=f"{yn :.2f}%", widths=f"{100*note_width :.2f}%", heights=f"{100*note_height :.2f}%", note_parser=note_parser)
+    
+                    yn += note_height
+                    
+                if coords:
+                    xn += note_width
+        
+        harp_render += '</svg>'
+        return harp_render
 
     def _render_mobile_harp_(self, instrument, x, harp_width, harp_height, aspect_ratio):
         """

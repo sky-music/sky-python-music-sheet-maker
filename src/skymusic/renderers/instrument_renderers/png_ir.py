@@ -234,10 +234,6 @@ class PngInstrumentRenderer(instrument_renderer.InstrumentRenderer):
         note_parser = self.gamepad.get_note_parser(locale=self.locale, shape=instrument.get_shape()) #Cannot be sooner because we need instrument shape
         
         # No background harp image: size is determined from number of notes
-        #num_frames = instrument.get_skygrid().get_num_frames() # cols
-        #num_buttons = instrument.get_skygrid().get_max_num_by_frame() #rows     
-        
-        #if harp_silent or harp_broken: num_buttons, num_frames = (1,1)
         
         note_size = note_renderer.get_png_size()
         harp_size = self.get_png_gamepad_size(instrument)
@@ -270,8 +266,6 @@ class PngInstrumentRenderer(instrument_renderer.InstrumentRenderer):
                     note = instrument.get_note_from_coord(coord)
                     # NOTE RENDER
                     if len(note.get_highlighted_frames()) > 0:  # Only paste highlighted notes
-                        #xn = ( xn0 + ix * (1 - 2 * xn0) / (num_frames - 1) ) * harp_size[0] - note_size[0]/2.0
-                        #yn = ( yn0 + iy * (1 - 2 * yn0) / (num_buttons - 1) ) * harp_size[1] - note_size[1]/2.0
                         note_render = note_renderer.render(note=note, rescale=1, note_parser=note_parser)
                         harp_render = self.trans_paste(harp_render, note_render, (round(xn), round(yn)))
         

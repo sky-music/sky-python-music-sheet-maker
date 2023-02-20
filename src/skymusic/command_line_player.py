@@ -110,7 +110,7 @@ class CommandLinePlayer:
         """Load all the yaml files of the batch_song directory (batch mode only)"""
         dirpath, _, filenames = next(os.walk(songs_dir), (None, None, []))
 
-        for filename in filenames:
+        for filename in filenames.copy():
             if os.path.splitext(filename)[1].lower().strip() != '.yaml':
                 filenames.remove(filename)
 

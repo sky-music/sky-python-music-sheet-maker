@@ -30,7 +30,7 @@ class SvgSongRenderer(song_renderer.SongRenderer):
         self.SVG_line_width = self.SVG_viewPort[2] - self.SVG_viewPortMargins[0]
         
         self.pt2px = 96.0 / 72
-        self.fontpt = 12
+        self.fontpt = Resources.SVG_SETTINGS['font_size']
         self.SVG_text_height = self.fontpt * self.pt2px  # In principle this should be in em
         self.SVG_rule_height = self.fontpt * self.pt2px*0.15
         self.SVG_layer_height = self.fontpt * self.pt2px
@@ -44,6 +44,8 @@ class SvgSongRenderer(song_renderer.SongRenderer):
         self.harp_relAspectRatio = 1.455/(5/3)
         #self.harp_AspectRatio = 1.455       
         self.set_harp_AspectRatio(5/3, self.harp_relAspectRatio)
+
+        self.gp_note_aspectRatio = Resources.SVG_SETTINGS['gp_note_aspectRatio']
 
         self.svg_defs = self.load_svg_template()
 
@@ -261,7 +263,10 @@ class SvgSongRenderer(song_renderer.SongRenderer):
                     break
 
                 #3. INSTRUMENT RENDER
-                instrument_render = instrument_renderer.render(instrument, x, f"{(100.0 * self.SVG_harp_size[0] / self.SVG_line_width) :.2f}%", "100%", self.harp_AspectRatio)
+                if not self.gamepad:
+                    instrument_render = instrument_renderer.render(instrument, x, f"{(100.0 * self.SVG_harp_size[0] / self.SVG_line_width) :.2f}%", "100%", self.harp_AspectRatio)
+                else:
+                    instrument_render = instrument_renderer.render(instrument, x, f"{(100.0 * self.SVG_harp_size[0] / self.SVG_line_width) :.2f}%", "100%", self.gp_note_aspectRatio)
 
                 #4. Repeat number
                 if instrument.get_repeat() > 1:
