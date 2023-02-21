@@ -1,4 +1,9 @@
-# winter piano
+#$Title: Do you wanna build a snowman
+#$Original artist(s): Popular
+#$Arranger, Transcriber: Tracey
+#$Musical key: C
+#$instrument: winter piano
+
 # intro
 F1 Bb1 Eb2 G1 Bb1 Eb2 Ab1 Bb1
 F1 Bb1 Eb2 G1 Bb1 Eb2 Ab1 Bb1

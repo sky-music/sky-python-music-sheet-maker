@@ -1,0 +1,373 @@
+warnings:
+  jianpu_pause: "Jianpu notation is used: setting '0' as the pause character instead of '{pause}'. Please make sure your input follows this convention."
+  jianpu_quaver_delimiter: "Jianpu notation is used: setting '{jianpu_quaver_delimiter}' as the quaver delimiter instead of '{quaver_delimiter}'. Please make sure your input follows this convention."
+  skyjson_url_connection: "Connection error when trying to get url from sky-music.herokuapp.com"
+words:
+  yes_word: 'yes'
+  no_word: 'no'
+recipient_specifics:
+  skip:
+    command_line: leave blank and type enter
+    music_cog: answer with - (dash)
+    sky_music_website: press 'answer'
+  skip_number:
+    command_line: leave blank and type enter
+    music_cog: answer with - (dash)
+    sky_music_website: press 'answer'
+  all_modes:
+    command_line: Type choice numbers, or 'all' to select all formats
+    music_cog: 
+    sky_music_website: 
+  put_in_songs_in:
+    command_line: ", put in '{songs_in}/'"
+    music_cog: 
+    sky_music_website: 
+instrument_type:
+  normal:
+    short_desc: Normal instrument
+    long_desc: "Normal instrument (piano, harp, flute, etc)"
+  drum:
+    short_desc: Drums
+    long_desc: "Drums"
+input_mode:
+  skykeyboard:
+    short_desc: Sky keyboard
+    long_desc: "Type on keyboard as you would in Sky:\n   QWERT\n   ASDFG\n   ZXCVB"
+  sky:
+    short_desc: 'Sky ABC1-5'
+    long_desc: "Sky column/row notation:\n   A1 A2 A3 A4 A5\n   B1 B2 B3 B4 B5\n   C1 C2 C3 C4 C5"
+  skyhtml:
+    short_desc: HTML visual sheet
+    long_desc: HTML visual sheet
+  english:
+    short_desc: English CDEFGAB
+    long_desc: "English (note name in C D E F G A B + alteration b/# + octave number, e.g. Cb4 D#4 E5 ...)"
+  doremi:
+    short_desc: French doremi
+    long_desc: "Doremi (note name in do re mi fa sol la si/ti + alteration b/# + octave number, e.g. dob4 re#4 mi5 ...)"
+  jianpu:
+    short_desc: 'Jianpu 1234567+-'
+    long_desc: "Jianpu (note name in 1 2 3 4 5 6 7, followed by alteration b/# and several + or - for octave shift)"
+  englishchords:
+    short_desc: Chords CDEFGABmaj
+    long_desc: "Abbreviated English chord name (e.g. C, F, Dm, Bdim, A+, Csus2, Dsus4, C6, Cmaj7, Dm11)"
+  doremijp:
+    short_desc: 日本語イタリアドレミ
+    long_desc: "Japanese do re mi: ド、ド#／レb、レ、レ#／ミb、ミ、ファ、ファ#／ソb、ソ、ソ#／ラb、ラ、ラ#／シb、シ"
+  skyjson:
+    short_desc: Sky-Music recording (JSON text)
+    long_desc: "JSON dictionary with time in ms and key number 0-14 used by SkyStudio app and <https://specy.github.io/skyMusic/>"
+  midi:
+    short_desc: Midi file
+    long_desc: Midi file (.mid or .midi)
+render_mode:
+  html:
+    short_desc: HTML visual sheet
+  svg:
+    short_desc: SVG visual sheet
+  png:
+    short_desc: PNG visual sheet
+  midi:
+    short_desc: Midi file
+  skyjson:
+    short_desc: Sky-Music recording (JSON text file)
+  skyascii:
+    short_desc: text file in Sky notation
+  englishascii:
+    short_desc: text file in English notation
+  jianpuascii:
+    short_desc: text file in Jianpu notation
+  doremiascii:
+    short_desc: text file in do-re-mi notation
+aspect_ratio:
+  widescreen:
+    short_desc: Widescreen TV (16:9)
+  oldtv:
+    short_desc: Old TV (4:3)
+  square:
+    short_desc: Square (1:1)
+  A4:
+    short_desc: A4 paper sheet (1:1.4)
+  vertical_panel:
+    short_desc: Vertical panel (1:2)
+song_meta:
+  title: Title
+  artist: Original artist(s)
+  transcript: Arranger, Transcriber
+  musical_key: Musical key
+  untitled: Untitled
+open_file: |
+    (Notes imported from {file_path})
+stock_queries:
+  instructions_command_line:
+    foreword: "===== VISUAL MUSIC SHEETS FOR SKY:CHILDREN OF THE LIGHT =====\n"
+    question: |
+      Accepted music notes formats:{input_modes}
+      
+      Pay attention to these special characters:
+      - Notes of a chord must be glued together (e.g. A1B1C1).
+      - Separate chords with "{icon_delimiter}".
+      - Use "{pause}" for a silence (pause), except in Jianpu use '0' instead.
+      - Use "{quaver_delimiter}" to link notes within an icon, for triplets, quavers... (e.g. {quaver_example}). In Jianpu, use "{jianpu_quaver_delimiter}" instead to avoid confusion with the octave.
+      - Add "{repeat_indicator}" after a chord to indicate repetition.
+      - Sharps "#" and flats "b" (semitones) after a note are possible for Western and Jianpu notations.
+      - Lyrics must be started and separated by '{lyric_delimiter}'
+      - Layers (several instruments) can be separated by '{layer_delimiter}', followed by layer name
+      - Horizontal rulers between song lines can be added with {ruler_delimiters}
+      
+      /!\ Keep your notes in a text file to be able to correct your song later! /!\
+        
+      Type '?' to get help for a particular question
+    afterword: =======================================
+    input_tip:
+    help_text:
+  instructions_sky_music_website:
+    foreword:
+    question: |
+      Accepted music notes formats:{input_modes}
+      
+      Pay attention to these special characters:
+      - Notes in a chord must be glued together (e.g. A1B1C1).
+      - Separate chords with "{icon_delimiter}".
+      - Use "{pause}" for a silence (pause), except for Jianpu use '0' instead.
+      - Use "{quaver_delimiter}" to link notes within an icon, for triplets, quavers... (e.g. {quaver_example}). With Jianpu, use "{jianpu_quaver_delimiter}" instead to avoid confusion with the octave.
+      - Add "{repeat_indicator}" after a chord to indicate repetition.
+      - Sharps "#" and flats "b" (semitones) are possible in Western and Jianpu.
+      - Lyrics must be started and separated by '{lyric_delimiter}'
+      - Layers (several instruments) can be separated by '{layer_delimiter}', followed by layer name
+      - Horizontal rulers between song lines can be added with {ruler_delimiters}     
+      
+      /!\ Keep your notes in a text file to be able to correct your song later! /!\
+    afterword:
+    input_tip: click OK to acknowledge
+    help_text:
+  instructions_music_cog:
+    foreword:
+    question: |
+      Welcome to the Visual Song Sheet creator!
+      I am going to ask you several questions to build your song sheet.
+      Type '?' to get help for a particular question.
+      **Hint: keep your notes in a text file to be able to correct your song later.**
+      
+    afterword:
+    input_tip:
+    help_text: |
+      Accepted music notes formats:{input_modes}
+      
+      Pay attention to these special characters:
+      - Notes in a chord must be glued together (e.g. A1B1C1).
+      - Separate chords with "{icon_delimiter}".
+      - Use "{pause}" for a silence (pause), except for Jianpu use '0' instead.
+      - Use "{quaver_delimiter}" to link notes within an icon, for triplets, quavers... (e.g. {quaver_example}). With Jianpu, use "{jianpu_quaver_delimiter}" instead to avoid confusion with the octave.
+      - Add "{repeat_indicator}" after a chord to indicate repetition.
+      - Sharps "#" and flats "b" (semitones) are possible in Western and Jianpu.
+      - Lyrics must be started and separated by '{lyric_delimiter}'
+      - Layers (several instruments) can be separated by '{layer_delimiter}', followed by layer name
+      - Horizontal rulers between song lines can be added with {ruler_delimiters}
+  instrument_type:
+    foreword:
+    question: Please choose your instrument
+    afterword:
+    input_tip: choose one instrument
+    help_text: |
+      The drum is special because it only has 2 rows and 4 columns
+  render_modes:
+    foreword:
+    question: Please choose one or several output rendering formats. {all_modes}
+    afterword:
+    input_tip: check one or several boxes. Visual sheets have colored notes arranged in a grid. Text formats allow manual editing of the notes. JSON and Midi can be played by dedicated software.
+    help_text: |
+      The visual sheets, with the colored dots arranged in a grid, can be rendered in several file formats. Choose HTML if you're undecided.
+      Text formats can be manually edited, or fed to the program again. {all_modes}
+  aspect_ratio:
+    foreword: By default the visual sheet is a 16:9 image in landscape orientation.
+    question: 'Please choose a different aspect ratio in the list, or {skip} to skip'
+    afterword:
+    input_tip: 'an aspect ratio in the list. {skip} to skip'
+    help_text: |
+      By default the visual sheet is a 16:9 image in landscape orientation. Please choose a different aspect ratio if you like.
+  song_bpm:
+    foreword: One of the output formats needs timing information.
+    question: 'Please choose the song tempo (BPM, beats per minute), or {skip_number} to skip'
+    afterword:
+    input_tip: 'a positive number between 12 and 1200. {skip_number} to skip'
+    help_text: |
+      You have selected an output format (such as Midi) that requires to know how fast to play the song. This is usually expressed in terms of beats per minute. Please give a integer value between 12 and 1200.
+  keep_meta:
+    foreword: "We have found metadata for the song in your input."
+    question: 'Do you want to keep this information?'
+    afterword:
+    input_tip: 'yes/no question'
+    help_text: |
+      We have found metadata for the song, such as the title, author, etc, in your input. Do you want to keep it (yes), or enter new information (no)?
+  song_title:
+    foreword:
+    question: What is the song title?
+    afterword:
+    input_tip: 'any text. {skip} to use "untitled"'
+    help_text: 
+  original_artist:
+    foreword:
+    question: What is(are) the Original artist(s)?
+    afterword:
+    input_tip: any non-empty text
+    help_text: Original artists include the composer, musician, singer, etc. An empty answer is NOT allowed.
+  transcript_writer:
+    foreword:
+    question: Who is the arranger? Who is the transcriber?
+    afterword:
+    input_tip: 'any text, {skip} to skip'
+    help_text: 'The arranger is the musician who found the notes and chords that sound right in Sky. The transcriber is the person who wrote down the notes. It can be the same person: you maybe?'
+  notes_file:
+    foreword:
+    question: 'Type or copy-paste notes below. You can also enter a text file name containing the notes{put_in_songs_in}'
+    afterword:
+    input_tip: a string of notes such as C1 D1F1, or a file name such as song.txt
+    help_text: |
+      Accepted music notes formats:{input_modes}
+      
+      Pay attention to these special characters:
+      - Notes composing a chord must be glued together (e.g. A1B1C1).
+      - Separate chords with "{icon_delimiter}".
+      - Use "{pause}" for a silence (rest), except for Jianpu where '0' is the official pause character.
+      - Use "{quaver_delimiter}" to link notes within an icon, for triplets, quavers... (e.g. {quaver_example}). With Jianpu, use "{jianpu_quaver_delimiter}" instead of "-" to avoid confusion with the octave.
+      - Add "{repeat_indicator}" after a chord to indicate repetition.
+      - Sharps "#" and flats "b" (semitones) are supported for Western and Jianpu notations.
+  file:
+    foreword:
+    question: "Enter a valid file name (case sensitive){put_in_songs_in}"
+    afterword:
+    input_tip: any text file containing one or several musical notes
+    help_text: "We have detected that you are trying to open a file, but couldn't find it. Please check its name and that it is located in the '{songs_in}' directory. File names are case sensitive"
+  notes:
+    foreword:
+    question: 'Please type or copy-paste notes ({skip} to skip)'
+    afterword:
+    input_tip: 'any text with one or several musical notes ({skip} to skip). Keep your notes safe in a text file in your computer.'
+    help_text: |
+      Accepted music notes formats:{input_modes}
+      
+      Pay attention to these special characters:
+      - Notes in a chord must be glued together (e.g. A1B1C1).
+      - Separate chords with "{icon_delimiter}".
+      - Use "{pause}" for a silence (rest), except for Jianpu use '0' instead.
+      - Use "{quaver_delimiter}" to link notes within an icon, for triplets, quavers... (e.g. {quaver_example}). With Jianpu, use "{jianpu_quaver_delimiter}" instead of "-" to avoid confusion with the octave.
+      - Add "{repeat_indicator}" after a chord to indicate repetition.
+      - Sharps "#" and flats "b" (semitones) are supported for Western and Jianpu notations.
+      - Lyrics must be separated by '{lyric_delimiter}'
+  one_input_mode:
+    foreword:
+    question: |
+      We detected that you use the following notation: '{input_mode}'.
+    afterword:
+    input_tip: click OK to acknowledge
+    help_text:
+  musical_notation:
+    foreword: Despite our efforts, we could not guess what musical notation you are using.
+    question: Please help us by choosing your format in the list below
+    afterword:
+    input_tip: Unique choice button
+    help_text: |
+      In the previous question, you have typed your song notes. We tried to automatically guess which notation you are using.
+      Despite our best efforts, there is still an ambiguity. Please select the right one in the list.
+  no_possible_key:
+    foreword:
+    question: |
+      Your song cannot be transposed exactly in Sky.
+      Default key will be set to {song_key}.
+    afterword:
+    input_tip: click OK to acknowledge
+    help_text:
+  one_possible_key:
+    foreword:
+    question: 'Your song can be transposed in Sky with the following key: {song_key}'
+    afterword:
+    input_tip: click OK to acknowledge
+    help_text:
+  possible_keys:
+    foreword: 'Your song can be transposed in Sky with the following keys: {song_key}.'
+    question: Please choose your musical key
+    afterword:
+    input_tip: Type the key name
+    help_text: |
+      Sky''s musical system does not include semitones. It is like removing all the black keys on the piano. Hence some songs cannot be played in the Home Sanctuary exactly as they sound in the outside world. You have to shift their frequencies before using this program, or play in other locations of Sky where the notes have been shifted on the keyboard. This is called transposition or 'changing the song key'.
+      Hopefully, we have detected that your song can be played in several song keys available in Sky. Please choose the one that is most convenient for you.
+  recommended_key:
+    foreword: Your musical notation uses relative pitch.
+    question: 'What is the recommended key to play in Sky (default is {song_key})? {skip} to skip'
+    afterword:
+    input_tip: '{skip}, or type a note name (e.g. C in English notation)'
+    help_text: |
+      You have used a musical notation that imposes the exact pitch of the notes.
+      Hence the visual sheet will sound differently in different places in Sky.  This is called transposition.
+  octave_shift:
+    foreword: "Do you want to shift the pitch of your notes? Use {recommended_octave_shift} if your written notes start at octave 4."
+    question: 'Octave shift number ({skip_number} to skip)'
+    afterword:
+    input_tip: octave shift as an integer between -6 and +6
+    help_text: |
+      A musical note is uniquely identified by its name (within an octave), and an octave number. Sky's music system spans less than 3 octaves.
+      If you do not specify an octave number after a note, we will assume it is the first octave of Sky, so your notes will essential by played near the bass.
+      You can shift your notes to a higher (lower) pitch by setting a positive (negative) number in this field.
+  no_song_file:
+    foreword: ---------------------------------------
+    question: 'Your {render_mode} was not saved to file.'
+    afterword:
+    input_tip: click OK to acknowledge
+    help_text:
+  one_song_file:
+    foreword: ---------------------------------------
+    question: 'Your {render_mode} is located at: {song_file}'
+    afterword:
+    input_tip: click OK to acknowledge
+    help_text:
+  several_song_files:
+    foreword: ---------------------------------------
+    question: 'Your {render_mode} is located in: {songs_out}'
+    afterword: 'Your song has been split into {num_files} files between "{first_file}" and "{last_file}"'
+    input_tip: click OK to acknowledge
+    help_text:
+  few_errors:
+    foreword:
+    question: 'Song successfully read with a few errors.'
+    afterword:
+    input_tip: click OK to acknowledge
+    help_text:
+  many_errors:
+    foreword: |
+      *WARNING*: Your song contains many errors.
+      Please check the following:
+      
+      - If you have specified the octave number, it must be between 1 and 3. If not, try again with an octave shift.
+      - If you have changed the musical key (i.e. transposed the song), a +/-1 octave shift might be necessary
+      - In Jianpu, pauses are indicated by '0' (zero)
+      - That your song is free of typos. Please check this website for full instructions: 
+      
+      <https://sky-music.github.io/make-your-own-sheet.html>
+    question: Do you want to continue anyway?
+    afterword: 
+    input_tip: 'yes/no question'
+    help_text:
+  empty_song:
+    foreword: |
+      *WARNING*: Your song is empty!
+      Please check the following:
+      
+      - You have entered at least one valid note
+      - If you entered an HTML visual sheet file, make sure it has been generated after the 1st July 2020 and contains the tag <div id='ascii' hidden>
+    question: Do you want to continue anyway?
+    afterword: 
+    input_tip: 'yes/no question'    
+    help_text:
+  skyjson_url:
+    foreword:
+    question: 'You can listen to your song being played by our partner website at: <{url}>'
+    afterword:
+    input_tip: click OK to acknowledge
+    help_text:
+  discord_ad:
+    foreword: '======================================='
+    question: 'This program is also available on Discord at: https://discord.gg/thatskygame'
+    afterword: 'To call the Bot from any channel, say this: !song'
+    input_tip: click OK to acknowledge
+    help_text:

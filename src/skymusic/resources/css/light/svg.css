@@ -1,0 +1,150 @@
+/* <!-- Element background color for icons in ../elements
+Set to none to have a transparent SVG, and a transparent PNG with alpha layer (RGBA) later
+Set to white to make the background white in RGB mode, and the PNG background white when converted to RGB
+--> */
+svg rect.harp-background, svg rect.drum-background {
+  fill: white;
+}
+
+svg rect.note-background, svg rect.note-background {
+  fill: white;
+}
+
+/* <!-- Sky instrument chart: a table with rounded edges --> */
+svg rect.harp, svg rect.drum {
+  fill: white;
+  stroke-width: 1;
+  stroke :black;
+}
+
+/* <!-- Sky instrument chart: a table with rounded edges and thick edges (for rendering PNG from SVG only) --> */
+svg rect[class*="-png"] {
+  fill: white;
+  stroke-width: 3;
+  stroke: black;
+}
+
+/* <!-- Makes the table disappear in case of broken instrument --> */
+svg.broken rect, svg.broken {
+  fill: none;
+  stroke-width: 0;
+  stroke: white;
+}
+
+/* <!-- Silent table (SVG only)--> */
+svg.silent rect:not([class*="-background"]), svg.silent {
+  stroke: grey;
+  stroke-width: 0;
+  fill: none;
+}
+
+/* <!-- Middle note button when the harp is silent --> */
+svg[class*="harp"].silent svg.button-7 .silent.icon {
+  stroke-width: 0;
+  stroke: white;
+  fill: #BBBBBB;
+  opacity: 1;
+}
+
+/* <!-- Middle note button when the drum is silent --> */
+svg[class*="drum"].silent svg.button-5 .silent.icon {
+  stroke-width: 0;
+  stroke: white;
+  fill: #BBBBBB;
+  opacity: 1;
+}
+
+svg text {
+    font-family: "Noto Sans", "Noto Sans CJK JP", "Noto Sans CJK KR", "Noto Sans CJK SC", "Noto Sans CJK TC", "Avenir", Arial, sans-serif;
+  	stroke: none;
+  	fill: black;
+}
+
+/* <!-- Song title --> */
+svg text.title {
+    font-size: 1.3em;
+    font-weight: bold;
+}
+
+/* <!-- Sky voice --> */
+svg text.voice {
+  font-size: 0.8em;
+  dominant-baseline: middle;
+}
+
+svg text.bold
+{
+	font-size: 1em;
+	font-weight: bold;
+}
+
+svg text.italic
+{
+	font-size: 1em;
+	font-style: italic;
+}
+
+svg text.h1
+{
+	font-size: 1.3em;
+	font-weight: bold;
+}
+
+svg text.h2
+{
+	font-size: 1.15em;
+	font-weight: bold;
+}
+
+/* <!-- Line number --> */
+svg text.num {
+  font-size: 0.8em;
+  color: grey;
+}
+
+/* <!-- Broken text --> */
+svg text.broken {
+  font-size: 6em;
+  stroke: red;
+  fill: red;
+}
+
+/* <!-- Bottom-left corner repetition mark --> (SVG only) */
+svg.repeat text.repeat {
+  dominant-baseline: baseline;
+  font-size: 0.9em;
+}
+
+/* <!-- Note backgrounds: actually used --> */
+svg .r1 { fill: limegreen; }
+svg .r2 { fill: deepskyblue; }
+svg .r3 { fill: deeppink; }
+svg .q1 { fill: rgb(253,231,36); }
+svg .q2 { fill: rgb(144,214,67); }
+svg .q3 { fill: rgb(53,183,120); }
+svg .q4 { fill: rgb(32,144,140); }
+svg .q5 { fill: rgb(48,103,141); }
+svg .q6 { fill: rgb(68,57,130); }
+svg .q7 { fill: rgb(68,1,84); }
+
+/* <!-- Rulers: actually used in svg files --> */
+svg line.sep {
+    stroke: gray;
+    stroke-width: 0.15em;
+}
+
+svg line.solid {
+    stroke: black;
+    stroke-width: 0.15em;
+}
+
+svg line.dashed {
+    stroke: black;
+    stroke-width: 0.15em;
+    stroke-dasharray: '10,10';
+}
+
+svg line.double {
+    stroke: black;
+    stroke-width: 0.15em;
+}

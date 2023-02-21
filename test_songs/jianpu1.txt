@@ -4,11 +4,13 @@
 12 345
 #Some quavers #and chords:
 1^2^3^4 5^671+
-#Pauses:
+#Pauses (0 in Jianpu, not '.'):
 1 0 2 0 0 3
+#Repetitions:
+1*2 2*14 0*2 3*1 0*1
 #Notes #without #octave:
 1 2 3 4 5 6 7
 #Errors:
-X + - : 0 1-2 9
+X + - : . 1-2 9
 #out of range:
 1-- 2+++++++

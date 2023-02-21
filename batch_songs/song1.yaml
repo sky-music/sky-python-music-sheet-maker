@@ -1,0 +1,15 @@
+instrument_type: NORMAL
+aspect_ratio: WIDESCREEN # an aspect ratio short name among WIDESCREEN, OLDTV, SQUARE, A4, VERTPANEL
+song_bpm: 60 # an integer value between 12 and 1200
+#octave_shift: 0 # an integer between -12 and +12
+render_modes: all # all to activate all modes, otherwise a comma-separated list of modes names among SVG, HTML, PNG, MIDI, SKYJSON, SKYASCII, SKYENGLISH
+#notes_file: | # a file name...
+#    redemption.txt 
+notes_file: | # ... OR song notes
+    C1 C2 C3 . B1B2-B3
+notes: #This question must be answered with a blank for complete automation
+musical_notation: SKY # An input_mode short name, among SKY, SKYKEYBOARD, ENGLISH, JIANPU, DOREMI, DOREMIJP, ENGLISHCHORDS, SKYHTML
+song_title: my song # song title
+recommended_key: C # The key in case your notation does not use octaves
+original_artist: Mozart # Artist name
+transcript_writer: me # Persons who arranged and transcribed the notes

@@ -1,8 +1,12 @@
 *.html
 *.pyc
-*.png
-*.svg
+*.pyo
+*.pyd
+.github
+dist/*
+build/*
 /songs_out
-/songs
+.DS_Store
 /venv
 .idea
+__pycache__

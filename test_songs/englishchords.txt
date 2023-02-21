@@ -1,9 +1,16 @@
 #Some chords:
-C D F G Dm Em A+ C6 Am9 Fmaj Dm11 Cmaj7
+C Cmaj7 Cmaj9 Cmaj11
+Dm Dm6 Dm13 Dsus
+Em Em7
+F Fmaj7
+G G6 G7 G9 Gsus
+Am Am7 Asus
 #Some quavers
 C-D
 #Pauses:
 C . D . . F
+#Repetitions:
+C*2 Em*14 .*2 Am9*1 .*1
 #Errors:
 X + : 0
 #incorrect case:

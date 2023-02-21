@@ -1,0 +1,348 @@
+# -*- coding: utf-8 -*-
+import math
+from skymusic.resources import Resources 
+
+class NoteParser:
+    """
+    A generic NoteParser for parsing notes of a chromatic/major scale, and turning them into the corresponding
+    coordinates in Sky's 3*5 piano (or in another instrument using set_shape)
+    """
+    # Compile regexes for notes to save before using
+    # these regexes are used for validating whether an individual note is formatted correctly.
+    note_name_with_octave_regex = None
+    note_name_regex = None
+    note_octave_regex = None
+
+    #CHROMATIC_SCALE = None
+    SEMITONE_INTERVAL_TO_MAJOR_SCALE_INTERVAL = {
+            0: 0,  # 0 semitones means it’s the root note
+            2: 1,  # 2 semitones means it’s a 2nd interval
+            4: 2,  # 4 semitones means it’s a 3rd interval
+            5: 3,  # 5 semitones means it’s a 4th interval
+            7: 4,  # 7 semitones means it’s a 5th interval
+            9: 5,  # 9 semitones means it’s a 6th interval
+            11: 6  # 11 semitones means it’s a 7th interval
+        }
+
+    # Number of notes in the chromatic scale, and number of notes in a major scale
+    CHROMATIC_SCALE_COUNT = 12
+    BASE_OF_MAJOR_SCALE = 7
+
+    def __init__(self, locale='en_US', start_octave=Resources.PARSING_START_OCTAVE, shape=(3,5)):
+
+        self.locale = locale
+        self.shape = shape if shape else (3,5)#Can be overridden  by a call to set_shape. Only used to check bound
+
+        # Specify the default starting octave of the harp, for instance 1 (C1 D1 E1 etc.), or 4 (C4 D4 E4).
+        #Octave-less notes will be assigned to this octave, e.g. F == F1
+        self.default_starting_octave = start_octave
+
+    def get_column_count(self): return self.shape[1]
+
+    def get_row_count(self): return self.shape[0]
+
+    def get_shape(self): return self.shape
+
+    def set_shape(self, shape=(3,5)): self.shape = shape if shape else (3,5)
+
+    def get_chromatic_scale(self): return self.CHROMATIC_SCALE
+
+    def get_inverse_chromatic_scale(self): return self.INVERSE_CHROMATIC_SCALE
+
+    def get_semitone_interval_to_major_scale_interval(self):  return self.SEMITONE_INTERVAL_TO_MAJOR_SCALE_INTERVAL
+
+    def get_chromatic_scale_count(self): return self.CHROMATIC_SCALE_COUNT
+
+
+    def get_default_starting_octave(self): return self.default_starting_octave
+
+    def get_base_of_western_major_scale(self): return self.BASE_OF_MAJOR_SCALE
+
+    def get_note_name_with_octave_regex(self): return self.note_name_with_octave_regex
+
+    def get_note_name_regex(self): return self.note_name_regex
+
+    def get_note_octave_regex(self): return self.note_octave_regex
+
+    def get_note_name(self, note):
+
+        note_regexobj = self.get_note_name_regex().search(note)
+        if note_regexobj:
+            note_name = note_regexobj.group(0)
+        else:
+            note_name = None
+        return note_name
+
+    def get_note_octave(self, note):
+
+        octave_regexobj = self.get_note_octave_regex().search(note)
+        if octave_regexobj:
+            note_octave = int(octave_regexobj.group(0))
+        else:
+            note_octave = ''
+            
+        return note_octave
+
+    def is_valid_note_name_with_octave(self, note):
+
+        """
+        Return True if note is in the format self.note_name_with_octave_regex, e.g. Ab4, else return False
+        """
+
+        note_regexobj = self.get_note_name_with_octave_regex().match(note)
+
+        if note_regexobj:
+            return True
+        else:
+            return False
+
+    def english_note_name(self, notes_string, reverse=False):
+        from skymusic.parsers.noteparsers import english
+        if reverse:
+            native_parser = english.English()
+            foreign_parser = self
+        else:
+            native_parser = self
+            foreign_parser = english.English()
+        
+        if foreign_parser.__class__ == native_parser.__class__:
+            return notes_string
+        
+        note_name = native_parser.note_name_regex.match(str(notes_string))
+
+        if note_name is not None:
+            note_name = native_parser.sanitize_note_name(note_name.group(0))
+        else:
+            return notes_string
+
+        try:
+            chromatic_value = native_parser.get_chromatic_scale()[note_name]
+            foreign_scale = foreign_parser.get_chromatic_scale()
+            foreign_note_name = list(foreign_scale.keys())[list(foreign_scale.values()).index(chromatic_value)]
+        except:
+            foreign_note_name = foreign_parser.note_name_regex.match(str(note_name))
+            if foreign_note_name is not None:
+                foreign_note_name = foreign_note_name.group(0)
+            else:
+                foreign_note_name = None
+
+        return foreign_note_name
+
+    def is_valid_note_name(self, note_name):
+
+        """
+        Return True if note is in the format self.note_name_regex, else return False
+        """
+
+        note_regexobj = self.get_note_name_regex().match(note_name)
+
+        if note_regexobj:
+            return True
+        else:
+            return False
+
+    def parse_note(self, note, song_key, is_finding_key=False):
+
+        """
+        Returns a tuple containing note_name, note_name for a note in the format self.note_name_with_octave_regex
+
+        When is_finding_key is True, the handle_note_name_without_octave method should be used
+        """
+
+        if self.is_valid_note_name_with_octave(note):
+            note_name = self.get_note_name(note)
+            note_octave = self.get_note_octave(note)
+            return note_name, note_octave
+        else:
+            if self.is_valid_note_name(note):
+
+                # Player has given note name without specifying an octave
+                note_name = note
+
+                if not is_finding_key:
+
+                    note_octave = self.get_default_starting_octave()
+                    return note_name, note_octave
+                else:
+                    return self.handle_note_name_without_octave(note_name, song_key)
+
+            else:
+                # Raise error, not a valid note
+                raise SyntaxError(f"Note {note} was not formatted correctly.")
+
+    def handle_note_name_without_octave(self, note_name, song_key):
+
+        """
+        Handle notes specified without octaves (e.g. the note G in the key of Ab)
+        """
+
+        note_octave = self.get_default_starting_octave()
+
+        chromatic_interval = self.convert_note_name_into_chromatic_position(
+            note_name) - self.convert_note_name_into_chromatic_position(song_key)
+
+        if chromatic_interval < 0:
+            note_octave += 1
+
+        return note_name, note_octave
+
+    def convert_note_name_into_chromatic_position(self, note_name):
+
+        """
+        Returns the numeric equivalent of the note in the chromatic scale
+        """
+
+        if self.is_valid_note_name(note_name):
+            note_name = self.sanitize_note_name(note_name)
+        else:
+            # Error: note is not formatted right, output broken harp
+            raise SyntaxError(f"ParsingError: Note {note_name} was not formatted correctly.")
+
+        chromatic_scale = self.get_chromatic_scale()
+
+        if note_name in chromatic_scale.keys():
+            return chromatic_scale[note_name]
+        else:
+            raise KeyError(f"ParsingError: Note {note_name} was not found in the chromatic scale.")
+
+    def convert_chromatic_position_into_note_name(self, chromatic_position):
+        
+        inverse_chromatic_scale = self.get_inverse_chromatic_scale()
+
+        try:
+            return inverse_chromatic_scale[chromatic_position]
+        except KeyError:
+            raise KeyError(f"ParsingError: Chromatic position {chromatic_position} was not found in the inverse chromatic scale.")        
+        
+
+    def convert_semitone_interval_to_major_scale_interval(self, semitone_interval):
+
+        conversion_dict = self.get_semitone_interval_to_major_scale_interval()
+
+        if semitone_interval in conversion_dict.keys():
+            return conversion_dict[semitone_interval]
+        else:
+            raise KeyError(f"ParsingError: Interval {semitone_interval} is not in the major scale.")
+
+    def calculate_coordinate_for_note(self, note, song_key=Resources.DEFAULT_KEY, note_shift=0, is_finding_key=False):
+
+        """
+
+        For a note in the format self.note_name_with_octave_regex, this method returns the corresponding coordinate
+        on the Sky piano (in the form of a tuple)
+
+        song_key will be determined by the find_keys method, and is expected to match CHROMATIC_SCALE,
+        otherwise the default key will be C. note_shift is the variable set by the user.
+
+        When this method is being used to find the key, `is_finding_key` should be set to True.
+
+        KeyError will be raised if:
+        - note is not in the major scale of song key (using the dict)
+        - note is not in the chromatic scale (using the dict)
+        SyntaxError will be raised if:
+        - note is not formatted correctly
+
+        KeyError and SyntaxError can be caught, by any method that calls this one, to output a broken harp
+        """
+
+        # Convert note to base 7
+        note_name, note_octave = self.parse_note(note, song_key, is_finding_key)
+
+        # Find the major scale interval from the song_key to the note_name
+        # Find the semitone interval from the song_key to the note_name first
+        if song_key is None:
+            song_key = Resources.DEFAULT_KEY
+        try:
+            song_key_chromatic_equivalent = self.convert_note_name_into_chromatic_position(song_key)
+        except (KeyError, SyntaxError):
+            # default to C major
+            song_key_chromatic_equivalent = 0
+        try:
+            note_name_chromatic_equivalent = self.convert_note_name_into_chromatic_position(note_name)
+        except KeyError:
+            # will output broken harp
+            raise KeyError(f"Note {note_name} was not found in the chromatic scale.")
+        except SyntaxError:
+            raise SyntaxError(f"Note {note_name} was not formatted correctly.")
+
+        interval_in_semitones = note_name_chromatic_equivalent - song_key_chromatic_equivalent
+        if interval_in_semitones < 0:
+            # Circular shift the interval back to a positive number
+            interval_in_semitones += self.get_chromatic_scale_count()
+            note_octave -= 1
+
+        note_octave_str = self.convert_base_10_to_base_7(note_octave)
+
+        try:
+            major_scale_interval = self.convert_semitone_interval_to_major_scale_interval(interval_in_semitones)
+        except KeyError:
+            # Turn note into a broken harp, since note is not in the song_key
+            raise KeyError(f"Note {note} is not in the song key.")
+
+        # Convert note to base 10 for arithmetic
+        note_in_base_10 = self.convert_base_7_to_base_10(note_octave_str + str(major_scale_interval))
+        note_in_base_10 -= self.get_base_of_western_major_scale() * self.get_default_starting_octave()
+
+        #if self.is_valid_note_name_with_octave(note):
+        # Apply the note shift whether the octave has been explicitely written or not
+        note_in_base_10 += note_shift
+
+        note_coordinate = self.convert_base_10_to_coordinate_of_another_base(note_in_base_10, self.get_column_count())
+
+        if self.is_coordinate_in_range(note_coordinate):
+            return note_coordinate
+        else:
+            # Coordinate is not in range of the two octaves of the Sky piano
+            raise KeyError(f"Note {note} is not in range of the two octaves of the Sky piano: {note_coordinate}")
+            # TODO: define custom errors
+
+    def convert_base_10_to_base_7(self, num):
+        n = 3
+        numstr = [0] * n
+        base = self.get_base_of_western_major_scale()
+        for i in range(n - 1, -1, -1):
+            numstr[i] = int(num / (base ** i))
+            num -= numstr[i] * (base ** i)
+        numstr = list(map(str, numstr))
+        return ''.join(numstr[::-1]).lstrip('0')
+
+    def convert_base_7_to_base_10(self, num_in_base_7):
+
+        """
+        Given a number in base 7 as a string, returns the number in base 10 as an integer.
+        """
+
+        num_in_base_10 = int(num_in_base_7, self.get_base_of_western_major_scale())
+        return num_in_base_10
+
+    def convert_base_10_to_coordinate_of_another_base(self, num, base):
+
+        """
+        Convert a number in base 10 to base `self.columns` (using mod and floor), and return as a tuple
+        """
+
+        remainder = num % base
+        quotient = math.floor(num / base)
+
+        return quotient, remainder
+
+    def sanitize_note_name(self, note_name):
+
+        # Do any work here to sanitize the note_name so that it matches the keys of self.CHROMATIC_SCALE
+
+        return note_name
+
+    def is_coordinate_in_range(self, coordinate):
+
+        """
+
+        Returns True if the coordinate is in range of the Sky piano (as defined by self.columns and self.lines),
+        return False if not. coordinate is expected to be a tuple.
+
+        """
+
+        if 0 <= coordinate[0] <= self.get_row_count() - 1 and 0 <= coordinate[1] <= self.get_column_count() - 1:
+            # Check if the row number and column number of the coordinates are within the instrument's range
+            return True
+        else:
+            return False
