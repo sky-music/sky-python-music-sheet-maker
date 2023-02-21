@@ -1,13 +1,44 @@
 from . import instrument_renderer
 from skymusic.renderers.note_renderers.svg_nr import SvgNoteRenderer
+from skymusic.modes import GamePlatform
 
 class SvgInstrumentRenderer(instrument_renderer.InstrumentRenderer):
     
-    def __init__(self, locale=None, gamepad=None):
+    def __init__(self, locale=None, platform_name=GamePlatform.get_default().get_name(), gamepad=None):
         super().__init__(locale)
         self.gamepad=gamepad
+        self.platform_name = platform_name
         #Gaps, must end with V or H
         self.gamepad_gaps = {'note-gapH': 0.43, 'note-gapV': 0.4, 'quaver-gapH': 0.2, 'line-gapV': 2, 'pauseH': 0.7-0.43} #Relative to note size
+        self.set_svg_note_size()
+
+    def set_svg_note_size(self):
+        self.SVG_note_size = SvgNoteRenderer(platform_name=self.platform_name, gamepad=self.gamepad).get_svg_size()
+        return self.SVG_note_size
+
+    def get_svg_note_size(self, absolute=True, rescale=1):
+        '''Gets note size'''
+        if self.SVG_note_size is None: self.set_svg_note_size()
+        if absolute:
+            return (self.SVG_note_size[0]*rescale, self.SVG_note_size[1]*rescale)
+        else:
+            return (1, self.SVG_note_size[1]/self.SVG_note_size[0])
+
+    def get_svg_gaps(self, absolute=True, rescale=1):
+        '''Get horizontal and vertical spacings'''
+        SVG_note_size = self.get_svg_note_size(absolute=absolute, rescale=rescale)
+        return {k:v*(SVG_note_size[0] if k.endswith('H') else SVG_note_size[1]) for k,v in self.gamepad_gaps.items()}
+
+    def get_svg_gamepad_size(self, instrument, absolute=True, rescale=1):
+        '''Get typical size of a gamepad layout'''
+        SVG_note_size =  self.get_svg_note_size(absolute=absolute, rescale=rescale)
+        num_buttons = max(1,instrument.get_skygrid().get_max_num_by_frame()) #rows
+        num_frames = max(1,instrument.get_skygrid().get_num_frames()) # cols
+        
+        if instrument.get_is_silent(): return (round(self.gamepad_gaps['pauseH']*SVG_note_size[0]), round(SVG_note_size[1]))
+        
+        return ( round((num_frames + self.gamepad_gaps['quaver-gapH']*(num_frames-1))*SVG_note_size[0]),
+                 round((num_buttons + self.gamepad_gaps['note-gapV']*(num_buttons-1))*SVG_note_size[1]) )
 
     def render_ruler(self, ruler, x, width: str, height: str, aspect_ratio):
         
@@ -43,7 +74,7 @@ class SvgInstrumentRenderer(instrument_renderer.InstrumentRenderer):
     def render_layer(self,*args,**kwargs):
         return self.render_ruler(*args,**kwargs)
 
-    def render_voice(self, instrument, x, width: str, height: str, aspect_ratio):
+    def render_voice(self, instrument, x, width: str, height: str, aspect_ratio=1):
         """Renders the lyrics text in SVG"""
         
         lyric = instrument.get_lyric(strip_html=True)
@@ -70,12 +101,12 @@ class SvgInstrumentRenderer(instrument_renderer.InstrumentRenderer):
 
         return harp_render
 
-    def _render_gamepad_harp_(self, instrument, x, harp_width, harp_height, note_aspectRatio):
+    def _render_gamepad_harp_(self, instrument, x, harp_width, harp_height):
         #TODO
         harp_silent = instrument.get_is_silent()
         harp_broken = instrument.get_is_broken()
         
-        note_renderer = SvgNoteRenderer(gamepad=self.gamepad)
+        note_renderer = SvgNoteRenderer(platform_name=self.gamepad.platform.get_name(),gamepad=self.gamepad)
         
         # Required to get gamepad button name from note coord in the Skygrid
         note_parser = self.gamepad.get_note_parser(locale=self.locale, shape=instrument.get_shape()) #Cannot be sooner because we need instrument shape
@@ -92,8 +123,9 @@ class SvgInstrumentRenderer(instrument_renderer.InstrumentRenderer):
         num_frames = max(1, len(frames))
         num_buttons = max(1, instrument.get_skygrid().get_max_num_by_frame())
         
+        (note_width, note_height) = note_renderer.get_svg_size()
+        note_height = (1/num_buttons)*(note_width/note_height)
         note_width = 1/num_frames
-        note_height = (1/num_buttons)*note_aspectRatio
         
         xn = xn0
         # Render harp in vertical layout mode
@@ -133,7 +165,7 @@ class SvgInstrumentRenderer(instrument_renderer.InstrumentRenderer):
             
         css_class = " ".join(filter(None,["instr", instr_type, instr_state]))
 
-        note_renderer = SvgNoteRenderer(gamepad=self.gamepad)
+        note_renderer = SvgNoteRenderer(platform_name=self.platform_name,gamepad=self.gamepad)
 
         # The harp SVG container
         harp_render = f'<svg x="{x :.2f}" y="0" width="{harp_width}" height="{harp_height}" class="{css_class}" id="instr-{instrument.get_index()}">'

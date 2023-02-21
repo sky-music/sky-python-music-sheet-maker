@@ -92,6 +92,8 @@ class PngSongRenderer(song_renderer.SongRenderer):
             self.png_harp_spacings = (
                 self._harp_rel_spacings_[0] * self.png_harp_size[0], self._harp_rel_spacings_[1] * self.png_harp_size[1])
             self.png_lyric_size = (self.png_harp_size[0], (self.png_harp_size[1] / self.png_harp_size0[1]))
+            
+        return self.png_harp_size
 
 
     def set_png_gamepad_spacings(self):
@@ -100,6 +102,7 @@ class PngSongRenderer(song_renderer.SongRenderer):
             instrument_renderer = PngInstrumentRenderer(locale=self.locale, harp_type='harp', platform_name=self.platform_name, gamepad=self.gamepad)
             gaps = instrument_renderer.get_png_gaps()
             self.png_gamepad_spacings = (gaps['note-gapH'], gaps['line-gapV'])
+        return self.png_gamepad_spacings
 
 
     def set_png_voice_size(self):

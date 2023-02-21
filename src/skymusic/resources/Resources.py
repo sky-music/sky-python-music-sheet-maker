@@ -152,7 +152,7 @@ PNG_SETTINGS = {'png_color': None,  # theme dependent
                 }
 
 SVG_SETTINGS = {'font_size': 12,
-                'gp_note_aspectRatio':100/110,
+                'note_size':(100,110),
                 }
 
 try:
@@ -202,5 +202,5 @@ DEFAULT_INSTRUMENT = 'harp'
 MIDI_PITCHES = {'C': 60, 'C#': 61, 'Db': 61, 'D': 62, 'D#': 63, 'Eb': 63, 'E': 64, 'F': 65, 'F#': 66, 'Gb': 66, 'G': 67, 'G#': 68, 'Ab': 68, 'A': 69, 'A#': 70, 'Bb': 70, 'B': 71}
 MIDI_SEMITONES = [0, 2, 4, 5, 7, 9, 11]  # May no longer be used when Western_scales is merged
 
-BYPASS_GAMEPAD_SVG = True #Debug: bypass platform for SVG renderer while it's not done
+BYPASS_GAMEPAD_SVG = False #Debug: bypass platform for SVG renderer while it's not done
 BYPASS_GAMEPAD_PNG = False #Debug: bypass platform for PNG renderer while it's not done

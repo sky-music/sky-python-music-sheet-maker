@@ -62,9 +62,9 @@ class CommandLinePlayer:
 
     def __init__(self, locale=None, preferences_path='../skymusic_preferences.yaml'):
         self.name = Resources.COMMAND_LINE_NAME
-        self.preferences = self.load_preferences(preferences_path)
-        if locale is None: locale = self.get_locale_from_prefs()
-        self.set_locale(locale)
+        self.preferences = self.load_preferences(preferences_path) 
+        self.set_locale(self.get_locale_from_prefs() if not locale else locale)
+        self._fix_preferences_(locale=self.locale)
         self.communicator = Communicator(owner=self, locale=self.locale)
         self.yaml_song = None
 
@@ -118,17 +118,21 @@ class CommandLinePlayer:
 
         return self.yaml_songs
 
+    def _fix_preferences_(self, locale):
+        ''' #Fixes a bug in YAML < 1.2'''
+        yes_word = Lang.get_string("words/yes_word", locale)
+        no_word = Lang.get_string("words/no_word", locale)
+        for k in self.preferences:
+            if self.preferences[k] is True: self.preferences[k] = yes_word
+            if self.preferences[k] is False: self.preferences[k] = no_word
+        return self.preferences
+
     def load_preferences(self, filepath):
         """Loads the preferences.yaml file with default answers to questions, if it exists"""
         try:
             with open(filepath, mode='r', encoding='utf-8', errors='ignore') as file:
                 print(f"(Loaded preferences file from {filepath})")
-                prefs = yaml.safe_load(file)
-                #Fixes a bug in YAML < 1.2
-                for k in prefs:
-                    if prefs[k] is True: prefs[k] = 'yes'
-                    if prefs[k] is False: prefs[k] = 'no'
-                return prefs
+                return yaml.safe_load(file)
         except (FileNotFoundError, PermissionError):
             return None
 

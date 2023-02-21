@@ -141,7 +141,6 @@ class SVGMerger(html.parser.HTMLParser):
 
     def _class_to_inline_(self, attrs):
         
-        
         attrs_new = {attr:value for (attr, value) in attrs}
          
         css_class = attrs_new.pop('class', '').strip()
@@ -162,7 +161,6 @@ class SVGMerger(html.parser.HTMLParser):
         if self.recording and tag in self.recording_gate: self.recording = False #Pausing recording
         if tag in self.suspend_gate:  self.recording = True #We passed the suspend gate, resuming recording
 
-            
 
     def handle_data(self, data):
         '''What to do with non-tag text; should not be used with SVG'''
@@ -216,27 +214,25 @@ if __name__ == '__main__':
     platforms = [GamePlatform.SWITCH, GamePlatform.PLAYSTATION]
     themes = ['light','dark']
     modes = ['html','svg'] #'html, svg'
-    css_files = ['svg2png.css'] # for html only
+    svg_root_dir = '../resources/original'
+    css_root_dir = '../resources/css'
+    css_files = {'html':['svg2png.css'], 'css': ['svg2png.css']} # to be inlined
     excluded_svgs = ['unhighlighted-drum', 'unhighlighted-harp', 'empty-drum', 'empty-harp', 'blank']
     strip_text = ['-symbol']
     
     for platform in platforms:
         for theme in themes:
             for mode in modes:
-                svg_dir = os.path.join('../resources/original', platform.get_name())
-                css_dir = os.path.join('../resources/css', theme)
-            
+                svg_dir = os.path.join(svg_root_dir, platform.get_name())
+                css_dir = os.path.join(css_root_dir, theme)
             
                 #%% MAIN
-                if mode == 'html':
-                    escape_html = True
-                    css_paths = [os.path.join(css_dir, css_file) for css_file in css_files]
-                    for css_path in css_paths:
+                if mode in css_files:
+                    css_paths = [os.path.join(css_dir, css_file) for css_file in css_files[mode]]
+                    for css_path in css_paths.copy():
                         if not os.path.isfile(css_path):
-                            print("*** WARNING: {css_path} not found.")
-                else:
-                    escape_html = False
-                    css_paths = []
+                            print(f"*** WARNING: {css_path} not found.")
+                            css_paths.remove(css_path)
                     
                 # Parse SVG files one by one
                 dirpath, _, filenames = next(os.walk(svg_dir), (None, None, []))
