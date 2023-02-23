@@ -13,9 +13,12 @@ class PseudoInstrument():
         return self.type
     
     #Mandatory because called by Song.get_harp_type()
-    def is_tonal(self): return False
+    def get_is_tonal(self): return False
     
-    def is_textual(self): return False
+    def get_is_textual(self):
+        return self._getattr_('text','') != ''
+        
+    def get_is_decorative(self): return False
     
     def set_index(self, index): self.index = index
         
@@ -39,6 +42,8 @@ class Ruler(PseudoInstrument):
         if code: self.set_code(code)
         self.text = ""
         self.emphasis = ''
+    
+    def get_is_decorative(self): return True
     
     def set_text(self, text: str):
         self.text = text[:64].strip()

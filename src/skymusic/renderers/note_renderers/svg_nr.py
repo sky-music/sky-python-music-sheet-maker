@@ -8,7 +8,7 @@ class SvgNoteRenderer(note_renderer.NoteRenderer):
         super().__init__()
         self.platform_name = platform_name
         self.gamepad = gamepad
-        self.SVG_size = None
+        self.gp_note_size = None
 
     def get_silent_svg(self, xs="0%", ys="0%", widths="10%"):
         return f'<use xlink:href="#silent" x="{xs}" y="{ys}" width="{widths}" height="{widths}" />'
@@ -22,11 +22,11 @@ class SvgNoteRenderer(note_renderer.NoteRenderer):
     def get_unhighlighted_svg(self, row_num, xs="0%", ys="0%", widths="10%"):
         return f'<use xlink:href="#d{row_num}" x="{xs}" y="{ys}" width="{widths}" height="{widths}" />'
 
-    def get_svg_size(self):
+    def get_gp_note_size(self):
         """Returns the original size of the SVG image of a note"""
-        if self.SVG_size is None:
-            self.SVG_size = Resources.SVG_SETTINGS['note_size']
-        return self.SVG_size    
+        if self.gp_note_size is None:
+            self.gp_note_size = Resources.SVG_SETTINGS['gp_note_size']
+        return self.gp_note_size    
 
     def render(self, note, xs="0%", ys="0%", widths="10%", heights="10%", note_parser=None):
         
@@ -106,3 +106,4 @@ class SvgNoteRenderer(note_renderer.NoteRenderer):
             note_svg = ''
               
         return note_svg
+

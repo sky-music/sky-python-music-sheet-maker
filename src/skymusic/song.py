@@ -92,7 +92,7 @@ class Song():
     def get_harp_type(self):
 
         for line in self.lines:
-            if line[0].is_tonal():
+            if line[0].get_is_tonal():
                 return line[0].get_type()
         
         return 'harp'            

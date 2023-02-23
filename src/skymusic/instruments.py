@@ -148,12 +148,15 @@ class Instrument():
     def get_type(self):
         return self.type
 
-    def is_tonal(self):
+    def get_is_tonal(self):
         return hasattr(self, 'skygrid')
         
-    def is_textual(self):
+    def get_is_textual(self):
         #Another definition could be envsioned, but currently .lyric is too specific to be relied on
-        return not hasattr(self, 'skygrid')
+        return hasattr(self, 'lyric')
+
+    def get_is_decorative(self):
+        return False
 
     def set_repeat(self, repeat): self.repeat = repeat
 
@@ -235,7 +238,7 @@ class Harp(Instrument):
     shape = (3, 5)
     def __init__(self):
         super().__init__()
-        self.skygrid = Skygrid(shape=self.shape) #do not change name as it is used by is_tonal() and is_textual()
+        self.skygrid = Skygrid(shape=self.shape) #do not change name as it is used by get_is_tonal() and get_is_textual()
         
     def __getattr__(self, attr_name):
         return getattr(self.skygrid, attr_name)
@@ -284,7 +287,7 @@ class Drum(Harp):
     shape = (2,4)
     def __init__(self):
         super().__init__()
-        self.skygrid = Skygrid(shape=self.shape) #do not change name as it is used by is_tonal() and is_textual()
+        self.skygrid = Skygrid(shape=self.shape) #do not change name as it is used by get_is_tonal() and get_is_textual()
     
 
 #TEXTS = ['voice','lyric']

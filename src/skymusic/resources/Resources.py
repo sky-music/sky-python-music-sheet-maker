@@ -24,20 +24,14 @@ def load_theme(theme, platform='mobile'):
     '''
     Loads CSS and PNG files as string and bytes buffers respectively, for a theme whose name 'theme' must be defined in the THEMES list
     '''
-    global PNGS, CSS, SVG, THEMES, PLATFORMS, PNG_SETTINGS, BYPASS_GAMEPAD_PNG
+    global PNGS, CSS, SVG, THEMES, PLATFORMS, PNG_SETTINGS, BYPASS_GAMEPAD_SVG
     
     if theme not in THEMES:
         load_theme(get_default_theme(), platform)
     elif (THEMES[theme] is False) or (PLATFORMS[platform] is False):
         
-        
-        if BYPASS_GAMEPAD_PNG:
-            png_module = importlib.import_module('.'+theme+'.'+'mobile', png.__name__)       
-            png_files = importlib_resources.contents(png_module)  
-        else: 
-            png_module = importlib.import_module('.'+theme+'.'+platform, png.__name__)       
-            png_files = importlib_resources.contents(png_module)        
-            
+        png_module = importlib.import_module('.'+theme+'.'+platform, png.__name__)       
+        png_files = importlib_resources.contents(png_module)        
         
         if not png_files:
             print(f"\n*** ERROR: could not find any PNG file to embed from {png_module}. ***\n")   
@@ -74,7 +68,7 @@ def load_theme(theme, platform='mobile'):
               
         PNG_SETTINGS['font_color'] = COLORS[theme]['font_color']
         PNG_SETTINGS['dimmed_font_color'] = COLORS[theme]['dimmed_font_color']  
-        PNG_SETTINGS['png_color'] = COLORS[theme]['png_color']
+        PNG_SETTINGS['harp_color'] = COLORS[theme]['harp_color']
         PNG_SETTINGS['text_bkg'] = COLORS[theme]['text_bkg']  
         PNG_SETTINGS['song_bkg'] = COLORS[theme]['song_bkg']  
         PNG_SETTINGS['hr_color'] = COLORS[theme]['hr_color']
@@ -103,13 +97,13 @@ PNGS = {'mobile': dict(), 'playstation': dict(), 'switch': dict()}
 COLORS = {
         'light': {'font_color': (0, 0, 0),
                   'dimmed_font_color': (128, 128, 128),
-                  'png_color': (255, 255, 255),
+                  'harp_color': (255, 255, 255),
                   'text_bkg': (255, 255, 255, 0), #Transparent white
                   'song_bkg': (255, 255, 255),
                   'hr_color': (0, 0, 0)},
         'dark': {'font_color': (255, 255, 255),
                   'dimmed_font_color': (128, 128, 128),
-                  'png_color': (54, 57, 63),
+                  'harp_color': (54, 57, 63),
                   'text_bkg': (54, 57, 63, 0), #Transparent dark
                   'song_bkg': (54, 57, 63),
                   'hr_color': (255, 255, 255)}, 
@@ -133,26 +127,35 @@ skyjson_api_url = "https://sky-music.herokuapp.com/api/generateTempSong"
 skyjson_api_key = ""    
 
 
-PNG_SETTINGS = {'png_color': None,  # theme dependent
+PNG_SETTINGS = {'harp_color': None,  # theme dependent
                 'font_color': None, # theme dependent
                 'text_bkg': None,   # theme dependent
                 'song_bkg': None,   # theme dependent
                 'hr_color': None,   # theme dependent
                 'harp_font_size':38,
-                'voice_font_size':32,
-                'png_h1_font_size':48,
-                'png_h2_font_size':42,
-                'png_font_size':36,
+                'voice_font_size':36,
+                'h1_font_size':48,
+                'h2_font_size':42,
+                'font_size':36,
                 'font_path': None,
                 'png_compress':6,
-                'png_max_quavers':6, #Default value is 6 for gamepad, will be calculated according to number of png files for mobile
-                'png_max_chord_size':6, #maximum number of notes in a chord
+                'png_dpi': (2*96, 2*96),
+                'max_quavers':6, #Default value is 6 for gamepad, will be calculated according to number of png files for mobile
+                'max_chord_size':6, #maximum number of notes in a chord
+                'max_harps_line': 10,
+                'max_gp_notes_line':20,#the more, the smaller the buttons
                 'row_names': ['A', 'B', 'C'],
                 'typical_notes': {'mobile': 'A-root', 'playstation': 'X', 'switch': 'X'},
+                'harp_aspect_ratio': 1.4553,
+                'harp_rel_spacings': (0.13, 0.1), #H and V padding relative to harp width and height
                 }
 
-SVG_SETTINGS = {'font_size': 12,
-                'note_size':(100,110),
+SVG_SETTINGS = {'font_size': 12, #pt
+                'gp_note_size':(100,110),# viewport of SVG symbols
+                'harp_aspect_ratio': 1.4553,
+                'harp_rel_spacings': (0.13, 0.1),
+                'max_harps_line':10,
+                'max_gp_notes_line':20,
                 }
 
 try:
@@ -203,4 +206,3 @@ MIDI_PITCHES = {'C': 60, 'C#': 61, 'Db': 61, 'D': 62, 'D#': 63, 'Eb': 63, 'E': 6
 MIDI_SEMITONES = [0, 2, 4, 5, 7, 9, 11]  # May no longer be used when Western_scales is merged
 
 BYPASS_GAMEPAD_SVG = False #Debug: bypass platform for SVG renderer while it's not done
-BYPASS_GAMEPAD_PNG = False #Debug: bypass platform for PNG renderer while it's not done

@@ -10,35 +10,35 @@ class SvgInstrumentRenderer(instrument_renderer.InstrumentRenderer):
         self.platform_name = platform_name
         #Gaps, must end with V or H
         self.gamepad_gaps = {'note-gapH': 0.43, 'note-gapV': 0.4, 'quaver-gapH': 0.2, 'line-gapV': 2, 'pauseH': 0.7-0.43} #Relative to note size
-        self.set_svg_note_size()
+        self.set_gp_note_size()
 
-    def set_svg_note_size(self):
-        self.SVG_note_size = SvgNoteRenderer(platform_name=self.platform_name, gamepad=self.gamepad).get_svg_size()
-        return self.SVG_note_size
+    def set_gp_note_size(self):
+        self.gp_note_size = SvgNoteRenderer(platform_name=self.platform_name, gamepad=self.gamepad).get_gp_note_size()
+        return self.gp_note_size
 
-    def get_svg_note_size(self, absolute=True, rescale=1):
+    def get_gp_note_size(self, absolute=True, rescale=1):
         '''Gets note size'''
-        if self.SVG_note_size is None: self.set_svg_note_size()
+        if self.gp_note_size is None: self.set_gp_note_size()
         if absolute:
-            return (self.SVG_note_size[0]*rescale, self.SVG_note_size[1]*rescale)
+            return (self.gp_note_size[0]*rescale, self.gp_note_size[1]*rescale)
         else:
-            return (1, self.SVG_note_size[1]/self.SVG_note_size[0])
+            return (1, self.gp_note_size[1]/self.gp_note_size[0])
 
-    def get_svg_gaps(self, absolute=True, rescale=1):
+    def get_gamepad_gaps(self, absolute=True, rescale=1):
         '''Get horizontal and vertical spacings'''
-        SVG_note_size = self.get_svg_note_size(absolute=absolute, rescale=rescale)
-        return {k:v*(SVG_note_size[0] if k.endswith('H') else SVG_note_size[1]) for k,v in self.gamepad_gaps.items()}
+        gp_note_size = self.get_gp_note_size(absolute=absolute, rescale=rescale)
+        return {k:v*(gp_note_size[0] if k.endswith('H') else gp_note_size[1]) for k,v in self.gamepad_gaps.items()}
 
-    def get_svg_gamepad_size(self, instrument, absolute=True, rescale=1):
+    def get_gamepad_size(self, instrument, absolute=True, rescale=1):
         '''Get typical size of a gamepad layout'''
-        SVG_note_size =  self.get_svg_note_size(absolute=absolute, rescale=rescale)
+        gp_note_size =  self.get_gp_note_size(absolute=absolute, rescale=rescale)
         num_buttons = max(1,instrument.get_skygrid().get_max_num_by_frame()) #rows
         num_frames = max(1,instrument.get_skygrid().get_num_frames()) # cols
         
-        if instrument.get_is_silent(): return (round(self.gamepad_gaps['pauseH']*SVG_note_size[0]), round(SVG_note_size[1]))
+        if instrument.get_is_silent(): return (round(self.gamepad_gaps['pauseH']*gp_note_size[0]), round(gp_note_size[1]))
         
-        return ( round((num_frames + self.gamepad_gaps['quaver-gapH']*(num_frames-1))*SVG_note_size[0]),
-                 round((num_buttons + self.gamepad_gaps['note-gapV']*(num_buttons-1))*SVG_note_size[1]) )
+        return ( round((num_frames + self.gamepad_gaps['quaver-gapH']*(num_frames-1))*gp_note_size[0]),
+                 round((num_buttons + self.gamepad_gaps['note-gapV']*(num_buttons-1))*gp_note_size[1]) )
 
     def render_ruler(self, ruler, x, width: str, height: str, aspect_ratio):
         
@@ -123,7 +123,7 @@ class SvgInstrumentRenderer(instrument_renderer.InstrumentRenderer):
         num_frames = max(1, len(frames))
         num_buttons = max(1, instrument.get_skygrid().get_max_num_by_frame())
         
-        (note_width, note_height) = note_renderer.get_svg_size()
+        (note_width, note_height) = note_renderer.get_gp_note_size()
         note_height = (1/num_buttons)*(note_width/note_height)
         note_width = 1/num_frames
         
@@ -193,3 +193,5 @@ class SvgInstrumentRenderer(instrument_renderer.InstrumentRenderer):
         harp_render += '\n</svg>'
 
         return harp_render
+
+

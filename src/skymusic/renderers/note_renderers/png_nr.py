@@ -1,5 +1,5 @@
 from skymusic.resources import Resources
-from skymusic.modes import GamePlatform, GamepadLayout
+from skymusic.modes import GamePlatform
 from . import note_renderer
 
 
@@ -16,21 +16,21 @@ class PngNoteRenderer(note_renderer.NoteRenderer):
     def __init__(self, platform_name=GamePlatform.get_default().get_name(), gamepad=None):
         self.platform_name = platform_name
         self.gamepad = gamepad
-        self.png_max_quavers = Resources.PNG_SETTINGS['png_max_quavers']
-        self.rows_names = Resources.PNG_SETTINGS['row_names']
-        self.png_size = None
+        self.max_quavers = Resources.PNG_SETTINGS['max_quavers']
+        self.row_names = Resources.PNG_SETTINGS['row_names']
+        self.note_size = None
 
 
-    def set_png_size(self):
+    def set_note_size(self):
         """Retrieves the original size of the .png image of a highlighted note"""
-        if self.png_size is None:
-            self.png_size = Image.open(Resources.PNGS[self.platform_name][Resources.PNG_SETTINGS['typical_notes'][self.platform_name]]).size
+        if self.note_size is None:
+            self.note_size = Image.open(Resources.PNGS[self.platform_name][Resources.PNG_SETTINGS['typical_notes'][self.platform_name]]).size
 
-    def get_png_size(self):
+    def get_note_size(self, rescale=1):
         """Returns the original size of the .png image of a note"""
-        if self.png_size is None:
-            self.set_png_size()
-        return self.png_size
+        if self.note_size is None:
+            self.set_note_size()
+        return (round(self.note_size[0]*rescale), round(self.note_size[1]*rescale))
 
     def get_dead_png(self):
         """Renders a PNG of a grey note placeholder, in case we want to display an empty harp when it is broken, instead of a central question mark"""
@@ -46,7 +46,7 @@ class PngNoteRenderer(note_renderer.NoteRenderer):
         if self.gamepad:
             png_key = "blank"
         else:
-            row_name = self.rows_names[coord[0]]
+            row_name = self.row_names[coord[0]]
             png_key = f"{row_name}-unhighlighted"
             
         
@@ -62,14 +62,14 @@ class PngNoteRenderer(note_renderer.NoteRenderer):
     def _get_mobile_png_(self, aspect, coord, highlighted_frames):
                 
         if highlighted_frames[0] == 0:
-            row_name = self.rows_names[coord[0]]
+            row_name = self.row_names[coord[0]]
             try:
                 note_png = Resources.PNGS[self.platform_name][f"{row_name}-{aspect}"]        
             except KeyError:
                 print(f"\n***ERROR: Could not find '{row_name}-{aspect}' in PNGS['{self.platform_name}'].")
                 note_png = None    
         else:
-            num = min(highlighted_frames[0], self.png_max_quavers)
+            num = min(highlighted_frames[0], self.max_quavers)
             try:
                 note_png = Resources.PNGS[self.platform_name][f"{aspect}-highlighted-{num}"]
             except KeyError:
@@ -116,5 +116,10 @@ class PngNoteRenderer(note_renderer.NoteRenderer):
                                              resample=Image.LANCZOS)
 
         return png_render
+
+
+
+
+
 
 
