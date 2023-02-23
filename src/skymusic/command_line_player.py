@@ -134,7 +134,7 @@ class CommandLinePlayer:
                 print(f"(Loaded preferences file from {filepath})")
                 return yaml.safe_load(file)
         except (FileNotFoundError, PermissionError):
-            return None
+            return {}
 
     def get_answer_from_preferences(self, q):
         """Try to get the answer to a question by probing the preferences dictionary, which was populated from the preferences.yaml"""

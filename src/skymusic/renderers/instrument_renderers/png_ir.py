@@ -37,18 +37,19 @@ class PngInstrumentRenderer(instrument_renderer.InstrumentRenderer):
         self.repeat_height = None
         self.voice_font_size = Resources.PNG_SETTINGS['voice_font_size']
         self.hr_color = Resources.PNG_SETTINGS['hr_color']  # Grey or White
-        try:
-            self.voice_font = ImageFont.truetype(self.font_path, self.voice_font_size)
-            self.harp_font = ImageFont.truetype(self.font_path, self.harp_font_size)
-            self.h1_font = ImageFont.truetype(self.font_path, self.h1_font_size)
-            self.h2_font = ImageFont.truetype(self.font_path, self.h2_font_size)
-            self.text_font = ImageFont.truetype(self.font_path, self.font_size)
-        except OSError:
-            self.voice_font = ImageFont.load_default()
-            self.harp_font = ImageFont.load_default()
-            self.h1_font = ImageFont.load_default()
-            self.h2_font = ImageFont.load_default()
-            self.text_font = ImageFont.load_default()
+        if not no_PIL_module:
+            try:
+                self.voice_font = ImageFont.truetype(self.font_path, self.voice_font_size)
+                self.harp_font = ImageFont.truetype(self.font_path, self.harp_font_size)
+                self.h1_font = ImageFont.truetype(self.font_path, self.h1_font_size)
+                self.h2_font = ImageFont.truetype(self.font_path, self.h2_font_size)
+                self.text_font = ImageFont.truetype(self.font_path, self.font_size)
+            except OSError:
+                self.voice_font = ImageFont.load_default()
+                self.harp_font = ImageFont.load_default()
+                self.h1_font = ImageFont.load_default()
+                self.h2_font = ImageFont.load_default()
+                self.text_font = ImageFont.load_default()
 
         self.harp_size = None
         self.gp_note_size = None

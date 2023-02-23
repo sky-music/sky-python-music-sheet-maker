@@ -67,7 +67,8 @@ class PngSongRenderer(song_renderer.SongRenderer):
         self._harp_max_upscale_ = 2
         self._gp_max_upscale_ = 1
         
-        self.switch_harp('harp') #sets _harp_size0_, _harp_spacings0_, _voice_size0_
+        if not no_PIL_module:
+            self.switch_harp('harp') #sets _harp_size0_, _harp_spacings0_, _voice_size0_
         
         
         self._gp_note_size_ = None
@@ -76,9 +77,11 @@ class PngSongRenderer(song_renderer.SongRenderer):
         self._nontonal_spacings_ = tuple()   
         
         #self.set_harp_rescale #Not mandatory: will be called depending on player's Song
-        self.set_nontonal_spacings()
-        self.set_gamepad_spacings()
-        self.set_gamepad_rescale(self._max_gp_notes_line_) #Called once and for all   
+
+        if not no_PIL_module:
+            self.set_nontonal_spacings()
+            self.set_gamepad_spacings()
+            self.set_gamepad_rescale(self._max_gp_notes_line_) #Called once and for all   
 
 
     def switch_harp(self, harp_type):
