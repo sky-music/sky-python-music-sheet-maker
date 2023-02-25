@@ -16,7 +16,7 @@ class PseudoInstrument():
     def get_is_tonal(self): return False
     
     def get_is_textual(self):
-        return self._getattr_('text','') != ''
+        return getattr(self, 'text','') != ''
         
     def get_is_decorative(self): return False
     

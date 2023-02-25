@@ -146,7 +146,10 @@ class HtmlInstrumentRenderer(instrument_renderer.InstrumentRenderer):
         text = ruler.get_text()
         if text:
             emphasis = ruler.get_emphasis()
-            hr_render += f'<p><{emphasis}>'+text+f'</{emphasis}></p>'        
+            hr_render += ('<p>' + (f'<{emphasis}>' if emphasis else '')
+                          + text + (f'</{emphasis}>'  if emphasis else '') + 
+                          '</p>'  
+                          )
             
         return hr_render
         

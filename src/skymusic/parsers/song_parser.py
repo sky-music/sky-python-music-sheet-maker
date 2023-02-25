@@ -41,7 +41,13 @@ class SongParser:
         #The backslash character is forbidden
         #Only regex with the following format are supported: \x, where x is s, t, w, d, n, r, a, r, f, v, or R
         self.allowed_regex = ['\s', '\t', '\w', '\d', '\n', '\r', '\a', '\e', '\f', '\v', '\R']
-        self.ruler_regex = Resources.DELIMITERS['lyric'] + r'{0,1}\s*(?P<code>' + r'|'.join(Resources.MARKDOWN_CODES['rulers']) + r')+\s*(?P<text>.*)'
+        ruler_md = r'|'.join(Resources.MARKDOWN_CODES['rulers']) #Markdown codes for rulers
+        single_ruler_md = r'|'.join([re.sub(r'(.)\1*','\\1',code) for code in Resources.MARKDOWN_CODES['rulers']]) #Same codes, duplicate characaters removed
+        self.ruler_regex = (Resources.DELIMITERS['lyric'] +  # Comment delimiter, optional
+                            r'{0,1}\s*(?P<code>' + ruler_md + r')' +  # Ruler markdown code
+                            r'(?:' + single_ruler_md + r')*' + # Trailing markdown characters, e.g. in ---
+                            r'\s*(?P<text>.*)' # The rest is some text
+                            )
         self.layer_regex = Resources.DELIMITERS['lyric'] + r'{0,1}\s*(?P<code>' + Resources.DELIMITERS['layer'] + r')+\s*(?P<text>.*)'
         self.music_theory = music_theory.MusicTheory(self)
         try:
@@ -353,16 +359,16 @@ class SongParser:
             hr_match = re.match(self.ruler_regex, line)
             lay_match = re.match(self.layer_regex, line)
             
-            if hr_match:
+            if hr_match:                
                 hr = sheetlayout.Ruler()
                 hr.set_code(hr_match.group('code')) # Markdown code
-                hr.set_text(hr_match.group('text')) # possible text
+                hr.set_text(re.sub(re.escape(self.lyric_delimiter),'',hr_match.group('text'))) # possible text                
                 instrument_line.append(hr)
             
             elif lay_match:
                 lay = sheetlayout.Layer()
                 lay.set_code(lay_match.group('code')) # Code
-                lay.set_text(lay_match.group('text')) # possible layer name
+                lay.set_text(re.sub(re.escape(self.lyric_delimiter),'',lay_match.group('text'))) # possible text
                 instrument_line.append(lay)   
                                                                         
             elif line[0] == self.lyric_delimiter:

@@ -204,7 +204,6 @@ class SvgSongRenderer(song_renderer.SongRenderer):
         end_row = num_lines
         end_col = 0
         ncols = self.max_harps_line
-        nnotes = self.max_gp_notes_line
         page_break = False
         
         non_voice_row = 1
