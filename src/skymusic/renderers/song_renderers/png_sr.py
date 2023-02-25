@@ -338,6 +338,7 @@ class PngSongRenderer(song_renderer.SongRenderer):
         xline_in_song = x_in_png
         yline_in_song = ysong
         prev_line0 = None
+        
         for row in range(start_row, end_row):
 
             line = song.get_line(row)
@@ -379,8 +380,9 @@ class PngSongRenderer(song_renderer.SongRenderer):
                         if lineW_predict > line_width: break
                         line_height = max(line_height, instr_size[1])
                 
-                # Forced dividing line after each line of harps
-                if prev_line0 not in ('ruler', 'layer'):
+                # Forced dividing line after each line of tonal instruments
+                prev_linetype = '' if not prev_line0 else prev_line0.get_type()
+                if prev_linetype not in ('ruler', 'layer'):
                     #yline_in_song += nontonal_spacings[1] / 2.0
                     song_render.paste(hr_line, (round(xline_in_song), round(yline_in_song)))
                     

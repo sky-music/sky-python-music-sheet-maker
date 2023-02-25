@@ -32,13 +32,20 @@ class SvgInstrumentRenderer(instrument_renderer.InstrumentRenderer):
     def get_gamepad_size(self, instrument, absolute=True, rescale=1):
         '''Get typical size of a gamepad layout'''
         gp_note_size =  self.get_gp_note_size(absolute=absolute, rescale=rescale)
-        num_buttons = max(1,instrument.get_skygrid().get_max_num_by_frame()) #rows
-        num_frames = max(1,instrument.get_skygrid().get_num_frames()) # cols
+        
+        num_buttons, num_frames = self.get_grid_size(instrument)
         
         if instrument.get_is_silent(): return (round(self.gamepad_gaps['pauseH']*gp_note_size[0]), round(gp_note_size[1]))
         
         return ( round((num_frames + self.gamepad_gaps['quaver-gapH']*(num_frames-1))*gp_note_size[0]),
                  round((num_buttons + self.gamepad_gaps['note-gapV']*(num_buttons-1))*gp_note_size[1]) )
+                 
+    def get_grid_size(self, instrument):
+        
+        num_buttons = max(1,instrument.get_skygrid().get_max_num_by_frame()) #rows
+        num_frames = max(1,instrument.get_skygrid().get_num_frames()) # cols
+        
+        return (num_buttons, num_frames)
 
     def render_ruler(self, ruler, x, width: str, height: str, aspect_ratio):
         
@@ -74,6 +81,26 @@ class SvgInstrumentRenderer(instrument_renderer.InstrumentRenderer):
     def render_layer(self,*args,**kwargs):
         return self.render_ruler(*args,**kwargs)
 
+
+    def render_repeat(self, instrument, x, widths):
+        
+        repeat = instrument.get_repeat()
+        
+        if not self.gamepad:
+        
+            repeat_render = (f'\n<svg x="{x :.2f}" y="0%"'
+                            f' width="{widths}" height="100%">'
+                                             )
+            repeat_render += f'\n<text x="2%" y="98%" class="repeat">x{repeat: d} </text></svg>'
+            
+        else:
+            #TODO: render pause several times
+            #need specianinformation on widths
+            repeat_render = ''
+            
+        return repeat_render
+        
+
     def render_voice(self, instrument, x, width: str, height: str, aspect_ratio=1):
         """Renders the lyrics text in SVG"""
         
@@ -101,7 +128,7 @@ class SvgInstrumentRenderer(instrument_renderer.InstrumentRenderer):
 
         return harp_render
 
-    def _render_gamepad_harp_(self, instrument, x, harp_width, harp_height):
+    def _render_gamepad_harp_(self, instrument, x, harp_width, harp_height, grid_size=(1,1)):
         #TODO
         harp_silent = instrument.get_is_silent()
         harp_broken = instrument.get_is_broken()
@@ -119,31 +146,44 @@ class SvgInstrumentRenderer(instrument_renderer.InstrumentRenderer):
         xn0 = 0
         yn0 = 0
         
-        frames = instrument.get_skygrid().get_highlighted_frames()
+        frames = instrument.get_skygrid().get_highlighted_frames()#cols
         num_frames = max(1, len(frames))
-        num_buttons = max(1, instrument.get_skygrid().get_max_num_by_frame())
+        num_buttons = max(1, instrument.get_skygrid().get_max_num_by_frame()) #rows
         
-        (note_width, note_height) = note_renderer.get_gp_note_size()
-        note_height = (1/num_buttons)*(note_width/note_height)
-        note_width = 1/num_frames
+        #TODO: use both frames and grid size
         
-        xn = xn0
+        quaver_gap = self.get_gamepad_gaps(absolute=False)['quaver-gapH']
+        row_gap = self.get_gamepad_gaps(absolute=False)['note-gapV']
+        
+        (note_width, note_height) = note_renderer.get_gp_note_size(absolute=False)
+        
+        max_frames, max_buttons = grid_size
+        
+        rel_note_height = 1/((max_buttons*note_height+(max_buttons-1)*row_gap))
+        
+        rel_note_width = rel_note_height*note_width/note_height
+        
+        rel_quaver_gap = quaver_gap*rel_note_width/note_width
+        rel_row_gap = row_gap*rel_note_height/note_height
+        
+        xn = xn0 #starts from left col
         # Render harp in vertical layout mode
         for ix, frame in enumerate(frames): # cols
             harp_render += '\n'
             coords = instrument.get_skygrid().get_highlighted_coords(frame)
-            yn = yn0
+            yn = yn0 #restarts from top row
             for iy, coord in enumerate(coords): #rows
 
                 note = instrument.get_note_from_coord(coord)
                 # NOTE RENDER
                 if len(note.get_highlighted_frames()) > 0:  # Only paste highlighted notes  
-                    harp_render += note_renderer.render(note, xs=f"{xn :.2f}%", ys=f"{yn :.2f}%", widths=f"{100*note_width :.2f}%", heights=f"{100*note_height :.2f}%", note_parser=note_parser)
+                    harp_render += note_renderer.render(note, xs=f"{100*xn :.2f}%", ys=f"{100*yn :.2f}%", widths=f"{100*rel_note_width :.2f}%", heights=f"{100*rel_note_height :.2f}%", note_parser=note_parser)
     
-                    yn += note_height
+                    yn += rel_note_height + rel_row_gap
                     
-                if coords:
-                    xn += note_width
+            if coords:
+                xn += rel_note_width + rel_quaver_gap
+            
         
         harp_render += '</svg>'
         return harp_render

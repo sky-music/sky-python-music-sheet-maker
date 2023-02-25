@@ -22,11 +22,14 @@ class SvgNoteRenderer(note_renderer.NoteRenderer):
     def get_unhighlighted_svg(self, row_num, xs="0%", ys="0%", widths="10%"):
         return f'<use xlink:href="#d{row_num}" x="{xs}" y="{ys}" width="{widths}" height="{widths}" />'
 
-    def get_gp_note_size(self):
+    def get_gp_note_size(self, absolute=True):
         """Returns the original size of the SVG image of a note"""
         if self.gp_note_size is None:
             self.gp_note_size = Resources.SVG_SETTINGS['gp_note_size']
-        return self.gp_note_size    
+        if absolute:
+            return self.gp_note_size
+        else:
+            return (self.gp_note_size[0]/self.gp_note_size[1], 1)
 
     def render(self, note, xs="0%", ys="0%", widths="10%", heights="10%", note_parser=None):
         
@@ -75,15 +78,15 @@ class SvgNoteRenderer(note_renderer.NoteRenderer):
                         note_core_render = self._get_mobile_svg_(aspect, xs, ys, widths, highlighted_classes)
                     else:
                         note_button = note_parser.get_note_from_coord((row, col) )
-                        note_core_render = self._get_gamepad_svg_(note_button)
+                        note_core_render = self._get_gamepad_svg_(note_button, xs, ys, widths, heights)
            
         svg_render = note_core_render
 
         return svg_render
 
-    def _get_gamepad_svg_(self, button, xs="0", ys="0", width="100%", height="100%"):
+    def _get_gamepad_svg_(self, button, xs="0%", ys="0%", widths="100%", heights="100%"):
         class_str = self.gamepad.platform.get_nickname() + button
-        return f'<use xlink:href="#{class_str}" x="{xs}" y="{ys}" width="{width}" height="{height}" />'
+        return f'<use xlink:href="#{class_str}" x="{xs}" y="{ys}" width="{widths}" height="{heights}" />'
 
     def _get_mobile_svg_(self, aspect, xs="0%", ys="0%", widths="10%", highlighted_classes=""):
         

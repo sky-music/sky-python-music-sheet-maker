@@ -10,16 +10,16 @@ aspect_ratio: WIDESCREEN # an aspect ratio short name among WIDESCREEN, OLDTV, S
 song_bpm: 120 # an integer value between 12 and 1200
 octave_shift: 0 # an integer between -12 and +12
 render_modes: all # 'all' to activate all modes, otherwise a comma-separated list of mode names among SVG, HTML, PNG, MIDI, SKYJSON, SKYASCII, SKYENGLISH
-notes_file: | # a file name or notes...
-    englishC.txt
+#notes_file: | # a file name or notes...
+#    englishC.txt
 #notes: # Unless a file name has been answered to the previous question, this question must be answered with a blank for automatic answering
 #musical_notation: SKY # Default value if not detected automatically. An input_mode short name, among ENGLISH, JIANPU, DOREMI, DOREMIJP, SKY, SKYHTML, SKYKEYBOARD, ENGLISHCHORDS
 recommended_key: C # The recommended key in case your notation does not use octaves
 possible_keys: C
 many_errors: yes #Carry on even if many errors are found
-transcript_writer: transcript # Persons who arranged the notes and transcribed them
-original_artist: artist # Artist
+#transcript_writer: transcript # Persons who arranged the notes and transcribed them
+#original_artist: artist # Artist
 keep_meta: yes # Keep meta data found in the file
-song_title: happy new year
+#song_title: happy new year
 #game_platform: mobile #Gameplatform, among playstation, switch, mobile
 gamepad_layout: 0

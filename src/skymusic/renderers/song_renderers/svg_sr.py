@@ -71,7 +71,7 @@ class SvgSongRenderer(song_renderer.SongRenderer):
                 1.0 * self.max_gp_notes_line * (1 + self.gamepad_relspacings[0])))
 
         note_size0 = SvgInstrumentRenderer(locale=self.locale, platform_name=self.platform_name, gamepad=self.gamepad).get_gp_note_size(absolute=True)        
-        self.gamepad_rescale = min(self.max_gp_notes_line, max(0.01, gp_note_width/note_size0[0]))
+        self.gamepad_rescale = min(self.max_gp_notes_line, max(0.1, gp_note_width/note_size0[0]))
   
         return self.gamepad_rescale
 
@@ -82,15 +82,23 @@ class SvgSongRenderer(song_renderer.SongRenderer):
         self.harp_spacings = (
             self.harp_rels_pacings[0] * self.harp_width,
             self.harp_rels_pacings[1] * self.harp_width / self.harp_AspectRatio)
+        self.nontonal_spacings =  (self.harp_size[0], self.harp_size[1]/4.0)
  
     def set_gamepad_spacings(self, absolute=True, rescale=1):
         
         instrument_renderer = SvgInstrumentRenderer(locale=self.locale, platform_name=self.platform_name, gamepad=self.gamepad)
         gaps = instrument_renderer.get_gamepad_gaps(absolute=absolute, rescale=rescale)
         self.gamepad_spacings = (gaps['note-gapH'], gaps['line-gapV'])
+        self.nontonal_spacings = (gaps['note-gapH'], gaps['note-gapV'])
         return self.gamepad_spacings
-        
-                      
+
+    def get_instr_spacings(self):
+        if self.gamepad is None:
+            return self.harp_spacings
+        else:
+            return self.gamepad_spacings             
+                     
+                                                                  
     def get_voice_height(self):
         """Tries to predict the height of the lyrics text when rendered in SVG"""
         return self.fontpt * self.pt2px
@@ -136,11 +144,8 @@ class SvgSongRenderer(song_renderer.SongRenderer):
         self.set_harp_AspectRatio(song.get_harp_aspect_ratio(), self.harp_relAspectRatio)
         #self.set_harp_AspectRatio(1.455)
 
-        if not self.gamepad:
-            instrument_spacings = self.harp_spacings
-        else:
-            instrument_spacings = self.gamepad_spacings
-
+        instrument_spacings = self.get_instr_spacings()
+        nontonal_spacings = self.nontonal_spacings
 
         svg_buffer = io.StringIO()
         filenum = len(buffer_list)
@@ -168,6 +173,7 @@ class SvgSongRenderer(song_renderer.SongRenderer):
         else:
             song_header += f"\n<text x=\"{x :.2f}\" y=\"{y :.2f}\" class=\"title\">{meta['title'][1]} (page {(filenum + 1)})</text>"
         
+        """
         # Dividing line after title
         y += self.text_height
         
@@ -179,9 +185,9 @@ class SvgSongRenderer(song_renderer.SongRenderer):
                 song_header += (f'\n<svg x="0" y="{y :.2f}" width="{self.line_width :.2f}" height="{(instrument_spacings[1] / 2.0) :.2f}">'
                                 f'\n<line x1="0" y1="50%" x2="100%" y2="50%" class="sep" /> '
                                 f'\n</svg>')
-                
-        y += self.text_height
-
+        """
+        y += 2*self.text_height
+        
         song_header += '\n</svg>'
 
         svg_buffer.write(song_header)
@@ -202,72 +208,95 @@ class SvgSongRenderer(song_renderer.SongRenderer):
         page_break = False
         
         non_voice_row = 1
-        prev_line = 'ruler' #Because headers have been separated with a ruler (see above)
+        prev_line0 = None
         
         for row in range(start_row, end_row):
 
             line = song.get_line(row)
+            line0 = line[0]
+            linetype = line0.get_type()
             if row > start_row:
                 start_col = 0
-            linetype = line[0].get_type().lower().strip()
             ncols = len(line) - start_col
             end_col = len(line)
             
             # Line SVG container
-            if line[0].get_is_textual():
+            if line0.get_is_textual():
                 
-                instrument_size = (self.text_height*len(str(line[0])), self.text_height)
+                instr_size = (self.text_height*len(str(line0)), self.text_height)
+                gp_grid_size = (1,1)
                 song_render += (f'\n<svg x="0" y="{y :.2f}" width="{self.line_width :.2f}" height="{self.text_height :.2f}"'
                                 f' class="line" id="line-{row}">')
-                y += self.text_height + instrument_spacings[1] / 2.0
+                y += self.text_height + nontonal_spacings[1] / 2.0
                 
             elif linetype == 'ruler':
                 
-                instrument_size = (self.line_width, self.rule_height)
+                instr_size = (self.line_width, self.rule_height)
+                gp_grid_size = (1,1)
                 song_render += (f'\n<svg x="0" y="{y :.2f}" width="{self.line_width :.2f}" height="{3*self.rule_height :.2f}"'
                                 f' class="line" id="line-{row}">')
-                y += 3*self.rule_height + instrument_spacings[1] / 2.0
+                y += 3*self.rule_height + nontonal_spacings[1] / 2.0
 
             elif linetype == 'layer':
                 
-                instrument_size = (self.line_width, self.layer_height)
+                instr_size = (self.line_width, self.layer_height)
+                gp_grid_size = (1,1)
                 song_render += (f'\n<svg x="0" y="{y :.2f}" width="{self.line_width :.2f}" height="{3*self.layer_height :.2f}"'
                                 f' class="line" id="line-{row}">')
-                y += 3*self.layer_height + instrument_spacings[1] / 2.0
+                y += 3*self.layer_height + nontonal_spacings[1] / 2.0
                 
-            elif line[0].get_is_tonal(): #Tonal instrument
+            elif line0.get_is_tonal(): #Tonal instrument
                 
                 if not self.gamepad:
-                    instrument_size = self.harp_size
+                    instr_size = self.harp_size
+                    gp_grid_size = tuple()
                 else:
                     # Special calculation for gamepad
-                    gamepad_instr_sizes = [instrument_renderer.get_gamepad_size(instr, rescale=self.gamepad_rescale) for instr in line]
+                    gp_instr_sizes = [instrument_renderer.get_gamepad_size(instr, rescale=self.gamepad_rescale) for instr in line]
+                    
+                    gp_grid_sizes = [instrument_renderer.get_grid_size(instr) for instr in line]
+                    
                     gapH = self.gamepad_spacings[0]
                     lineW_predict = 0
-                    instr_height = 0
-                    instr_width = 0
-                    instrument_size = (0,0)
-                    for instr_size in gamepad_instr_sizes:
+                    instr_size = (0,0)
+                    gp_grid_size = (1,1)
+                    
+                    for sz, grd in zip(gp_instr_sizes, gp_grid_sizes):
+                        instr_size = (max(instr_size[0], sz[0]), max(instr_size[1], sz[1]))
+                        gp_grid_size = (max(gp_grid_size[0], grd[0]), max(gp_grid_size[1], grd[1]))
                         lineW_predict += instr_size[0] + gapH
                         if lineW_predict > self.line_width:
                             break
-                        instrument_size = (max(instr_width, instr_size[0]), max(instr_height, instr_size[1]))
                 
-                
-                if prev_line not in ('ruler', 'layer'):
+                prev_linetype = 'ruler' if not prev_line0 else prev_line0.get_type()
+                if prev_linetype not in ('ruler', 'layer'):
                     # Dividing line
-                    y += instrument_spacings[1] / 4.0
+                    y += nontonal_spacings[1] / 4.0
                     song_render += (f'\n<svg x="0" y="{y :.2f}" width="{self.line_width :.2f}" height="{(instrument_spacings[1] / 2.0) :.2f}">'
                                     f'\n<line x1="0" y1="50%" x2="100%" y2="50%" class="sep"/>'
                                     f'\n</svg>')
-                    y += instrument_spacings[1] / 4.0
-
-                y += instrument_spacings[1] / 2.0
+                    y += nontonal_spacings[1] / 4.0
+                
+                if prev_line0:
+                    if line0.get_is_tonal():
+                        y += instrument_spacings[1] / 2
+                    else:
+                        y += nontonal_spacings[1] / 2
                 
                 # Instrument-line opening
-                song_render += (f'\n<svg x="0" y="{y :.2f}" width="{self.line_width :.2f}" height="{instrument_size[1] :.2f}"'
+                if prev_line0:
+                    if line0.get_is_tonal():
+                        y += instrument_spacings[1] / 2
+                    else:
+                        y += nontonal_spacings[1] / 2
+                
+                song_render += (f'\n<svg x="0" y="{y :.2f}" width="{self.line_width :.2f}" height="{instr_size[1] :.2f}"'
                                 f' class="line" id="line-{row}">')
-                y += instrument_size[1] + instrument_spacings[1] / 2.0
+                y += instr_size[1]
+                if line0.get_is_tonal():
+                    y += instrument_spacings[1] / 2
+                else:
+                    y += nontonal_spacings[1] / 2
 
             line_render = ''
             sub_line = 0
@@ -286,26 +315,26 @@ class SvgSongRenderer(song_renderer.SongRenderer):
                     x = 0
 
                     # Creating a new line SVG
-                    if line[0].get_is_textual():
+                    if line0.get_is_textual():
                         line_render += (f'\n<svg x="{x :.2f}" y="{y :.2f}" width="{self.line_width :.2f}" height="{self.text_height :.2f}"'
                                         f' class="line-{row}-{sub_line}">')
-                        y += self.text_height + instrument_spacings[1] / 2.0
+                        y += self.text_height + nontonal_spacings[1] / 2.0
                         
                     elif linetype == 'ruler':
                         line_render += (f'\n<svg x="{x :.2f}" y="{y :.2f}" width="{self.line_width :.2f}" height="{3*self.rule_height :.2f}"'
                                         f' class="line-{row}-{sub_line}">')
-                        y += 3*self.rule_height + instrument_spacings[1] / 2.0
+                        y += 3*self.rule_height + nontonal_spacings[1] / 2.0
 
                     elif linetype == 'layer':
                         line_render += (f'\n<svg x="{x :.2f}" y="{y :.2f}" width="{self.line_width :.2f}" height="{3*self.layer_height :.2f}"'
                                         f' class="line-{row}-{sub_line}">')
-                        y += 3*self.layer_height + instrument_spacings[1] / 2.0
+                        y += 3*self.layer_height + nontonal_spacings[1] / 2.0
                         
-                    elif line[0].get_is_tonal():
+                    elif line0.get_is_tonal():
                         y += instrument_spacings[1] / 2.0
-                        line_render += (f'\n<svg x="{x :.2f}" y="{y :.2f}" width="{self.line_width :.2f}" height="{instrument_size[1] :.2f}"'
+                        line_render += (f'\n<svg x="{x :.2f}" y="{y :.2f}" width="{self.line_width :.2f}" height="{instr_size[1] :.2f}"'
                                         f' class="line-{row}-{sub_line}">')
-                        y += instrument_size[1] + instrument_spacings[1] / 2.0
+                        y += instr_size[1] + instrument_spacings[1] / 2.0
 
                 #2. Page break
                 ypredict = y + ysong
@@ -317,38 +346,41 @@ class SvgSongRenderer(song_renderer.SongRenderer):
 
                 #3. INSTRUMENT RENDER
                 if not self.gamepad:
-                    instrument_render = instrument_renderer.render(instrument, x, f"{(100.0 * instrument_size[0] / self.line_width) :.2f}%", "100%", self.harp_AspectRatio)
+                    instrument_render = instrument_renderer.render(instrument, x, f"{(100.0 * instr_size[0] / self.line_width) :.2f}%", "100%", self.harp_AspectRatio)
                 else:
-                    instrument_render = instrument_renderer.render(instrument, x, f"{(100.0 * instrument_size[0] / self.line_width) :.2f}%", "100%")
+                    instrument_render = instrument_renderer.render(instrument, x, f"{(100.0 * instr_size[0] / self.line_width) :.2f}%", "100%", gp_grid_size)
 
                 #4. Repeat number
                 if instrument.get_repeat() > 1:
-
-                    instrument_render += (f'\n<svg x="{(x + instrument_size[0]) :.2f}" y="0%"'
-                                          f' width="{(100.0 * instrument_size[0] / self.line_width) :.2f}%" height="100%">'
-                                         )
-                    instrument_render += f'\n<text x="2%" y="98%" class="repeat">x{instrument.get_repeat()} </text></svg>'
+                    #Todo: change that to give more information on widths, note wodths etc
+                    line_render += instrument_renderer.render_repeat(instrument, x + instr_size[0], f'{(100.0 * instr_size[0] / self.line_width) :.2f}%')
 
                     x += instrument_spacings[0]
 
                 line_render += "\n" + instrument_render
                 instrument_index += 1
-                x += instrument_size[0] + instrument_spacings[0]
+                x += instr_size[0] + instrument_spacings[0]
 
             #end loop on cols
             
-            if num_lines > 10 and line[0].get_is_tonal():
+            if num_lines > 10 and line0.get_is_tonal():
                 line_num_str = f'{non_voice_row :d}'
                 line_render += (f'\n<svg x="{x :.2f}" y="0%" width="{len(line_num_str)}em" height="100%">'
                                )
-                line_render += f'\n<text x="2%" y="98%" class="num">{line_num_str}</text>'
+                               
+                if self.gamepad:
+                    num_ypos = '50%'
+                else:
+                    num_ypos = '98%'
+                               
+                line_render += f'\n<text x="2%" y="{num_ypos}" class="num">{line_num_str}</text>'
                 line_render += '</svg>\n'
                 x += self.text_height*3/2
                 non_voice_row += 1
             
             line_render += '\n</svg>'  # Closes last instrument-line SVG
             song_render += line_render
-            prev_line = linetype
+            prev_line0 = line0
             
             if page_break:
                 end_row = row
@@ -369,6 +401,8 @@ class SvgSongRenderer(song_renderer.SongRenderer):
             buffer_list = self.write_buffers(song, css_mode, end_row, end_col, buffer_list)
 
         return buffer_list
+
+
 
 
 
