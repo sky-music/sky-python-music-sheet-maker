@@ -222,6 +222,7 @@ class SvgSongRenderer(song_renderer.SongRenderer):
             # Line SVG container
             if line0.get_is_textual():
                 
+                y += nontonal_spacings[1] / 2.0
                 instr_size = (self.text_height*len(str(line0)), self.text_height)
                 gp_grid_size = (1,1)
                 song_render += (f'\n<svg x="0" y="{y :.2f}" width="{self.line_width :.2f}" height="{self.text_height :.2f}"'
@@ -230,17 +231,19 @@ class SvgSongRenderer(song_renderer.SongRenderer):
                 
             elif linetype == 'ruler':
                 
+                y += nontonal_spacings[1] / 2.0
                 instr_size = (self.line_width, self.rule_height)
                 gp_grid_size = (1,1)
-                song_render += (f'\n<svg x="0" y="{y :.2f}" width="{self.line_width :.2f}" height="{3*self.rule_height :.2f}"'
+                song_render += (f'\n<svg x="0" y="{y :.2f}" width="{self.line_width :.2f}" height="{nontonal_spacings[1] :.2f}"'
                                 f' class="line" id="line-{row}">')
                 y += 3*self.rule_height + nontonal_spacings[1] / 2.0
 
             elif linetype == 'layer':
                 
+                y += nontonal_spacings[1] / 2.0
                 instr_size = (self.line_width, self.layer_height)
                 gp_grid_size = (1,1)
-                song_render += (f'\n<svg x="0" y="{y :.2f}" width="{self.line_width :.2f}" height="{3*self.layer_height :.2f}"'
+                song_render += (f'\n<svg x="0" y="{y :.2f}" width="{self.line_width :.2f}" height="{nontonal_spacings[1]:.2f}"'
                                 f' class="line" id="line-{row}">')
                 y += 3*self.layer_height + nontonal_spacings[1] / 2.0
                 
@@ -270,11 +273,11 @@ class SvgSongRenderer(song_renderer.SongRenderer):
                 prev_linetype = 'ruler' if not prev_line0 else prev_line0.get_type()
                 if prev_linetype not in ('ruler', 'layer'):
                     # Dividing line
-                    y += nontonal_spacings[1] / 4.0
-                    song_render += (f'\n<svg x="0" y="{y :.2f}" width="{self.line_width :.2f}" height="{(instrument_spacings[1] / 2.0) :.2f}">'
+                    y += nontonal_spacings[1] / 2.0
+                    song_render += (f'\n<svg x="0" y="{y :.2f}" width="{self.line_width :.2f}" height="{3*self.rule_height :.2f}">'
                                     f'\n<line x1="0" y1="50%" x2="100%" y2="50%" class="sep"/>'
                                     f'\n</svg>')
-                    y += nontonal_spacings[1] / 4.0
+                    y += nontonal_spacings[1] / 2.0
                 
                 if prev_line0:
                     if line0.get_is_tonal():
@@ -320,12 +323,12 @@ class SvgSongRenderer(song_renderer.SongRenderer):
                         y += self.text_height + nontonal_spacings[1] / 2.0
                         
                     elif linetype == 'ruler':
-                        line_render += (f'\n<svg x="{x :.2f}" y="{y :.2f}" width="{self.line_width :.2f}" height="{3*self.rule_height :.2f}"'
+                        line_render += (f'\n<svg x="{x :.2f}" y="{y :.2f}" width="{self.line_width :.2f}" height="{nontonal_spacings[1] :.2f}"'
                                         f' class="line-{row}-{sub_line}">')
                         y += 3*self.rule_height + nontonal_spacings[1] / 2.0
 
                     elif linetype == 'layer':
-                        line_render += (f'\n<svg x="{x :.2f}" y="{y :.2f}" width="{self.line_width :.2f}" height="{3*self.layer_height :.2f}"'
+                        line_render += (f'\n<svg x="{x :.2f}" y="{y :.2f}" width="{self.nontonal_spacings[1] :.2f}" height="{3*self.layer_height :.2f}"'
                                         f' class="line-{row}-{sub_line}">')
                         y += 3*self.layer_height + nontonal_spacings[1] / 2.0
                         
@@ -349,16 +352,28 @@ class SvgSongRenderer(song_renderer.SongRenderer):
                 else:
                     instrument_render = instrument_renderer.render(instrument, x, f"{(100.0 * instr_size[0] / self.line_width) :.2f}%", "100%", gp_grid_size)
 
-                #4. Repeat number
-                if instrument.get_repeat() > 1:
-                    #Todo: change that to give more information on widths, note wodths etc
-                    line_render += instrument_renderer.render_repeat(instrument, x + instr_size[0], f'{(100.0 * instr_size[0] / self.line_width) :.2f}%')
-
-                    x += instrument_spacings[0]
-
                 line_render += "\n" + instrument_render
+
                 instrument_index += 1
-                x += instr_size[0] + instrument_spacings[0]
+                x += instr_size[0]
+
+                #4. Repeat number
+                repeat = instrument.get_repeat()
+                if repeat > 1:
+                    #Todo: change that to give more information on widths, note wodths etc
+                    if self.gamepad and instrument.get_is_silent():
+                        
+                        for i in range(1,repeat):
+                            line_render += instrument_renderer.render(instrument, x, f"{(100.0 * instr_size[0] / self.line_width) :.2f}%", "100%", gp_grid_size)
+                        
+                            x += instr_size[0]
+                    
+                    else:
+                        line_render += instrument_renderer.render_repeat(instrument, x + instr_size[0])
+
+                        x += instrument_spacings[0]
+
+                x += instrument_spacings[0]
 
             #end loop on cols
             

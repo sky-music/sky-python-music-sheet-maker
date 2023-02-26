@@ -72,31 +72,27 @@ class SvgInstrumentRenderer(instrument_renderer.InstrumentRenderer):
             elif emphasis != None:
                 class_suffix = ' '+emphasis
             
-            text_render = (f'\n<text x="0%" y="55%" class="ruler text {class_suffix}">{text}</text>')        
+            text_render = (f'\n<text x="0%" y="75%" class="ruler text {class_suffix}">{text}</text>')        
             hr_render += text_render
         
         hr_render += '</svg>'            
         return hr_render
 
+
     def render_layer(self,*args,**kwargs):
         return self.render_ruler(*args,**kwargs)
 
 
-    def render_repeat(self, instrument, x, widths):
+    def render_repeat(self, instrument, x):
         
         repeat = instrument.get_repeat()
         
-        if not self.gamepad:
-        
-            repeat_render = (f'\n<svg x="{x :.2f}" y="0%"'
-                            f' width="{widths}" height="100%">'
-                                             )
-            repeat_render += f'\n<text x="2%" y="98%" class="repeat">x{repeat: d} </text></svg>'
+        if repeat == 1: return ''
             
-        else:
-            #TODO: render pause several times
-            #need specianinformation on widths
-            repeat_render = ''
+        repeat_render = (f'\n<svg x="{x :.2f}" y="0%"'
+                        f' width="{len(str(repeat)):d}em" height="100%">'
+                                         )
+        repeat_render += f'\n<text x="2%" y="{50 if self.gamepad else 98}%" class="repeat">x{repeat:d}</text></svg>'
             
         return repeat_render
         
@@ -128,10 +124,42 @@ class SvgInstrumentRenderer(instrument_renderer.InstrumentRenderer):
 
         return harp_render
 
+    def _render_gamepad_broken_(self, instrument, x, harp_width, harp_height, grid_size):
+        # The harp SVG container
+        css_class = "gp instr broken"
+        
+        harp_render = f'<svg x="{x :.2f}" y="0" width="{harp_width}" height="{harp_height}" class="{css_class}" id="instr-{instrument.get_index()}">'
+        
+        nr = SvgNoteRenderer(platform_name=self.platform_name, gamepad=self.gamepad)
+        
+        harp_render += nr.get_broken_svg('0%', '0%', widths='100%', heights='100%')
+        
+        harp_render += '</svg>'
+        
+        return harp_render
+        
+
+    def _render_gamepad_pause_(self, instrument, x, harp_width, harp_height, grid_size):
+        
+        # The harp SVG container
+        css_class = "gp instr silent"
+        
+        harp_render = f'<svg x="{x :.2f}" y="0" width="{harp_width}" height="{harp_height}" class="{css_class}" id="instr-{instrument.get_index()}">'
+        
+        nr = SvgNoteRenderer(platform_name=self.platform_name, gamepad=self.gamepad)
+        
+        harp_render += nr.get_silent_svg('0%', '0%', widths='100%', heights='100%')
+        
+        harp_render += '</svg>'
+        
+        return harp_render
+        
+
     def _render_gamepad_harp_(self, instrument, x, harp_width, harp_height, grid_size=(1,1)):
-        #TODO
-        harp_silent = instrument.get_is_silent()
-        harp_broken = instrument.get_is_broken()
+        
+        if instrument.get_is_silent(): return self._render_gamepad_pause_(instrument, x, harp_width, harp_height, grid_size)
+        
+        if instrument.get_is_broken(): return self._render_gamepad_broken_(instrument, x, harp_width, harp_height, grid_size)
         
         note_renderer = SvgNoteRenderer(platform_name=self.gamepad.platform.get_name(),gamepad=self.gamepad)
         
@@ -228,7 +256,7 @@ class SvgInstrumentRenderer(instrument_renderer.InstrumentRenderer):
                 yn = yn0 + row * (1 - 2 * yn0*1.07) / (instrument.get_num_rows() - 1) - note_width / 2.0
 
                 # NOTE RENDER
-                harp_render += note_renderer.render(note, xs=f"{100*xn :.2f}%", ys=f"{100*yn :.2f}%", widths=f"{100*note_width :.2f}%")
+                harp_render += note_renderer.render(note, xs=f"{100*xn :.2f}%", ys=f"{100*yn :.2f}%", widths=f"{100*note_width :.2f}%", heights=f"{100*note_width :.2f}%")
                 
         harp_render += '\n</svg>'
 

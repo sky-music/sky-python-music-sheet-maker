@@ -22,10 +22,10 @@ class HtmlNoteRenderer(note_renderer.NoteRenderer):
     def get_dead_svg(self):
         return '<dn></dn>'
 
-    def get_harpbroken_svg(self):
+    def get_broken_svg(self):
         return '<text x="45.4" y="81" class="broken">?</text>'
 
-    def get_harpbroken_gamepad_svg(self):
+    def get_broken_gamepad_svg(self):
         return '<text x="45.4" y="81" class="broken">?</text>'
 
     def get_unhighlighted_svg(self, row_num):
@@ -55,7 +55,7 @@ class HtmlNoteRenderer(note_renderer.NoteRenderer):
         if note.instrument.get_is_broken() and ((row, col) == note.instrument.get_middle_coord()):
             highlighted_classes = []
             # Draws a special symbol when harp is broken
-            note_core_render = self.get_harpbroken_svg() if gamepad is None else self.get_harpbroken_gamepad_svg()
+            note_core_render = self.get_broken_svg() if gamepad is None else self.get_broken_gamepad_svg()
             
         elif note.instrument.get_is_silent() and ((row, col) == note.instrument.get_middle_coord()):
             highlighted_classes = []
