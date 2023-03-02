@@ -225,6 +225,12 @@ class Communicator:
                     choices_dicts = [{'number': i, 'text': str(limit,self.locale)} for i, limit in enumerate(limits)]
                 except TypeError:
                     choices_dicts = [{'number': i, 'text': str(limit).strip()} for i, limit in enumerate(limits)]
+            
+                # Adds helper image name for a:hover display of an image
+                if query.get_reply_type() == ReplyType.GAMEPADLAYOUT:
+                    for gamepad, choice_dict in zip(limits, choices_dicts):
+                        choice_dict.update({'image_url': 'gamepads/' + gamepad.get_nickname()})
+                        
             else:
                 choices_dicts = []
                 

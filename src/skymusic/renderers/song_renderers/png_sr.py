@@ -9,8 +9,11 @@ from skymusic.sheetlayout import Ruler
 try:
     from PIL import Image, ImageDraw, ImageFont
     no_PIL_module = False
-except (ImportError, ModuleNotFoundError):
+except ModuleNotFoundError:
     no_PIL_module = True
+except ImportError as err:
+    no_PIL_module = True
+    print(err)
 
 
 class PngSongRenderer(song_renderer.SongRenderer):
@@ -286,7 +289,7 @@ class PngSongRenderer(song_renderer.SongRenderer):
         global no_PIL_module
 
         if no_PIL_module:
-            print("\n***WARNING: PNG was not rendered because PIL module was not found. ***")
+            print("\n***WARNING: PNG was not rendered because PIL module was not found, or its import generated an error. ***")
             return None
      
         filenum = len(buffer_list)

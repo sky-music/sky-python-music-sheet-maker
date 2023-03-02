@@ -55,7 +55,7 @@ class RenderMode(Enum):
     PNG = (True, True, False, False, "render_mode/png/short_desc", 'image/png', '.png', skymusic.parsers.noteparsers.skyabc15.SkyABC15)
     MIDI = (False, False, True, True, "render_mode/midi/short_desc", 'audio/midi', '.mid', skymusic.parsers.noteparsers.skyabc15.SkyABC15)
     SKYJSON = (False, False, True, False, "render_mode/skyjson/short_desc", 'application/json', '.json.txt', skymusic.parsers.noteparsers.skyjson.SkyJson)
-    SKYASCII = (False, False, False, False, "render_mode/skyascii/short_desc", 'text/plain', '_sky.txt', skymusic.parsers.noteparsers.skyabc15.SkyABC15)
+    SKYASCII = (False, False, False, False, "render_mode/skyascii/short_desc", 'text/plain', '_skyABC15.txt', skymusic.parsers.noteparsers.skyabc15.SkyABC15)
     ENGLISHASCII = (False, False, False, True, "render_mode/englishascii/short_desc", 'text/plain', '_english.txt', skymusic.parsers.noteparsers.english.English)
     JIANPUASCII = (False, False, False, True, "render_mode/jianpuascii/short_desc", 'text/plain', '_jianpu.txt', skymusic.parsers.noteparsers.jianpu.Jianpu)
     DOREMIASCII = (False, False, False, True, "render_mode/doremiascii/short_desc", 'text/plain', '_doremi.txt', skymusic.parsers.noteparsers.doremi.Doremi)

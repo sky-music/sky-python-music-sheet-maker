@@ -3,13 +3,14 @@ from skymusic.resources import Resources
 from skymusic.renderers.note_renderers import png_nr
 from skymusic.modes import GamePlatform
 
-
 try:
     from PIL import Image, ImageDraw, ImageFont
-
     no_PIL_module = False
-except (ImportError, ModuleNotFoundError):
+except ModuleNotFoundError:
     no_PIL_module = True
+except ImportError as err:
+    no_PIL_module = True
+    print(err)
 
 
 class PngInstrumentRenderer(instrument_renderer.InstrumentRenderer):

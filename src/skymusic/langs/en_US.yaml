@@ -35,19 +35,19 @@ game_platform:
 gamepad_layout:
   playstation:
     normal:
-      ps1: Ends with R
-      ps2: Ends with LR
-      ps3: Ends with L2
-      ps4: Ends with R2
+      ps1: Last note is R (default)
+      ps2: Last note is LR
+      ps3: Last note is L2
+      ps4: Last note is R2
     drum:
-      ps1: Ends with R2
+      ps1: Last note is R2
   switch:
     normal:
-      sw1: Ends with LR
-      sw2: Ends with LR, layout mimicks gamepad
-      sw3: Ends with ZR
+      sw1: Last note is LR (default)
+      sw2: Last note is LR, layout mimicks gamepad
+      sw3: Last note is ZR
     drum:
-      sw1: Ends with ZR
+      sw1: Last note is ZR
 instrument_type:
   normal:
     short_desc: Normal instrument

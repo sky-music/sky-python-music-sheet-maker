@@ -2,13 +2,14 @@ from skymusic.resources import Resources
 from skymusic.modes import GamePlatform
 from . import note_renderer
 
-
 try:
     from PIL import Image
-
     no_PIL_module = False
-except (ImportError, ModuleNotFoundError):
+except ModuleNotFoundError:
     no_PIL_module = True
+except ImportError as err:
+    no_PIL_module = True
+    print(err)
 
 
 class PngNoteRenderer(note_renderer.NoteRenderer):

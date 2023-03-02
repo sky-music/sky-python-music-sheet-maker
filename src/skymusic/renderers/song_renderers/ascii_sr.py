@@ -1,4 +1,4 @@
-import re, io
+import io
 from . import song_renderer
 from skymusic.renderers.instrument_renderers.ascii_ir import AsciiInstrumentRenderer
 from skymusic.resources import Resources

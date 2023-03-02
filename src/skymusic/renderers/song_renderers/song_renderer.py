@@ -1,4 +1,4 @@
-import re, os, io
+import os, io
 from skymusic import Lang
 
 class SongRendererError(Exception):

@@ -26,7 +26,7 @@ recipient_specifics:
 game_platform:
   mobile:
     short_desc: "Normal"
-    long_desc: "Smartphone, tablet or computer"
+    long_desc: "Smartphone, tablette ou ordinateur"
   playstation:
     short_desc: "PlayStation"
     long_desc: "Sony PlayStation"
@@ -36,19 +36,19 @@ game_platform:
 gamepad_layout:
   playstation:
     normal:
-      ps1: Ends with R
-      ps2: Ends with LR
-      ps3: Ends with L2
-      ps4: Ends with R2
+      ps1: Dernière note est R (par défaut)
+      ps2: Dernière note est LR
+      ps3: Dernière note est L2
+      ps4: Dernière note est R2
     drum:
-      ps1: Ends with R2
+      ps1: Dernière note est R2
   switch:
     normal:
-      sw1: Ends with LR
-      sw2: Ends with LR, layout mimicks gamepad
-      sw3: Ends with ZR
+      sw1: Dernière note est LR (par défaut)
+      sw2: Dernière note est LR, layout mimicks gamepad
+      sw3: Dernière note est ZR
     drum:
-      sw1: Ends with ZR
+      sw1: Dernière note est ZR
 instrument_type:
   normal:
     short_desc: Instrument normal
@@ -153,7 +153,7 @@ stock_queries:
       Formats de notes acceptés :{input_modes}
     
       - Les notes composant un accord doivent être attachées (e.g. A1B1C1).
-      - Separate chords with {icon_delimiter}
+      - Separez les accords avec {icon_delimiter}
       - Tapez "{pause}" pour marquer une pause (silence), sauf en notation Jianpu où '0' (zéro) est utilisé conventionellement
       - Tapez "{quaver_delimiter}" pour relier les notes entre elles, pour les triplets... (e.g. {quaver_example}). En Jianpu, utilisez "{jianpu_quaver_delimiter}" au lieu de '-' pour éviter la confusion avec l'octave.
       - Tapez "{repeat_indicator}" après un groupe de notes pour indiquer la répétition.
@@ -180,7 +180,7 @@ stock_queries:
       Formats de notes acceptés :{input_modes}
     
       - Les notes composant un accord doivent être attachées (e.g. A1B1C1).
-      - Separate chords with {icon_delimiter}
+      - Séparez les accords par {icon_delimiter}
       - Tapez "{pause}" pour marquer une pause (silence), sauf en notation Jianpu où '0' (zéro) est utilisé
       - Tapez "{quaver_delimiter}" pour relier les notes entre elles, pour les triplets... (e.g. {quaver_example}). En Jianpu, utilisez "{jianpu_quaver_delimiter}" pour éviter la confusion avec l'octave.
       - Tapez "{repeat_indicator}" après un groupe de notes pour indiquer la répétition.
@@ -195,26 +195,26 @@ stock_queries:
       Les percussions n'ont que 2 lignes et 4 colonnes
   game_platform:
     foreword:
-    question: Please choose your gaming platform
+    question: Merci de choisir votre console de jeu
     afterword:
-    input_tip: choose one platform
+    input_tip: choisir une plateforme
     help_text: |
-      Unless you play on PlayStation or Switch, keep the default choice 
+      Si vous ne jouez pas sur PlayStation ou Switch, laissez le choix par défaut (mobile)
   gamepad_layout:
     foreword:
-    question: Please choose your gamepad buttons layout
+    question: Merci de choisir votre configuration de boutons
     afterword:
-    input_tip: choose one layout
+    input_tip: choisissez une configuration
     help_text: |
-      They are usually 4 buttons layouts. Do not get mistaken or your song will not sound right!
+      Il peut y avoir jusqu'à 4 configurations de boutons. Ne vous trompez pas sinon la chanson ne sonnera pas comme vous voulez !
   render_modes:
     foreword:
     question: Choisissez les formats d'exportation de la chanson. {all_modes}
     afterword:
-    input_tip: check one or several boxes. Visual sheets have colored notes arranged in a grid. Text formats allow manual editing of the notes. JSON and Midi can be played by dedicated software.
+    input_tip: cochez une ou plusieurs options. Les tablatures montrent des notes colorées dans une grille. Les formats texte permettent de modifier les notes facilement. JSON et Midi sont lus par des logiciels musicaux.
     help_text: |
-      The visual sheets, with the colored dots arranged in a grid, can be rendered in several file formats. Choose HTML if you're undecided.
-      Text formats can be manually edited, or fed to the program again. {all_modes}
+      Les tablatures, avec des boutons colorés rangés dans une grille, peuvent être converties en plusieurs formats. Choisissez HTML si vous ne savez pas quoi choisir.
+      Les formats texte peuvent être édités à la main. {all_modes}
   aspect_ratio:
     foreword: Par défaut le format d'image PNG est en paysage 16:9.
     question: "Vous pouvez choisir un rapport d'aspect différent, ou {skip} pour passer"
@@ -263,7 +263,7 @@ stock_queries:
       Formats de notes acceptés :{input_modes}
     
       - Les notes composant un accord doivent être attachées (e.g. A1B1C1).
-      - Separate chords with {icon_delimiter}
+      - Separez les accords avec {icon_delimiter}
       - Tapez "{pause}" pour marquer une pause (silence), sauf en notation Jianpu où '0' (zéro) est utilisé.
       - Tapez "{quaver_delimiter}" pour relier les notes entre elles, pour les triplets... (e.g. {quaver_example}). En Jianpu, utilisez "{jianpu_quaver_delimiter}" pour éviter la confusion avec l'octave.
       - Tapez "{repeat_indicator}" après un groupe de notes pour indiquer la répétition.
@@ -284,7 +284,7 @@ stock_queries:
       Formats de notes acceptés :{input_modes}
     
       - Les notes d'un accord doivent être attachées (e.g. A1B1C1).
-      - Separate chords with {icon_delimiter}
+      - Separez les accords avec {icon_delimiter}
       - Tapez "{pause}" pour marquer une pause (silence), sauf en notation Jianpu où '0' (zéro) est utilisé.
       - Tapez "{quaver_delimiter}" pour relier les notes entre elles, pour les triplets... (e.g. {quaver_example}). En Jianpu, utilisez "{jianpu_quaver_delimiter}" pour éviter la confusion avec l'octave.
       - Tapez "{repeat_indicator}" après un groupe de notes pour indiquer la répétition.
@@ -297,7 +297,7 @@ stock_queries:
     help_text:
   musical_notation:
     foreword: Malgré nos efforts, nous n'avons pas pu détecter votre format de notes.
-    question: Merci de nous aider en choissant le bon dans la liste ci-contre
+    question: Merci de nous aider en choissant le bon format dans la liste ci-dessous
     afterword:
     input_tip: Case à choix unique
     help_text: |
