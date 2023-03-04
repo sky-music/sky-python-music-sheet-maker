@@ -2,6 +2,7 @@ from enum import Enum
 import skymusic.parsers.noteparsers
 import skymusic.instruments
 from skymusic import Lang
+from skymusic.resources import Resources
 """
 This file stores input/output modes as classes.
 This is more secure than simply numbering them, or labeling them with a string.
@@ -243,6 +244,13 @@ class GamepadLayout(Enum):
     
     def get_nickname(self):
         return self.nickname
+    
+    def get_help_image_path(self):
+        '''Gets absolute help image path, to be displayed when user askes for help (except on website)'''
+        try:
+            return Resources.GAMEPAD_IMAGES[self.platform.get_name()][0]
+        except (KeyError, IndexError):
+            return ''
     
 
 class CSSMode(Enum):

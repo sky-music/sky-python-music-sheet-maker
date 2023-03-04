@@ -15,7 +15,8 @@ handler: The name of the method that must be executed by the recipient
 question: the question, as a prompt
 foreword: optional text to display before the question
 afterword: optional text to display after the question
-help_text: text displayed when user asks for help by typing '?' or clicking help on the web servet
+help_text: text displayed when user asks for help by typing '?' or clicking help on the web server
+help_image: a relative path to an image, or a method of limits, to be shown by communicator.py by typing '?'.
 input_tip: hovering help text displayed on the web server
 reply_type: type of the data expected for an answer, defined in the modes.ReplyType enum
 
@@ -139,6 +140,7 @@ def load(locale):
                              'afterword': Lang.get_string("stock_queries/gamepad_layout/afterword", locale),
                              'input_tip': Lang.get_string("stock_queries/gamepad_layout/input_tip", locale),
                              'help_text': Lang.get_string("stock_queries/gamepad_layout/help_text", locale),
+                             'help_image': 'get_help_image_path',
                              'reply_type': ReplyType.GAMEPADLAYOUT,
                              'limits': [], # depend on chosen GamePlatform, so empty by default
                              'default': None

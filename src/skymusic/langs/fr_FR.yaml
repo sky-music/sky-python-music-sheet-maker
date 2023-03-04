@@ -36,19 +36,19 @@ game_platform:
 gamepad_layout:
   playstation:
     normal:
-      ps1: Dernière note est R (par défaut)
-      ps2: Dernière note est LR
-      ps3: Dernière note est L2
-      ps4: Dernière note est R2
+      ps1: La note la plus aigue est R (par défaut)
+      ps2: La note la plus aigue est LR
+      ps3: La note la plus aigue est L2
+      ps4: La note la plus aigue est R2
     drum:
-      ps1: Dernière note est R2
+      ps1: La note la plus aigue est R2
   switch:
     normal:
-      sw1: Dernière note est LR (par défaut)
-      sw2: Dernière note est LR, layout mimicks gamepad
-      sw3: Dernière note est ZR
+      sw1: La note la plus aigue est LR (par défaut)
+      sw2: La note la plus aigue est LR, layout mimicks gamepad
+      sw3: La note la plus aigue est ZR
     drum:
-      sw1: Dernière note est ZR
+      sw1: La note la plus aigue est ZR
 instrument_type:
   normal:
     short_desc: Instrument normal
@@ -241,7 +241,7 @@ stock_queries:
     question: Quel est le titre de la chanson ?
     afterword:
     input_tip: 'texte. {skip} pour utiliser "Sans titre"'
-    help_text: 
+    help_text: Le titre de la chanson n'est pas obligatoire, mais recommandé
   original_artist:
     foreword:
     question: Qui sont les artistes d'origine de la chanson ?

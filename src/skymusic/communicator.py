@@ -2,6 +2,15 @@ import io
 from skymusic.modes import RenderMode, ReplyType
 from skymusic.communication import QueryOpen, QueryChoice, QueryBoolean, QueryMultipleChoices, QueryMemory, Information
 from skymusic import Lang, QueryStock
+from skymusic.resources import Resources
+
+try:
+    from PIL import Image
+    no_PIL_module = False
+except ModuleNotFoundError:
+    no_PIL_module = True
+except ImportError:
+    no_PIL_module = True
 
 """
 Classes to ask and answer questions called Query and Reply between the bot and the music sheet maker
@@ -82,6 +91,38 @@ class Communicator:
     def get_locale(self):        
         return self.locale
 
+    @property
+    def is_music_cog(self):
+        try:
+            is_cog = self.owner.get_name() == Resources.MUSIC_COG_NAME
+        except AttributeError:
+            try:  # Guesses harder
+                self.owner.bot
+                is_cog = True
+            except AttributeError:
+                is_cog = False
+        return is_cog
+
+    @property
+    def is_sky_music_website(self):
+        try:
+            is_website = self.owner.get_name() == Resources.SKY_MUSIC_WEBSITE_NAME
+        except AttributeError:
+            try:  # Guesses harder
+                self.owner.session_ID
+                is_website = True
+            except:
+                is_website = False
+
+        return is_website
+
+    @property
+    def is_command_line(self):
+        try:
+            return self.owner.get_name() == Resources.COMMAND_LINE_NAME
+        except AttributeError:  # Guesses harder
+            return not (self.is_music_cog or self.is_sky_music_website)
+
     def get_stock_query(self, stock_query_name):
         
         try:
@@ -117,6 +158,10 @@ class Communicator:
         method_args = stock_query_dict.copy()
         method_args.pop('class')  # The class was used and is not an argument for Query
         method_args.pop('handler')  # The handler is not useful here and is not an argument for Query
+        
+        # Disables help_image for website that does not use it, to save time
+        if recipient.communicator.is_sky_music_website: method_args.pop('help_image','')
+        
         for i in range(2): # Recursivity level of 2
             if replacements is not None:
                 for k in method_args:
@@ -152,6 +197,12 @@ class Communicator:
         Returns a text that can be printed in the standard output
         """
         question = str(query.get_result())
+        
+        if not no_PIL_module:
+            help_image = query.get_help_image()
+            if help_image:
+                help_image.show()
+        
         return question
 
     def reply_to_website_result(self, reply):
@@ -259,6 +310,8 @@ class Communicator:
         Returns a text that can be sent to a Discord utils.Question model
         """
         output = {}
+        
+        #TODO: add support for help_image
         
         limits = query.get_limits()
         if query.help_required:

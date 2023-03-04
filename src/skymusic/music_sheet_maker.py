@@ -147,34 +147,6 @@ class MusicSheetMaker:
 
         return self.locale
 
-    def is_music_cog(self, recipient):
-        try:
-            is_cog = recipient.get_name() == Resources.MUSIC_COG_NAME
-        except AttributeError:
-            try:  # Guesses harder
-                recipient.bot
-                is_cog = True
-            except AttributeError:
-                is_cog = False
-        return is_cog
-
-    def is_sky_music_website(self, recipient):
-        try:
-            is_website = recipient.get_name() == Resources.SKY_MUSIC_WEBSITE_NAME
-        except AttributeError:
-            try:  # Guesses harder
-                recipient.session_ID
-                is_website = True
-            except:
-                is_website = False
-
-        return is_website
-
-    def is_command_line(self, recipient):
-        try:
-            return recipient.get_name() == Resources.COMMAND_LINE_NAME
-        except AttributeError:  # Guesses harder
-            return not (self.is_music_cog(recipient) or self.is_sky_music_website(recipient))
 
     def get_song(self):
         return self.song
@@ -186,7 +158,7 @@ class MusicSheetMaker:
         return self.song_parser
 
     def set_song_parser(self, song_parser=None, recipient=None):
-        if self.is_command_line(recipient):
+        if recipient.communicator.is_command_line:
             silent_warnings = False
         else:
             silent_warnings = True
@@ -337,7 +309,7 @@ class MusicSheetMaker:
             self.send_json_url(recipient=recipient, song_bundle=song_bundle, skyjson_url_api=self.skyjson_url_api)
 
         # 16. Advertises for the Discord version
-        if self.is_command_line(recipient):
+        if recipient.communicator.is_command_line:
             q_discord = self.communicator.send_stock_query('discord_ad', recipient=recipient)
             recipient.execute_queries(q_discord)
 
@@ -372,10 +344,10 @@ class MusicSheetMaker:
                         'layer_delimiter': Resources.DELIMITERS['layer'],
                         'ruler_delimiters': ", ".join([repr(rul) for rul in Resources.MARKDOWN_CODES['rulers']])
                         }
-        if self.is_command_line(recipient):
+        if recipient.communicator.is_command_line:
             i_instr = self.communicator.send_stock_query('instructions_command_line', recipient=recipient,
                                                          replacements=replacements, prerequisites=prerequisites)
-        elif self.is_sky_music_website(recipient):
+        elif recipient.communicator.is_sky_music_website:
             i_instr = self.communicator.send_stock_query('instructions_sky_music_website', recipient=recipient,
                                                          replacements=replacements, prerequisites=prerequisites)
         else:
@@ -449,7 +421,7 @@ class MusicSheetMaker:
                         }
         replacements.update({'put_in_songs_in': Lang.get_string(f"recipient_specifics/put_in_songs_in/{recipient.get_name()}", self.locale)})
 
-        if self.is_music_cog(recipient):
+        if recipient.communicator.is_music_cog:
 
             return self.ask_notes(recipient=recipient, prerequisites=prerequisites, execute=execute)
 
@@ -465,7 +437,7 @@ class MusicSheetMaker:
 
                 result = q_notes.get_reply().get_result()
 
-                if self.is_music_cog(recipient):
+                if recipient.communicator.is_music_cog:
                     isfile = False # Don't allow reading files stored on system path on the music-cog
                 else:                
                     # Detects if the result is a valid filepath, or a tentative one
@@ -483,11 +455,11 @@ class MusicSheetMaker:
 
                 if isfile: 
                     notes = FileUtils.read_file(file_path, Resources.BINARY_EXT)
-                    if self.is_command_line(recipient):
+                    if recipient.communicator.is_command_line:
                         print(Lang.get_string("open_file", self.locale).format(file_path=os.path.abspath(file_path)))
                 else:
                     notes = result.split(os.linesep)  # Returns a list of strings in any case
-                    if self.is_command_line(recipient):  # Loop to ask for several lines in the standard input interface
+                    if recipient.communicator.is_command_line:  # Loop to ask for several lines in the standard input interface
                         while result:
                             (q_notes, result) = self.ask_notes(recipient=recipient, prerequisites=prerequisites, execute=execute)
 
@@ -742,7 +714,7 @@ class MusicSheetMaker:
         if len(render_modes) == 1:
             return None, render_modes
 
-        if self.is_music_cog(recipient):
+        if recipient.communicator.is_music_cog:
 
             return None, self.music_cog_render_modes
 
@@ -844,7 +816,7 @@ class MusicSheetMaker:
     def render_song(self, recipient, render_modes=None, aspect_ratio=AspectRatio.WIDESCREEN, song_bpm=Resources.DEFAULT_BPM, gamepad=None):
 
         if render_modes is None:
-            if self.is_music_cog(recipient):
+            if recipient.communicator.is_music_cog:
                 render_modes = self.music_cog_render_modes
             else:
                 render_modes = self.render_modes_enabled
@@ -855,17 +827,17 @@ class MusicSheetMaker:
         if not isinstance(aspect_ratio, AspectRatio):
             aspect_ratio = AspectRatio.WIDESCREEN
 
-        if not self.is_command_line(recipient):
+        if not recipient.communicator.is_command_line:
             self.css_mode = CSSMode.EMBED
 
-        if self.is_command_line(recipient):
+        if recipient.communicator.is_command_line:
             print("=" * 40)
 
-        if self.is_music_cog(recipient):
+        if recipient.communicator.is_music_cog:
             theme = Resources.MUSIC_COG_THEME
-        elif self.is_command_line(recipient):
+        elif recipient.communicator.is_command_line:
             theme = Resources.COMMAND_LINE_THEME
-        elif self.is_sky_music_website(recipient):
+        elif recipient.communicator.is_sky_music_website:
             theme = Resources.SKY_MUSIC_WEBSITE_THEME
         else:
             theme = Resources.get_default_theme()
@@ -878,7 +850,7 @@ class MusicSheetMaker:
 
             if buffers is not None:
                 song_bundle.add_render(render_mode, buffers)
-                if self.is_command_line(recipient):
+                if recipient.communicator.is_command_line:
                     song_title = song_bundle.get_sanitized_song_filename()
                     self.send_buffers_to_files(song_title, render_mode, buffers, recipient=recipient)
 
@@ -1017,7 +989,7 @@ class MusicSheetMaker:
             file_path = os.path.join(self.song_in_dir, os.path.normpath(result))
             isfile = os.path.isfile(file_path)
 
-            if isfile and self.is_command_line(recipient):
+            if isfile and recipient.communicator.is_command_line:
                 notes = FileUtils.read_file(file_path, Resources.BINARY_EXT)
             else:
                 notes = result.split(os.linesep)
@@ -1055,7 +1027,7 @@ class MusicSheetMaker:
         Retrieves render modes from previous answered queries.
         Should work, but not fully tested
         """
-        if self.is_music_cog(recipient):
+        if recipient.communicator.is_music_cog:
             return self.music_cog_render_modes
         else:
             return self.retrieve_query_result(recipient, 'render_modes', default=self.render_modes_enabled)

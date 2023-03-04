@@ -4,7 +4,7 @@ try:
     from importlib import resources as importlib_resources
 except ImportError:
     import importlib_resources
-from skymusic.resources import fonts, png, css, js, svg
+from skymusic.resources import fonts, png, css, js, svg, gamepads
 #from skymusic import modes
 
 def get_default_theme():
@@ -24,7 +24,7 @@ def load_theme(theme, platform='mobile'):
     '''
     Loads CSS and PNG files as string and bytes buffers respectively, for a theme whose name 'theme' must be defined in the THEMES list
     '''
-    global PNGS, CSS, SVG, THEMES, PLATFORMS, PNG_SETTINGS, BYPASS_GAMEPAD_SVG
+    global PNGS, CSS, SVG, THEMES, PLATFORMS, PNG_SETTINGS
     
     if theme not in THEMES:
         load_theme(get_default_theme(), platform)
@@ -36,7 +36,7 @@ def load_theme(theme, platform='mobile'):
         if not png_files:
             print(f"\n*** ERROR: could not find any PNG file to embed from {png_module}. ***\n")   
         
-        png_files = [file for file in png_files if os.path.splitext(file)[1] == '.png']
+        png_files = [file for file in png_files if os.path.splitext(file)[1].lower() == '.png']
         
         for png_file in png_files: #Populates the PNG dictionary using extension stripped filenames as keys
             PNGS[platform][os.path.splitext(png_file)[0]] = io.BytesIO(importlib_resources.read_binary(png_module, png_file))
@@ -50,7 +50,7 @@ def load_theme(theme, platform='mobile'):
         if not css_files:
             print(f"\n*** ERROR: could not find any CSS file to embed from {css_module}. ***\n")     
         
-        css_files = [file for file in css_files if os.path.splitext(file)[1] == '.css']
+        css_files = [file for file in css_files if os.path.splitext(file)[1].lower() == '.css']
         
         for css_file in css_files:
             CSS[os.path.splitext(css_file)[0]] = io.StringIO(importlib_resources.read_text(css_module, css_file))
@@ -61,7 +61,7 @@ def load_theme(theme, platform='mobile'):
         if not svg_files:
             print(f"\n*** ERROR: could not find any SVG file to embed from {svg_module}. ***\n")     
         
-        svg_files = [file for file in svg_files if os.path.splitext(file)[1] == '.svg']
+        svg_files = [file for file in svg_files if os.path.splitext(file)[1].lower() == '.svg']
         
         for svg_file in svg_files:
             SVG[os.path.splitext(svg_file)[0]] = io.StringIO(importlib_resources.read_text(svg_module, svg_file))
@@ -93,6 +93,21 @@ The svg to png converter needs svg2png.css
 
 SVG = {'mobile': io.StringIO(), 'playstation': io.StringIO(), 'switch': io.StringIO()} # Names of the SVG templates to load
 PNGS = {'mobile': dict(), 'playstation': dict(), 'switch': dict()}
+
+'''A dictionary of gamepad images, to be shown when user asks for help. Only the first image found is used in practice'''
+GAMEPAD_IMAGES = {'mobile': [], 'playstation': [], 'switch': []}
+for platform in GAMEPAD_IMAGES:
+    try:
+        platform_module = importlib.import_module('.'+platform, gamepads.__name__)
+        platform_images = importlib_resources.contents(platform_module)        
+        platform_images = [file for file in platform_images if os.path.splitext(file)[1].lower() in ('.jpg', '.png', '.webp', '.gif', '.tif', '.jpeg', '.tiff')]
+        for image in platform_images:
+            with importlib_resources.path(platform_module, image) as fp:
+                GAMEPAD_IMAGES[platform].append(str(fp))
+    except ModuleNotFoundError:
+        pass
+
+
 #Will be populated by load_theme()
 COLORS = {
         'light': {'font_color': (0, 0, 0),
@@ -204,5 +219,3 @@ DEFAULT_INSTRUMENT = 'harp'
 
 MIDI_PITCHES = {'C': 60, 'C#': 61, 'Db': 61, 'D': 62, 'D#': 63, 'Eb': 63, 'E': 64, 'F': 65, 'F#': 66, 'Gb': 66, 'G': 67, 'G#': 68, 'Ab': 68, 'A': 69, 'A#': 70, 'Bb': 70, 'B': 71}
 MIDI_SEMITONES = [0, 2, 4, 5, 7, 9, 11]  # May no longer be used when Western_scales is merged
-
-BYPASS_GAMEPAD_SVG = False #Debug: bypass platform for SVG renderer while it's not done

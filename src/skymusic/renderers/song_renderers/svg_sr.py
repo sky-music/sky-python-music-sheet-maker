@@ -15,10 +15,6 @@ class SvgSongRenderer(song_renderer.SongRenderer):
         self.platform_name = platform.get_name()
         self.gamepad = gamepad
         
-        if Resources.BYPASS_GAMEPAD_SVG:
-            self.gamepad = None
-            self.platform_name = GamePlatform.get_default().get_name()
-        
         Resources.load_theme(theme, self.platform_name)
 
         self.aspect_ratio = aspect_ratio

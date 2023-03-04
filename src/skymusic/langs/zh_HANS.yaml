@@ -36,19 +36,19 @@ game_platform:
 gamepad_layout:
   playstation:
     normal:
-      ps1: Last note is R (default)
-      ps2: Last note is LR
-      ps3: Last note is L2
-      ps4: Last note is R2
+      ps1: Higher note is R (default)
+      ps2: Higher note is LR
+      ps3: Higher note is L2
+      ps4: Higher note is R2
     drum:
-      ps1: Last note is R2
+      ps1: Higher note is R2
   switch:
     normal:
-      sw1: Last note is LR (default)
-      sw2: Last note is LR, layout mimicks gamepad
-      sw3: Last note is ZR
+      sw1: Higher note is LR (default)
+      sw2: Higher note is LR, layout mimicks gamepad
+      sw3: Higher note is ZR
     drum:
-      sw1: Last note is ZR
+      sw1: Higher note is ZR
 instrument_type:
   normal:
     short_desc: Normal instrument
@@ -246,7 +246,7 @@ stock_queries:
     question: 该乐谱歌名
     afterword:
     input_tip: '任何字或词 {skip}，跳过使用 "untitled"'
-    help_text: 
+    help_text: The song title is not mandatory, but recommended
   original_artist:
     foreword:
     question: 该歌曲原著作家名称

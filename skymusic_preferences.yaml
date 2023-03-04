@@ -22,4 +22,4 @@ possible_keys: C
 keep_meta: yes # Keep meta data found in the file
 #song_title: happy new year
 #game_platform: mobile #Gameplatform, among playstation, switch, mobile
-gamepad_layout: 0
+#gamepad_layout: 0

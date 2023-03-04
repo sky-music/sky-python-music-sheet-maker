@@ -1,7 +1,12 @@
 # -*- mode: python ; coding: utf-8 -*-
-# pyinstaller --distpath="~/Desktop/dist" --workpath="~/Desktop/build" skymusic.spec
-# Using conda's python: ~/opt/anaconda3/bin/python -m PyInstaller --distpath="~/Desktop/dist" --workpath="~/Desktop/build" skymusic.spec
-# In Windows: %homedrive%%homepath%\WinPython\python-3.7.2.amd64\python.exe -m PyInstaller --distpath="%homedrive%%homepath%\Desktop\dist" --workpath="%homedrive%%homepath%\Desktop\build" skymusic.spec
+# First navigate to the project root directory using cd, or add the path before 'skymusic.spec' 
+# Make sure you have set the proxy settings right (in .condarc for Anaconda)
+#
+# In MacOS Spyder: pyinstaller --distpath="~/Desktop/dist" --workpath="~/Desktop/build" skymusic.spec
+# With MacOS Anaconda's python: ~/opt/anaconda3/bin/python -m PyInstaller --distpath="~/Desktop/dist" --workpath="~/Desktop/build" skymusic.spec
+#
+# In Windows WinPython: %homedrive%%homepath%\WinPython\python-3.7.2.amd64\python.exe -m PyInstaller --distpath="%homedrive%%homepath%\Desktop\dist" --workpath="%homedrive%%homepath%\Desktop\build" skymusic.spec
+# In Windows Anaconda Prompt: python.exe -m PyInstaller --distpath="%homedrive%%homepath%\Desktop\dist" --workpath="%homedrive%%homepath%\Desktop\build" skymusic.spec
 # In Windows Spyder: # ! pyinstaller --distpath="%homedrive%%homepath%\Desktop\dist" --workpath="%homedrive%%homepath%\Desktop\build" skymusic.spec
 
 block_cipher = None
