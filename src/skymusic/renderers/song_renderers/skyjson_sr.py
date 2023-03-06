@@ -87,7 +87,7 @@ class SkyjsonSongRenderer(song_renderer.SongRenderer):
         
     
     def render_to_new_format(self, layers):
-        '''Render columns from the layers dictionary'''
+        '''Render Sky-Music JSON columns from our layers dictionary'''
         # layers = {0: {name, instrs}, 1: {name, instrs}
         # instrs = [instr, instr...]
         #columns = [0, notes], [0, notes]

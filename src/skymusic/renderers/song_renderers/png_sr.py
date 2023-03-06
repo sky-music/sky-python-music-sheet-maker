@@ -420,7 +420,7 @@ class PngSongRenderer(song_renderer.SongRenderer):
                 x_predict = x + instr_spacings[0] / 2.0 + self.dimmed_text_font.getsize('99')[0]
                 if self.gamepad is None or (not instrument.get_is_tonal()):
                     last_instr_size = self.get_harp_size(instr_rescale)
-                    #TODO: predict text length
+                    #TODO: predict text length instead of using generic length
                 else:
                     last_instr_size = instrument_renderer.get_gamepad_size(instrument, instr_rescale)
                 x_predict += last_instr_size[0]

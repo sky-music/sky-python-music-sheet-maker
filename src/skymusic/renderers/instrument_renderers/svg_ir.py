@@ -178,8 +178,6 @@ class SvgInstrumentRenderer(instrument_renderer.InstrumentRenderer):
         num_frames = max(1, len(frames))
         num_buttons = max(1, instrument.get_skygrid().get_max_num_by_frame()) #rows
         
-        #TODO: use both frames and grid size
-        
         quaver_gap = self.get_gamepad_gaps(absolute=False)['quaver-gapH']
         row_gap = self.get_gamepad_gaps(absolute=False)['note-gapV']
         
@@ -244,7 +242,7 @@ class SvgInstrumentRenderer(instrument_renderer.InstrumentRenderer):
             harp_render += '\n<use xlink:href="#instr" />'
 
         for row in range(instrument.get_num_rows()):
-            harp_render += '\n'
+            if not instr_broken and not instr_silent: harp_render += '\n'
             for col in range(instrument.get_num_columns()):
                 note = instrument.get_note_from_coord((row, col))
                 

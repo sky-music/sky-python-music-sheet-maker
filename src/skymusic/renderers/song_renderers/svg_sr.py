@@ -151,7 +151,9 @@ class SvgSongRenderer(song_renderer.SongRenderer):
         self.write_headers(svg_buffer, filenum, song, css_mode)             
        
         # Song metadata SVG container
-        song_header = (f'\n<svg x="{self.SVGviewPort_margins[0] :.2f}" y="{self.SVGviewPort_margins[1] :.2f}"'
+        song_header = '<svg><rect width="100%" height="100%" class="background" /></svg>'
+        
+        song_header += (f'\n<svg x="{self.SVGviewPort_margins[0] :.2f}" y="{self.SVGviewPort_margins[1] :.2f}"'
                        f' width="{self.line_width :.2f}" height="{(self.SVGviewPort[3] - self.SVGviewPort_margins[1]) :.2f}">'
                        )
 
@@ -356,7 +358,7 @@ class SvgSongRenderer(song_renderer.SongRenderer):
                 #4. Repeat number
                 repeat = instrument.get_repeat()
                 if repeat > 1:
-                    #Todo: change that to give more information on widths, note wodths etc
+                    
                     if self.gamepad and instrument.get_is_silent():
                         
                         for i in range(1,repeat):

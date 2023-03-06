@@ -1,5 +1,5 @@
 import os, io, re
-from skymusic.modes import InputMode, CSSMode, RenderMode, ReplyType, AspectRatio, GamePlatform, GamepadLayout, InstrumentType
+from skymusic.modes import InputMode, CSSMode, RenderMode, ReplyType, AspectRatio, GamePlatform, GamepadLayout, InstrumentType, ColorTheme, Locutor
 from skymusic.communicator import Communicator, QueriesExecutionAbort
 from skymusic.parsers.song_parser import SongParser
 from skymusic.renderers.song_renderers.song_renderer import SongRenderer
@@ -105,9 +105,10 @@ class SongBundle:
 
 class MusicSheetMaker:
 
-    def __init__(self, locale='en_US', application_root=None, song_in_dir=None, song_out_dir=None, skyjson_url_api=None):
-        self.name = Resources.MUSIC_MAKER_NAME
+    def __init__(self, locale='en_US', theme=None, application_root=None, song_in_dir=None, song_out_dir=None, skyjson_url_api=None):
+        self.name = Locutor.MUSIC_MAKER.get_name()
         self.locale = self.set_locale(locale)
+        self.theme = theme
         self.communicator = Communicator(owner=self, locale=self.locale)
         self.song = None
         self.song_parser = None
@@ -132,11 +133,9 @@ class MusicSheetMaker:
         else:
             raise AttributeError(f"type object '{type(self).__name__}' has no attribute 'communicator'")
 
-    def get_name(self):
-        return self.name
+    def get_name(self): return self.name
 
-    def get_locale(self):
-        return self.locale
+    def get_locale(self): return self.locale
 
     def set_locale(self, locale):
 
@@ -147,15 +146,13 @@ class MusicSheetMaker:
 
         return self.locale
 
+    def set_theme(self, theme:str): self.theme = theme.strip()
 
-    def get_song(self):
-        return self.song
+    def get_song(self): return self.song
 
-    def set_song(self, song):
-        self.song = song
+    def set_song(self, song): self.song = song
 
-    def get_song_parser(self):
-        return self.song_parser
+    def get_song_parser(self): return self.song_parser
 
     def set_song_parser(self, song_parser=None, recipient=None):
         if recipient.communicator.is_command_line:
@@ -221,6 +218,10 @@ class MusicSheetMaker:
             kwargs['query']
         except KeyError:
             raise MusicSheetMakerError('No Query passed to create_song')
+
+        theme = self.theme
+        if not theme:
+            theme = Locutor.get_locutor_theme(recipient.get_name())
 
         # ======= NEW SONG =======
 
@@ -302,7 +303,7 @@ class MusicSheetMaker:
             self.set_song_metadata(recipient=recipient, meta=(title, artist, transcript), song_key=song_key)
         
         # 14. Renders Song
-        song_bundle = self.render_song(recipient=recipient, render_modes=render_modes, aspect_ratio=aspect_ratio, song_bpm=song_bpm, gamepad=gamepad)
+        song_bundle = self.render_song(recipient=recipient, render_modes=render_modes, aspect_ratio=aspect_ratio, song_bpm=song_bpm, gamepad=gamepad, theme=theme)
 
         # 15. Sends an url from sky-music.herokuapp.com
         if self.skyjson_url_api:
@@ -813,7 +814,7 @@ class MusicSheetMaker:
         return
 
 
-    def render_song(self, recipient, render_modes=None, aspect_ratio=AspectRatio.WIDESCREEN, song_bpm=Resources.DEFAULT_BPM, gamepad=None):
+    def render_song(self, recipient, render_modes=None, aspect_ratio=AspectRatio.WIDESCREEN, song_bpm=Resources.DEFAULT_BPM, gamepad=None, theme=None):
 
         if render_modes is None:
             if recipient.communicator.is_music_cog:
@@ -832,15 +833,6 @@ class MusicSheetMaker:
 
         if recipient.communicator.is_command_line:
             print("=" * 40)
-
-        if recipient.communicator.is_music_cog:
-            theme = Resources.MUSIC_COG_THEME
-        elif recipient.communicator.is_command_line:
-            theme = Resources.COMMAND_LINE_THEME
-        elif recipient.communicator.is_sky_music_website:
-            theme = Resources.SKY_MUSIC_WEBSITE_THEME
-        else:
-            theme = Resources.get_default_theme()
 
         song_bundle = SongBundle()
         song_bundle.set_meta(self.get_song().get_meta())

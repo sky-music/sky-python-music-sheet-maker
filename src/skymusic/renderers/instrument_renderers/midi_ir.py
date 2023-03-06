@@ -4,11 +4,12 @@ from skymusic.resources import Resources
 
 try:
     import mido
-
     no_mido_module = False
-except (ImportError, ModuleNotFoundError):
+except ModuleNotFoundError:
     no_mido_module = True
-
+except ImportError as err:
+    no_mido_module = True
+    print(err)
 
 
 class MidiInstrumentRenderer(instrument_renderer.InstrumentRenderer):
@@ -52,7 +53,6 @@ class MidiInstrumentRenderer(instrument_renderer.InstrumentRenderer):
     def render_icon(self, instrument):
         
         note_renderer = midi_nr.MidiNoteRenderer(music_key=self.music_key)
-        #harp_render = []
         
         render_args = []
         harp_render = [] 
@@ -112,6 +112,6 @@ class MidiInstrumentRenderer(instrument_renderer.InstrumentRenderer):
         return NotImplemented
         
     def render_layer(self, *args, **kwargs):    
-        #TODO: implement layers as tracks
+        #Layers are handled in the MidiSongParser, by creating a new_track
         return NotImplemented
             

@@ -9,6 +9,23 @@ This is more secure than simply numbering them, or labeling them with a string.
 ALL CLASSES LISTED IN ReplyType MUST CONTAIN the get_short_desc() and get_long_desc() methods
 """
 
+class ColorTheme(Enum):
+    ''' A class to store possible color themes'''
+    LIGHT = ('light',)
+    DARK = ('dark',)
+    
+    def __init__(self, name):
+        self._name = name
+        
+    def __str__(self, locale='en_US'): return self._name
+    
+    def get_default(self): return self.LIGHT
+    
+    def get_name(self): return self._name
+    
+    def get_short_desc(self, locale='en_US'): return self._name
+    
+
 class InputMode(Enum):
     '''A class of different input languages that can be parsed by the program'''
     SKYKEYBOARD = (False, "input_mode/skykeyboard/short_desc", "input_mode/skykeyboard/long_desc", skymusic.parsers.noteparsers.skykeyboard.SkyKeyboard)
@@ -262,6 +279,49 @@ class CSSMode(Enum):
     EMBED = 3
     HARD = EMBED
 
+
+class Locutor(Enum):
+    ''' A class to store possible locutors'''
+    
+    MUSIC_MAKER = ('music_sheet_maker', False, None, None, ColorTheme.LIGHT)
+    MUSIC_COG = ('music_cog', True, False, False, ColorTheme.DARK)
+    SKY_MUSIC_WEBSITE = ('sky_music_website', True, False, False, ColorTheme.LIGHT)
+    COMMAND_LINE = ('command_line', True, True, False, ColorTheme.LIGHT)
+    
+    @classmethod
+    def get_locutor_theme(cls, locutor_name):
+        for locutor in cls:
+            if locutor_name.lower().strip() == locutor._name.lower().strip():
+                return locutor.color_theme.get_name()
+                break
+    
+    def __init__(self, name, player, command_line, website, color_theme):
+        self._name = name #name is already an enum attribute
+        self.player = player
+        self.command_line = command_line
+        self.website = website
+        self.color_theme = color_theme
+        
+    def __str__(self, locale='en_US'): return self._name
+    
+    def get_default(self): return self.COMMAND_LINE
+    
+    def get_name(self): return self._name
+    
+    def get_short_desc(self, locale='en_US'): return self._name
+    
+    def get_theme(self):
+        return self.color_theme.get_name()
+
+    @property
+    def is_command_line(self): return self.command_line
+    
+    @property
+    def is_website(self): return self.website
+            
+    @property
+    def is_bot(self): return (not self.is_command_line) and (not self.is_website)
+    
 
 class ReplyType(Enum):
     '''A Class of possible replies from the user'''

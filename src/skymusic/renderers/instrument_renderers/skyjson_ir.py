@@ -14,13 +14,13 @@ class SkyjsonInstrumentRenderer(instrument_renderer.InstrumentRenderer):
         version = kwargs.pop('version', 'old')
         
         if version == 'old':
-            return self.__render_old_harp__(*args, **kwargs)
+            return self._render_old_harp_(*args, **kwargs)
         elif version == 'new':
-            return self.__render_new_harp__(*args, **kwargs)
+            return self._render_new_harp_(*args, **kwargs)
         else:
             raise KeyError(version)
 
-    def __render_old_harp__(self, instrument,layer=1, time=0):
+    def _render_old_harp_(self, instrument,layer=1, time=0):
 
         json_render = []
         if instrument.get_is_broken():
@@ -39,7 +39,7 @@ class SkyjsonInstrumentRenderer(instrument_renderer.InstrumentRenderer):
                         
         return json_render
 
-    def __render_new_harp__(self, instrument, layer_index=0):
+    def _render_new_harp_(self, instrument, layer_index=0):
         '''Split the instrument chord into a list of notes, along with the provided layer_index'''
         notes = []
         if not instrument:
@@ -63,6 +63,6 @@ class SkyjsonInstrumentRenderer(instrument_renderer.InstrumentRenderer):
         return NotImplemented
         
     def render_layer(self,*args,**kwargs):
-        #TODO: handle layers: either here or in the song_parser # Done?
-        return self.render_ruler(*args,**kwargs)
+        #Layers are handled in the JsonSongParser, by creating a new layer
+        return NotImplemented
             

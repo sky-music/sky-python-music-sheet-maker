@@ -1,5 +1,5 @@
 import io
-from skymusic.modes import RenderMode, ReplyType
+from skymusic.modes import RenderMode, ReplyType, Locutor
 from skymusic.communication import QueryOpen, QueryChoice, QueryBoolean, QueryMultipleChoices, QueryMemory, Information
 from skymusic import Lang, QueryStock
 from skymusic.resources import Resources
@@ -94,7 +94,7 @@ class Communicator:
     @property
     def is_music_cog(self):
         try:
-            is_cog = self.owner.get_name() == Resources.MUSIC_COG_NAME
+            is_cog = self.owner.get_name() == Locutor.MUSIC_COG.get_name()
         except AttributeError:
             try:  # Guesses harder
                 self.owner.bot
@@ -106,7 +106,7 @@ class Communicator:
     @property
     def is_sky_music_website(self):
         try:
-            is_website = self.owner.get_name() == Resources.SKY_MUSIC_WEBSITE_NAME
+            is_website = self.owner.get_name() == Locutor.SKY_MUSIC_WEBSITE.get_name()
         except AttributeError:
             try:  # Guesses harder
                 self.owner.session_ID
@@ -119,7 +119,7 @@ class Communicator:
     @property
     def is_command_line(self):
         try:
-            return self.owner.get_name() == Resources.COMMAND_LINE_NAME
+            return self.owner.get_name() == Locutor.COMMAND_LINE.get_name()
         except AttributeError:  # Guesses harder
             return not (self.is_music_cog or self.is_sky_music_website)
 
@@ -310,8 +310,6 @@ class Communicator:
         Returns a text that can be sent to a Discord utils.Question model
         """
         output = {}
-        
-        #TODO: add support for help_image
         
         limits = query.get_limits()
         if query.help_required:

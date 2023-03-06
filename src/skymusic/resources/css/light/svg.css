@@ -1,4 +1,6 @@
 
+svg rect.background { fill: white; }
+
 /* <!-- Makes the table disappear in case of broken instrument (SVG only)--> */
 svg.broken rect {
   fill: none;
@@ -74,15 +76,10 @@ svg text.h2
 /* <!-- Line number --> */
 svg text.num {
   font-size: 0.8em;
-  color: grey;
+  stroke: grey;
+  fill: grey;
 }
 
-/* <!-- Broken text --> */
-svg text.broken {
-  font-size: 6em;
-  stroke: red;
-  fill: red;
-}
 
 /* <!-- Bottom-left corner repetition mark --> (SVG only) */
 svg.repeat text.repeat {

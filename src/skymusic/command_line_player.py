@@ -28,7 +28,8 @@ from skymusic.music_sheet_maker import MusicSheetMaker
 from skymusic.communicator import Communicator, QueriesExecutionAbort
 from skymusic import Lang
 from skymusic import Config
-from skymusic.resources import Resources
+from skymusic.modes import Locutor
+#from skymusic.resources import Resources
 try:
     import readline
 except ModuleNotFoundError:
@@ -61,7 +62,7 @@ class CommandLinePlayer:
     """
 
     def __init__(self, locale=None, preferences_path='../skymusic_preferences.yaml'):
-        self.name = Resources.COMMAND_LINE_NAME
+        self.name = Locutor.COMMAND_LINE.get_name()
         self.preferences = self.load_preferences(preferences_path) 
         self.set_locale(self.get_locale_from_prefs() if not locale else locale)
         self._fix_preferences_(locale=self.locale)
@@ -226,7 +227,8 @@ class CommandLinePlayer:
 # MAIN SCRIPT
 try:
     player = CommandLinePlayer(preferences_path=PREFERENCES_PATH) # Me
-    maker = MusicSheetMaker(locale=player.get_locale(), application_root=application_root, song_in_dir=SONG_IN_DIR, song_out_dir=SONG_OUT_DIR, skyjson_url_api=(SKYJSON_URL if not BATCH_MODE else None)) # The other party
+    theme = player.preferences.get('theme', None)
+    maker = MusicSheetMaker(locale=player.get_locale(), theme=theme, application_root=application_root, song_in_dir=SONG_IN_DIR, song_out_dir=SONG_OUT_DIR, skyjson_url_api=(SKYJSON_URL if not BATCH_MODE else None)) # The other party
 
     if BATCH_MODE:
         # process a song using a yaml file instead of asking questions in the command prompt

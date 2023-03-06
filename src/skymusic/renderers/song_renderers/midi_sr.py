@@ -7,8 +7,11 @@ from skymusic.resources import Resources
 try:
     import mido
     no_mido_module = False
-except (ImportError, ModuleNotFoundError):
+except ModuleNotFoundError:
     no_mido_module = True
+except ImportError as err:
+    no_mido_module = True
+    print(err)
 
 
 class MidiSongRenderer(song_renderer.SongRenderer):
@@ -30,7 +33,7 @@ class MidiSongRenderer(song_renderer.SongRenderer):
             self.midi_key = None
 
 
-    def __write_header__(self, mid, track, tempo, instrument=None):
+    def _write_header_(self, mid, track, tempo, instrument=None):
         track.append(mido.MetaMessage('set_tempo', tempo=tempo))
 
         try:
@@ -43,7 +46,7 @@ class MidiSongRenderer(song_renderer.SongRenderer):
                 track.append(mido.Message('program_change', program=instrument, time=0))
                 
 
-    def __copyright_track__(self, mid, song):
+    def _copyright_track_(self, mid, song):
         
         copytrack = mido.MidiTrack()
         mid.tracks.append(copytrack)
@@ -58,12 +61,12 @@ class MidiSongRenderer(song_renderer.SongRenderer):
         
         return mid
 
-    def __new_track__(self,mid,tempo,instrument=None):
+    def _new_track_(self,mid,tempo,instrument=None):
         
         track = mido.MidiTrack()
         mid.tracks.append(track)
         
-        self.__write_header__(mid, track, tempo, instrument) 
+        self._write_header_(mid, track, tempo, instrument) 
         return track
 
     def write_buffers(self, song):
@@ -86,8 +89,8 @@ class MidiSongRenderer(song_renderer.SongRenderer):
             tempo = mido.bpm2tempo(Resources.DEFAULT_BPM)
 
         mid = mido.MidiFile(type=1)
-        self.__copyright_track__(mid, song)
-        track = self.__new_track__(mid, tempo, self.midi_instrument)
+        self._copyright_track_(mid, song)
+        track = self._new_track_(mid, tempo, self.midi_instrument)
 
         sec = mido.second2tick(1, ticks_per_beat=mid.ticks_per_beat, tempo=tempo)  # 1 second in ticks
         note_ticks = self.midi_note_duration * sec * Resources.DEFAULT_BPM / self.midi_bpm  # note duration in ticks
@@ -98,7 +101,7 @@ class MidiSongRenderer(song_renderer.SongRenderer):
             if len(line) > 0:
                 linetype = line[0].get_type().lower().strip()
                 if linetype == 'layer':
-                    track = self.__new_track__(mid, tempo)#no instrument change yet
+                    track = self._new_track_(mid, tempo)#no instrument change yet
                 elif line[0].get_is_tonal():
                     instrument_index = 0
                     for instrument in line:

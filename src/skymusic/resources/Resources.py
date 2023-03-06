@@ -118,9 +118,9 @@ COLORS = {
                   'hr_color': (0, 0, 0)},
         'dark': {'font_color': (255, 255, 255),
                   'dimmed_font_color': (128, 128, 128),
-                  'harp_color': (54, 57, 63),
-                  'text_bkg': (54, 57, 63, 0), #Transparent dark
-                  'song_bkg': (54, 57, 63),
+                  'harp_color': (40, 40, 40),
+                  'text_bkg': (40, 40, 40, 0), #Transparent dark
+                  'song_bkg': (40, 40, 40),
                   'hr_color': (255, 255, 255)}, 
 }                  
     
@@ -203,15 +203,6 @@ SKYJSON_CHORD_DELAY = 50 #Delay in ms below which 2 notes are considered a chord
 DEFAULT_BPM = 220
 PARSING_START_OCTAVE = 1
 RENDERING_START_OCTAVE = 4
-
-MUSIC_MAKER_NAME = 'music_sheet_maker'
-MUSIC_COG_NAME = 'music_cog'
-SKY_MUSIC_WEBSITE_NAME = 'sky_music_website'
-COMMAND_LINE_NAME = 'command_line'
-
-MUSIC_COG_THEME = 'dark'
-SKY_MUSIC_WEBSITE_THEME = 'light'
-COMMAND_LINE_THEME = 'light'
 
 DEFAULT_KEY = 'C' # The default proposed song key, to parse notes when the song key cannot be retrieved, not to be confused with the 0 index of the English/Jianpu/doremi chromatic scales, which is C by convention 
 
