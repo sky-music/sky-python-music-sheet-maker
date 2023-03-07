@@ -4,7 +4,7 @@
 # It is operational for command-line users only
 # To disable a default answer, start the whole line with an hashtag #
 #==========================================
-theme: light #Forced color theme among light, dark
+theme: LIGHT #Forced color theme among LIGHT, DARK
 #locale: fr_FR #Forces default language
 instrument_type: HARP #An instrument short name among HARP, DRUM
 aspect_ratio: WIDESCREEN # an aspect ratio short name among WIDESCREEN, OLDTV, SQUARE, A4, VERTPANEL

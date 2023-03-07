@@ -28,7 +28,7 @@ from skymusic.music_sheet_maker import MusicSheetMaker
 from skymusic.communicator import Communicator, QueriesExecutionAbort
 from skymusic import Lang
 from skymusic import Config
-from skymusic.modes import Locutor
+from skymusic.modes import Locutor, ColorTheme
 #from skymusic.resources import Resources
 try:
     import readline
@@ -164,6 +164,12 @@ class CommandLinePlayer:
 
         return answer
 
+    def get_theme_from_prefs(self):
+        '''Fetches theme code NAME in the preferences, and returns its name as defined in modes.py'''
+        k = self.preferences.get('theme', '')
+        color_theme = getattr(ColorTheme, k, None)
+        if color_theme: return color_theme.get_name()
+        
 
     def load_yaml_song(self, filepath):
         """Batch mode only: loads the .yaml file in the batch_songs directory, containing answers to questions for a particular song"""
@@ -227,7 +233,7 @@ class CommandLinePlayer:
 # MAIN SCRIPT
 try:
     player = CommandLinePlayer(preferences_path=PREFERENCES_PATH) # Me
-    theme = player.preferences.get('theme', None)
+    theme = player.get_theme_from_prefs()
     maker = MusicSheetMaker(locale=player.get_locale(), theme=theme, application_root=application_root, song_in_dir=SONG_IN_DIR, song_out_dir=SONG_OUT_DIR, skyjson_url_api=(SKYJSON_URL if not BATCH_MODE else None)) # The other party
 
     if BATCH_MODE:
