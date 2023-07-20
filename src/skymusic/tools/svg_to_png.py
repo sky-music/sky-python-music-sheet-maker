@@ -328,12 +328,12 @@ def set_transparency(png_paths, transparency):
             (basename, ext) = os.path.splitext(png_path)
             if ext == '.png':
                 if not SIMULATE:
-                    im = Image.open(png_path)
-                    if transparency:
-                        im = im.convert('RGBA')
-                    else:
-                        im = im.convert('RGB')
-                    im.save(png_path, dpi=(96, 96), optimize=True)
+                    with Image.open(png_path, mode='r') as im:
+                        if transparency:
+                            im = im.convert('RGBA')
+                        else:
+                            im = im.convert('RGB')
+                        im.save(png_path, dpi=(96, 96), optimize=True)
             files_set += 1
             
     return files_set

@@ -83,7 +83,7 @@ input_mode:
     long_desc: "do re mi en japonais: ド、ド#／レb、レ、レ#／ミb、ミ、ファ、ファ#／ソb、ソ、ソ#／ラb、ラ、ラ#／シb、シ"
   skyjson:
     short_desc: 'Enregistrement Sky-Music  (JSON text)'
-    long_desc: "Dictionaire JSON avec le temps en ms et la touche 0-14 comme sur l'app SkyStudio et <https://specy.github.io/skyMusic/"
+    long_desc: "Dictionaire JSON avec le temps en ms et la touche 0-14 comme sur l'app SkyStudio et Sky Music de Specy"
   midi:
     short_desc: Midi file
     long_desc: Fichier Midi (.mid ou .midi)
