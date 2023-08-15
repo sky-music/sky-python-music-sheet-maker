@@ -27,7 +27,7 @@ class SkyjsonSongRenderer(song_renderer.SongRenderer):
                      'permission':'', 'type': 'composed',
                      'pitch': song.get_music_key(),
                      'bpm': int(self.song_bpm), 
-                     'data':{"isComposed":True,"isComposedVersion":True,"appName":"VisualSheetMaker"},
+                     'data':{"isComposed":True,"isComposedVersion":True,"appName":"Sky"},
                      'version':2,
                      'pitchLevel':0, 'bitsPerPage': 16,
                      'isEncrypted': False, 
