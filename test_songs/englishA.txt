@@ -1,12 +1,12 @@
 #All Notes:
 A1 B1 C#2 D2 E2 F#2 G#2 A2 B2 C#3 D3 E3 F#3 G#3 A4
-#Chords:
+#Two Chords:
 C#2D2 E2F#2G#2
 #Some quavers #and chords:
 C#2-D2-E2-F#2 G#2-A1B1C#2
-#Pauses:
+#Pauses, 1 simple and 1 repeated:
 C2 . D2 . . E2
-#Repetitions:
+#Repetitions of #notes and pauses:
 C#2*2 D2*14 .*2 E2*1 .*1
 #Notes #without #octave:
 C# D E F# G# A B
@@ -14,9 +14,9 @@ C# D E F# G# A B
 C#D EF#G#
 #quavers #without #octaves:
 C#-D EF#G-ABC#D
-#Errors:
+#Invalid characters:
 X + : 0
-#Out of range #notes:
+#Out of range #single notes:
 A0 A6 A7 A8
 #lowercase and #multiple #spaces:
    a1-d1    e1f#1g#1-a1-b1-c#2-d2   

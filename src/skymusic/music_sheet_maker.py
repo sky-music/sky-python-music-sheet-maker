@@ -1,5 +1,5 @@
 import os, io, re
-from skymusic.modes import InputMode, CSSMode, RenderMode, ReplyType, AspectRatio
+from skymusic.modes import InputMode, CSSMode, RenderMode, ReplyType, AspectRatio, GamePlatform, GamepadLayout, InstrumentType, ColorTheme, Locutor
 from skymusic.communicator import Communicator, QueriesExecutionAbort
 from skymusic.parsers.song_parser import SongParser
 from skymusic.renderers.song_renderers.song_renderer import SongRenderer
@@ -105,9 +105,10 @@ class SongBundle:
 
 class MusicSheetMaker:
 
-    def __init__(self, locale='en_US', application_root=None, song_in_dir=None, song_out_dir=None, skyjson_url_api=None):
-        self.name = Resources.MUSIC_MAKER_NAME
+    def __init__(self, locale='en_US', theme=None, application_root=None, song_in_dir=None, song_out_dir=None, skyjson_url_api=None):
+        self.name = Locutor.MUSIC_MAKER.get_name()
         self.locale = self.set_locale(locale)
+        self.theme = theme
         self.communicator = Communicator(owner=self, locale=self.locale)
         self.song = None
         self.song_parser = None
@@ -132,11 +133,9 @@ class MusicSheetMaker:
         else:
             raise AttributeError(f"type object '{type(self).__name__}' has no attribute 'communicator'")
 
-    def get_name(self):
-        return self.name
+    def get_name(self): return self.name
 
-    def get_locale(self):
-        return self.locale
+    def get_locale(self): return self.locale
 
     def set_locale(self, locale):
 
@@ -147,46 +146,16 @@ class MusicSheetMaker:
 
         return self.locale
 
-    def is_music_cog(self, recipient):
-        try:
-            is_cog = recipient.get_name() == Resources.MUSIC_COG_NAME
-        except AttributeError:
-            try:  # Guesses harder
-                recipient.bot
-                is_cog = True
-            except AttributeError:
-                is_cog = False
-        return is_cog
+    def set_theme(self, theme:str): self.theme = theme.strip()
 
-    def is_sky_music_website(self, recipient):
-        try:
-            is_website = recipient.get_name() == Resources.SKY_MUSIC_WEBSITE_NAME
-        except AttributeError:
-            try:  # Guesses harder
-                recipient.session_ID
-                is_website = True
-            except:
-                is_website = False
+    def get_song(self): return self.song
 
-        return is_website
+    def set_song(self, song): self.song = song
 
-    def is_command_line(self, recipient):
-        try:
-            return recipient.get_name() == Resources.COMMAND_LINE_NAME
-        except AttributeError:  # Guesses harder
-            return not (self.is_music_cog(recipient) or self.is_sky_music_website(recipient))
-
-    def get_song(self):
-        return self.song
-
-    def set_song(self, song):
-        self.song = song
-
-    def get_song_parser(self):
-        return self.song_parser
+    def get_song_parser(self): return self.song_parser
 
     def set_song_parser(self, song_parser=None, recipient=None):
-        if self.is_command_line(recipient):
+        if recipient.communicator.is_command_line:
             silent_warnings = False
         else:
             silent_warnings = True
@@ -250,6 +219,10 @@ class MusicSheetMaker:
         except KeyError:
             raise MusicSheetMakerError('No Query passed to create_song')
 
+        theme = self.theme
+        if not theme:
+            theme = Locutor.get_locutor_theme(recipient.get_name())
+
         # ======= NEW SONG =======
 
         # 0. Set Song Parser # Must be done first!
@@ -259,10 +232,10 @@ class MusicSheetMaker:
         (i_instr, res) = self.ask_instructions(recipient=recipient)
 
         # 2. Asks instrument type
-        (q_instr_type, instrument_type) = self.ask_instrument(recipient=recipient)
+        (q_instr_type, instrument) = self.ask_instrument(recipient=recipient)
 
         # 2b. Sets instrument type
-        self.get_song_parser().set_instrument_type(instrument_type)
+        self.get_song_parser().set_instrument_type(instrument)
 
         # 3. Ask for notes
         (q_notes, notes) = self.ask_notes_or_file(recipient=recipient, prerequisites=[i_instr])
@@ -295,15 +268,31 @@ class MusicSheetMaker:
         # 9. Asks for render modes
         (q_render, render_modes) = self.ask_render_modes(recipient=recipient)
 
-        # 10. Asks for aspect ratio
+        has_visual = sum([mode.get_is_visual() for mode in render_modes]) > 0
+
+        # 10. Asks for gaming platform
+        if has_visual:
+            (q_platform, platform) = self.ask_platform(recipient=recipient, prerequisites=[q_render])
+            
+            # 11b. Asks for gamepad layout (if applicable)
+            if q_platform:
+               
+                (q_gamepad, gamepad) = self.ask_gamepad(recipient=recipient, platform=platform, instrument=instrument, prerequisites=[q_platform, q_instr_type])
+            else:
+                (q_gamepad, gamepad) = (None, None)
+        else:
+            (q_platform, platform) = (None, None)
+            (q_gamepad, gamepad) = (None, None)
+        
+        # 11. Asks for aspect ratio
         (q_aspect, aspect_ratio) = self.ask_aspect_ratio(recipient=recipient, render_modes=render_modes, prerequisites=[q_render])
         #(q_aspect, aspect_ratio) = self.ask_aspect_ratio(recipient=recipient, prerequisites=[q_render])  # EXPERIMENTAL
 
-        # 11. Ask beats per minutes
+        # 12. Ask beats per minutes
         (q_song_bpm, song_bpm) = self.ask_song_bpm(recipient=recipient, render_modes=render_modes, prerequisites=[q_render])
         #(q_song_bpm, song_bpm) = self.ask_song_bpm(recipient=recipient, prerequisites=[q_render])  # EXPERIMENTAL
 
-        # 12. Asks for song metadata
+        # 13. Asks for song metadata
         if self.get_song().get_meta_changed():
             (q_keep_meta, keep_meta) = self.ask_song_keep_metadata(recipient=recipient, prerequisites=[q_notes])
         else:
@@ -312,22 +301,21 @@ class MusicSheetMaker:
         if not keep_meta:
             (qs_meta, (title, artist, transcript)) = self.ask_song_metadata(recipient=recipient)
             self.set_song_metadata(recipient=recipient, meta=(title, artist, transcript), song_key=song_key)
-            #self.set_song_metadata(recipient=recipient) # EXPERIMENTAL
+        
+        # 14. Renders Song
+        song_bundle = self.render_song(recipient=recipient, render_modes=render_modes, aspect_ratio=aspect_ratio, song_bpm=song_bpm, gamepad=gamepad, theme=theme)
 
-        # 13. Renders Song
-        song_bundle = self.render_song(recipient=recipient, render_modes=render_modes, aspect_ratio=aspect_ratio, song_bpm=song_bpm)
-
-        # 14. Sends an url from sky-music.herokuapp.com
+        # 15. Sends an url from sky-music.herokuapp.com
         if self.skyjson_url_api:
             self.send_json_url(recipient=recipient, song_bundle=song_bundle, skyjson_url_api=self.skyjson_url_api)
 
-        # 15. Advertises for the Discord version
-        if self.is_command_line(recipient):
+        # 16. Advertises for the Discord version
+        if recipient.communicator.is_command_line:
             q_discord = self.communicator.send_stock_query('discord_ad', recipient=recipient)
             recipient.execute_queries(q_discord)
 
 
-        # 16. Sends result back (required for website)
+        # 17. Sends result back (required for website)
         return song_bundle
 
 
@@ -338,8 +326,8 @@ class MusicSheetMaker:
 
         if execute:
             recipient.execute_queries(q_instrument)
-            instrument_name = q_instrument.get_reply().get_result()
-            return q_instrument, instrument_name
+            instrument = q_instrument.get_reply().get_result()
+            return q_instrument, instrument
         else:
             return q_instrument, None
 
@@ -357,10 +345,10 @@ class MusicSheetMaker:
                         'layer_delimiter': Resources.DELIMITERS['layer'],
                         'ruler_delimiters': ", ".join([repr(rul) for rul in Resources.MARKDOWN_CODES['rulers']])
                         }
-        if self.is_command_line(recipient):
+        if recipient.communicator.is_command_line:
             i_instr = self.communicator.send_stock_query('instructions_command_line', recipient=recipient,
                                                          replacements=replacements, prerequisites=prerequisites)
-        elif self.is_sky_music_website(recipient):
+        elif recipient.communicator.is_sky_music_website:
             i_instr = self.communicator.send_stock_query('instructions_sky_music_website', recipient=recipient,
                                                          replacements=replacements, prerequisites=prerequisites)
         else:
@@ -434,7 +422,7 @@ class MusicSheetMaker:
                         }
         replacements.update({'put_in_songs_in': Lang.get_string(f"recipient_specifics/put_in_songs_in/{recipient.get_name()}", self.locale)})
 
-        if self.is_music_cog(recipient):
+        if recipient.communicator.is_music_cog:
 
             return self.ask_notes(recipient=recipient, prerequisites=prerequisites, execute=execute)
 
@@ -450,7 +438,7 @@ class MusicSheetMaker:
 
                 result = q_notes.get_reply().get_result()
 
-                if self.is_music_cog(recipient):
+                if recipient.communicator.is_music_cog:
                     isfile = False # Don't allow reading files stored on system path on the music-cog
                 else:                
                     # Detects if the result is a valid filepath, or a tentative one
@@ -468,11 +456,11 @@ class MusicSheetMaker:
 
                 if isfile: 
                     notes = FileUtils.read_file(file_path, Resources.BINARY_EXT)
-                    if self.is_command_line(recipient):
+                    if recipient.communicator.is_command_line:
                         print(Lang.get_string("open_file", self.locale).format(file_path=os.path.abspath(file_path)))
                 else:
                     notes = result.split(os.linesep)  # Returns a list of strings in any case
-                    if self.is_command_line(recipient):  # Loop to ask for several lines in the standard input interface
+                    if recipient.communicator.is_command_line:  # Loop to ask for several lines in the standard input interface
                         while result:
                             (q_notes, result) = self.ask_notes(recipient=recipient, prerequisites=prerequisites, execute=execute)
 
@@ -727,7 +715,7 @@ class MusicSheetMaker:
         if len(render_modes) == 1:
             return None, render_modes
 
-        if self.is_music_cog(recipient):
+        if recipient.communicator.is_music_cog:
 
             return None, self.music_cog_render_modes
 
@@ -744,6 +732,44 @@ class MusicSheetMaker:
                 return q_render, render_modes
             else:
                 return q_render, None
+
+    def ask_platform(self, recipient, prerequisites=None, execute=True):
+        '''Asks for game platform'''
+        q_platform = self.communicator.send_stock_query('game_platform', recipient=recipient, prerequisites=prerequisites)
+
+        if execute:
+            recipient.execute_queries(q_platform)
+            platform = q_platform.get_reply().get_result()
+            return q_platform, platform
+        else:
+            return q_platform, None
+
+    def ask_gamepad(self, recipient, platform=None, instrument=None, prerequisites=None, execute=True):
+        '''Aks gamepad layout'''
+        
+        if platform is None:
+            platform =  self.retrieve_query_result(recipient, 'game_platform', default=GamePlatform.get_default())
+        
+        if instrument is None:
+            instrument =  self.retrieve_query_result(recipient, 'instrument_type', default=InstrumentType.get_default())
+        
+        possible_gamepads = GamepadLayout.get_layouts(platform=platform, instrument=instrument)
+        
+        if not possible_gamepads: return None, None # No gamepad layout (MOBILE)
+        
+        if len(possible_gamepads) == 1:
+            return None, possible_gamepads[0]
+        
+        default_gamepad = possible_gamepads[0] if possible_gamepads else None
+        q_gamepad = self.communicator.send_stock_query('gamepad_layout', recipient=recipient, prerequisites=prerequisites,
+                                                       limits=possible_gamepads, default=default_gamepad)
+
+        if execute:
+            recipient.execute_queries(q_gamepad)
+            gamepad = q_gamepad.get_reply().get_result()
+            return q_gamepad, gamepad
+        else:
+            return q_gamepad, None
 
 
     def set_parser_input_mode(self, recipient, notes=None, input_mode=None):
@@ -788,10 +814,10 @@ class MusicSheetMaker:
         return
 
 
-    def render_song(self, recipient, render_modes=None, aspect_ratio=AspectRatio.WIDESCREEN, song_bpm=Resources.DEFAULT_BPM):
+    def render_song(self, recipient, render_modes=None, aspect_ratio=AspectRatio.WIDESCREEN, song_bpm=Resources.DEFAULT_BPM, gamepad=None, theme=None):
 
         if render_modes is None:
-            if self.is_music_cog(recipient):
+            if recipient.communicator.is_music_cog:
                 render_modes = self.music_cog_render_modes
             else:
                 render_modes = self.render_modes_enabled
@@ -802,30 +828,21 @@ class MusicSheetMaker:
         if not isinstance(aspect_ratio, AspectRatio):
             aspect_ratio = AspectRatio.WIDESCREEN
 
-        if not self.is_command_line(recipient):
+        if not recipient.communicator.is_command_line:
             self.css_mode = CSSMode.EMBED
 
-        if self.is_command_line(recipient):
+        if recipient.communicator.is_command_line:
             print("=" * 40)
-
-        if self.is_music_cog(recipient):
-            theme = Resources.MUSIC_COG_THEME
-        elif self.is_command_line(recipient):
-            theme = Resources.COMMAND_LINE_THEME
-        elif self.is_sky_music_website(recipient):
-            theme = Resources.SKY_MUSIC_WEBSITE_THEME
-        else:
-            theme = Resources.get_default_theme()
 
         song_bundle = SongBundle()
         song_bundle.set_meta(self.get_song().get_meta())
 
         for render_mode in render_modes:
-            buffers = self.get_song().render(render_mode=render_mode, aspect_ratio=aspect_ratio, song_bpm=song_bpm, css_mode=self.css_mode, theme=theme)  # A list of IOString or IOBytes buffers
+            buffers = self.get_song().render(render_mode=render_mode, aspect_ratio=aspect_ratio, song_bpm=song_bpm, gamepad=gamepad, css_mode=self.css_mode, theme=theme)  # A list of IOString or IOBytes buffers
 
             if buffers is not None:
                 song_bundle.add_render(render_mode, buffers)
-                if self.is_command_line(recipient):
+                if recipient.communicator.is_command_line:
                     song_title = song_bundle.get_sanitized_song_filename()
                     self.send_buffers_to_files(song_title, render_mode, buffers, recipient=recipient)
 
@@ -964,7 +981,7 @@ class MusicSheetMaker:
             file_path = os.path.join(self.song_in_dir, os.path.normpath(result))
             isfile = os.path.isfile(file_path)
 
-            if isfile and self.is_command_line(recipient):
+            if isfile and recipient.communicator.is_command_line:
                 notes = FileUtils.read_file(file_path, Resources.BINARY_EXT)
             else:
                 notes = result.split(os.linesep)
@@ -1002,13 +1019,10 @@ class MusicSheetMaker:
         Retrieves render modes from previous answered queries.
         Should work, but not fully tested
         """
-        if self.is_music_cog(recipient):
+        if recipient.communicator.is_music_cog:
             return self.music_cog_render_modes
-
-        render_modes = self.retrieve_query_result(recipient, 'render_modes', default=self.render_modes_enabled)
-
-        return render_modes
-
+        else:
+            return self.retrieve_query_result(recipient, 'render_modes', default=self.render_modes_enabled)
 
     def retrieve_query_result(self, recipient, criterion, default=None):
         """

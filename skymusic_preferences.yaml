@@ -4,18 +4,23 @@
 # It is operational for command-line users only
 # To disable a default answer, start the whole line with an hashtag #
 #==========================================
+theme: LIGHT #Forced color theme among LIGHT, DARK
 #locale: fr_FR #Forces default language
-instrument_type: NORMAL #An instrument short name among NORMAL, DRUM
-#aspect_ratio: WIDESCREEN # an aspect ratio short name among WIDESCREEN, OLDTV, SQUARE, A4, VERTPANEL
-#song_bpm: 120 # an integer value between 12 and 1200
+instrument_type: HARP #An instrument short name among HARP, DRUM
+aspect_ratio: WIDESCREEN # an aspect ratio short name among WIDESCREEN, OLDTV, SQUARE, A4, VERTPANEL
+song_bpm: 120 # an integer value between 12 and 1200
 #octave_shift: 0 # an integer between -12 and +12
-#render_modes: HTML # 'all' to activate all modes, otherwise a comma-separated list of mode names among SVG, HTML, PNG, MIDI, SKYJSON, SKYASCII, SKYENGLISH
+render_modes: all # 'all' to activate all modes, otherwise a comma-separated list of mode names among SVG, HTML, PNG, MIDI, SKYJSON, SKYASCII, SKYENGLISH
 #notes_file: | # a file name or notes...
-#    bug.json
+#    englishC.txt
 #notes: # Unless a file name has been answered to the previous question, this question must be answered with a blank for automatic answering
 #musical_notation: SKY # Default value if not detected automatically. An input_mode short name, among ENGLISH, JIANPU, DOREMI, DOREMIJP, SKY, SKYHTML, SKYKEYBOARD, ENGLISHCHORDS
 #recommended_key: C # The recommended key in case your notation does not use octaves
-#transcript_writer: kimu # Persons who arranged the notes and transcribed them
+#possible_keys: C
+#many_errors: yes #Carry on even if many errors are found
+#transcript_writer: transcript # Persons who arranged the notes and transcribed them
 #original_artist: artist # Artist
-#keep_meta: oui # Keep meta data found in the file
-
+keep_meta: yes # Keep meta data found in the file
+#song_title: happy new year
+#game_platform: mobile #Gameplatform, among playstation, switch, mobile
+#gamepad_layout: 0

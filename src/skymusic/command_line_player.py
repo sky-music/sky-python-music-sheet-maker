@@ -28,7 +28,8 @@ from skymusic.music_sheet_maker import MusicSheetMaker
 from skymusic.communicator import Communicator, QueriesExecutionAbort
 from skymusic import Lang
 from skymusic import Config
-from skymusic.resources import Resources
+from skymusic.modes import Locutor, ColorTheme
+#from skymusic.resources import Resources
 try:
     import readline
 except ModuleNotFoundError:
@@ -61,10 +62,10 @@ class CommandLinePlayer:
     """
 
     def __init__(self, locale=None, preferences_path='../skymusic_preferences.yaml'):
-        self.name = Resources.COMMAND_LINE_NAME
-        self.preferences = self.load_preferences(preferences_path)
-        if locale is None: locale = self.get_locale_from_prefs()
-        self.set_locale(locale)
+        self.name = Locutor.COMMAND_LINE.get_name()
+        self.preferences = self.load_preferences(preferences_path) 
+        self.set_locale(self.get_locale_from_prefs() if not locale else locale)
+        self._fix_preferences_(locale=self.locale)
         self.communicator = Communicator(owner=self, locale=self.locale)
         self.yaml_song = None
 
@@ -110,13 +111,22 @@ class CommandLinePlayer:
         """Load all the yaml files of the batch_song directory (batch mode only)"""
         dirpath, _, filenames = next(os.walk(songs_dir), (None, None, []))
 
-        for filename in filenames:
+        for filename in filenames.copy():
             if os.path.splitext(filename)[1].lower().strip() != '.yaml':
                 filenames.remove(filename)
 
         self.yaml_songs = [os.path.normpath(os.path.join(dirpath, filename)) for filename in filenames]
 
         return self.yaml_songs
+
+    def _fix_preferences_(self, locale):
+        ''' #Fixes a bug in YAML < 1.2'''
+        yes_word = Lang.get_string("words/yes_word", locale)
+        no_word = Lang.get_string("words/no_word", locale)
+        for k in self.preferences:
+            if self.preferences[k] is True: self.preferences[k] = yes_word
+            if self.preferences[k] is False: self.preferences[k] = no_word
+        return self.preferences
 
     def load_preferences(self, filepath):
         """Loads the preferences.yaml file with default answers to questions, if it exists"""
@@ -125,7 +135,7 @@ class CommandLinePlayer:
                 print(f"(Loaded preferences file from {filepath})")
                 return yaml.safe_load(file)
         except (FileNotFoundError, PermissionError):
-            return None
+            return {}
 
     def get_answer_from_preferences(self, q):
         """Try to get the answer to a question by probing the preferences dictionary, which was populated from the preferences.yaml"""
@@ -154,6 +164,12 @@ class CommandLinePlayer:
 
         return answer
 
+    def get_theme_from_prefs(self):
+        '''Fetches theme code NAME in the preferences, and returns its name as defined in modes.py'''
+        k = self.preferences.get('theme', '')
+        color_theme = getattr(ColorTheme, k, None)
+        if color_theme: return color_theme.get_name()
+        
 
     def load_yaml_song(self, filepath):
         """Batch mode only: loads the .yaml file in the batch_songs directory, containing answers to questions for a particular song"""
@@ -217,7 +233,8 @@ class CommandLinePlayer:
 # MAIN SCRIPT
 try:
     player = CommandLinePlayer(preferences_path=PREFERENCES_PATH) # Me
-    maker = MusicSheetMaker(locale=player.get_locale(), application_root=application_root, song_in_dir=SONG_IN_DIR, song_out_dir=SONG_OUT_DIR, skyjson_url_api=(SKYJSON_URL if not BATCH_MODE else None)) # The other party
+    theme = player.get_theme_from_prefs()
+    maker = MusicSheetMaker(locale=player.get_locale(), theme=theme, application_root=application_root, song_in_dir=SONG_IN_DIR, song_out_dir=SONG_OUT_DIR, skyjson_url_api=(SKYJSON_URL if not BATCH_MODE else None)) # The other party
 
     if BATCH_MODE:
         # process a song using a yaml file instead of asking questions in the command prompt

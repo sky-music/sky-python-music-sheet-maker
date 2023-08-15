@@ -1,7 +1,8 @@
-This folder contains files for PNG output:
+This folder contains:
 
-* the original SVG files, in the 'svg' sub-directory, that use the style sheets placed in the same folder, via an @import command, namely svg.css and common.css.
-* the converted PNG files, for each theme, using the script in ../python/tools/svg_to_png.py.
+* PNG elements that will be opened and merged by the PNG renderer. They are sorted in a separate directory according to each color theme (light, dark, etc,) and each gaming platform (mobile, playstation, etc). The names of these files must not be changed as they are hard-coded in the PNG renderers classes in png_ir.py, png_nr.py, and png_sr.py
 
-The 'root-highlighted-n.svg' file is a bit special since it does not correspond as such to any note. It is used by 'svg_to_png.py'
-to create several files in a batch: 'root-highlighted-1.svg', ''root-highlighted-2.svg', etc, that will be used for rendering quavers.
+A .__init__.py file is necessary in the theme directories as well as in the platforms sub-directories as the folders will be imported as modules by the PNG renderer.
+
+
+

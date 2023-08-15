@@ -72,7 +72,7 @@ class SkyJson(noteparser.NoteParser):
             if (pos[0] < 0) and (pos[1] < 0):  # Special character
                 return pos
             else:
-                columns = self.get_column_count()
+                columns = self.get_num_columns()
                 idx = pos[0] * columns + pos[1]
                 idx = idx + note_shift
                 pos = (int(idx / columns), idx - columns * int(idx / columns))
@@ -83,7 +83,7 @@ class SkyJson(noteparser.NoteParser):
         else:
             raise KeyError('Note ' + str(note) + ' was not found in the coord_map dictionary.')
 
-    def get_note_from_coordinate(self, coord, layer_index=0, version='old'):
+    def get_note_from_coord(self, coord, layer_index=0, version='old'):
         '''string representation of note, using unpadded layer numbers, or list'''
         note = self.inv_coord_map.get(coord, 'X')
         

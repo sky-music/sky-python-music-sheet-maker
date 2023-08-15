@@ -35,13 +35,13 @@ class Jianpu(noteparser.NoteParser):
         self.inv_coord_map = {(-1,-1): '.'}
         for i in range(0,shape[0]):
             for j in range(0,shape[1]):
-                (quotient, remainder) = divmod(i*self.get_column_count()+j, len(self.MAJOR_NOTES))
+                (quotient, remainder) = divmod(i*self.get_num_columns()+j, len(self.MAJOR_NOTES))
                 note_name = self.MAJOR_NOTES[remainder]
                 oct_str = '+' * quotient if quotient > 0 else ''
                 self.inv_coord_map[(i,j)] = note_name + oct_str
 
     def get_note_octave(self, note):
-
+        '''Extracts octave symbol from note string'''
         note_octave = re.search(r'(\+)+', note)
         if note_octave is not None:
             note_octave = self.get_default_starting_octave() + len(note_octave.group(0))
@@ -56,8 +56,8 @@ class Jianpu(noteparser.NoteParser):
                 note_octave = self.get_default_starting_octave()
                 return note_octave
 
-    def get_note_from_coordinate(self, coord):
-
+    def get_note_from_coord(self, coord):
+        '''Gets note symbol from note coordinates (row, col)'''
         try:
             note = self.inv_coord_map[coord]
         except KeyError:

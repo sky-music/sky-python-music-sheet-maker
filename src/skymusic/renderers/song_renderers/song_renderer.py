@@ -1,4 +1,4 @@
-import re, os, io
+import os, io
 from skymusic import Lang
 
 class SongRendererError(Exception):
@@ -8,12 +8,9 @@ class SongRendererError(Exception):
     def __str__(self):
         return str(self.explanation)
 
-    pass
-
-
 class SongRenderer():
     
-    def __init__(self, locale=None):
+    def __init__(self, locale=None, theme=None):
         
         if locale is None:
             self.locale = Lang.guess_locale()

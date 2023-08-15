@@ -22,6 +22,32 @@ recipient_specifics:
     command_line: ", put in '{songs_in}/'"
     music_cog: 
     sky_music_website: 
+game_platform:
+  mobile:
+    short_desc: "Normal"
+    long_desc: "Smartphone, tablet or computer"
+  playstation:
+    short_desc: "PlayStation"
+    long_desc: "Sony PlayStation"
+  switch:
+    short_desc: "Switch"
+    long_desc: "Nintendo Switch"
+gamepad_layout:
+  playstation:
+    normal:
+      ps1: Higher note is R (default)
+      ps2: Higher note is LR
+      ps3: Higher note is L2
+      ps4: Higher note is R2
+    drum:
+      ps1: Higher note is R2
+  switch:
+    normal:
+      sw1: Higher note is LR (default)
+      sw2: Higher note is LR, layout mimicks gamepad
+      sw3: Higher note is ZR
+    drum:
+      sw1: Higher note is ZR
 instrument_type:
   normal:
     short_desc: Normal instrument
@@ -56,7 +82,7 @@ input_mode:
     long_desc: "Japanese do re mi: ド、ド#／レb、レ、レ#／ミb、ミ、ファ、ファ#／ソb、ソ、ソ#／ラb、ラ、ラ#／シb、シ"
   skyjson:
     short_desc: Sky-Music recording (JSON text)
-    long_desc: "JSON dictionary with time in ms and key number 0-14 used by SkyStudio app and <https://specy.github.io/skyMusic/>"
+    long_desc: "JSON dictionary with time in ms and key number 0-14 used by SkyStudio app and Specy's Sky Music"
   midi:
     short_desc: Midi file
     long_desc: Midi file (.mid or .midi)
@@ -171,6 +197,20 @@ stock_queries:
     input_tip: choose one instrument
     help_text: |
       The drum is special because it only has 2 rows and 4 columns
+  game_platform:
+    foreword:
+    question: Please choose your gaming platform
+    afterword:
+    input_tip: choose one platform
+    help_text: |
+      Unless you play on PlayStation or Switch, keep the default choice 
+  gamepad_layout:
+    foreword:
+    question: Please choose your gamepad buttons layout
+    afterword:
+    input_tip: choose one layout
+    help_text: |
+      They are usually 4 buttons layouts. Do not get mistaken or your song will not sound right!
   render_modes:
     foreword:
     question: Please choose one or several output rendering formats. {all_modes}
@@ -205,7 +245,7 @@ stock_queries:
     question: What is the song title?
     afterword:
     input_tip: 'any text. {skip} to use "untitled"'
-    help_text: 
+    help_text: The song title is not mandatory, but recommended
   original_artist:
     foreword:
     question: What is(are) the Original artist(s)?

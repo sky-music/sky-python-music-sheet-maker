@@ -1,4 +1,4 @@
-from skymusic.modes import ReplyType, AspectRatio, InstrumentType
+from skymusic.modes import ReplyType, AspectRatio, InstrumentType, GamePlatform, GamepadLayout
 from skymusic.communication import QueryOpen, QueryChoice, QueryMultipleChoices, QueryBoolean, Information
 from skymusic import Lang
 
@@ -15,7 +15,8 @@ handler: The name of the method that must be executed by the recipient
 question: the question, as a prompt
 foreword: optional text to display before the question
 afterword: optional text to display after the question
-help_text: text displayed when user asks for help by typing '?' or clicking help on the web servet
+help_text: text displayed when user asks for help by typing '?' or clicking help on the web server
+help_image: a relative path to an image, or a method of limits, to be shown by communicator.py by typing '?'.
 input_tip: hovering help text displayed on the web server
 reply_type: type of the data expected for an answer, defined in the modes.ReplyType enum
 
@@ -56,18 +57,6 @@ def load(locale):
                             'question': '',
                             'reply_type': ReplyType.TEXT
                             },
-
-            'instrument_type': {'class': QueryChoice,
-                             'handler': 'None',
-                             'foreword': Lang.get_string("stock_queries/instrument_type/foreword", locale),
-                             'question': Lang.get_string("stock_queries/instrument_type/question", locale),
-                             'afterword': Lang.get_string("stock_queries/instrument_type/afterword", locale),
-                             'input_tip': Lang.get_string("stock_queries/instrument_type/input_tip", locale),
-                             'help_text': Lang.get_string("stock_queries/instrument_type/help_text", locale),
-                             'reply_type': ReplyType.INSTRUMENT,
-                             'limits': list(InstrumentType),
-                             'default': InstrumentType.NORMAL
-                             },
         
             'instructions_command_line': {'class': Information,
                                     'handler': 'None',
@@ -107,7 +96,7 @@ def load(locale):
                              'limits': [],
                              'default': 'all'
                              },
-        
+
             'aspect_ratio': {'class': QueryChoice,
                              'handler': 'None',
                              'foreword': Lang.get_string("stock_queries/aspect_ratio/foreword", locale),
@@ -119,7 +108,44 @@ def load(locale):
                              'limits': list(AspectRatio),
                              'default': AspectRatio.WIDESCREEN
                              },
-        
+
+            'instrument_type': {'class': QueryChoice,
+                             'handler': 'None',
+                             'foreword': Lang.get_string("stock_queries/instrument_type/foreword", locale),
+                             'question': Lang.get_string("stock_queries/instrument_type/question", locale),
+                             'afterword': Lang.get_string("stock_queries/instrument_type/afterword", locale),
+                             'input_tip': Lang.get_string("stock_queries/instrument_type/input_tip", locale),
+                             'help_text': Lang.get_string("stock_queries/instrument_type/help_text", locale),
+                             'reply_type': ReplyType.INSTRUMENT,
+                             'limits': list(InstrumentType),
+                             'default': InstrumentType.HARP
+                             },
+
+            'game_platform': {'class': QueryChoice,
+                             'handler': 'None',
+                             'foreword': Lang.get_string("stock_queries/game_platform/foreword", locale),
+                             'question': Lang.get_string("stock_queries/game_platform/question", locale),
+                             'afterword': Lang.get_string("stock_queries/game_platform/afterword", locale),
+                             'input_tip': Lang.get_string("stock_queries/game_platform/input_tip", locale),
+                             'help_text': Lang.get_string("stock_queries/game_platform/help_text", locale),
+                             'reply_type': ReplyType.GAMEPLATFORM,
+                             'limits': list(GamePlatform),
+                             'default': GamePlatform.MOBILE
+                             },
+
+            'gamepad_layout': {'class': QueryChoice,
+                             'handler': 'None',
+                             'foreword': Lang.get_string("stock_queries/gamepad_layout/foreword", locale),
+                             'question': Lang.get_string("stock_queries/gamepad_layout/question", locale),
+                             'afterword': Lang.get_string("stock_queries/gamepad_layout/afterword", locale),
+                             'input_tip': Lang.get_string("stock_queries/gamepad_layout/input_tip", locale),
+                             'help_text': Lang.get_string("stock_queries/gamepad_layout/help_text", locale),
+                             'help_image': 'get_help_image_path',
+                             'reply_type': ReplyType.GAMEPADLAYOUT,
+                             'limits': [], # depend on chosen GamePlatform, so empty by default
+                             'default': None
+                             },
+                
             'song_bpm': {'class': QueryOpen,
                              'handler': 'None',
                              'foreword': Lang.get_string("stock_queries/song_bpm/foreword", locale),

@@ -3,15 +3,15 @@ from . import song_renderer, ascii_sr
 from skymusic import instruments
 from skymusic.renderers.instrument_renderers.html_ir import HtmlInstrumentRenderer
 from skymusic.resources import Resources
-from skymusic.modes import CSSMode, RenderMode
+from skymusic.modes import CSSMode, RenderMode, GamePlatform
 
 class HtmlSongRenderer(song_renderer.SongRenderer):
 
-    def __init__(self, locale=None, theme=Resources.get_default_theme()):
-        
+    def __init__(self, locale=None, gamepad=None, theme=Resources.get_default_theme()):
         super().__init__(locale)
-        Resources.load_theme(theme)
-        #self.HTML_note_width = '1em'
+        platform = gamepad.platform if gamepad else GamePlatform.get_default()
+        Resources.load_theme(theme, platform.get_name())
+        self.gamepad = gamepad
 
     def write_headers(self, html_buffer, song, css_mode):
         
@@ -40,13 +40,18 @@ class HtmlSongRenderer(song_renderer.SongRenderer):
 
         if css_mode == CSSMode.EMBED:
             html_buffer.write('\n<style type="text/css">\n')
-            html_buffer.write(Resources.CSS['common'].getvalue())
-            html_buffer.write(Resources.CSS['html'].getvalue())
+            html_buffer.write(Resources.CSS['html_base'].getvalue())
+            
+            if self.gamepad:
+                html_buffer.write(Resources.CSS['html_gamepad'].getvalue())
+            else:
+                html_buffer.write(Resources.CSS['html_mobile'].getvalue())
+            
             html_buffer.write('\n</style>')
            
         elif css_mode == CSSMode.IMPORT:
             html_buffer.write('\n<style type="text/css">')
-            html_buffer.write("@import url(\'%s\');</style>" % rel_css_path.replace('\\','/'))
+            html_buffer.write("@import url(%s);</style>" % rel_css_path.replace('\\','/'))
         elif css_mode == CSSMode.XML:
             html_buffer.write(f'\n<link href="{rel_css_path}" rel="stylesheet" />')
 
@@ -93,14 +98,16 @@ class HtmlSongRenderer(song_renderer.SongRenderer):
         instrument_index = 0
         song_lines = song.get_lines()
         num_lines = len(song_lines)
-        instrument_renderer = HtmlInstrumentRenderer(self.locale)
         
-        non_voice_row = 1
+        instrument_renderer = HtmlInstrumentRenderer(locale=self.locale, gamepad=self.gamepad)
+        
+        non_voice_row = 0
         prev_type = ''
         for i, line in enumerate(song_lines):
             if len(line) > 0: 
-                linetype =   line[0].get_type()                             
-                if linetype in instruments.HARPS and (prev_type not in ('ruler', 'layer')):
+                linetype =   line[0].get_type()
+                if line[0].get_is_tonal(): non_voice_row += 1                 
+                if line[0].get_is_tonal() and (prev_type not in ('ruler', 'layer')):
                     song_render += '\n<hr class="sep" />'
                               
                 #song_render += '<div class="line">'
@@ -114,9 +121,9 @@ class HtmlSongRenderer(song_renderer.SongRenderer):
                     instrument_index += 1
                     line_render += instrument_render
                 
-                if num_lines > 10 and line[0].get_type() in instruments.HARPS:
-                    line_render += f'\n<div class="num">{non_voice_row :d}</div>'
-                    non_voice_row += 1
+                #Add line number at the end
+                if num_lines > 5 and  line[0].get_is_tonal():
+                    line_render += f'\n<div class="{"gp " if self.gamepad else ""}num">{non_voice_row :d}</div>'
                 
                 line_render += "\n</div>"
                 song_render += line_render

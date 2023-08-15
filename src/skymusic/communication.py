@@ -1,10 +1,18 @@
 import re, os
-from skymusic.modes import ReplyType, InputMode, RenderMode, AspectRatio, InstrumentType
+from skymusic.modes import ReplyType
 from datetime import datetime
 import hashlib
 from fractions import Fraction
 from collections import OrderedDict
 #import io
+
+try:
+    from PIL import Image
+    no_PIL_module = False
+except ModuleNotFoundError:
+    no_PIL_module = True
+except ImportError:
+    no_PIL_module = True
 
 
 class QueryError(Exception):
@@ -123,7 +131,7 @@ class Reply:
 
 class Query:
 
-    def __init__(self, name=None, sender=None, recipient=None, question=None, foreword=None, afterword=None, help_text=None, input_tip=None, reply_type=ReplyType.OTHER, expect_long_answer=False, limits=None, default=None, prerequisites=None):
+    def __init__(self, name=None, sender=None, recipient=None, question=None, foreword=None, afterword=None, help_text='', help_image='', input_tip='', reply_type=ReplyType.OTHER, expect_long_answer=False, limits=None, default=None, prerequisites=None):
         """
         The general Query class
 
@@ -141,6 +149,8 @@ class Query:
         self.foreword = foreword
         self.afterword = afterword
         self.help_text = help_text
+        self._help_image_url_ = help_image # A relative path to the image, possibly f-encoded
+        self.help_image = None # A PIL.Image object
         self.input_tip = input_tip
         self.reply_type = reply_type  # Expected type of the reply, among ReplyType
         #Repairing limits:
@@ -199,8 +209,8 @@ class Query:
         else:
             answer_string = "invalid"
         
-        string = (f"<{self.__class__.__name__} {self.get_identifier()} from {sender_name} to {recipient_name}:"
-                  f" {repr(self.question)[:20]}..., {self.reply_type} expected{limits_string}, answer={answer_string}>"
+        string = (f"<{self.__class__.__name__} {self.get_identifier()} from '{sender_name}' to '{recipient_name}': '{self.name}':"
+                  f" {repr(self.question)[:25]}..., {self.reply_type} expected{limits_string}, answer={answer_string}>"
                   )
         return string
 
@@ -256,6 +266,39 @@ class Query:
             return ''
         else:
             return self.help_text
+
+
+
+    def set_help_image(self):
+        '''Open an Image based on given url'''
+        if self._help_image_url_:
+            if not no_PIL_module:   
+                limits = self.get_limits()
+                reply_type = self.get_reply_type()
+                try: # Try to get image url from limits method if it has one
+                    if limits:
+                        self._help_image_url_ = getattr(limits[0], self._help_image_url_)()
+                    elif reply_type:
+                        self._help_image_url_ = getattr(reply_type, self._help_image_url_)()
+                except AttributeError:
+                    pass
+                
+                #if everything else has failed:
+                if self._help_image_url_ and not os.path.isfile(self._help_image_url_):
+                    try:
+                        from skymusic.resources import Resources
+                        res_dir = os.path.dirname(Resources.__file__)
+                        self._help_image_url_ = os.path.join(res_dir, self._help_image_url_)                    
+                    except ModuleNotFoundError:
+                        pass
+                try:
+                    self.help_image = Image.open(self._help_image_url_)
+                except FileNotFoundError:
+                    print(f"***ERROR: could not open '{self._help_image_url_}'")
+        return self.help_image
+
+    def get_help_image(self):
+        return self.help_image
 
     def get_input_tip(self):
         if self.input_tip is None:
@@ -417,7 +460,7 @@ class Query:
         valid_classes = self.reply_type.get_classes()
         if valid_classes:
             if not isinstance(limits[0], valid_classes):
-                raise InvalidQueryTypeError("incorrect limits type", limits[0], valid_classes)
+                raise InvalidQueryTypeError("incorrect limits type", limits[0], valid_classes[0])
         
         if self.reply_type == ReplyType.FILEPATH:
             if os.path.isdir(limits[0]):
@@ -575,6 +618,7 @@ class Query:
         result = []
         if self.help_required:
             result += [self.get_help_text()+'\n']
+            if self._help_image_url_: self.set_help_image()
         result += [self.get_foreword(), self.get_question(), self.get_afterword()]
  
         try:
@@ -582,7 +626,8 @@ class Query:
         except:
             pass
 
-        self.result = result
+        self.result = result        
+        
         return result
     
 
@@ -712,6 +757,7 @@ class QueryChoice(Query):
         result = []
         if self.help_required:
             result += [self.get_help_text()]
+            if self._help_image_url_: self.set_help_image()
         result += [self.get_foreword(), self.get_question()]
         
         object_types = ReplyType.get_object_types()
@@ -877,6 +923,7 @@ class QueryBoolean(QueryChoice):
 
         if self.help_required:
             result += [self.get_help_text()]
+            if self._help_image_url_: self.set_help_image()
         result += [self.get_foreword()]
         result += [f"{self.get_question()} ({self.get_limits()[0]}/{self.get_limits()[1]})"]
         result += [self.get_afterword()]

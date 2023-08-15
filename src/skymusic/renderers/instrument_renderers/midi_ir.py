@@ -4,11 +4,12 @@ from skymusic.resources import Resources
 
 try:
     import mido
-
     no_mido_module = False
-except (ImportError, ModuleNotFoundError):
+except ModuleNotFoundError:
     no_mido_module = True
-
+except ImportError as err:
+    no_mido_module = True
+    print(err)
 
 
 class MidiInstrumentRenderer(instrument_renderer.InstrumentRenderer):
@@ -33,9 +34,9 @@ class MidiInstrumentRenderer(instrument_renderer.InstrumentRenderer):
         
         for event_type in ['note_on', 'note_off']:
             t = self.delta_times[event_type]
-            for row in range(instrument.get_row_count()):
-                for col in range(instrument.get_column_count()):
-                    note = instrument.get_note_from_position((row, col))
+            for row in range(instrument.get_num_rows()):
+                for col in range(instrument.get_num_columns()):
+                    note = instrument.get_note_from_coord((row, col))
                     frames = note.get_highlighted_frames()
                     if frames:
                         if frames[0] == 0:
@@ -52,17 +53,16 @@ class MidiInstrumentRenderer(instrument_renderer.InstrumentRenderer):
     def render_icon(self, instrument):
         
         note_renderer = midi_nr.MidiNoteRenderer(music_key=self.music_key)
-        #harp_render = []
         
         render_args = []
         harp_render = [] 
         
         t = self.delta_times['note_on']
         
-        for frame in range(instrument.get_frame_count()):
+        for frame in instrument.get_highlighted_frames():
             
                 coords = instrument.get_highlighted_coords(frame)
-                notes = [instrument.get_note_from_position(coord) for coord in coords]
+                notes = [instrument.get_note_from_coord(coord) for coord in coords]
                 for note in notes:                                     
                     render_args.append({'note':note,'event_type':'note_on','t':t})                
                     note_duration = self.delta_times['note_off'] if frame == 0 else self.delta_times['quaver_off']
@@ -112,6 +112,6 @@ class MidiInstrumentRenderer(instrument_renderer.InstrumentRenderer):
         return NotImplemented
         
     def render_layer(self, *args, **kwargs):    
-        #TODO: implement layers as tracks
+        #Layers are handled in the MidiSongParser, by creating a new_track
         return NotImplemented
             

@@ -172,7 +172,8 @@ Note this is a development image with all optional dependencies included.
 
 **Assets:**
 
-SVG icons are thanks to [madwurmz](http://madwurmz.com).
+Original SVG icons are thanks to [madwurmz](http://madwurmz.com).
+Playstation and Switch icons are designed by kimu.
 
 **Codebase:**
 

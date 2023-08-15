@@ -1,16 +1,16 @@
 #All Notes:
 A1 A2 A3 A4 A5 B1 B2 B3 B4 B5 C1 C2 C3 C4 C5
-#Chords:
+#Two Chords:
 A1A2 A3A4A5
-#Some quavers #and chords:
+#Some quavers #and quavered chords:
 A1-A2-A3-A4 A5-B1B2B3
-#Pauses:
+#Pauses, 1 simple and 1 repeated:
 A1 . A2 . . A3
-#Repetitions:
+#Repetitions of #notes and pauses:
 A1*2 A2*14 .*2 A3*1 .*1
-#Errors:
+#Invalid characters:
 X + 0 a
-#out of #range:
+#out of #range single notes:
 C8 D1
 #lowercase and #multiple #spaces:
    a1-a2-a3-a4  a5-b1b2b3

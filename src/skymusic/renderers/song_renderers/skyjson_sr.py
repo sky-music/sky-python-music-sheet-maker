@@ -27,7 +27,7 @@ class SkyjsonSongRenderer(song_renderer.SongRenderer):
                      'permission':'', 'type': 'composed',
                      'pitch': song.get_music_key(),
                      'bpm': int(self.song_bpm), 
-                     'data':{"isComposed":True,"isComposedVersion":True,"appName":"VisualSheetMaker"},
+                     'data':{"isComposed":True,"isComposedVersion":True,"appName":"Sky"},
                      'version':2,
                      'pitchLevel':0, 'bitsPerPage': 16,
                      'isEncrypted': False, 
@@ -57,7 +57,7 @@ class SkyjsonSongRenderer(song_renderer.SongRenderer):
                 if linetype == 'layer':
                     layer_index += 1
                     layers[layer_index] = {'name':line[0].get_text(), 'instruments':[]}
-                elif linetype in instruments.HARPS:
+                elif line[0].get_is_tonal():
                     if layer_index == 0: layer_index += 1
                     layers[layer_index]['instruments'] += line
         
@@ -87,7 +87,7 @@ class SkyjsonSongRenderer(song_renderer.SongRenderer):
         
     
     def render_to_new_format(self, layers):
-        '''Render columns from the layers dictionary'''
+        '''Render Sky-Music JSON columns from our layers dictionary'''
         # layers = {0: {name, instrs}, 1: {name, instrs}
         # instrs = [instr, instr...]
         #columns = [0, notes], [0, notes]

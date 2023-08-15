@@ -24,6 +24,32 @@ recipient_specifics:
     command_line: ", trong thư mục '{songs_in}/'"
     music_cog: 
     sky_music_website: 
+game_platform:
+  mobile:
+    short_desc: "Normal"
+    long_desc: "Smartphone, tablet or computer"
+  playstation:
+    short_desc: "PlayStation"
+    long_desc: "Sony PlayStation"
+  switch:
+    short_desc: "Switch"
+    long_desc: "Nintendo Switch"
+gamepad_layout:
+  playstation:
+    normal:
+      ps1: Higher note is R (default)
+      ps2: Higher note is LR
+      ps3: Higher note is L2
+      ps4: Higher note is R2
+    drum:
+      ps1: Higher note is R2
+  switch:
+    normal:
+      sw1: Higher note is LR (default)
+      sw2: Higher note is LR, layout mimicks gamepad
+      sw3: Higher note is ZR
+    drum:
+      sw1: Higher note is ZR
 instrument_type:
   normal:
     short_desc: Nhạc cụ thường
@@ -170,6 +196,20 @@ stock_queries:
     input_tip: Chọn một nhạc cụ
     help_text: |
       Trống là nhạc cụ đặc biệt trong Sky vì chúng chỉ có 2 hàng 4 cột
+  game_platform:
+    foreword:
+    question: Please choose your gaming platform
+    afterword:
+    input_tip: choose one platform
+    help_text: |
+      Unless you play on PlayStation or Switch, keep the default choice 
+  gamepad_layout:
+    foreword:
+    question: Please choose your gamepad buttons layout
+    afterword:
+    input_tip: choose one layout
+    help_text: |
+      They are usually 4 buttons layouts. Do not get mistaken or your song will not sound right!
   render_modes:
     foreword:
     question: Hãy chọn các định dạng xuất bản (rendering formats). {all_modes}
@@ -204,7 +244,7 @@ stock_queries:
     question: Tiêu đề bài hát là gì?
     afterword:
     input_tip: 'Có thể nhập bất kì. Để trống nếu bạn muốn sử dụng "Không tên"'
-    help_text: 
+    help_text: The song title is not mandatory, but recommended
   original_artist:
     foreword:
     question: Nghệ sĩ gốc của bài hát này là ai?

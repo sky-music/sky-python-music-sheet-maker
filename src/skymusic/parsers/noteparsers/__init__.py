@@ -1,5 +1,5 @@
-from . import noteparser, skykeyboard, skyabc15, english, jianpu, doremi, englishchords, doremi_jp, skyjson
-__all__ = [noteparser, skykeyboard, skyabc15, english, jianpu, doremi, englishchords, doremi_jp, skyjson]
+from . import noteparser, skykeyboard, skyabc15, english, jianpu, doremi, englishchords, doremi_jp, skyjson, gamepad
+__all__ = [noteparser, skykeyboard, skyabc15, english, jianpu, doremi, englishchords, doremi_jp, skyjson, gamepad]
 
 import os
 import sys
