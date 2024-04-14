@@ -216,8 +216,8 @@ class PngInstrumentRenderer(instrument_renderer.InstrumentRenderer):
 
         # Rescaling
         if max_size is not None:
-            rescale =  min(1,max_size[0]/voice_render.size[0])
-            rescale =  min(1,max_size[1]/voice_render.size[1])
+            rescale =  min(1,max_size[0]/max(1,voice_render.size[0]))
+            rescale =  min(1,max_size[1]/max(1,voice_render.size[1]))
         if rescale != 1 and rescale > 0:
             voice_render = voice_render.resize((round(voice_render.size[0] * rescale), round(voice_render.size[1] * rescale)),
                                        resample=Image.LANCZOS)
