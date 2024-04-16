@@ -5,6 +5,7 @@ from skymusic.renderers.instrument_renderers.png_ir import PngInstrumentRenderer
 from skymusic.resources import Resources
 from skymusic.modes import GamePlatform
 from skymusic.sheetlayout import Ruler
+from skymusic import Lang
 
 try:
     from PIL import Image, ImageDraw, ImageFont
@@ -43,18 +44,10 @@ class PngSongRenderer(song_renderer.SongRenderer):
         self.font_path = Resources.PNG_SETTINGS['font_path']
         self.text_bkg = Resources.PNG_SETTINGS['text_bkg']  # Transparent white
       
-        if not no_PIL_module:    
-            try:
-                self.h1_font = ImageFont.truetype(self.font_path, self.h1_font_size)
-                self.h2_font = ImageFont.truetype(self.font_path, self.h2_font_size)
-                self.text_font = ImageFont.truetype(self.font_path, self.font_size)
-                self.dimmed_text_font = ImageFont.truetype(self.font_path, self.font_size)
-            except OSError:
-                self.h1_font = ImageFont.load_default()
-                self.h2_font = ImageFont.load_default()
-                self.text_font = ImageFont.load_default()
-                self.dimmed_text_font = ImageFont.load_default()
-
+        # Load default font from locale
+        Resources.load_font(locale)
+        self.font_path = Resources.PNG_SETTINGS['font_path']           
+        self.set_fonts()
 
         # INSTRUMENT RESIZING
         self._max_harps_line_ = round(Resources.PNG_SETTINGS['max_harps_line']*aspect_ratio/(16/9.0))
@@ -71,8 +64,7 @@ class PngSongRenderer(song_renderer.SongRenderer):
         self._gp_max_upscale_ = 1
         
         if not no_PIL_module:
-            self.switch_harp('harp') #sets _harp_size0_, _harp_spacings0_, _voice_size0_
-        
+            self.switch_harp('harp') #sets _harp_size0_, _harp_spacings0_, _voice_size0_    
         
         self._gp_note_size_ = None
         self._gamepad_spacings_ = tuple()
@@ -86,6 +78,37 @@ class PngSongRenderer(song_renderer.SongRenderer):
             self.set_gamepad_spacings()
             self.set_gamepad_rescale(self._max_gp_notes_line_) #Called once and for all   
 
+    def set_fonts(self, font_path=None):
+        
+        if not font_path: font_path = self.font_path
+        
+        if not no_PIL_module:    
+            try:
+                self.h1_font = ImageFont.truetype(font_path, self.h1_font_size)
+                self.h2_font = ImageFont.truetype(font_path, self.h2_font_size)
+                self.text_font = ImageFont.truetype(font_path, self.font_size)
+                self.dimmed_text_font = ImageFont.truetype(font_path, self.font_size)
+            except OSError:
+                self.h1_font = ImageFont.load_default()
+                self.h2_font = ImageFont.load_default()
+                self.text_font = ImageFont.load_default()
+                self.dimmed_text_font = ImageFont.load_default()
+                print('***ERROR: could not load font '+font_path)    
+
+
+    def check_set_fonts(self, song):
+        '''Tries to identify alphabet from text'''
+        text = ""
+        lines = song.get_textual_lines()
+        for line in lines:
+            for voice in line:
+                text += voice.get_lyric()
+        family = Lang.family_from_text(text)
+        self.font_path = Resources.load_font(family)
+        self.set_fonts()
+        if family not in self.locale:
+            self.locale = family
+            
 
     def switch_harp(self, harp_type):
         
@@ -180,8 +203,7 @@ class PngSongRenderer(song_renderer.SongRenderer):
 
     def get_text_height(self, fnt, rescale=1):
         """Calculates the text height in PNG for a standard text depending on the input font size"""
-        return round(fnt.getsize('HQfgjyp')[1]*rescale)
-
+        return round(fnt.getsize(u'HQfgjypŹỵ')[1]*rescale)
                 
 
     def trans_paste(self, bg, fg, box=(0, 0)):
@@ -221,9 +243,9 @@ class PngSongRenderer(song_renderer.SongRenderer):
             num_im = num_im.resize((round(num_im.size[0] * rescale), round(num_im.size[1] * rescale)), resample=Image.LANCZOS)
         return num_im
 
-
-    def write_header(self, song_render, filenum, song, x_in_png, y_in_png):
     
+    def write_header(self, song_render, filenum, song, x_in_png, y_in_png):
+
         #harp_type = song.get_harp_type()
         #self.switch_harp(harp_type)
         text_rescale = 1 #self.get_text_rescale() #Hard-coded value
@@ -283,6 +305,9 @@ class PngSongRenderer(song_renderer.SongRenderer):
     
 
     def write_buffers(self, song, start_row=0, start_col=0, tonal_row=0, buffer_list=None):
+        
+        # Select right font according to unicode characters
+        self.check_set_fonts(song)
         
         if buffer_list is None:
             buffer_list = []

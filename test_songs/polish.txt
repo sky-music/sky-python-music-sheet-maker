@@ -1,0 +1,18 @@
+#$Title: Barka
+#$Original artist(s): Cesáreo Gabaráin, lyrics: Stanisław Szmidt, singer: Jan Paweł II
+#$Arranger, Transcriber: Fishew
+
+#Pan  # - #kie - #dyś #sta - #nął #nad #brze - #giem # -
+B5 . B4 B5 C1 B5 B4 B3 B3 .
+#Szu - #kał #lu - #dzi # - #go - #to - #wych #pójść #za #Nim # -
+B4 B5 C1 C1 . C1 C1 C1 B5 B4 B4 .
+#By #ło - #wić #ser - #ca # - #słów #Bo - #żych #pra - #wdą # -
+B4 B3 B4 B5 B5 . B5 C1 B4 B3 B3 .
+#O #Pa - #nie # - #to #Ty #na #mnie #spoj - #rza - #łeś # -
+B3 C3 C3 . C3 C4 C5 C4 C3 C2 C2 .
+#Two - #je #us - #ta # - #dziś #wy - #rzek - #ły #me #i - #mię # -
+C1 B5 C1 C1 . C1 C2 C3 C2 C1 B5 B5 .
+#Swo - #ją #bar - #kę # - #po - #zo - #sta - #wiam #na #brze - #gu # -
+B3 B3 C3 C3 . C3 C4 C5 C4 C3 C2 C2 .
+#Ra - #zem #z #To - #bą # - #no - #wy #za - #cznę #dziś #łów
+C1 B5 C1 C1 . B4 B5 C1 B5 B4 B3 

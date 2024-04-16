@@ -23,20 +23,24 @@ def shortest_path(path, start_path):
 
 
 def file_status(file_path):
-    """Returns an integer depending on file statis"""
+    """Returns an integer depending on file status"""
     isfile = os.path.isfile(file_path)
 
     if isfile:
-        isfile=1 #Definitely a file in the filesystem
+        isfile = 1 # Rigorously a file in the filesystem
     else:
+        isfile = -1
         bare_ext = os.path.splitext(file_path)[1].strip('.')
-        if not bare_ext.startswith(' ') and (2 <= len(bare_ext) <= 4):
-            isfile = -1 # maybe a file, but path is invalid (typo)
-            closest = closest_file(file_path)
-            if closest:
-                (file_path, isfile) = (closest, 1)
+        
+        closest, score = closest_file(file_path)
+        
+        file_suspect = (not bare_ext.startswith(' ') and (2 <= len(bare_ext) <= 4)) # has a file extension, not a pause . followed by a musical note
+        
+        if closest and (score > 0.8 or (score > 0.6 and file_suspect)):
+        
+            (file_path, isfile) = (closest, 1) # is a file, but path was invalid (typo)       
         else:
-            isfile = 0 #Not a file attempt
+            isfile = 0 # Not a file
             
     return (file_path, isfile)
 
@@ -68,19 +72,19 @@ def closest_file(filepath):
     filedir, filename = os.path.split(filepath)
     
     best_file = None
-    best_score = 99
+    best_score = 0
+    score_threshold = 0.5
     for (root, dirs, files) in os.walk(filedir):
         for file in files:
             bare_file = __strip_accents__(os.path.splitext(os.path.splitext(file)[0])[0]).lower()
             bare_filename = __strip_accents__(os.path.splitext(os.path.splitext(filename)[0])[0]).lower()
-            d = edit_distance(bare_file,bare_filename)
+            d = __edit_distance__(bare_file,bare_filename)
+            score = 1 - (d/max(len(bare_file),len(bare_filename)))
             #print(f"d({file,filename})={d}")
-            if d < 3 or (d<4 and len(filename)>10):
-                if d < best_score:
-                    best_file = os.path.join(root, file)
-                    best_score = d
+            if score > score_threshold and score > best_score:
+                best_file, best_score = os.path.join(root, file), score
                 
-    return best_file   
+    return (best_file, best_score)
 
 #% Levenshtein
 
@@ -130,6 +134,6 @@ def __levenshtein__(s, t):
 
     return res
     
-def edit_distance(s, t):
+def __edit_distance__(s, t):
 
     return __levenshtein__(s,t)

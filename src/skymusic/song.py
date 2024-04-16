@@ -54,6 +54,15 @@ class Song():
         except Exception as ex:
             return []
             raise ex
+            
+    def get_textual_lines(self):
+        
+        lines = []
+        for line in self.lines:
+            if len(line) > 0:
+                if line[0].is_textual:
+                    lines += [line]
+        return lines
 
     def get_num_lines(self):
         """Returns the number of lines n the Song"""

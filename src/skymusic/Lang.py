@@ -5,9 +5,43 @@ LANG_ROOT = os.path.join(os.path.dirname(__file__), "langs")
 locales = ['en_US', 'fr_FR', 'vi_VN', 'zh_HANS']
 substitutes = {'fr': 'fr_FR', 'en': 'en_US', 'vn': 'vi_VN', 'zh': 'zh_HANS', 'zh_CN': 'zh_HANS'}
 
+'''Unicode ranges for non Asian characters'''
+CHAR_RANGES = {'el': [0x370, 0x3ff], 'pl': [0x0, 0x24b], 'ar': [0x600, 0x7ff], 'he': [0x591, 0x5f4], 'th': [0xe01, 0xe5b],'ru': [0x400, 0x527], 'uk': [0x400, 0x527], 'hy': [0x531, 0x58a], 'ka': [0x10a0, 0x10fc]}
+
 LANG = dict()
 loaded = dict((locale, False) for locale in locales)
 warn_count = 0
+
+def family_from_text(text):
+    '''Determines locale prefix from some text, analysing unicode characters positions'''
+    m = 0
+    text = re.sub('[^\w]+','',text) #Remove non-word characters
+    text = re.sub('[A-Za-z]+','',text) #Removes letters, including accented ones, keeping accents isolated, to move average away from zero
+    if not text:
+        m = 0
+        return ''
+    else:
+        m = sum([int(ord(c)) for c in text])/len(text)
+        for loc, range in CHAR_RANGES.items():
+            if m>range[0] and m<range[1]:
+                return loc.lower()
+    return ''
+        
+
+def sanitize_locale(locale):
+    '''Sanitization: correct case and replacement of - in case the locale is a IETF language tag'''
+    matchobj = re.match(r'([^_-]*)[_|-]*([^_-]*)', locale.strip())
+    locale = '_'.join(filter(None,(matchobj.group(1).lower(), matchobj.group(2).upper())))
+    return locale
+    
+def get_locale_family(locale):
+    
+    matchobj = re.match(r'([^_-]*)[_|-]*([^_-]*)', locale.strip())
+    if matchobj:
+        family = matchobj.group(1).lower()
+    else:
+        family = ''
+    return family
 
 def check_locale(locale):
     try:
@@ -18,9 +52,7 @@ def check_locale(locale):
         print(f"\n***WARNING: locale code '{locale}' too short")
         return None
 
-    # Sanitization: correct case and replacement of - in case the locale is a IETF language tag
-    matchobj = re.match(r'([^_-]*)[_|-]*([^_-]*)', locale.strip())
-    locale = '_'.join(filter(None,(matchobj.group(1).lower(), matchobj.group(2).upper())))
+    locale = sanitize_locale(locale)
 
     if locale not in locales:
         substitute = find_substitute(locale)

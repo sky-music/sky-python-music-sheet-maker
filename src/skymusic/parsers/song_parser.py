@@ -186,7 +186,7 @@ class SongParser:
         if input_mode is None: input_mode = self.input_mode
 
         if input_mode is None:
-            raise SongParserError("cannot set NoteParser: Invalid input_mode {input_mode}")
+            raise SongParserError(f"cannot set NoteParser: Invalid input_mode '{input_mode}'")
         else:
             self.note_parser = self.get_note_parser(input_mode)
 
