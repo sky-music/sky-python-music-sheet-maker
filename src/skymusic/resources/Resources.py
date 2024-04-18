@@ -178,7 +178,7 @@ FONTS = {
 'ja': 'NotoSansCJKjp-Bold.otf',
 'zh': 'NotoSansCJKjp-Bold.otf',
 'ko': 'NotoSansCJKjp-Bold.otf',
-'latin': 'NotoSans-Bold.ttf',
+'latin': 'NotoSans-Full-Bold.ttf',
 'pl': 'NotoSans-Bold.ttf',
 'el': 'NotoSans-Bold.ttf',
 'ar': 'NotoSansArabic-Bold.ttf',
@@ -187,7 +187,7 @@ FONTS = {
 'cyrillic': 'NotoSans-Bold.ttf',
 'ru': 'NotoSans-Bold.ttf',
 'uk': 'NotoSans-Bold.ttf',
-'vi': 'NotoSans-Bold.ttf',
+'vi': 'NotoSans-Full-Bold.ttf',
 'hy': 'NotoSansArmenian-Bold.ttf',
 'ka': 'NotoSansGeorgian-Bold.ttf',
 }

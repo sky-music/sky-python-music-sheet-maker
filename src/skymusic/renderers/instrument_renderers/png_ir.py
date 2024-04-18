@@ -156,8 +156,8 @@ class PngInstrumentRenderer(instrument_renderer.InstrumentRenderer):
         """Calculates the height of the voices based on a standard text and the font size"""
         #fnt = ImageFont.truetype(self.font_path, self.voice_font_size)
         fnt = fnt if fnt else self.voice_font
-        sz = fnt.getsize(text)
-        return (round(sz[0]*rescale), round(sz[1]*rescale))
+        (_, _, w, h) = fnt.getbbox(text)
+        return (round(w*rescale), round(h*rescale))
 
     def __scaled_font__(self, font_size, rescale):
         return ImageFont.truetype(self.font_path, round(font_size*rescale))

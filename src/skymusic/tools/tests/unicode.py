@@ -1,4 +1,4 @@
-import os, sys
+import os, sys, re
 this_dir = os.path.join(os.path.dirname(__file__))
 SRC_ROOT = os.path.normpath(os.path.join(this_dir, '../../../'))
 sys.path.append(SRC_ROOT)
@@ -37,8 +37,13 @@ for lang, chars in langs.items():
     print(fnt_name)
     fnt_path = os.path.join(SRC_ROOT,'skymusic/resources/fonts',fnt_name)
     fnt = ImageFont.truetype(fnt_path, 14)
+    chars = ' '.join(list(chars))
+    chars = chars[0:48] + ('\n' + chars[48:] if len(chars) > 48 else '')
     w,h = fnt.getsize(chars)
-    img = Image.new('RGB', (w,h), color=(255,255,255))
+    g = re.findall('\n',chars)
+    h = h*(1+len(g))
+    w = w / (1+len(g))
+    img = Image.new('RGB', (int(w),int(h*1.1)), color=(255,255,255))
     draw = ImageDraw.Draw(img)
     draw.text((0, 0), chars, font=fnt, fill=(0,0,0))
     img.show()
