@@ -145,6 +145,12 @@ class Instrument():
         self.is_silent = True
         self.is_broken = False
 
+    @property
+    def is_tonal(self): return self.get_is_tonal()
+    
+    @property
+    def is_textual(self): return self.get_is_textual()    
+
     def get_type(self):
         return self.type
 
@@ -221,6 +227,10 @@ class Voice(Instrument):  # Lyrics or comments
                 self.emphasis = 'b'
             elif (len(star_match.group('start')) == 1 and len(star_match.group('end')) == 1):
                 self.emphasis = 'i'
+
+    def get_text(self, *args, **kwargs): return self.get_lyric(*args, **kwargs)
+    
+    def set_text(self, *args, **kwargs): return self.set_lyric(*args, **kwargs)    
 
     def __len__(self):
         return len(self.lyric)

@@ -57,7 +57,7 @@ class MidiSongRenderer(song_renderer.SongRenderer):
         if artist: artist = artist[1]
         transcript = song_meta['transcript']
         if transcript: transcript = transcript[1]
-        copytrack.append(mido.MetaMessage('copyright', text=artist+'/'+transcript))
+        copytrack.append(mido.MetaMessage('copyright', text=ascii(artist)+'/'+ascii(transcript)))
         
         return mid
 

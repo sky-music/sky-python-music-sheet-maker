@@ -54,6 +54,28 @@ class Song():
         except Exception as ex:
             return []
             raise ex
+            
+    def get_textual_lines(self):
+        
+        lines = []
+        for line in self.lines:
+            if len(line) > 0:
+                if line[0].is_textual:
+                    lines += [line]
+        return lines
+        
+    def get_meta_text(self):
+        '''returns text from song meta information'''
+        text = [meta[1] for meta in self.get_meta().values()]
+        return ' '.join(text)
+ 
+    def get_raw_text(self):
+        '''all text in the song'''
+        text = self.get_meta_text()
+        lines = self.get_textual_lines()
+        for line in lines:
+            text += ' '.join([voice.get_lyric() for voice in line])
+        return text
 
     def get_num_lines(self):
         """Returns the number of lines n the Song"""

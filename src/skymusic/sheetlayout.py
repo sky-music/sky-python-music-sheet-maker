@@ -8,6 +8,8 @@ class PseudoInstrument():
         self.type = None #mandatory
         self.index = 0 # mandatory to avoid errors
         self.repeat = 0 # Mandatory to avoid errors
+        self.is_tonal = False
+        self.is_textual = False
         
     def get_type(self):
         return self.type

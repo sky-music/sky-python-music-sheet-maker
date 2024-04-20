@@ -5,6 +5,7 @@ from skymusic.renderers.instrument_renderers.png_ir import PngInstrumentRenderer
 from skymusic.resources import Resources
 from skymusic.modes import GamePlatform
 from skymusic.sheetlayout import Ruler
+from skymusic import Lang
 
 try:
     from PIL import Image, ImageDraw, ImageFont
@@ -43,18 +44,10 @@ class PngSongRenderer(song_renderer.SongRenderer):
         self.font_path = Resources.PNG_SETTINGS['font_path']
         self.text_bkg = Resources.PNG_SETTINGS['text_bkg']  # Transparent white
       
-        if not no_PIL_module:    
-            try:
-                self.h1_font = ImageFont.truetype(self.font_path, self.h1_font_size)
-                self.h2_font = ImageFont.truetype(self.font_path, self.h2_font_size)
-                self.text_font = ImageFont.truetype(self.font_path, self.font_size)
-                self.dimmed_text_font = ImageFont.truetype(self.font_path, self.font_size)
-            except OSError:
-                self.h1_font = ImageFont.load_default()
-                self.h2_font = ImageFont.load_default()
-                self.text_font = ImageFont.load_default()
-                self.dimmed_text_font = ImageFont.load_default()
-
+        # Load default font from locale
+        Resources.load_font(locale)
+        self.font_path = Resources.PNG_SETTINGS['font_path']           
+        self.set_fonts()
 
         # INSTRUMENT RESIZING
         self._max_harps_line_ = round(Resources.PNG_SETTINGS['max_harps_line']*aspect_ratio/(16/9.0))
@@ -71,8 +64,7 @@ class PngSongRenderer(song_renderer.SongRenderer):
         self._gp_max_upscale_ = 1
         
         if not no_PIL_module:
-            self.switch_harp('harp') #sets _harp_size0_, _harp_spacings0_, _voice_size0_
-        
+            self.switch_harp('harp') #sets _harp_size0_, _harp_spacings0_, _voice_size0_    
         
         self._gp_note_size_ = None
         self._gamepad_spacings_ = tuple()
@@ -86,9 +78,36 @@ class PngSongRenderer(song_renderer.SongRenderer):
             self.set_gamepad_spacings()
             self.set_gamepad_rescale(self._max_gp_notes_line_) #Called once and for all   
 
+    def set_fonts(self, font_path=None):
+        
+        if not font_path: font_path = self.font_path
+        
+        if not no_PIL_module:    
+            try:
+                self.h1_font = ImageFont.truetype(font_path, self.h1_font_size)
+                self.h2_font = ImageFont.truetype(font_path, self.h2_font_size)
+                self.text_font = ImageFont.truetype(font_path, self.font_size)
+                self.dimmed_text_font = ImageFont.truetype(font_path, self.font_size)
+            except OSError:
+                self.h1_font = ImageFont.load_default()
+                self.h2_font = ImageFont.load_default()
+                self.text_font = ImageFont.load_default()
+                self.dimmed_text_font = ImageFont.load_default()
+                print('***ERROR: could not load font '+font_path)    
+
+
+    def check_set_fonts(self, song):
+        '''Tries to identify alphabet from text'''
+        text = song.get_raw_text()
+        family = Lang.family_from_text(text)
+        self.font_path = Resources.load_font(family)
+        self.set_fonts()
+        if family not in self.locale:
+            self.locale = family
+            
 
     def switch_harp(self, harp_type):
-        
+        '''Switch harp type (from Drums to Harps or vice-versa)'''
         instrument_renderer = PngInstrumentRenderer(self.locale, harp_type=harp_type, platform_name=self.platform_name, gamepad=self.gamepad)            
         self._harp_size_ = instrument_renderer.get_harp_size()  # A tuple
         self._harp_spacings_ = (round(self._harp_rel_spacings_[0] * self._harp_size_[0]),
@@ -109,7 +128,7 @@ class PngSongRenderer(song_renderer.SongRenderer):
         return self._harp_rescale_
 
     def set_gamepad_rescale(self, gp_notes_line=None):
-
+        '''Sets the rescale factor depending on gamepad'''
         if gp_notes_line: 
             if not self._gp_note_size_:
                 self._gp_note_size_ = PngInstrumentRenderer(locale=self.locale, platform_name=self.platform_name, gamepad=self.gamepad).get_gp_note_size()
@@ -121,7 +140,7 @@ class PngSongRenderer(song_renderer.SongRenderer):
         return self._gamepad_rescale_
 
     def get_instr_rescale(self):
-        """Gets the rescale factor depending on gamepad"""
+        '''Returns the rescale factor depending on gamepad'''
         if self.gamepad is None:       
             return self._harp_rescale_
         else:
@@ -129,23 +148,23 @@ class PngSongRenderer(song_renderer.SongRenderer):
 
 
     def get_harp_size(self, rescale=1):
-        
+        '''Returns harp image size W,H'''
         return (round(self._harp_size_[0]*rescale), round(self._harp_size_[1]*rescale))
     
     def get_harp_spacings(self, rescale=1):
-            
+        '''Returns spacing between harp images'''
         return (round(self._harp_spacings_[0]*rescale), round(self._harp_spacings_[1]*rescale))
         #self.harp_spacings = (
         #    self._harp_rel_spacings_[0] * self.harp_size[0], self._harp_rel_spacings_[1] * self.harp_size[1])
 
     def get_voice_height(self, rescale=1):
-            
+        '''Returns height in pixels of lyrics image'''
         return round(self._voice_height_*rescale)
         #self.voice_size = (self.harp_size[0], (self.harp_size[1] / self.harp_size0[1]))
             
         
     def set_gamepad_spacings(self):
-       
+       '''Sets spacing between gamepad buttons layouts'''
        if not self._gamepad_spacings_:
            instrument_renderer = PngInstrumentRenderer(locale=self.locale, harp_type='harp', platform_name=self.platform_name, gamepad=self.gamepad)
            gaps = instrument_renderer.get_gamepad_gaps()
@@ -153,7 +172,7 @@ class PngSongRenderer(song_renderer.SongRenderer):
        return self._gamepad_spacings_
 
     def get_gamepad_spacings(self, rescale=1):
-        
+        '''Returns spacing between gamepad buttons layouts'''
         return (round(self._gamepad_spacings_[0]*rescale), round(self._gamepad_spacings_[1]*rescale))
 
     def get_instr_spacings(self, rescale=1):
@@ -163,7 +182,7 @@ class PngSongRenderer(song_renderer.SongRenderer):
             return self.get_gamepad_spacings(rescale)
     
     def set_nontonal_spacings(self):
-        
+        '''Sets spacing between lyrics'''
         if not self.gamepad:
             self._nontonal_spacings_ = (self._harp_size_[0], self._harp_size_[1]/4.0)
         else:
@@ -174,28 +193,30 @@ class PngSongRenderer(song_renderer.SongRenderer):
         return self._nontonal_spacings_
 
     def get_nontonal_spacings(self, rescale=1):
-        
+        '''Returns spacing between lyrics'''
         return (round(self._nontonal_spacings_[0]*rescale), round(self._nontonal_spacings_[1]*rescale))
 
 
     def get_text_height(self, fnt, rescale=1):
         """Calculates the text height in PNG for a standard text depending on the input font size"""
-        return round(fnt.getsize('HQfgjyp')[1]*rescale)
-
+        (_, _, w, h) = fnt.getbbox(u'HQfgjypŹỵ')
+        return round(h*rescale)
+        #return round(fnt.getlength(u'HQfgjypŹỵ')*rescale)
                 
 
     def trans_paste(self, bg, fg, box=(0, 0)):
-            if fg.mode == 'RGBA':
-                if bg.mode != 'RGBA':
-                    bg = bg.convert('RGBA')
-                fg_trans = Image.new('RGBA', bg.size)
-                fg_trans.paste(fg, box, mask=fg)  # transparent foreground
-                return Image.alpha_composite(bg, fg_trans)
-            else:
-                if bg.mode == 'RGBA':
-                    bg = bg.convert('RGB')
-                bg.paste(fg, box)
-                return bg
+        '''Transparent paste of an image within an image'''
+        if fg.mode == 'RGBA':
+            if bg.mode != 'RGBA':
+                bg = bg.convert('RGBA')
+            fg_trans = Image.new('RGBA', bg.size)
+            fg_trans.paste(fg, box, mask=fg)  # transparent foreground
+            return Image.alpha_composite(bg, fg_trans)
+        else:
+            if bg.mode == 'RGBA':
+                bg = bg.convert('RGB')
+            bg.paste(fg, box)
+            return bg
 
     def wrap_text(self, text, width, target_width):
         
@@ -208,9 +229,9 @@ class PngSongRenderer(song_renderer.SongRenderer):
 
 
     def get_num_png(self, num, fit_size=None, rescale=1):
-        
+        '''Repeat number as a PNG snippet'''
         num_str = "%d" % int(num)
-        w,h = self.text_font.getsize(num_str)
+        (_, _, w, h) = self.text_font.getbbox(num_str)
         num_im = Image.new('RGBA', (200*w, h), color=self.text_bkg)
         draw = ImageDraw.Draw(num_im)
         draw.text((0, num_im.size[1] - 1.05 * h), num_str, font=self.dimmed_text_font, fill=self.dimmed_font_color)
@@ -221,9 +242,9 @@ class PngSongRenderer(song_renderer.SongRenderer):
             num_im = num_im.resize((round(num_im.size[0] * rescale), round(num_im.size[1] * rescale)), resample=Image.LANCZOS)
         return num_im
 
-
-    def write_header(self, song_render, filenum, song, x_in_png, y_in_png):
     
+    def write_header(self, song_render, filenum, song, x_in_png, y_in_png):
+        '''Sub routine to write the song headers only'''
         #harp_type = song.get_harp_type()
         #self.switch_harp(harp_type)
         text_rescale = 1 #self.get_text_rescale() #Hard-coded value
@@ -235,7 +256,7 @@ class PngSongRenderer(song_renderer.SongRenderer):
 
             title = meta['title'][1]
             fnt = self.h1_font
-            title, numlines = self.wrap_text(title, fnt.getsize(title)[0], round(line_width/text_rescale))               
+            title, numlines = self.wrap_text(title, fnt.getlength(title), round(line_width/text_rescale))               
             h = self.get_text_height(fnt)
             title_header = Image.new('RGBA', (round(line_width/text_rescale), round(h*numlines)))
             draw = ImageDraw.Draw(title_header)
@@ -252,7 +273,7 @@ class PngSongRenderer(song_renderer.SongRenderer):
                     meta_text = meta[k][0] + ' ' + meta[k][1]
                     #fnt = ImageFont.truetype(self.font_path, self.)
                     fnt = self.text_font
-                    meta_text, numlines = self.wrap_text(meta_text, fnt.getsize(meta_text)[0], int(line_width/text_rescale))
+                    meta_text, numlines = self.wrap_text(meta_text, fnt.getlength(meta_text), int(line_width/text_rescale))
                     h = self.get_text_height(fnt)
                     header = Image.new('RGBA', (int(line_width/text_rescale), int(h*numlines)))
                     draw = ImageDraw.Draw(header)
@@ -283,6 +304,9 @@ class PngSongRenderer(song_renderer.SongRenderer):
     
 
     def write_buffers(self, song, start_row=0, start_col=0, tonal_row=0, buffer_list=None):
+        '''Write song images in a io.BytesIO() object'''
+        # Select right font according to unicode characters
+        self.check_set_fonts(song)
         
         if buffer_list is None:
             buffer_list = []
@@ -417,7 +441,7 @@ class PngSongRenderer(song_renderer.SongRenderer):
                 instrument.set_index(instrument_index)
                 
                 # Creating a new line if max number is exceeded
-                x_predict = x + instr_spacings[0] / 2.0 + self.dimmed_text_font.getsize('99')[0]
+                x_predict = x + instr_spacings[0] / 2.0 + self.dimmed_text_font.getlength('99')
                 if self.gamepad is None or (not instrument.get_is_tonal()):
                     last_instr_size = self.get_harp_size(instr_rescale)
                     #TODO: predict text length instead of using generic length

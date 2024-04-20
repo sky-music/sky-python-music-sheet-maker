@@ -173,12 +173,40 @@ SVG_SETTINGS = {'font_size': 12, #pt
                 'max_gp_notes_line':20,
                 }
 
-try:
-    with importlib_resources.path(fonts, 'NotoSansCJKjp-Bold.otf') as fp:
-        PNG_SETTINGS['font_path'] = str(fp)
-except FileNotFoundError:
-    PNG_SETTINGS['font_path'] = os.path.join(os.path.dirname(fonts.__file__), 'NotoSansCJKjp-Bold.otf')
-    print(f"***ERROR: Could not find: 'fonts/{os.path.relpath(PNG_SETTINGS['font_path'], start=os.path.dirname(fonts.__file__))}'")
+FONTS = {
+'asian': 'NotoSansCJKjp-Bold.otf',
+'ja': 'NotoSansCJKjp-Bold.otf',
+'zh': 'NotoSansCJKjp-Bold.otf',
+'ko': 'NotoSansCJKjp-Bold.otf',
+'latin': 'NotoSans-Full-Bold.ttf',
+'pl': 'NotoSans-Bold.ttf',
+'el': 'NotoSans-Bold.ttf',
+'ar': 'NotoSansArabic-Bold.ttf',
+'he': 'NotoSansHebrew-Bold.ttf',
+'th': 'NotoSansThai-Bold.ttf',
+'cyrillic': 'NotoSans-Bold.ttf',
+'ru': 'NotoSans-Bold.ttf',
+'uk': 'NotoSans-Bold.ttf',
+'vi': 'NotoSans-Full-Bold.ttf',
+'hy': 'NotoSansArmenian-Bold.ttf',
+'ka': 'NotoSansGeorgian-Bold.ttf',
+}
+
+def load_font(locale='ja'):
+
+    # Keep only locale prefix
+    matchobj = re.match(r'([^_-]*)[_|-]*([^_-]*)', locale.strip())
+    if matchobj: locale = matchobj.group(1).lower()
+    if locale not in FONTS: locale = list(FONTS)[0]
+
+    try:
+        with importlib_resources.path(fonts, FONTS[locale]) as fp:
+            PNG_SETTINGS['font_path'] = str(fp)
+    except FileNotFoundError:
+        PNG_SETTINGS['font_path'] = os.path.join(os.path.dirname(fonts.__file__), FONTS[locale])
+        print(f"***ERROR: Could not find: 'fonts/{os.path.relpath(PNG_SETTINGS['font_path'], start=os.path.dirname(fonts.__file__))}'")
+        
+    return PNG_SETTINGS['font_path']
 
 MAX_FILENAME_LENGTH = 127
 MAX_NUM_FILES = 15

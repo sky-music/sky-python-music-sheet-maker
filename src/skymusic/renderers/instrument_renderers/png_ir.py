@@ -2,6 +2,7 @@ from . import instrument_renderer
 from skymusic.resources import Resources
 from skymusic.renderers.note_renderers import png_nr
 from skymusic.modes import GamePlatform
+from skymusic import Lang
 
 try:
     from PIL import Image, ImageDraw, ImageFont
@@ -28,16 +29,30 @@ class PngInstrumentRenderer(instrument_renderer.InstrumentRenderer):
 
         self.text_bkg = Resources.PNG_SETTINGS['text_bkg']  # Transparent white
         self.song_bkg = Resources.PNG_SETTINGS['song_bkg'] # White paper sheet
-        self.font_color = Resources.PNG_SETTINGS['font_color']       
-        self.font_path = Resources.PNG_SETTINGS['font_path']
+        self.font_color = Resources.PNG_SETTINGS['font_color'] 
         self.harp_font_size = Resources.PNG_SETTINGS['harp_font_size']
         self.font_size = Resources.PNG_SETTINGS['font_size']
         self.h1_font_size = Resources.PNG_SETTINGS['h1_font_size']
         self.h2_font_size = Resources.PNG_SETTINGS['h2_font_size']
-        self.font_path = Resources.PNG_SETTINGS['font_path']
         self.repeat_height = None
         self.voice_font_size = Resources.PNG_SETTINGS['voice_font_size']
         self.hr_color = Resources.PNG_SETTINGS['hr_color']  # Grey or White
+        
+        # Load default font from locale
+        self.font_path = Resources.load_font(locale)         
+        self.set_fonts()
+
+        self.harp_size = None
+        self.gp_note_size = None
+        self.harp_type = harp_type
+        self.empty_harp_png = Resources.PNGS[platform_name][f'empty-{harp_type}']
+        self.unhighlighted_harp_png = Resources.PNGS[platform_name][f'unhighlighted-{harp_type}']
+
+
+    def set_fonts(self, font_path=None):
+        
+        if not font_path: font_path = self.font_path
+        
         if not no_PIL_module:
             try:
                 self.voice_font = ImageFont.truetype(self.font_path, self.voice_font_size)
@@ -52,11 +67,6 @@ class PngInstrumentRenderer(instrument_renderer.InstrumentRenderer):
                 self.h2_font = ImageFont.load_default()
                 self.text_font = ImageFont.load_default()
 
-        self.harp_size = None
-        self.gp_note_size = None
-        self.harp_type = harp_type
-        self.empty_harp_png = Resources.PNGS[platform_name][f'empty-{harp_type}']
-        self.unhighlighted_harp_png = Resources.PNGS[platform_name][f'unhighlighted-{harp_type}']
 
     def trans_paste(self, bg, fg, box=(0, 0)):
         if fg.mode == 'RGBA':
@@ -141,13 +151,13 @@ class PngInstrumentRenderer(instrument_renderer.InstrumentRenderer):
         
         return {k:round(v*(self.gp_note_size[0] if k.endswith('H') else self.gp_note_size[1])) for k,v in self.gamepad_gaps.items()}
         
-
-    def get_text_size(self, fnt=None, text='HQfgjyp', rescale=1):
+        
+    def get_text_size(self, fnt=None, text=u'HQfgjypŹỵ', rescale=1):
         """Calculates the height of the voices based on a standard text and the font size"""
         #fnt = ImageFont.truetype(self.font_path, self.voice_font_size)
         fnt = fnt if fnt else self.voice_font
-        sz = fnt.getsize(text)
-        return (round(sz[0]*rescale), round(sz[1]*rescale))
+        (_, _, w, h) = fnt.getbbox(text)
+        return (round(w*rescale), round(h*rescale))
 
     def __scaled_font__(self, font_size, rescale):
         return ImageFont.truetype(self.font_path, round(font_size*rescale))
@@ -206,7 +216,7 @@ class PngInstrumentRenderer(instrument_renderer.InstrumentRenderer):
             fnt = self.__scaled_font__(self.voice_font_size, rescale)
         else:
             fnt = self.voice_font
-            
+        
         lyric_width, lyric_height = self.get_text_size(fnt, lyric)
 
         voice_render = Image.new('RGBA', (lyric_width, lyric_height), color=self.text_bkg)
