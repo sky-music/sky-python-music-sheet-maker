@@ -31,7 +31,7 @@ More details at the [Sky-Music website](https://sky-music.github.io).
 
 The program requires Python >= 3.6 and the following packages:
 
-* PIL (preferably pillow)
+* pillow (imported as PIL), preferrably >=9.5.0
 * import_resources (for Python < 3.8)
 * pyYaml
 * mido (optional: for generating midi output)
