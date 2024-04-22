@@ -177,7 +177,7 @@ Playstation and Switch icons are designed by kimu.
 
 **Codebase:**
 
-Various contributions from Specy (html & js), Jurassimok (Setup.py), Skyventuree, heronwr (command-line arguments).
+Various contributions from Specy (html & js), Jurassimok (Setup.py), sorae42, heronwr (command-line arguments).
 
 Docker images by heronwr aka lambdaw.
 
@@ -187,10 +187,10 @@ This program is not being actively maintained by its original creator Tracey. As
 
 **Translators:**
 
-- skyventuree, a.k.a. こじめ (Vietnamese)
+- sorae42 (Vietnamese)
 - jmmelko (French)
-- Kai00 (simplified chinese)
-- we are still looking for a japanese translator!
+- Kai00 (Simplified Chinese)
+- We are still looking for a japanese translator!
 
 <a id="info"></a>
 ## Info
