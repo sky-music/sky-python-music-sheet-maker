@@ -26,8 +26,8 @@ recipient_specifics:
     sky_music_website: 
 game_platform:
   mobile:
-    short_desc: "Normal"
-    long_desc: "Smartphone, tablet or computer"
+    short_desc: "Bình thường"
+    long_desc: "Điện thoại, máy tính bảng và máy tính cá nhân"
   playstation:
     short_desc: "PlayStation"
     long_desc: "Sony PlayStation"
@@ -37,19 +37,19 @@ game_platform:
 gamepad_layout:
   playstation:
     normal:
-      ps1: Higher note is R (default)
-      ps2: Higher note is LR
-      ps3: Higher note is L2
-      ps4: Higher note is R2
+      ps1: Nốt cao nhất là R (mặc định)
+      ps2: Nốt cao nhất là LR
+      ps3: Nốt cao nhất là L2
+      ps4: Nốt cao nhất là R2
     drum:
-      ps1: Higher note is R2
+      ps1: Nốt cao nhất là R2
   switch:
     normal:
-      sw1: Higher note is LR (default)
-      sw2: Higher note is LR, layout mimicks gamepad
-      sw3: Higher note is ZR
+      sw1: Nốt cao nhất là (default)
+      sw2: Nốt cao nhất là LR, bố trí như tay cầm chơi game
+      sw3: Nốt cao nhất là ZR
     drum:
-      sw1: Higher note is ZR
+      sw1: Nốt cao nhất là ZR
 instrument_type:
   normal:
     short_desc: Nhạc cụ thường
@@ -81,7 +81,7 @@ input_mode:
     long_desc: "Nốt có hợp âm Tiếng Anh ngắn (VD: C, F, Dm, Bdim, A+, Csus2, Dsus4, C6, Cmaj7, Dm11)"
   doremijp:
     short_desc: 日本語イタリアドレミ
-    long_desc: "Do re mi Nhật Bản: ド、ド#／レb、レ、レ#／ミb、ミ、ファ、ファ#／ソb、ソ、ソ#／ラb、ラ、ラ#／シb、シ"
+    long_desc: "Do re mi Nhật Bản (dựa vào nốt từ Italia): ド、ド#／レb、レ、レ#／ミb、ミ、ファ、ファ#／ソb、ソ、ソ#／ラb、ラ、ラ#／シb、シ"
   skyjson:
     short_desc: 'Bản ghi âm nhạc trên Sky (tệp văn bản JSON)'
     long_desc: "JSON: Tệp bao gồm thời gian (ms) và thứ tự phím 0-14 để sử dụng trong ứng dụng SkyStudio và <https://sky-music.herokuapp.com>"
@@ -132,15 +132,15 @@ stock_queries:
     question: |
       Dạng nốt nhạc được chấp nhận: {input_modes}
     
-      - Khi viết hợp âm phải dính các phím lại với nhau (VD: A1B1C1).
+      - Khi viết hợp âm phải viết liền các phím lại với nhau (VD: A1B1C1).
       - Tách các hợp âm bằng: "{icon_delimiter}".
-      - Sử dụng "{pause}" để ngắt quãng (nghỉ), ngoại trừ Jianpu, kí tự '0' được sử dụng như kí tự ngắt quãng chính thức.
+      - Sử dụng "{pause}" để ngắt quãng, ngoại trừ Jianpu khi kí tự '0' sẽ được sử dụng như kí tự ngắt quãng.
       - Sử dụng "{quaver_delimiter}" để nối nốt trong một biểu tượng (liên ba, láy rền/hát rung,...) (VD: {quaver_example}). Với Jianpu, sử dụng "{jianpu_quaver_delimiter}" thay vì "-" để không bị nhầm lẫn với quãng tám.
       - Thêm "{repeat_indicator}" sau một hợp âm để biểu thị sự lập lại (repetition).
       - Dấu thăng "#" và dấu giáng "b" (nửa cung) được hỗ trợ cho hệ kí tự Phương Tây và Jianpu.
-      - Lyrics must be separated by '#'
-      - Layers (several instruments) can be separated by '{layer_delimiter}', followed by layer name
-      - Horizontal rulers between song lines can be added with {ruler_delimiters}      
+      - Lời bài hát buộc phải ngăn cách bởi '#'.
+      - Các lớp (nhiều dụng cụ nhạc) có thể được ngăn cách bởi '{layer_delimiter}', rồi sau đó là tên lớp.
+      - Các vạch kẻ dọc ở giữa mỗi dòng nhạc có thể được thêm với {ruler_delimiters}.
       
       /!\ Lưu ban nhạc trong một tệp văn bản để có thể sửa lại sau này /!\
       
@@ -153,15 +153,15 @@ stock_queries:
     question: |
       Dạng nốt nhạc được chấp nhận: {input_modes}
     
-      - Khi viết hợp âm phải dính các phím lại với nhau (VD: A1B1C1).
+      - Khi viết hợp âm phải viết liền các phím lại với nhau (VD: A1B1C1).
       - Tách các hợp âm bằng: "{icon_delimiter}".
-      - Sử dụng "{pause}" để ngắt quãng (nghỉ), ngoại trừ Jianpu, kí tự '0' được sử dụng như kí tự ngắt quãng chính thức.
+      - Sử dụng "{pause}" để ngắt quãng, ngoại trừ Jianpu khi kí tự '0' sẽ được sử dụng như kí tự ngắt quãng.
       - Sử dụng "{quaver_delimiter}" để nối nốt trong một biểu tượng (liên ba, láy rền/hát rung,...) (VD: {quaver_example}). Với Jianpu, sử dụng "{jianpu_quaver_delimiter}" thay vì "-" để không bị nhầm lẫn với quãng tám.
       - Thêm "{repeat_indicator}" sau một hợp âm để biểu thị sự lập lại (repetition).
       - Dấu thăng "#" và dấu giáng "b" (nửa cung) được hỗ trợ cho hệ kí tự Phương Tây và Jianpu.
-      - Lyrics must be separated by '#'
-      - Layers (several instruments) can be separated by '{layer_delimiter}', followed by layer name
-      - Horizontal rulers between song lines can be added with {ruler_delimiters}      
+      - Lời bài hát buộc phải ngăn cách bởi '#'.
+      - Các lớp (nhiều dụng cụ nhạc) có thể được ngăn cách bởi '{layer_delimiter}', rồi sau đó là tên lớp.
+      - Các vạch kẻ dọc ở giữa mỗi dòng nhạc có thể được thêm với {ruler_delimiters}.    
       
       /!\ Lưu bản nhạc trong một tệp văn bản để có thể sửa lại sau này /!\
     afterword:
@@ -180,15 +180,15 @@ stock_queries:
     help_text: |
       Dạng nốt nhạc được chấp nhận: {input_modes}
     
-      - Khi viết hợp âm phải dính các phím lại với nhau (VD: A1B1C1).
+      - Khi viết hợp âm phải viết liền các phím lại với nhau (VD: A1B1C1).
       - Tách các hợp âm bằng: "{icon_delimiter}".
-      - Sử dụng "{pause}" để ngắt quãng (nghỉ), ngoại trừ Jianpu, kí tự '0' được sử dụng như kí tự ngắt quãng chính thức.
+      - Sử dụng "{pause}" để ngắt quãng, ngoại trừ Jianpu khi kí tự '0' sẽ được sử dụng như kí tự ngắt quãng.
       - Sử dụng "{quaver_delimiter}" để nối nốt trong một biểu tượng (liên ba, láy rền/hát rung,...) (VD: {quaver_example}). Với Jianpu, sử dụng "{jianpu_quaver_delimiter}" thay vì "-" để không bị nhầm lẫn với quãng tám.
       - Thêm "{repeat_indicator}" sau một hợp âm để biểu thị sự lập lại (repetition).
       - Dấu thăng "#" và dấu giáng "b" (nửa cung) được hỗ trợ cho hệ kí tự Phương Tây và Jianpu.
-      - Lyrics must be separated by '{lyric_delimiter}'
-      - Layers (several instruments) can be separated by '{layer_delimiter}', followed by layer name
-      - Horizontal rulers between song lines can be added with {ruler_delimiters}      
+      - Lời bài hát buộc phải ngăn cách bởi '#'.
+      - Các lớp (nhiều dụng cụ nhạc) có thể được ngăn cách bởi '{layer_delimiter}', rồi sau đó là tên lớp.
+      - Các vạch kẻ dọc ở giữa mỗi dòng nhạc có thể được thêm với {ruler_delimiters}.    
   instrument_type:
     foreword:
     question: Vui lòng chọn nhạc cụ
@@ -198,26 +198,26 @@ stock_queries:
       Trống là nhạc cụ đặc biệt trong Sky vì chúng chỉ có 2 hàng 4 cột
   game_platform:
     foreword:
-    question: Please choose your gaming platform
+    question: Chọn nền tảng máy chơi game của bạn
     afterword:
-    input_tip: choose one platform
+    input_tip: Chọn một nền tảng
     help_text: |
-      Unless you play on PlayStation or Switch, keep the default choice 
+      Giữ lựa chọn mặc định, trừ khi bạn đang chơi trên Switch hoặc Playstation.
   gamepad_layout:
     foreword:
-    question: Please choose your gamepad buttons layout
+    question: Hãy chọn một layout tay cầm
     afterword:
-    input_tip: choose one layout
+    input_tip: Chọn một layout
     help_text: |
-      They are usually 4 buttons layouts. Do not get mistaken or your song will not sound right!
+      Thường sẽ có 4 layout khác nhau. Nếu bạn nhầm lẫn chúng thì bài hát có thể nghe không hợp lí!
   render_modes:
     foreword:
     question: Hãy chọn các định dạng xuất bản (rendering formats). {all_modes}
     afterword:
     input_tip: Chọn một hoặc nhiều hộp thoại. Thêm một định dạng văn bản để có thể thay đổi bản nhạc sau này.
     help_text: |
-      The visual sheets, with the colored dots arranged in a grid, can be rendered in several file formats. Choose HTML if you're undecided.
-      Text formats can be manually edited, or fed to the program again. {all_modes}
+      Bảng nhạc trực quan, với những dấu chấm được sắp xếp trong một khung, có thể xuất ra thành nhiều định dạng tệp. Chọn HTML nếu bạn chưa chắc chắn.
+      Định dạng văn bản có thể sau này tự sửa đổi được, hoặc cho nó vào phần mềm này để chỉnh sửa. {all_modes}
   aspect_ratio:
     foreword: Bảng nhạc trực quan được mặc định là ảnh ngang với tỉ lệ 16:9.
     question: 'Hãy chọn một tỉ lệ khác trong danh sách, hoặc {skip_number} để bỏ qua'
@@ -229,7 +229,7 @@ stock_queries:
     foreword: Một trong những định dạng yêu cầu phải có thông tin về điểm thời gian (timing)
     question: Hãy nhập tốc độ bài hát (BPM - nhịp trên phút), hoặc bỏ trống
     afterword:
-    input_tip: Một số dương 12-1200. Bỏ trống hoặc nhập 0 để bỏ qua.
+    input_tip: Một số dương từ 12 đến 1200. Bỏ trống hoặc nhập 0 để bỏ qua.
     help_text: |
       Bạn đã chọn định dạng (như Midi) mà cần phải biết tốc độ bao nhiêu để có thể chơi được. Tốc độ này được biểu diễn bằng nhịp trên phút (BPM). Hãy nhập một số nguyên từ 12 đến 1200.
   keep_meta:
@@ -244,7 +244,7 @@ stock_queries:
     question: Tiêu đề bài hát là gì?
     afterword:
     input_tip: 'Có thể nhập bất kì. Để trống nếu bạn muốn sử dụng "Không tên"'
-    help_text: The song title is not mandatory, but recommended
+    help_text: Không bắt buộc phải có tiêu đề bài hát, nhưng vẫn khuyến khích
   original_artist:
     foreword:
     question: Nghệ sĩ gốc của bài hát này là ai?
@@ -267,11 +267,11 @@ stock_queries:
     
       - Khi viết hợp âm phải dính các phím lại với nhau (VD: A1B1C1).
       - Tách các hợp âm bằng: "{icon_delimiter}".
-      - Sử dụng "{pause}" để ngắt quãng (nghỉ), ngoại trừ Jianpu, Jianpu sử dụng kí tự ngắt quãng là '0' (số không).
+      - Sử dụng "{pause}" để ngắt quãng, ngoại trừ Jianpu khi kí tự '0' sẽ được sử dụng như kí tự ngắt quãng.
       - Sử dụng "{quaver_delimiter}" để nối nốt trong một biểu tượng (liên ba - triplets, láy rền/hát rung - quaver,...) (VD: {quaver_example}). Với Jianpu, sử dụng "{jianpu_quaver_delimiter}" thay vì "-" để không bị nhầm lẫn với quãng tám.
       - Thêm "{repeat_indicator}" sau một hợp âm để biểu thị sự lập lại (repetition).
       - Dấu thăng "#" và dấu giáng "b" (nửa cung) được hỗ trợ cho hệ kí tự Phương Tây và Jianpu.
-      - Lyrics must be separated by '{lyric_delimiter}'  
+      - Lời bài hát buộc phải ngăn cách bởi '{lyric_delimiter}'  
   file:
     foreword:
     question: "Nhập tên tệp (phân biệt chữ hoa, thường) {put_in_songs_in}"
@@ -286,25 +286,25 @@ stock_queries:
     help_text: |
       Dạng nốt nhạc được chấp nhận: {input_modes}
     
-      - Khi viết hợp âm phải dính các phím lại với nhau (VD: A1B1C1).
+      - Khi viết hợp âm phải viết liền các phím lại với nhau (VD: A1B1C1).
       - Tách các hợp âm bằng: "{icon_delimiter}".
-      - Sử dụng "{pause}" để ngắt quãng (nghỉ), ngoại trừ Jianpu, Jianpu sử dụng kí tự ngắt quãng là '0' (số không).
+      - Sử dụng "{pause}" để ngắt quãng, ngoại trừ Jianpu khi kí tự '0' sẽ được sử dụng như kí tự ngắt quãng.
       - Sử dụng "{quaver_delimiter}" để nối nốt trong một biểu tượng (liên ba - triplets, láy rền/hát rung - quaver,...) (VD: {quaver_example}). Với Jianpu, sử dụng "{jianpu_quaver_delimiter}" thay vì "-" để không bị nhầm lẫn với quãng tám.
       - Thêm "{repeat_indicator}" sau một hợp âm để biểu thị sự lập lại (repetition).
       - Dấu thăng "#" và dấu giáng "b" (nửa cung) được hỗ trợ cho hệ kí tự Phương Tây (tiếng Anh) và Jianpu.
-      - Lyrics must be separated by '{lyric_delimiter}'     
+      - Lời bài hát phải được cách nhau bởi '{lyric_delimiter}'     
   one_input_mode:
     foreword:
     question: |
-      Tôi nhận thấy là bạn đang sử dụng hệ kí tự: '{input_mode}'.
+      Phát hiện bạn đang sử dụng hệ kí tự: '{input_mode}'.
     afterword:
     input_tip: Bấm OK để tiếp tục
     help_text:
   musical_notation:
-    foreword: Dù đã cố gắng nhưng tôi không thể đoán được hệ kí tự nốt bạn đang sử dụng.
+    foreword: Không thể đoán được hệ kí tự nốt bạn đang sử dụng.
     question: Hãy chọn dạng hệ kí tự mà bạn đang sử dụng
     afterword:
-    input_tip: Kiểu chọn nút độc đáo 
+    input_tip: Chọn một mục
     # not accurate
     help_text: |
       Trong câu hỏi trước, bạn đã nhập nốt nhạc của bạn. Tôi đã đoán hệ kí tự bạn đang sử dụng.
