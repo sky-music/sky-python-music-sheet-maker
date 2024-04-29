@@ -24,23 +24,27 @@ def shortest_path(path, start_path):
 
 def file_status(file_path):
     """Returns an integer depending on file status"""
-    isfile = os.path.isfile(file_path)
-
-    if isfile:
-        isfile = 1 # Rigorously a file in the filesystem
+    
+    if len(file_path) > 256:
+        isfile = 0
     else:
-        isfile = -1
-        bare_ext = os.path.splitext(file_path)[1].strip('.')
-        
-        closest, score = closest_file(file_path)
-        
-        file_suspect = (not bare_ext.startswith(' ') and (2 <= len(bare_ext) <= 4)) # has a file extension, not a pause . followed by a musical note
-        
-        if closest and (score > 0.8 or (score > 0.6 and file_suspect)):
-        
-            (file_path, isfile) = (closest, 1) # is a file, but path was invalid (typo)       
+        isfile = os.path.isfile(file_path)
+    
+        if isfile:
+            isfile = 1 # Rigorously a file in the filesystem
         else:
-            isfile = 0 # Not a file
+            isfile = -1
+            bare_ext = os.path.splitext(file_path)[1].strip('.')
+            
+            closest, score = closest_file(file_path)
+            
+            file_suspect = (not bare_ext.startswith(' ') and (2 <= len(bare_ext) <= 4)) # has a file extension, not a pause . followed by a musical note
+            
+            if closest and (score > 0.8 or (score > 0.6 and file_suspect)):
+            
+                (file_path, isfile) = (closest, 1) # is a file, but path was invalid (typo)       
+            else:
+                isfile = 0 # Not a file
             
     return (file_path, isfile)
 
@@ -136,4 +140,7 @@ def __levenshtein__(s, t):
     
 def __edit_distance__(s, t):
 
-    return __levenshtein__(s,t)
+    try:
+        return __levenshtein__(s,t)
+    except RecursionError:
+        return max(len(s), len(t))
