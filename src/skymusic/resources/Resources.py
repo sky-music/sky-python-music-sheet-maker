@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 import io, os, importlib, re
+from collections import OrderedDict
 try:
     from importlib import resources as importlib_resources
 except ImportError:
     import importlib_resources
 from skymusic.resources import fonts, png, css, js, svg, gamepads
-#from skymusic import modes
+
 
 def get_default_theme():
-    global THEMES
+    #global THEMES
     return list(THEMES)[0]
 
 def detect_themes():
@@ -24,7 +25,7 @@ def load_theme(theme, platform='mobile'):
     '''
     Loads CSS and PNG files as string and bytes buffers respectively, for a theme whose name 'theme' must be defined in the THEMES list
     '''
-    global PNGS, CSS, SVG, THEMES, PLATFORMS, PNG_SETTINGS
+    #global PNGS, CSS, SVG, THEMES, PLATFORMS, PNG_SETTINGS
     
     if theme not in THEMES:
         load_theme(get_default_theme(), platform)
@@ -73,12 +74,14 @@ def load_theme(theme, platform='mobile'):
         PNG_SETTINGS['song_bkg'] = COLORS[theme]['song_bkg']  
         PNG_SETTINGS['hr_color'] = COLORS[theme]['hr_color']
         
+        for k in THEMES: THEMES[k] = False
         THEMES[theme] = True
+        for k in PLATFORMS: PLATFORMS[k] = False
         PLATFORMS[platform] = True
 
 
 # %% Parameters
-THEMES = {'light': False, 'dark': False}
+THEMES = OrderedDict({'light': False, 'dark': False})
 PLATFORMS = {'mobile': False, 'playstation': False, 'switch': False}
 # THEMES = detect_themes()
 # Must be initialized with the theme names, which must correspond to directories in tue css and png folders
